@@ -1,0 +1,68 @@
+Package: mizerReef
+Title: Mizer Models with Benthic Refuge and unstructured resources suitable for
+    simulating coral reef ecosystems
+Version: 1.0.0
+Date: 2023-31-12
+Authors@R: c(
+    person("Gustav", "Delius",
+           email = "gustav.delius@york.ac.uk", 
+           role = c("cre", "aut", "cph"),
+           comment = c(ORCID = "0000-0003-4092-8228")),
+    person("Chelsey M.", "Beese",
+           email = "beese.c.m$gmail.com", role = "aut",
+           comment = c(ORCID = "0000-0003-0949-7888")),
+    person("Peter J.", "Mumby",
+           email = "p.j.mumby@uq.edu.au", role = "aut",
+           comment = c(ORCID = "0000-0002-6297-9053")),
+    person("Alice", "Rogers",
+           email = "alice.rogers@vuw.ac.nz", role = "aut",
+           comment = c(ORCID = "0000-0002-7244-0860")))
+Description: This package provides the functionality for setting up and
+    exploring mizer models with benthic refuge and algae, detritus, and 
+    plankton components and includes an example model for a Caribbean 
+    coral reef.
+License: GPL-3
+Depends: 
+    R (>= 3.5.0)
+Imports:
+    mizer (>= 2.4.0),
+    mizerExperimental (>= 2.4.0),
+    assertthat,
+    lubridate,
+    methods,
+    ggplot2,
+    plotly,
+    splus2R
+Suggests: 
+    knitr,
+    patchwork,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Remotes: 
+    sizespectrum/mizerExperimental
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+URL: https://sizespectrum.org/mizerReef/, https://github.com/sizespectrum/mizerReef
+BugReports: https://github.com/sizespectrum/mizerReef/issues
+Language: en-GB
+Collate:
+    'algae_components.R'
+    'data.R'
+    'detritus_components.R'
+    'emptyReefParams.R'
+    'mizerReef-package.R'
+    'newReefParams.R'
+    'newReefMultispeciesParams.R'
+    'reef-components.R'
+    'reef-helpers.R'
+    'reef-plots.R'
+    'reef-project_methods.R'
+    'reef-rates.R'
+    'reef-set_params.R'
+    'reef-steady.R'
+    'reef-summary_methods.R'
+VignetteBuilder: knitr
+
