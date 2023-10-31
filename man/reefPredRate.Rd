@@ -4,7 +4,16 @@
 \alias{reefPredRate}
 \title{Get predation rate needed to project mizerReef model}
 \usage{
-reefPredRate(params, n, n_pp, n_other, t, feeding_level, vulnerable, ...)
+reefPredRate(
+  params,
+  n,
+  n_pp,
+  n_other,
+  t,
+  feeding_level,
+  vulnerable = reefVulnerable(params, n, n_pp, n_other, t),
+  ...
+)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}

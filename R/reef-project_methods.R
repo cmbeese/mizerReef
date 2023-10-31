@@ -46,7 +46,7 @@ reefRates <- function(params, n, n_pp, n_other,
     ## Growth ----
     ## Vulnerability ----
     # Calculate vulnerability of fish based on complexity
-    r$vulnerable <- rates_fns$Vulnerable(
+    r$vulnerable <- reefVulnerable(
         params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
 
     # Calculate rate E_{e,i}(w) of encountered food
@@ -348,7 +348,9 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
 #'   the encounter rates.
 #' @export
 #' @family mizer rate functions
-reefEncounter <- function(params, n, n_pp, n_other, t, vulnerable, ...) {
+reefEncounter <- function(params, n, n_pp, n_other, t, 
+                          vulnerable = reefVulnerable(params, n, n_pp, n_other, t),
+                          ...) {
 
     # Pull values from params
     no_sp <- dim(params@interaction)[1]
@@ -479,7 +481,6 @@ reefEncounter <- function(params, n, n_pp, n_other, t, vulnerable, ...) {
     return(encounter)
 }
 
-
 #' Get feeding level needed to project a mizerReef model
 #'
 #' You would not usually call this function directly but instead use
@@ -559,8 +560,9 @@ reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter, ...) {
 #'   spectrum.
 #' @export
 #' @family mizer rate functions
-reefPredRate <- function(params, n, n_pp, n_other, t,
-                        feeding_level, vulnerable, ...) {
+reefPredRate <- function(params, n, n_pp, n_other, t, feeding_level, 
+                         vulnerable = reefVulnerable(params, n, n_pp, n_other, t),
+                         ...) {
 
     # Pull values from params
     no_sp <- dim(params@interaction)[1]

@@ -3,7 +3,6 @@
 #' Sets up a multi-species size spectrum model with additional unstructured
 #' resource components, senescence mortality, and predation refuge.
 #'
-#' @inheritParams newReefMultispeciesParams
 #' @inheritParams setURParams
 #' @inheritParams setRho
 #' @inheritParams setExtMortParams
@@ -40,7 +39,7 @@ newReefParams <- function(species_params,
                           n = 3/4, ...) {
 
     ## USE ORIGINAL MIZER FUNCTION TO INITIALIZE A MODEL
-    params <- newReefMultispeciesParams(species_params = species_params,
+    params <- newMultispeciesParams(species_params = species_params,
                                         interaction = interaction,
                                         min_w_pp = min_w_pp,
                                         n = n, p = n, ...)

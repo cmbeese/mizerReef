@@ -31,8 +31,7 @@ Imports:
     lubridate,
     methods,
     ggplot2,
-    plotly,
-    splus2R
+    plotly
 Suggests: 
     knitr,
     patchwork,
@@ -52,10 +51,8 @@ Collate:
     'algae_components.R'
     'data.R'
     'detritus_components.R'
-    'emptyReefParams.R'
     'mizerReef-package.R'
     'newReefParams.R'
-    'newReefMultispeciesParams.R'
     'reef-components.R'
     'reef-helpers.R'
     'reef-plots.R'
