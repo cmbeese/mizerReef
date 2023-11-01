@@ -44,8 +44,11 @@ For the \code{data} method vulnerability is density dependent and changes with
 the abundance of competitors for refuge.
 }
 \seealso{
-Other rate functions: 
-\code{\link{getReefEncounter}()},
-\code{\link{getReefPredRate}()}
+Other mizer rate functions: 
+\code{\link{reefEncounter}()},
+\code{\link{reefFeedingLevel}()},
+\code{\link{reefMort}()},
+\code{\link{reefPredRate}()},
+\code{\link{reefRates}()}
 }
 \concept{rate functions}

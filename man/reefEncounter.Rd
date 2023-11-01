@@ -4,7 +4,15 @@
 \alias{reefEncounter}
 \title{Get encounter rate needed to project a mizerReef model}
 \usage{
-reefEncounter(params, n, n_pp, n_other, t, vulnerable, ...)
+reefEncounter(
+  params,
+  n,
+  n_pp,
+  n_other,
+  t,
+  vulnerable = reefVulnerable(params, n, n_pp, n_other, t),
+  ...
+)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}
