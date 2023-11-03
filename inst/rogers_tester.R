@@ -2,6 +2,7 @@
 
 #### Setup - loading packages and functions ------------------------------------
 # Load in relevant packages
+library(mizer)
 library(mizerReef)
 library(assertthat)
 
@@ -21,6 +22,11 @@ rogers_params <- newReefParams(species_params = rogers_species,
                                UR_interaction = rogers_UR_int,
                                method = met[1],
                                method_params = rogers_2014)
+
+## USE ORIGINAL MIZER FUNCTION TO INITIALIZE A MODEL
+rogers_params <- newMultispeciesParams(species_params = rogers_species,
+                                interaction = rogers_int,
+                                n = 3/4, p = 3/4)
 
 # Save as rda
 save(rogers_params, file = "data/rogers_params.rda")

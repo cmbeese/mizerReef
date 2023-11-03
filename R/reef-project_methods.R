@@ -147,8 +147,8 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
     colnames(refuge) <- colnames(params@initial_n)
 
     # Set parameters used with all methods
-    min_ref_w    <- refuge_params$min_ref_w
-    # min_ref_w    <- params@species_params$min_ref_w
+    w_settle    <- refuge_params$w_settle
+    # w_settle    <- params@species_params$w_settle
     max_protect  <- refuge_params$max_protect
     tau          <- refuge_params$tau
 
@@ -175,17 +175,11 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
         # Find indices of fish in size range to protect
         # Set threshold weight - no organisms smaller than min_ref_length
         # can utilize refuge to escape predators
-        # TRUE for fish larger than minimum protected size
-        min <- t(sapply(min_ref_w, function(x) params@w >= x))
-        # TRUE for fish smaller than maximum protected weight
-        max <- t(sapply(max_W, function(x) params@w <= x))
-        # TRUE for fish that meet both conditions
-        bin_fish <- min & max
-        idx.bin <- which(bin_fish == TRUE)
-
-        # Calculate protection level for fish
-        refuge[idx.bin] <- (-1 * prop_protect) /
-            (1 + exp(-1 * slope*(w - max_W))) + prop_protect
+        # Loop through species
+        for (i in 1:no_sp){
+            denom <- 1 + exp(slope*(w - max_W[i]))
+            refuge[i, ] <- ifelse(w > w_settle, prop_protect/denom, 0)
+        }
 
     # Binned method ------------------------------------------------------------
     } else if (refuge_params$method == "binned") {
@@ -201,11 +195,11 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
             end_w  <- params@species_params[["a"]] *
                 method_params$end_L[[k]] ^ params@species_params[["b"]]
 
-            # Set threshold weight - no organisms smaller than min_ref_w
+            # Set threshold weight - no organisms smaller than w_settle
             # can utilize refuge to escape predators
-            # idx.sm <- which(start_w < min_ref_w)
-            # start_w[idx.sm] <- min_ref_w[idx.sm]
-            start_w[start_w < min_ref_w] <- min_ref_w
+            # idx.sm <- which(start_w < w_settle)
+            # start_w[idx.sm] <- w_settle[idx.sm]
+            start_w[start_w < w_settle] <- w_settle
 
             # Find indices of fish in size range to protect
             # TRUE for fish larger than start weight of bin
@@ -241,9 +235,9 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
 
             # Set threshold weight - no organisms smaller than
             # minimum size that can utilize refuge
-            # idx.sm <- which(start_w < min_ref_w)
-            # start_w[idx.sm] <- min_ref_w[idx.sm]
-            start_w[start_w < min_ref_w] <- min_ref_w
+            # idx.sm <- which(start_w < w_settle)
+            # start_w[idx.sm] <- w_settle[idx.sm]
+            start_w[start_w < w_settle] <- w_settle
 
             # Calculate competitor density - number of fish that use refuge in
             # each size bin
@@ -349,8 +343,8 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
 #' @export
 #' @family mizer rate functions
 reefEncounter <- function(params, n, n_pp, n_other, t, 
-                          vulnerable = reefVulnerable(params, n, n_pp, n_other, t),
-                          ...) {
+                          vulnerable = reefVulnerable(params, 
+                                                      n, n_pp, n_other, t),...) {
 
     # Pull values from params
     no_sp <- dim(params@interaction)[1]
@@ -489,7 +483,9 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 #' @section Feeding level:
 #'
 #'      In mizerReef models, feeding level only applies to herbivorous and
-#'      detritivorous functional groups. Predation is regulated by refuge.
+#'      detritivorous functional groups. Predation is regulated by refuge,
+#'      so no maximum intake rate is imposed for piscivores.
+#'      
 #'      The feeding level \eqn{f_i(w)} is the proportion of its maximum intake
 #'      rate at which the consumer is actually taking in algae or detritus. It
 #'      is calculated from the encounter rate \eqn{E_i} and the maximum intake
@@ -527,127 +523,54 @@ reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter, ...) {
     return(feed)
 }
 
-#' Get predation rate needed to project mizerReef model
+#' Get total predation mortality rate needed to project mizer reef model
 #'
-#' Calculates the potential rate (in units 1/year) at which a prey individual of
-#' a given size \eqn{w} is killed by predators from species \eqn{j}. In formulas
-#' \deqn{{\tt pred\_rate}_j(w_p) = \int \phi_j(w,w_p) (1-f_j(w))
-#'   \gamma_j(w) N_j(w) \, dw.}{pred_rate_j(w_p) = \int\phi_i(w,w_p) (1-f_i(w))
-#'   \gamma_i(w) N_i(w) dw.}
-#' This potential rate is used in the function [mizerPredMort()] to
-#' calculate the realised predation mortality rate on the prey individual.
+#' Calculates the total predation mortality rate \eqn{\mu_{p,i}(w_p)} (in units
+#' of 1/year) on each prey species by prey size:
+#' 
+#' \deqn{\mu_{p.i}(w_p) = \sum_j {\tt pred\_rate}_j(w_p)\, V_{ji}(w_p)\, \theta_{ji}.}{
+#'   \mu_{p.i}(w_p) = \sum_j pred_rate_j(w_p) V_{ji}(w_p) \theta_{ji}.}
+#'   
 #' You would not usually call this
-#' function directly but instead use [getPredRate()], which then calls this
+#' function directly but instead use [getPredMort()], which then calls this
 #' function unless an alternative function has been registered, see below.
-#'
-#' @section Your own predation rate function:
-#' By default [getPredRate()] calls [mizerPredRate()]. However you can
-#' replace this with your own alternative predation rate function. If
-#' your function is called `"myPredRate"` then you register it in a MizerParams
-#' object `params` with
-#' ```
-#' params <- setRateFunction(params, "PredRate", "myPredRate")
-#' ```
-#' Your function will then be called instead of [mizerPredRate()], with
-#' the same arguments.
-#'
+#' 
 #' @inheritParams reefRates
-#' @param feeding_level An array (species x size) with the feeding level as
-#'   calculated by [getFeedingLevel()].
+#' @param pred_rate A two dimensional array (predator species x predator size)
+#'   with the feeding level.
 #'
-#' @return A named two dimensional array (predator species x prey size) with the
-#'   predation rate, where the prey size runs over fish community plus resource
-#'   spectrum.
-#' @export
+#' @return A two dimensional array (prey species x prey size) with the predation
+#'   mortality
 #' @family mizer rate functions
-reefPredRate <- function(params, n, n_pp, n_other, t, feeding_level, 
-                         vulnerable = reefVulnerable(params, n, n_pp, n_other, t),
-                         ...) {
-
-    # Pull values from params
-    no_sp <- dim(params@interaction)[1]
-    no_w <- length(params@w)
-    no_w_full <- length(params@w_full)
-
-    # Find indices of predator species impacted by refuge
+#' @export
+reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
+                         vulnerable = reefVulnerable(params, n, n_pp,
+                                                     n_other, t), ...) {
+    
+    # Find indices of fish that have grown out of the resource spectrum
+    idx_sp <- (length(params@w_full) - 
+                   length(params@w) + 1):length(params@w_full)
+    no_sp <- nrow(params@species_params)
+    
+    # Find indices of predator species whose foraging is hindered by refuge
     bad_pred  <- which(params@species_params$bad_pred == TRUE)
     good_pred <- which(params@species_params$bad_pred == FALSE)
-
-    # Calculate n_vulnerable, number at each size vulnerable to being
-    # encountered
-    n_vul <- vulnerable * n
-
-    # Initialize pred_rate matrix
-    pr <- matrix(0, nrow = no_sp, ncol = no_w)
-
-    # If the the user has set a custom pred_kernel we can not use fft.
-    # In this case we use the code from mizer version 0.3
-    if (!is.null(comment(params@pred_kernel))) {
-
-        # First deal with predators unaffected by refuge
-        n_total_in_size_bins <- sweep(n, 2, params@dw, '*', check.margin = FALSE)
-
-        # The next line is a bottle neck
-        good_pr <- sweep(params@pred_kernel, c(1, 2),
-                           (1 - feeding_level) * params@search_vol *
-                               n_total_in_size_bins,
-                           "*", check.margin = FALSE)
-
-        # integrate over all predator sizes
-        good_pr <- colSums(aperm(good_pr, c(2, 1, 3)), dims = 1)
-
-        pr[good_pred,] <- good_pr[good_pred,]
-
-        # Now deal with predators affected by refuge
-        vul_n_total_in_bins <- sweep(n_vul, 2,
-                                        params@dw, '*', check.margin = FALSE)
-
-        # The next line is a bottle neck
-        bad_pr <- sweep(params@pred_kernel, c(1, 2), (1 - feeding_level) *
-                            params@search_vol * vul_n_total_in_bins,"*",
-                        check.margin = FALSE)
-
-        # integrate over all predator sizes
-        bad_pr <- colSums(aperm(bad_pr, c(2, 1, 3)), dims = 1)
-
-        pr[bad_pred,] <- bad_pr[bad_pred,]
-
-        pred_rate <- pr
-
-        return(pred_rate)
+    
+    # Create list of vulnerabilities for each predator
+    vul <- vector("list", no_sp)
+    vul[bad_pred] <- list(vulnerable)
+    vul[good_pred] <- list(1)
+    
+    # Loop through predator species to calculate predation mortality on
+    # each prey species by predator
+    pm <- vector("list", no_sp)
+    for (i in 1:no_sp){
+        pm[[i]] <- pm + vul[[i]] * pred_rate[, idx_sp, drop = FALSE]
     }
-
-    # Get indices of w_full that give w
-    idx_sp <- (no_w_full - no_w + 1):no_w_full
-    # We express the result as a a convolution  involving
-    # two objects: Q[i,] and ft_pred_kernel_p[i,].
-    # Here Q[i,] is all the integrand of (3.12) except the feeding kernel
-    # and theta
-    Q <- matrix(0, nrow = no_sp, ncol = no_w_full)
-    gp <- matrix(0, nrow = no_sp, ncol = no_w_full)
-    bp <- matrix(0, nrow = no_sp, ncol = no_w_full)
-    # We fill the end of each row of Q with the proper values
-    # Good predators
-    gp[,idx_sp] <- sweep((1 - feeding_level) * params@search_vol * n,
-                                   2, params@dw, "*")
-
-    Q[good_pred, idx_sp] <- gp[good_pred, idx_sp]
-
-    # Bad predators
-    bp[,idx_sp] <- sweep((1 - feeding_level) * params@search_vol * n_vul,
-                                    2, params@dw, "*")
-
-    Q[bad_pred, idx_sp] <- bp[bad_pred, idx_sp]
-
-    # We do our spectral integration in parallel over the different species
-    pred_rate <- Re(base::t(mvfft(base::t(params@ft_pred_kernel_p) *
-                            mvfft(base::t(Q)), inverse = TRUE))) / no_w_full
-    # Due to numerical errors we might get negative or very small entries that
-    # should be 0
-    pred_rate[pred_rate < 1e-18] <- 0
-
-    return(pred_rate * params@ft_mask)
+    
+    return(base::t(params@interaction) %*% pm)
 }
+
 
 #' Expanding external mortality rate to include senescence
 #'
@@ -688,7 +611,7 @@ reefSenMort <- function(params, ...) {
     no_w_full <- length(params@w_full)
 
     # Get user set senescence mortality parameters
-    mort_params <- params@other_params[['sen_mort_params']]
+    mort_params <- params@other_params[['ext_mort_params']]
     sen_prop    <- mort_params$sen_prop
     sen_curve   <- mort_params$sen_curve
 
@@ -701,12 +624,14 @@ reefSenMort <- function(params, ...) {
 
     # Or could use max size?
     sen_weight <- params@species_params[['w_max']]
+    log_sw <- log10(sen_weight)
+    log_w  <- log10(params@w)
 
     # Loop through species
     for (i in 1:length(sen_weight)){
-        log_sw <- log10(sen_weight[i])
-        log_w  <- log10(params@w)
-        sen_mort[i,] <- sen_prop * ( log_w / log_sw ) ^ sen_curve
+        sen <- sen_prop * ( log_w / log_sw[i] )
+        sen[sen < 0] <- 0 
+        sen_mort[i,] <- sen ^ sen_curve
     }
     return(sen_mort)
 }

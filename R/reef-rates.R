@@ -16,13 +16,14 @@ getVulnerable <- function(params, n = initialN(params),
     assert_that(is.array(n),
                 is.numeric(n_pp),
                 is.list(n_other),
-                is.number(t),
+                splus2R::is.number(t),
                 identical(dim(n), dim(params@initial_n)),
                 identical(length(n_pp), length(params@initial_n_pp)),
                 identical(length(n_other), length(params@initial_n_other))
     )
 
-    vulnerable <- reefVulnerable(params, n = n, n_pp = n_pp, n_other = n_other, t = t)
+    vulnerable <- reefVulnerable(params, n = n, n_pp = n_pp, 
+                                 n_other = n_other, t = t)
     dimnames(vulnerable) <- dimnames(params@metab)
     vulnerable
 }

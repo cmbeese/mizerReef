@@ -60,7 +60,7 @@ setURParams <- function(params,
 
     # Check if values are numeric
     if(!all(sapply(UR_interaction, is.numeric))) {
-        stop("The ntries for algae & detritus interaction should be numeric.")
+        stop("The entries for algae & detritus interaction should be numeric.")
     }
 
     # Check if values are between 0 and 1
@@ -78,7 +78,7 @@ setURParams <- function(params,
     }
 
     # Set default algae growth rate
-    if(is.null(algae_growth)){ params@other_params$algae_growth <- 200
+    if(is.null(algae_growth)){ params@other_params$algae_growth <- 1000
     } else{ params@other_params$algae_growth <- algae_growth }
 
     # Set default proportion of waste that becomes part of the detritus pool
@@ -162,7 +162,7 @@ setRho <- function(params,
     id <- params@species_params$interaction_detritus
 
     # Calculate encounter rates divided by w^n of largest individuals
-    E <- getEncounter(params)[, length(params@w)] /
+    E <- mizer::getEncounter(params)[, length(params@w)] /
         (params@w[length(params@w)] ^ n)
 
     # Calculate rho for each unstructured resource
@@ -509,7 +509,7 @@ setRefuge <- function(params,
             stop("The simple method parameters dataframe needs a column called
                  'max_L' with the maximum length (cm) of protected fish.")
         }
-        if (!is.null(method_params$slope)){ slope <- 100 }
+        if (is.null(method_params$slope)){ method_params$slope <- 100 }
     }
 
     # Check names of method_params for binned method

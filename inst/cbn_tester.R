@@ -2,6 +2,7 @@
 
 #### Setup - loading packages and functions ------------------------------------
 # Load in relevant packages
+library(mizer)
 library(mizerReef)
 library(assertthat)
 
@@ -32,22 +33,22 @@ cbn_params <- newReefParams(species_params = cbn_species,
 save(cbn_params, file = "data/cbn_params.rda")
 
 ## Project to steady state
-cbn_sim <- reef_steady(cbn_sim)
+cbn_params <- reef_steady(cbn_params)
 
-
+# Plots
 plotVulnerable(cbn_params)
 plotSpectra(cbn_params, power = 2)
 plotBiomass(cbn_params)
 
-## FOR ERRORS ------------------------------------------------------------------
-rates_fns <- lapply(cbn_sim@rates_funcs, get)
-
-r <- rates_fns$Rates(cbn_sim,
-                     n = cbn_sim@initial_n,
-                     n_pp = cbn_sim@initial_n_pp,
-                     n_other = cbn_sim@initial_n_other,
-                     t = 0,
-                     effort = cbn_sim@initial_effort,
-                     rates_fns = rates_fns)
-
-g <- newMultispeciesParams(NS_species_params)
+# ## FOR ERRORS ------------------------------------------------------------------
+# rates_fns <- lapply(cbn_sim@rates_funcs, get)
+# 
+# r <- rates_fns$Rates(cbn_sim,
+#                      n = cbn_sim@initial_n,
+#                      n_pp = cbn_sim@initial_n_pp,
+#                      n_other = cbn_sim@initial_n_other,
+#                      t = 0,
+#                      effort = cbn_sim@initial_effort,
+#                      rates_fns = rates_fns)
+# 
+# g <- newMultispeciesParams(NS_species_params)

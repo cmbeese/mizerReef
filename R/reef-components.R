@@ -42,11 +42,12 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 tune_algae_detritus <- function(params) {
 
     # algae
-    ain <- sum(getAlgaeProduction(params)) / params@initial_n_other$algae
+    ain <- getAlgaeProduction(params) / params@initial_n_other$algae
     aout <- algae_consumption(params)
     if (ain < aout) {
-        stop("There is not enough algae production to support this abundance
-             of herbivores.")
+        warning("The value for algae growth provided does not produce enough
+                to support this abundance of herbivores. I will increase this
+                value to meet the comsumption rate.")
     }
     params@other_params$algae$algae_growth <- ain - aout
 

@@ -29,7 +29,7 @@ reef_steady <- function(params, t_max = 100, t_per = 1.5, dt = 0.1,
     # Force other components to stay at current level
     old_other_dynamics <- params@other_dynamics
     for (res in names(params@other_dynamics)) {
-        params@other_dynamics[[res]] <- "constant_other"
+        params@other_dynamics[[res]] <- "constant_dynamics"
     }
 
     object <- projectToSteady(params,
@@ -79,5 +79,5 @@ reef_steady <- function(params, t_max = 100, t_per = 1.5, dt = 0.1,
     }
 }
 
-# environment(reef_steady) <- asNamespace("mizer")
-# utils::assignInNamespace("steady", reef_steady, ns = "mizer")
+environment(reef_steady) <- asNamespace("mizer")
+utils::assignInNamespace("steady", reef_steady, ns = "mizer")

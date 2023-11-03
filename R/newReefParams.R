@@ -40,9 +40,73 @@ newReefParams <- function(species_params,
 
     ## USE ORIGINAL MIZER FUNCTION TO INITIALIZE A MODEL
     params <- newMultispeciesParams(species_params = species_params,
-                                        interaction = interaction,
-                                        min_w_pp = min_w_pp,
-                                        n = n, p = n, ...)
+                                    interaction = interaction,
+                                    min_w_pp = min_w_pp,
+                                    n = n, p = n, ...)
+    
+    # Check that a and b parameters are present for all species -
+    # needed for l2w conversion
+    if (anyNA(params@species_params[["a"]]) ||
+        anyNA(params@species_params[["b"]])) {
+        stop("There must be no NAs in the species_params columns 'a' and 'b'.")
+    }
+    
+    ## ADD IN DETRITUS AND ALGAE
+    params <- setURParams(params = params,
+                          UR_interaction = UR_interaction,
+                          algae_growth = algae_growth,
+                          prop_decomp = prop_decomp,
+                          d.external = d.external)
+    
+    # Determine the necessary detritus and algae encounter rates so that at
+    #maximum size the group has feeding level f0
+    if(is.null(crit_feed)){ crit_feed <- 0.6 }
+    f0 <- set_species_param_default(params@species_params, "f0", crit_feed)$f0
+    
+    # Get interaction of each species with detritus and algae
+    ia <- params@species_params$interaction_algae
+    id <- params@species_params$interaction_detritus
+    
+    # Calculate encounter rates divided by w^n of largest individuals
+    E <- getEncounter(params)[, length(params@w)] /
+        (params@w[length(params@w)] ^ n)
+    
+    # Calculate rho for each unstructured resource
+    # f0*h/(1-f0) is the encounter rate when feeding level is f0
+    # We subtract E so that if feeding level is too low, they eat
+    # algae to replace it. For unstructured resources
+    # encounter rate = rho * w^n * B_A, and multiply by interaction
+    rho_alg <- pmax(0, f0 * params@species_params$h / (1 - f0) - E) * ia
+    rho_det <- pmax(0, f0 * params@species_params$h / (1 - f0) - E) * id
+    
+    # Store new rho values in species_params data frame
+    params@species_params$rho_algae    <- rho_alg
+    params@species_params$rho_detritus <- rho_det
+    
+    # # Function to calculate rho - why doesn't this work?
+    # params <- setRho(params = params,
+    #                  crit_feed = crit_feed, n = n)
+ 
+    # Calculate rho * w^n for use in algae and detritus dynamic functions
+    rho_alg <- outer(params@species_params$rho_algae, params@w ^ n)
+    rho_det <- outer(params@species_params$rho_detritus, params@w ^ n)
+    
+    # Add in algae
+    params <- setComponent(
+        params, "algae", initial_value = 1,
+        dynamics_fun = "algae_dynamics",
+        encounter_fun = "encounter_contribution",
+        component_params = list(rho = rho_alg,
+                                algae_growth = params@other_params$algae_growth))
+    
+    # Add in detritus
+    params <- setComponent(
+        params, "detritus", initial_value = 1,
+        dynamics_fun = "detritus_dynamics",
+        encounter_fun = "encounter_contribution",
+        component_params = list(rho = rho_det,
+                                prop_decomp = params@other_params$prop_decomp,
+                                d.external = params@other_params$d.external))
 
     ## ADD WEIGHT DEPENDENT MORTALITY
     params <- setExtMortParams(params = params,
@@ -61,37 +125,6 @@ newReefParams <- function(species_params,
 
     # Add in senescence mortality
     params <- setRateFunction(params, "Mort", "reefMort")
-
-    ## ADD IN DETRITUS AND ALGAE
-    params <- setURParams(params = params,
-                          UR_interaction = UR_interaction,
-                          algae_growth = algae_growth,
-                          prop_decomp = prop_decomp,
-                          d.external = d.external)
-
-    params <- setRho(params = params,
-                     crit_feed = crit_feed, n = n)
-
-    # Calculate rho * w^n for use in algae and detritus dynamic functions
-    rho_alg <- outer(params@species_params$rho_algae, params@w ^ n)
-    rho_det <- outer(params@species_params$rho_detritus, params@w ^ n)
-
-    # Add in algae
-    params <- setComponent(
-        params, "algae", initial_value = 1,
-        dynamics_fun = "algae_dynamics",
-        encounter_fun = "encounter_contribution",
-        component_params = list(rho = rho_alg,
-                               algae_growth = params@other_params$algae_growth))
-
-    # Add in detritus
-    params <- setComponent(
-        params, "detritus", initial_value = 1,
-        dynamics_fun = "detritus_dynamics",
-        encounter_fun = "encounter_contribution",
-        component_params = list(rho = rho_det,
-                                prop_decomp = params@other_params$prop_decomp,
-                                d.external = params@other_params$d.external))
 
     ## ADD REFUGE
 
