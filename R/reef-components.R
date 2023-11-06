@@ -46,8 +46,8 @@ tune_algae_detritus <- function(params) {
     aout <- algae_consumption(params)
     if (ain < aout) {
         warning("The value for algae growth provided does not produce enough
-                to support this abundance of herbivores. I will increase this
-                value to meet the comsumption rate.")
+                to support this abundance of herbivores. I will increase algae
+                growth to meet the comsumption rate.")
     }
     params@other_params$algae$algae_growth <- ain - aout
 
@@ -55,6 +55,11 @@ tune_algae_detritus <- function(params) {
     params@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(params))
     dout <- detritus_consumption(params)
+    if (din < dout) {
+        warning("Detrital production is not high enough to support this 
+                abundance of detritivores. I will increase external
+                input to meet the comsumption rate.")
+    }
     params@other_params$detritus$external <- dout - din
 
     params
