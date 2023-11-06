@@ -43,12 +43,12 @@ reefRates <- function(params, n, n_pp, n_other,
                       t = 0, effort, rates_fns, ...) {
     r <- list()
 
-    ## Growth ----
     ## Vulnerability ----
     # Calculate vulnerability of fish based on complexity
     r$vulnerable <- reefVulnerable(
         params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
-
+    
+    ## Growth ----
     # Calculate rate E_{e,i}(w) of encountered food
     r$encounter <- rates_fns$Encounter(
         params, n = n, n_pp = n_pp, n_other = n_other,
@@ -473,54 +473,6 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
     }
 
     return(encounter)
-}
-
-#' Get feeding level needed to project a mizerReef model
-#'
-#' You would not usually call this function directly but instead use
-#' [getFeedingLevel()].
-#'
-#' @section Feeding level:
-#'
-#'      In mizerReef models, feeding level only applies to herbivorous and
-#'      detritivorous functional groups. Predation is regulated by refuge,
-#'      so no maximum intake rate is imposed for piscivores.
-#'      
-#'      The feeding level \eqn{f_i(w)} is the proportion of its maximum intake
-#'      rate at which the consumer is actually taking in algae or detritus. It
-#'      is calculated from the encounter rate \eqn{E_i} and the maximum intake
-#'      rate \eqn{h_i(w)} as:
-#'
-#'       \deqn{f_i(w) = \frac{E_i(w)}{E_i(w)+h_i(w)}.}{E_i(w)/(E_i(w)+h_i(w)).}
-#'
-#'       The encounter rate \eqn{E_i} is passed as an argument or calculated
-#'       with [getEncounter()]. The maximum intake rate \eqn{h_i(w)} is taken
-#'       from the `params` object, and is set with [setMaxIntakeRate()].
-#'
-#'       As a consequence of the above expression for the feeding level,
-#'       \eqn{1-f_i(w)} is the proportion of the detritus or algae available
-#'       to a consumer that it actually consumes.
-#'
-#' @seealso The feeding level is used in [mizerEReproAndGrowth()] and in
-#' [mizerPredRate()].
-#'
-#' @inheritParams reefEncounter
-#' @param encounter A two dimensional array (predator species x predator size)
-#'   with the encounter rate.
-#'
-#' @return A two dimensional array (predator species x predator size) with the
-#'   feeding level.
-#'
-#' @export
-#' @family mizer rate functions
-reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter, ...) {
-    feed <- encounter / (encounter + params@intake_max)
-
-    # Set feeding level to 0 for all piscivores
-    idx.pisc <- which(as.logical(params@species_params$pisc))
-    feed[idx.pisc, ] <- 0
-
-    return(feed)
 }
 
 #' Get total predation mortality rate needed to project mizer reef model
