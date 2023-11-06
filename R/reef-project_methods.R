@@ -169,15 +169,15 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
         slope <- method_params$slope
 
         # Convert length to weight
-        max_W <- params@species_params[["a"]] *
-            method_params$max_L ^ params@species_params[["b"]]
+        W_refuge <- params@species_params[["a"]] *
+            method_params$L_refuge ^ params@species_params[["b"]]
 
         # Find indices of fish in size range to protect
         # Set threshold weight - no organisms smaller than min_ref_length
         # can utilize refuge to escape predators
         # Loop through species
         for (i in 1:no_sp){
-            denom <- 1 + exp(slope*(w - max_W[i]))
+            denom <- 1 + exp(slope*(w - W_refuge[i]))
             refuge[i, ] <- ifelse(w > w_settle, prop_protect/denom, 0)
         }
 
@@ -562,10 +562,16 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     vul[good_pred] <- list(1)
     
     # Loop through predator species to calculate predation mortality on
-    # each prey species by predator
-    pm <- vector("list", no_sp)
+    # each prey species & size by all predators
+    pm <- matrix(0, dim(n), dim(n))
     for (i in 1:no_sp){
-        pm[[i]] <- pm + vul[[i]] * pred_rate[, idx_sp, drop = FALSE]
+        # Predation rate of predator species i on all prey (by size)
+        pr_i <- pred_rate[i, idx_sp, drop = TRUE]
+        # Vulnerability rate of all prey (species by size) to predator i
+        vul <- vul[[i]]
+        # vul*pr_i predation mortality on prey (species by size) by predator i 
+        # pm + add to predation mortality from other predators
+        pm <- pm + vul*pr_i
     }
     
     return(base::t(params@interaction) %*% pm)

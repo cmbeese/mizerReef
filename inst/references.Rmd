@@ -1,0 +1,40 @@
+---
+output: html_document
+    bibliography: "references.bib"
+csl: "ecology.csl"
+---
+
+```{r}
+library(knitr)
+library(knitcitations)
+# bibliography
+
+# Methods
+    # Ackerman 2000 - visual census not accurate for fish under 10 cm
+    citep("10.3354/meps206227")
+    # Rogers 2014 - simple method 
+    citep("10.1016/j.cub.2014.03.026")
+    # Rogers 2017 - data method
+    citep("10.1002/ecy.2103")
+    # Rogers 2018 - less fisheries value
+    citep("10.1002/ecy.2103")
+
+# Parameter values
+    
+    # Beese 2023 - parameters taken from there
+    citep("10.1111/1365-2664.14458")
+    
+    # Nash 2014 - h max intake values
+    citep("10.1007/s00442-014-3152-y")
+
+    # PPMRS
+
+
+# Write bib
+write.bibtex(file="references.bib")
+
+```
+
+
+```
+

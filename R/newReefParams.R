@@ -21,7 +21,7 @@
 #' @export
 newReefParams <- function(species_params,
                           interaction = NULL,
-                          min_w_pp = NA,
+                          min_w_pp = 1.0,
                           ext_mort_params = NULL,
                           UR_interaction,
                           algae_growth = NULL,
@@ -37,7 +37,7 @@ newReefParams <- function(species_params,
                           bad_predator = NULL,
                           pisc = NULL,
                           n = 3/4, ...) {
-
+    
     ## USE ORIGINAL MIZER FUNCTION TO INITIALIZE A MODEL
     params <- newMultispeciesParams(species_params = species_params,
                                     interaction = interaction,

@@ -1,6 +1,7 @@
 ---
 title: "Model Description"
-# bibliography: mizerReef-bib.bib
+bibliography: "references.bib"
+csl: "ecology.csl"
 execute: 
   echo: false
 format:
@@ -19,11 +20,11 @@ editor:
     wrap: 72
 ---
 
-```{r}
-#| include: false
+```{r, include = FALSE}
 library(ggplot2)
 library(dplyr)
 library(knitr)
+library(knitcitations)
 library(mizer)
 # remotes::install_github("sizespectrum/mizerExperimental")
 library(mizerExperimental)
@@ -35,12 +36,12 @@ params <- cbn_params
 This document details the structure and parameters for a tropical coral
 reef ecosystem model. The model consists of a collection of fish and
 invertebrate [functional groups](#groups) supported by a collection of
-[resource spectra](#resources). All predator-prey interactions are
+[resources](#resources). All predator-prey interactions are
 mediated by habitat structure, which determines the availability of
 [refuge](#refuge). Parameters were chosen to describe a Caribbean coral
 reef ecosystem. Numerical values for the parameters associated with each
 section are provided under the "Parameter values" subsections. Many of the 
-parameters were taken from [@Beese2023] to allow for comparison
+parameters were taken from [@Beese_2023] to allow for comparison
 of results. 
 
 ::: {.content-visible when-format="html"}
@@ -58,27 +59,33 @@ Skip to [Size-spectrum dynamics]
 
 The model includes `r nrow(params@species_params)-1` functional groups
 of fish as well as a general group of benthic invertebrates. Estimates
-of observed abundances for each group are not direct model parameters
-but rather were used to select reproduction parameters (discussed later)
-so that the steady state abundances in the model agree with these
-observations.
+of observed abundances for each group  were to used select reproduction 
+parameters (discussed later) so that the steady state abundances in the 
+model agree with these observations.
 
-Biomass estimates for most functional groups were based on data
-collected in Bonaire [@rogers2014]. The survey methods used were unable
-to detect cryptic or nocturnal species or individuals smaller than 10 cm
-in length. Biomass estimates for carnivorous eels, noctural
-invertivores, and cryptobenthic predators were taken from the literature
-[@REFERENCE]. The minimum size observed, or cutoff size, for each
-species is given in @tbl-biomass along with the observed biomass per
-square meter in grams.
+Biomass estimates for most functional groups were based on data collected
+from relatively un-fished reefs within a marine reserve in Bonaire 
+[@Rogers_2014]. The survey methods used were unable to detect cryptic or 
+nocturnal species, so estimates for carnivorous eels, nocturnal 
+invertivores, and cryptobenthic predators were taken from the literature [@REFERENCES HERE]. Life history parameters for each functional group are 
+derived from data on the chosen representative species, the most abundant 
+in each group.
+
+Fish less than 10 cm in length were excluded from analysis as their
+abundance is not well captured by visual methods [@Ackerman_2000]. The
+cutoff weight for observed biomass estimates was calculated for 
+each functional group using length-weight relationships from FishBase.
+The cutoff size is given in @tbl-biomass along with the observed biomass 
+per square meter in grams.
 
 ```{r}
 #| label: tbl-biomass
 #| tbl-cap: Observed biomasses
 params@species_params %>%
     filter(!is.na(biomass_observed)) %>%
-    select(biomass_observed, biomass_cutoff) %>%
-    kable(col.names = c("Biomass [g/m^2]", "cutoff size [g]"))
+    select(func_group,rep_species,biomass_observed, biomass_cutoff) %>%
+    kable(col.names = c("Functional group","Species",
+                        "Biomass [g/m^2]", "Cutoff Size [g]"))
 ```
 
 ## Size-spectrum dynamics
@@ -178,17 +185,6 @@ $$ {#eq-phi_normal} if $w/w_p$ is larger than 1 and zero otherwise. Here
 $\beta_i$ is the preferred predator-prey mass ratio and $\sigma_i$
 determines the width of the kernel.
 
-<!-- For grabbing piscivores and cryptobenthics, which tend to be eat larger -->
-<!-- prey, we use a power-law kernel with sigmoidal cutoffs given by -->
-
-<!-- $$ -->
-<!-- \phi_i(w, w_p) =  -->
-<!-- \frac{(w/w_p)^s}{\left(1+e^{l_l}\frac{w_p}{w}\right)^{u_l} -->
-<!-- \left(1+e^{-l_r}\frac{w}{w_p}\right)^{u_r}}. -->
-<!-- $$ {#eq-phi_power} Here the parameters $l_l$ and $u_l$ determine the -->
-<!-- sigmoidal cutoff at low predator/prey mass ratio and $l_r$ and $u_r$ -->
-<!-- similarly determine the cutoff at large predator/prey mass ratio. -->
-
 #### Parameter values
 
 ::: {.content-visible when-format="html"}
@@ -211,9 +207,11 @@ ggplot(melt(params@interaction),
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 ```
 
-The parameters for the predation kernels were estimated based on values
-found in the literature [@REFERENCE]. For the species that use a
-lognormal predation kernel, the parameters are given in @tbl-lognormal.
+The parameters for the predation kernels were chosen to reflect relative 
+differences in foraging prefereces between predator functional groups. 
+Initial estimates were based on published PPMR data for several species
+within eahc group [@REFERENCES FOR PPMR]. These were then adjusted based on functional group characteristics such as preferred prey, predatory mode, 
+and gape size. The parameters are given in @tbl-lognormal.
 
 ```{r results='asis'}
 #| label: tbl-lognormal
@@ -223,23 +221,6 @@ params@species_params %>%
     select(beta, sigma, gamma) %>%
     kable()
 ```
-
-<!-- For the species that use a truncated power law predation kernel, the -->
-<!-- parameters are given in @tbl-power. -->
-
-<!-- ```{r results='asis'} -->
-<!-- #| label: tbl-power -->
-<!-- #| tbl-cap: Parameters for the power-law predation kernels -->
-<!-- params@species_params %>% -->
-<!--     filter(pred_kernel_type == "power_law") %>% -->
-<!--     select(starts_with("kernel"), gamma) %>% -->
-<!--     rename(s = kernel_exp, -->
-<!--            l_l = kernel_l_l, -->
-<!--            u_l = kernel_u_l, -->
-<!--            l_r = kernel_l_r, -->
-<!--            u_r = kernel_u_r) %>% -->
-<!--     kable() -->
-<!-- ``` -->
 
 ### Predation Refuge {#refuge}
 
@@ -259,39 +240,48 @@ Individuals smaller than $w_{settle}$ represent pelagic larval fish that
 have not yet settled to the reef substrate and are too small to utilize 
 refuge to avoid predation. The default value for this minimum weight is 
 0.1 grams. All individuals below this size are assumed to be vulnerable to predators. To ensure some food is always available, the maximum value of 
-$R_j(w_p)$ is set to $r_{max}$, which defaults to 98\%.
+$R_j(w_p)$ is set to $R_{max}$, which defaults to 98\%.
 
 Refuge can be suppressed for functional groups which are not expected to 
 utilize biogenic structures for protection (e.g. schooling species) with 
 the [refuge\_user] parameter in the species parameters data frame.
 
 The mizerReef package provides three methods to define the overall
-refuge profile of a reef depending on the availability of complexity
-data for the modelled area.
+refuge profile of a reef depending on the availability of habitat
+complexity data for the modelled area.
 
 ##### Simple Method
 
 This method is best suited to data-poor reefs or reefs where the refuge
-distribution is unknown. The proportion of prey of weight $w_p$ and
-functional group $j$ with access to refuge $R_j(w_p)$ is given by:
+distribution is unknown. It is akin to the way refuge was defined in 
+@Rogers_2014 The proportion of prey of weight $w_p$ and functional 
+group $j$ with access to refuge $R_j(w_p)$ is given by the sigmoid function:
 
 $$
-R_j(w_p) = \frac{r}{1 + e^{\left(\alpha (w - W_{refuge})\right)}}
+R_j(w_p) = \frac{r_{peak}}{1 + e^{\left(\alpha (w - W_{refuge})\right)}}
 $$ {#eq-refuge_simple}
 
-where $r$ defines the proportion of fish smaller than size $W_{refuge}$ with
-access to predation refuge. The availability of refuge decreases with
-increasing body size at rate $\alpha$. A smaller $\alpha$ results in a 
-more gradual decrease in refuge availability, while the default value 
-of 100 results in a steeper decline.
+Here $W_{refuge}$ defines the weight at which refuges transition from being 
+widely available to becoming unavailable. 
+
+$r_{peak}$ defines the maximum proportion of fish with access to predation 
+refuge and is always less than or equal to $R_{max}$.
+
+$\alpha$ controls the rate at which the availability of 
+refuge decreases with increasing body size. A smaller $\alpha$ results in 
+a more gradual decrease in refuge availability, while the default value 
+of 100 results in a steeper decline. 
+
+This sigmoid takes on values between $0$ and $R_{max}$. $W_{refuge}$ marks 
+the body weight at which refuge becomes scarcer for prey. 
 
 ##### Binned Method
 
 This method is appropriate for theoretical applications and does not
-rely on complexity data. It sets the availability of refuge to a
-constant proportion of fish within a given size range. The proportion of
-fish in functional group $j$ and weight $w_p$ with access to refuge
-$R_j(w_p)$ is given by:
+rely on complexity data. It is analagous to the way refuge was defined in
+@Beese_2023. It sets the availability of refuge to a constant proportion 
+of fish within a given size range. The proportion of fish in functional 
+group $j$ and weight $w_p$ with access to refuge $R_j(w_p)$ is given by:
 
 $$
 R_j(w_p) = r_k ~~~~~~~ w_p \in (~w_{k-1}, w_k~]
@@ -303,23 +293,21 @@ fish with access to refuge in size class $k$.
 ##### Data Method
 
 This method is appropriate when **refuge density** data is available for
-the modeled reef. The **refuge density** describes the distribution of
-refuges across defined fish body size categories. The proportion of prey
-of weight $w_p$ and functional group $j$ with access to refuge
-$R_j(w_p)$ is given by
+the modeled reef and mirrors he way refuge was defined in @Rogers_2017 and @Rogers_2018. The **refuge density** describes the distribution of refuges 
+across defined fish body size categories. The proportion of prey of weight 
+$w_p$ and functional group $j$ with access to refuge $R_j(w_p)$ is given by
 
 $$
-R_j(w_p) = \tau\cdot\frac{\eta_k}{\sum_{i}\int_{w_{k-1}}^{w_k} N_i(w)~dw}
-            ~~~~~~~ w_p \in (~w_{k-1}, w_k~]
+R_j(w_p) = min\left \{R_{max} \, , \frac{\tau\cdot\eta_k}{\sum_{i}\int_{w_{k-1}}^{w_k} N_i(w)~dw}
+            ~~~~~~~ w_p \in (~w_{k-1}, w_k~] \right \}
 $$ {#eq-refuge_data}
 
-when there are fewer refuges than competitors and $r_max$ otherwise.
 The parameter $\tau$ is the proportion of fish with access to refuge that are
-expected to utilize it, $\eta_k$ is the density of refuges in size range
-$(w_{k-1}, w_k]$ and $\sum_{i} \int_{w_{k-1}}^{w_k} N_i(w)~dw$ gives the
-total number of fish from any group in size range $(w_{k-1}, w_k]$.
-This represents the density of competitors for refuges in size class
-$k$.
+expected to utilize it, $\eta_k$ is the density $no./m^{2}$ of refuges in 
+size range $(w_{k-1}, w_k]$ and $\sum_{i} \int_{w_{k-1}}^{w_k} N_i(w)~dw$ 
+gives the density $g/m^{2}$ of fish from any group in size range 
+$(w_{k-1}, w_k]$. This represents the density of competitors for 
+refuges in size class $k$.
 
 ##### Vulnerability
 
@@ -402,20 +390,20 @@ form of feces, which contribute to detritus.
 Skip to [Metabolic losses]
 :::
 
-Feeding level is only applied for non-piscivorous consumers and no maximum
-consumption rate is imposed for piscivorous functional groups.
-
 For consumers of algae and detritus, the values for the coefficients 
-$h_i$ in the maximum consumption rates were chosen so that the feeding 
-level that fish experience has a reasonable value with fish being 
+$h_i$ in the maximum consumption rates were set according the default 
+value calculated by mizer. This sets consumption so that the feeding 
+level that fish experience has a reasonable value with fish being
 neither too starved nor totally satiated.
+
+No maximum consumption rate is imposed for piscivorous functional groups.
 
 ```{r}
 #| label: tbl-h
 #| tbl-cap: Consumption parameters
 params@species_params %>%
     filter(pisc == FALSE) %>%
-    select(h, alpha) %>%
+    select(h, alpha, n) %>%
     kable()
 ```
 
@@ -523,12 +511,11 @@ and $l$ is measured in centimetres.
 ## Mortality {#mortality}
 
 The mortality rate $\mu_i(w)$ of an individual of group $i$ and weight
-$w$ has two sources: predation mortality $\mu_{p.i}(w)$ and external mortality
-$\mu_{ext.i}(w)$. External mortality is composed of residual natural 
-mortality $\mu_{nat.i}(w)$, and senescence $\mu_{sen.i}(w)$. The mortality
-rate for group $i$ is then given by: 
+$w$ has three sources: predation mortality $\mu_{p.i}(w)$, background
+mortality $\mu_{ext.i}(w)$, fishing mortality $\mu_{f.i}(w)$. Background 
+mortality is composed of residual natural mortality $\mu_{nat.i}(w)$, and senescence $\mu_{sen.i}(w)$. The mortality rate for group $i$ is then given by: 
 $$
-\mu_i(w)=\mu_{p.i}(w)+\mu_{ext.i}(w)
+\mu_i(w)=\mu_{p.i}(w)+\mu_{ext.i}(w)+\mu_{f.i}(w)
 $$ {#eq-mort} We will now explain each of the terms.
 
 ### Predation mortality
@@ -546,12 +533,12 @@ $$ {#eq-mup}
 ### Residual natural mortality {#extmort}
 
 Mortality caused by illness, fishing, or predators not explicitly included 
-in the model is captured by $\mu_{nat}(w)$, which is independent of the
+in the model is captured by $\mu_{nat.i}(w)$, which is independent of the
 functional groups and group abundances. It is assumed to decrease 
 allometrically with body size:
 
 $$
-\mu_{ext.i}(w) = \mu_{nat} w^{1 - n}
+\mu_{nat.i}(w) = \mu_{nat} w^{1 - n}
 $$ {#eq-z0} where $\mu_{nat}$ is the residual natural mortality rate 
 and $n$ is the allometric scaling exponent. 
 
@@ -561,7 +548,7 @@ and $n$ is the allometric scaling exponent.
 Skip to [Senescence mortality]
 :::
 
-```{r, include = FALSE}
+```{r}
 ext_mort <- params@other_params[['ext_mort_params']]
 ```
 
@@ -589,6 +576,28 @@ Skip to [Reproduction]
 
 We use a senescence mortality rate of $k_{sen} =$ `r ext_mort$sen_prop` and
 the exponent $p_{sen} =$ `r ext_mort$sen_curve`.
+
+## Fishing mortality
+Fishing parameters for mizerReef models can be set up with `setFishing()`,
+which contains the details of how to set up gears with different selectivities
+and the capabilities of different functional groups.
+
+Fishing mortality $\mu_{f.i}(w)$ is calculated with the function `getFMort()`.
+
+No fishing mortality was imposed in this iteration of the model, though 
+the mizerReef package retains all functionality for simulating fishing 
+scenarios from mizer.
+
+<!-- ADD FISHING SCENARIOS HERE -->
+
+## Plankton Mortality
+
+The predation mortality rate on the plankton resource $P$ is given by 
+a similar expression to the predation mortality on fish:
+$$
+
+  \mu_{P}(w_p) = \sum_j {\tt pred\_rate}_j(w_p)\, \theta_{jP}.
+$$
 
 ## Reproduction {#reproduction}
 
@@ -645,7 +654,7 @@ species $i$.
 #### Parameter values
 
 ::: {.content-visible when-format="html"}
-Skip to [Carrion]
+Skip to [Resources]
 :::
 
 The reproduction parameters $\epsilon_i$ and $R_{max.i}$ are not
@@ -667,7 +676,48 @@ df %>%
     kable()
 ```
 
-# Resource Spectra {#resources}
+# Resources {#resources}
+
+The fish spectrum is fed by three background resources: the [plankton spectrum](#plankton), [algae](#algae), and [detritus](#detritus). Small
+individuals of all species will feed on plankton while only herbivorous
+groups and invertebrates feed on algae or detritus. 
+
+## Plankton Spectrum {#plankton}
+
+```{r}
+wcutoff <- params@resource_params$w_pp_cutoff
+lambda <- params@resource_params$lambda
+kappa <- params@resource_params$kappa
+```
+
+The plankton spectrum $N_P(w)$ tracks the abundance all planktonic food
+sources. This spectrum starts at a smaller size than the fish spectrum, 
+in order to provide food for the smallest individuals (larvae) of the 
+fish spectrum. The time evolution of the resource spectrum is described by 
+a semi-chemostat equation as in mizer.
+
+The semichemostat dynamics are given by:
+$$
+  \frac{\partial N_P(w,t)}{\partial t} 
+  = r_P(w) \Big[ c_P (w) - N_P(w,t) \Big] - \mu_P(w) N_P(w,t).
+$$
+Here $r_p(w)$ is the plankton regeneration rate and $c_p(w)$ is the carrying
+capacity in the absence of predation. By default, mizerReef assumes the same
+allometric forms as mizer, $r_P(w)= r_P\, w^{n-1}.$ and 
+$c_p(w)=\kappa\, w^{-\lambda}.$ 
+
+The mortality $\mu_p(w)$ is due to predation by consumers and is described 
+in the subsection [Resource mortality].
+
+#### Parameter values
+
+::: {.content-visible when-format="html"}
+Skip to [Algae]
+:::
+
+The plankton spectrum ranges from 
+$w_0=`r signif(min(params@w_full), digits = 1)`$ to $w_{cutoff}=`r wcutoff`$ 
+grams. The steady state abundance of plankton at size 1g is $\kappa=`r kappa`[g/m^{-2}]$. The slope of the plankton spectrum $\lambda=`r lambda`$. 
 
 ## Algae
 
@@ -867,3 +917,5 @@ dext <- params@other_params$d.external
 The value of the external detritus production rate is $p_{d.ext}=$ 
 `r dext` grams per year. This was chosen so that the production and
 consumption are equal for the chosen steady state abundances.
+
+

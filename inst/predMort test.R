@@ -33,14 +33,19 @@ vul <- vector("list", no_sp)
 vul[bad_pred] <- list(vulnerable)
 vul[good_pred] <- list(1)
 p <- matrix(0, dim(n), dim(n))
-i = 1
+i = 2
 
-p <- vul[[i]] * pred_rate[, idx_sp, drop = FALSE]
+p[i,] <- vul[[i]] * pred_rate[i, idx_sp, drop = FALSE]
+
+v <- vul[[i]]
+pr_i <- pred_rate[i, idx_sp, drop = TRUE]
 
 # Loop through predator species
 p <- matrix(0, dim(n), dim(n))
 for (i in 1:no_sp){
-    p <- vul[[i]] * pred_rate[, idx_sp, drop = FALSE]
+    vul <- vu
+    pm_by_prey <- lapply(vul[[i]], function(row) row * row_to_multiply)
+    p <-  * pred_rate[, idx_sp, drop = FALSE]
 }
 
 return(base::t(params@interaction) %*% p)

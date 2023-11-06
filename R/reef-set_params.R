@@ -306,6 +306,10 @@ setExtMortParams <- function(params,
 #'  `refuge_user`, which is true for groups utilize that predation refuge,
 #'  and `bad_pred`, which is true for predators whose foraging is hindered
 #'  by refuge.
+#'  
+#'  To ensure some food is always available to predators, the maximum 
+#'  proportion of fish protected by refuge in any size class is set by
+#'  `max_protect`.
 #'
 #'  The refuge profile is used when calculating the food encounter rate in
 #'  [reefEncounter()] and the predation mortality rate in [reefPredMort()]. Its
@@ -320,19 +324,19 @@ setExtMortParams <- function(params,
 #'      proportion of fish with access to refuge \eqn{ R_j(w_p) }$ is given by:
 #'
 #'      \deqn{ R_j(w_p) =
-#'          \frac{-ref}{1 + e^{\left(-\alpha (w - W_{max})\right)}} + ref }
-#'          {R_j(w_p) = -r/(1 + e^{(-\alpha (w - W_{max}))} + ref }
-#'
-#'      where \eqn{W_{max}} defines the prey body size at which no crevices in
-#'      the reef are large enough to act as a refuge. Refuge is available to a
-#'      constant proportion \eqn{ref} of fish smaller than \eqn{W_{max}}. The
-#'      slope \eqn{\alpha} describes the sharpness of the cutoff for fish
-#'      larger than \eqn{W_{max}}. The default value for \eqn{\alpha} sets a
-#'      steep slope of \eqn{100}.
+#'          \frac{r_{peak}}{1 + e^{\left(\alpha (w - W_{refuge})\right)}}}
+#'          {R_j(w_p) = r_{peak}/(1 + e^{(\alpha (w - W_{refuge}))}}
+#'          
+#'      Here \eqn{W_{refuge}} marks the body weight at which refuge becomes 
+#'      scarcer for prey. \eqn{r_{peak}} defines the maximum proportion of 
+#'      fish with access to predation refuge and is always less than or equal 
+#'      to `max_protect`. \eqn{\alpha} controls the rate at which the 
+#'      availability of refuge decreases with increasing body size. It
+#'      defaults to a steep slop of 100.
 #'
 #'      For this method, `method_params` should contain columns named
-#'      `prop_protect` and `max_L` that give the proportion of fish to protect
-#'      and the maximum length protected (cm), respectively.
+#'      `prop_protect` and `L_refuge` that give the values for \eqn{r_{peak}}
+#'      and the length at which refuge becomes scarce in cm.
 #'
 #'      2. ``binned`` - This method is appropriate for theoretical applications
 #'      and does not rely on empirical data. It sets refuge to a constant
@@ -346,9 +350,9 @@ setExtMortParams <- function(params,
 #'      size class \eqn{k}.
 #'
 #'      For this method, `method_params` should contain columns named
-#'      `start_L`and `end_L` which contain the starting and ending lengths (cm)
-#'      of each size bin and `prop_protect`, the proportion protected within
-#'      each corresponding size bin.
+#'      `start_L`and `end_L` which contain the starting and ending lengths [cm]
+#'      of each size bin and `prop_protect`, the proportion of fish protected
+#'      within each corresponding size bin.
 #'
 #'      3. ``data`` -  This method is appropriate when data on the number of
 #'      refuge holes present within defined fish length bins is available. The
@@ -369,9 +373,9 @@ setExtMortParams <- function(params,
 #'      size class \eqn{k}.
 #'
 #'      For this method, `method_params` should contain columns named
-#'      `start_L`and `end_L` which contain the starting and ending lengths (cm)
+#'      `start_L`and `end_L` which contain the starting and ending lengths [cm]
 #'      of each size bin and `refuge_density`, the number of refuges available
-#'      in each size bin.
+#'      in each size bin [no/m^2].
 #'
 #'  This function checks that the supplied refuge parameters are valid, adds
 #'  relevant columns to the `species_params` dataframe, and stores refuge
@@ -505,9 +509,9 @@ setRefuge <- function(params,
                   method_params$prop_protect > 1) {
             stop("prop_protect should be a proportion between 0 and 1")
         }
-        if(!("max_L" %in% cnames)) {
+        if(!("L_refuge" %in% cnames)) {
             stop("The simple method parameters dataframe needs a column called
-                 'max_L' with the maximum length (cm) of protected fish.")
+                 'L_refuge' with the threshhold length (cm) for protected fish.")
         }
         if (is.null(method_params$slope)){ method_params$slope <- 100 }
     }
