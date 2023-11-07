@@ -46,9 +46,8 @@ the abundance of competitors for refuge.
 \seealso{
 Other mizer rate functions: 
 \code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
 \code{\link{reefMort}()},
-\code{\link{reefPredRate}()},
+\code{\link{reefPredMort}()},
 \code{\link{reefRates}()}
 }
 \concept{rate functions}

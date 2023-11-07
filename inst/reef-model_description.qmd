@@ -250,7 +250,7 @@ The mizerReef package provides three methods to define the overall
 refuge profile of a reef depending on the availability of habitat
 complexity data for the modelled area.
 
-##### Simple Method
+##### Sigmoidal
 
 This method is best suited to data-poor reefs or reefs where the refuge
 distribution is unknown. It is akin to the way refuge was defined in 
@@ -258,13 +258,13 @@ distribution is unknown. It is akin to the way refuge was defined in
 group $j$ with access to refuge $R_j(w_p)$ is given by the sigmoid function:
 
 $$
-R_j(w_p) = \frac{r_{peak}}{1 + e^{\left(\alpha (w - W_{refuge})\right)}}
+R_j(w_p) = \frac{r}{1 + e^{\left(\alpha (w - W_{refuge})\right)}}
 $$ {#eq-refuge_simple}
 
 Here $W_{refuge}$ defines the weight at which refuges transition from being 
 widely available to becoming unavailable. 
 
-$r_{peak}$ defines the maximum proportion of fish with access to predation 
+$r$ defines the maximum proportion of fish with access to predation 
 refuge and is always less than or equal to $R_{max}$.
 
 $\alpha$ controls the rate at which the availability of 
@@ -275,7 +275,7 @@ of 100 results in a steeper decline.
 This sigmoid takes on values between $0$ and $R_{max}$. $W_{refuge}$ marks 
 the body weight at which refuge becomes scarcer for prey. 
 
-##### Binned Method
+##### Binned
 
 This method is appropriate for theoretical applications and does not
 rely on complexity data. It is analagous to the way refuge was defined in
@@ -290,7 +290,7 @@ $$ {#eq-refuge_binned}
 where $w_p$ is the weight of the prey and $r_k$ is the proportion of
 fish with access to refuge in size class $k$.
 
-##### Data Method
+##### Competitive
 
 This method is appropriate when **refuge density** data is available for
 the modeled reef and mirrors he way refuge was defined in @Rogers_2017 and @Rogers_2018. The **refuge density** describes the distribution of refuges 
@@ -355,6 +355,9 @@ params@species_params %>%
                                 bad_pred == FALSE ~ 'Yes')) %>%
     kable(col.names = c("Uses refuge?", "Accesses prey in refuge?"))
 ```
+
+### Degradation
+
 
 ### Consumption {#consumption}
 
@@ -511,8 +514,8 @@ and $l$ is measured in centimetres.
 ## Mortality {#mortality}
 
 The mortality rate $\mu_i(w)$ of an individual of group $i$ and weight
-$w$ has three sources: predation mortality $\mu_{p.i}(w)$, background
-mortality $\mu_{ext.i}(w)$, fishing mortality $\mu_{f.i}(w)$. Background 
+$w$ has three sources: predation mortality $\mu_{p.i}(w)$, external
+mortality $\mu_{ext.i}(w)$, fishing mortality $\mu_{f.i}(w)$. External
 mortality is composed of residual natural mortality $\mu_{nat.i}(w)$, and senescence $\mu_{sen.i}(w)$. The mortality rate for group $i$ is then given by: 
 $$
 \mu_i(w)=\mu_{p.i}(w)+\mu_{ext.i}(w)+\mu_{f.i}(w)

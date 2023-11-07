@@ -98,9 +98,8 @@ the encounters of these components will be included in the returned value.
 
 \seealso{
 Other mizer rate functions: 
-\code{\link{reefFeedingLevel}()},
 \code{\link{reefMort}()},
-\code{\link{reefPredRate}()},
+\code{\link{reefPredMort}()},
 \code{\link{reefRates}()},
 \code{\link{reefVulnerable}()}
 }

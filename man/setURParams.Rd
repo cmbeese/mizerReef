@@ -28,7 +28,10 @@ so that steady state abundances match given values.}
 become part of the detritus pool.}
 
 \item{d.external}{The rate at which detritus biomass sinks from the pelagic
-zone and becomes part of the detritus pool in grams per year.}
+zone and becomes part of the detritus pool in grams per year. This value
+is reset to make up any differences in consumption and production in
+the \verb{[reefSteady()]} function so that steady state abundances match
+observed values.}
 }
 \value{
 \code{setUResourceParams}: MizerParams object with updated unstructured
@@ -42,20 +45,24 @@ Checks unstructured resource interaction matrix
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{ mizerReef supports two resource spectra that are not size- structured.
  Algae is consumed by herbivorous fish, while detritus is consumed by
- herbivorous fish and benthic invertebrates.
+ herbivorous fish and benthic invertebrates. This function sets the 
+ interaction matrix for these resources as well as any default
+ parameters necessary to structure them.
 
  The resource interaction matrix \eqn\{\\theta_\{ki\} modifies the
- interaction of each functional group \eqn{i} with each resource \eqn{k}
- in the model. This can be used for example to allow for different
- spatial overlap among the species. This function checks if provided
- unstructured resource interaction matrices are valid.
+ interaction of each functional group \eqn{i} with each unstructured
+ resource \eqn{k} in the model. This can be used for example to allow 
+ for different diet preferences on each unstructured resource. 
+ 
+ Note that interaction with size structured resources, such as
+ plankton, is still set with the `resource_interaction` column of
+ the species parameters dataframe. 
 }\if{html}{\out{</div>}}
 }
 
 \seealso{
 Other functions for setting parameters: 
 \code{\link{setExtMortParams}()},
-\code{\link{setRefuge}()},
-\code{\link{setRho}()}
+\code{\link{setRefuge}()}
 }
 \concept{functions for setting parameters}

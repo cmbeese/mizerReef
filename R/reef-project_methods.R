@@ -48,6 +48,11 @@ reefRates <- function(params, n, n_pp, n_other,
     r$vulnerable <- reefVulnerable(
         params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
     
+    # Implement degradation
+    r$degrade <- reefDegrade(
+        params, n = n, n_pp = n_pp, n_other = n_other, 
+        vulnerable = r$vulnerable, t = t, ...)
+    
     ## Growth ----
     # Calculate rate E_{e,i}(w) of encountered food
     r$encounter <- rates_fns$Encounter(
@@ -114,7 +119,7 @@ reefRates <- function(params, n, n_pp, n_other,
 #' predators) to simulate benthic complexity
 #'
 #' This function calculates the proportion of fish that are not hidden in
-#' predation refuge and thus vulnerable to predation. For the `simple` and
+#' predation refuge and thus vulnerable to predation. For the `sigmoidal` and
 #' `binned` methods vulnerability changes over time in response to degradation.
 #'
 #' TO DO: ADD CODE AND DESCRIPTION HERE OF DEGRADATION
@@ -156,13 +161,13 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
     refuge_user <- params@species_params$refuge_user
 
     # Static methods
-    # static = c("simple", "binned")
+    # static = c("sigmoidal", "binned")
     # if (is.element(refuge_params$method, static)){
     #
     #     vulnerable <- params@other_params$initial_vulnerable
 
-    # Simple method ------------------------------------------------------------
-    if (refuge_params$method == "simple"){
+    # Sigmoidal method ------------------------------------------------------------
+    if (refuge_params$method == "sigmoidal"){
 
         # Pull slop and proportion of fish to be protected from method_params
         prop_protect <- method_params$prop_protect
@@ -277,6 +282,39 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
 
     return(vulnerable)
 }
+
+# #' Degrade coral reef habitat structure by decreasing the availability of 
+# #' refuge at certain sizes
+# #'
+# #' TO DO: ADD CODE AND DESCRIPTION HERE OF DEGRADATION
+# #'
+# #' @inheritParams reefRates
+# #' @param vulnerable A two dimensional array (prey species x prey size) with
+# #'      the proportion of prey vulnerable to being encountered.
+# #' @param ... Unused
+# #'
+# #' @return Array (species x size) with the proportion of individuals that are
+# #'          not protected from predation by refuge
+# #'
+# #' @export
+# #' @family mizer rate functions
+# # Account for species that don't utilize refuge
+# reefDegrade <- function(params, n, n_pp, n_other, t, 
+#                         vulnerable = reefVulnerable(params, 
+#                                                     n, n_pp, n_other, t),...)
+#     {
+#     
+#     if (degrade == FALSE){
+#         return(vulnerable)
+#     } else {
+#         
+#         decrease_amount <- (percentage / 100) * value
+#         result <- value - decrease_amount
+#         
+#     }   
+#     
+# }
+
 
 #' Get encounter rate needed to project a mizerReef model
 #'
@@ -430,7 +468,7 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
         # the end.
         avail_energy <- Re(base::t(mvfft(base::t(params@ft_pred_kernel_e) *
                                              mvfft(base::t(prey)),
-                                         inverse = TRUE))) / length(params@w_full)
+                                    inverse = TRUE))) / length(params@w_full)
         # Only keep the bit for fish sizes
         avail_energy <- avail_energy[, idx_sp, drop = FALSE]
         # Due to numerical errors we might get negative or very small entries
@@ -515,7 +553,6 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     
     # Loop through predator species to calculate predation mortality on
     # each prey species & size by all predators
-    pm <- matrix(0, dim(n), dim(n))
     for (i in 1:no_sp){
         # Predation rate of predator species i on all prey (by size)
         pr_i <- pred_rate[i, idx_sp, drop = TRUE]

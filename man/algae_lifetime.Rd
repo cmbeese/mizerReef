@@ -3,12 +3,7 @@
 \name{algae_lifetime}
 \alias{algae_lifetime}
 \alias{algae_lifetime<-}
-\title{#' Plot algae production rates
-#'
-#' @param params MizerParams
-#' @return A pie chart.
-#' @export
-Expected algae lifetime}
+\title{Expected algae lifetime}
 \usage{
 algae_lifetime(params)
 

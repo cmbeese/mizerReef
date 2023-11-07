@@ -39,8 +39,7 @@ sum of the usual mortality and size-based external/ senescence mortality
 \seealso{
 Other mizer rate functions: 
 \code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
-\code{\link{reefPredRate}()},
+\code{\link{reefPredMort}()},
 \code{\link{reefRates}()},
 \code{\link{reefVulnerable}()}
 }

@@ -29,7 +29,7 @@ not protected from predation by refuge
 }
 \description{
 This function calculates the proportion of fish that are not hidden in
-predation refuge and thus vulnerable to predation. For the \code{simple} and
+predation refuge and thus vulnerable to predation. For the \code{sigmoidal} and
 \code{binned} methods vulnerability changes over time in response to degradation.
 }
 \details{
@@ -41,9 +41,8 @@ the abundance of competitors for refuge.
 \seealso{
 Other mizer rate functions: 
 \code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
 \code{\link{reefMort}()},
-\code{\link{reefPredRate}()},
+\code{\link{reefPredMort}()},
 \code{\link{reefRates}()}
 }
 \concept{mizer rate functions}

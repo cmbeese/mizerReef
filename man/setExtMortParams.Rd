@@ -18,44 +18,44 @@ Optional parameters:}
 senescence parameters
 }
 \description{
-Checks if given parameters are valid, sets defaults, and then stores them in
-the mizerParams object.
+mizerReef models contain two sources of external mortality, residual
+natural mortality and senescence. This function checks if given parameters
+are valid, sets defaults, and then stores them in the mizerParams object.
 }
 \details{
-mizerReef models contain two sources of external mortality, external
-predation and senescence.
+External mortality implemented by default in mizerReef. You do not need to
+set these parameters. This function should only be used to change default
+values.
 }
-\section{External predation}{
+\section{Residual natural mortality}{
 
 
-The external predation accounts for all the mortality that is not due to
-predation by predators included in the model. It is a rate with units
-1/year.
-
-External predation mortality is assumed to decrease allometrically with
-body size, given by:
-
-\eqn{\mu_{ext}(w) = z_{0.i}}. The value of the constant \eqn{z_0} for each
-species is taken from the \code{z0} column of the species parameter data frame, if
-that column exists. Otherwise it is calculated as
-\deqn{\mu_{ext}(w) = {\tt z0pre}_i\, w_{inf}^{\tt z0exp}.}{z_{0.i} = z0pre_i w_{inf}^{z0exp}.}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ Residual natural mortality accounts for any external predation or
+ fishing mortality that is not explicitly included in the model. It is
+ assumed to decrease allometrically with body size. Residual natural
+ mortality is a rate with units 1/year given by:
+ 
+ \deqn{\mu_{nat.i}(w) = \mu_{nat}\, w^{1-n}.}
+      \{\\mu_\{nat.i\}(w) = \\mu_\{nat\}\\, w^\{1-n\}.\}
+      
+  Here \eqn{\mu_{nat}} is the residual natural mortality rate at size
+  1 g and \eqn{n} is the allometric scaling exponent. In mizerReef, 
+  these default to \eqn{\mu_{nat} = 0.2} and \eqn{n = 0.75}.
+}\if{html}{\out{</div>}}
 }
 
 \section{Senescence mortality}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ Senescence mortality is implemented by default in mizerReef. You do not
- need to set these parameters. This function should only be used to
- change default values.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
+ mortality caused by background sources such as illness or age. The 
+ rate of senescence mortality (in 1/year) is given by:
 
- Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
- mortality caused by external sources such as illness or age. This is
- addition to external mortality, \eqn{\mu_{ext.i}(w)}, which represents
- all mortality that is not due to fishing or predation by predators
- included in the model. The rate of senescence mortality is given by:
-
- \deqn{\mu_{sen.i}(w) = k_{sen}\left(\frac{w}{w_{max.i}}\right)^{p_{sen}}}
-      \{\\mu_\{sen.i\}(w) = k_\{sen\}(w/w_\{max.i\})^\{p_\{sen\}\}\}
+ \deqn{\mu_{sen.i}(w) = k_{sen}\left(
+                             \frac{log_{10}(w)}{log_{10}(w_{max.i})}
+                             \right)^{p_{sen}}}
+      \{\\mu_\{sen.i\}(w) = k_\{sen\}
+      (log_\{10\}(w)/log_\{10\}(w_\{max.i\}))^\{p_\{sen\}\}\}
 
  where \eqn{k_{sen}} is the rate of senescence mortality, \eqn{p_sen}
  defines the slope of the senescence curve, \eqn{w_max.i} maximum body
@@ -66,7 +66,6 @@ that column exists. Otherwise it is calculated as
 \seealso{
 Other functions for setting parameters: 
 \code{\link{setRefuge}()},
-\code{\link{setRho}()},
 \code{\link{setURParams}()}
 }
 \concept{functions for setting parameters}

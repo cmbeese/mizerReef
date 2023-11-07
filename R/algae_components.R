@@ -149,13 +149,13 @@ getAlgaeProduction <- function(params) {
 }
 
 
-# Probably not a useful function at the moment since algae production is constant (for now)
-
-#' #' Plot algae production rates
-#' #'
-#' #' @param params MizerParams
-#' #' @return A pie chart.
-#' #' @export
+# Probably not a useful function at the moment since algae production 
+# is constant (for now)
+# #' Plot algae production rates
+# #'
+# #' @param params MizerParams
+# #' @return A pie chart.
+# #' @export
 # plotalgaeProduction <- function(params) {
 #   production <- getalgaeProduction(params)
 #   df <- data.frame(Producer = names(production),

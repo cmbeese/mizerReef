@@ -7,7 +7,7 @@
 newReefParams(
   species_params,
   interaction = NULL,
-  min_w_pp = NA,
+  min_w_pp = 1,
   ext_mort_params = NULL,
   UR_interaction,
   algae_growth = NULL,
@@ -42,13 +42,13 @@ so that steady state abundances match given values.}
 become part of the detritus pool.}
 
 \item{d.external}{The rate at which detritus biomass sinks from the pelagic
-zone and becomes part of the detritus pool in grams per year.}
-
-\item{crit_feed}{the desired critical feeding level for herbivores and
-detritivores}
+zone and becomes part of the detritus pool in grams per year. This value
+is reset to make up any differences in consumption and production in
+the \verb{[reefSteady()]} function so that steady state abundances match
+observed values.}
 
 \item{method}{The desired method for setting up benthic refuge,
-can be "simple", "binned", or "data"}
+can be "sigmoidal", "binned", or "competitive"}
 
 \item{max_protect}{The maximum proportion of fish (any size class)
 protected by refuge}
@@ -60,18 +60,13 @@ method for calculating refuge}
 
 \item{refuge_user}{A vector of logical values indicating whether each
 functional group uses refuge, TRUE indicates the group uses refuge while
-false indicates that they do not. Alternatively,t hese can be included in
-the \code{params@species_params} dataframe.}
+false indicates that they do not. Alternatively, these can be included in
+the \code{params@species_params} data frame.}
 
 \item{bad_predator}{A vector of logical values indicating whether hunting is
 inhibited by refuge for this functional group. FALSE indicates that this
 species is able to encounter prey within refuge (e.g. eels). Alternatively,
-these can also be included in the \code{params@species_params} dataframe.}
-
-\item{pisc}{A vector of logical values indicating whether this
-functional group are generally piscivores. FALSE indicates that this group
-feeds only from the resource spectra. Alternatively,
-these can also be included in the \code{params@species_params} dataframe.
+these can also be included in the \code{params@species_params} data frame.
 
 Optional parameters:}
 
@@ -93,31 +88,33 @@ resource components, senescence mortality, and predation refuge.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{ mizerReef supports two resource spectra that are not size- structured.
  Algae is consumed by herbivorous fish, while detritus is consumed by
- herbivorous fish and benthic invertebrates.
+ herbivorous fish and benthic invertebrates. This function sets the 
+ interaction matrix for these resources as well as any default
+ parameters necessary to structure them.
 
  The resource interaction matrix \eqn\{\\theta_\{ki\} modifies the
- interaction of each functional group \eqn{i} with each resource \eqn{k}
- in the model. This can be used for example to allow for different
- spatial overlap among the species. This function checks if provided
- unstructured resource interaction matrices are valid.
+ interaction of each functional group \eqn{i} with each unstructured
+ resource \eqn{k} in the model. This can be used for example to allow 
+ for different diet preferences on each unstructured resource. 
+ 
+ Note that interaction with size structured resources, such as
+ plankton, is still set with the `resource_interaction` column of
+ the species parameters dataframe. 
 }\if{html}{\out{</div>}}
 }
 
 \section{Senescence mortality}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ Senescence mortality is implemented by default in mizerReef. You do not
- need to set these parameters. This function should only be used to
- change default values.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
+ mortality caused by background sources such as illness or age. The 
+ rate of senescence mortality (in 1/year) is given by:
 
- Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
- mortality caused by external sources such as illness or age. This is
- addition to external mortality, \eqn{\mu_{ext.i}(w)}, which represents
- all mortality that is not due to fishing or predation by predators
- included in the model. The rate of senescence mortality is given by:
-
- \deqn{\mu_{sen.i}(w) = k_{sen}\left(\frac{w}{w_{max.i}}\right)^{p_{sen}}}
-      \{\\mu_\{sen.i\}(w) = k_\{sen\}(w/w_\{max.i\})^\{p_\{sen\}\}\}
+ \deqn{\mu_{sen.i}(w) = k_{sen}\left(
+                             \frac{log_{10}(w)}{log_{10}(w_{max.i})}
+                             \right)^{p_{sen}}}
+      \{\\mu_\{sen.i\}(w) = k_\{sen\}
+      (log_\{10\}(w)/log_\{10\}(w_\{max.i\}))^\{p_\{sen\}\}\}
 
  where \eqn{k_{sen}} is the rate of senescence mortality, \eqn{p_sen}
  defines the slope of the senescence curve, \eqn{w_max.i} maximum body
@@ -134,39 +131,47 @@ refuge. The refuge profile defines the proportion of fish within
 user-defined length bins that are protected from being encountered
 by a predator.
 
-A unique refuge profile is generated for each predator x prey combination
-based on the given refuge profile parameters as well as four values from
-\code{params@species_params}: length to weight conversion values \code{a} and \code{b},
-\code{refuge_user}, which is true for groups utilize that predation refuge,
-and \code{bad_pred}, which is true for predators whose foraging is hindered
-by refuge.
+A unique refuge profile is generated for each predator group x
+prey group x prey size combination based on the given refuge profile
+parameters as well as four values from \code{params@species_params}: length
+to weight conversion values \code{a} and \code{b}, \code{refuge_user}, which is true
+for groups utilize that predation refuge, and \code{bad_pred}, which is false
+for predator groups whose body shape or predatory strategy allow them to
+access fish within refuge (e.g. eels).
+
+To ensure some food is always available to predators, the maximum
+proportion of fish protected by refuge in any size class is set by
+\code{max_protect}.
 
 The refuge profile is used when calculating the food encounter rate in
-\code{\link[=reefEncounter]{reefEncounter()}} and the predation mortality rate in \code{\link[=reefPredMort]{reefPredMort()}}. Its
-entries are dimensionless numbers. If no refuge is available then
-predator-prey interactions are determined entirely by size-preference.
+\code{\link[=reefEncounter]{reefEncounter()}} and the predation mortality rate in \code{\link[=reefPredMort]{reefPredMort()}}.
+Its entries are dimensionless values between 0 and 1 which represent the
+proportion of fish in the corresponding prey and size categories that are
+hidden within refuge and thus cannot be encountered by predators. If no
+refuge is available then predator-prey interactions are determined
+entirely by size-preference.
 
 The mizerReef package provides three methods to define the refuge profile:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ 1. ``simple`` -  This method is preferred for data-poor reefs or reefs
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ 1.``sigmoidal`` - This method is preferred for data-poor reefs or reefs
  where the refuge distribution is unknown. It is also ideal for systems
  where only one functional group is expected to be utilizing refuge. The
  proportion of fish with access to refuge \eqn{ R_j(w_p) }$ is given by:
 
  \deqn{ R_j(w_p) =
-         \frac{-ref}{1 + e^{\left(-\alpha (w - W_{max})\right)}} + ref }
-     \{R_j(w_p) = -r/(1 + e^\{(-\\alpha (w - W_\{max\}))\} + ref \}
-
- where \eqn{W_{max}} defines the prey body size at which no crevices in
- the reef are large enough to act as a refuge. Refuge is available to a
- constant proportion \eqn{ref} of fish smaller than \eqn{W_{max}}. The
- slope \eqn{\alpha} describes the sharpness of the cutoff for fish
- larger than \eqn{W_{max}}. The default value for \eqn{\alpha} sets a
- steep slope of \eqn{100}.
+         \frac{r}{1 + e^{\left(\alpha (w - W_{refuge})\right)}}}
+     \{R_j(w_p) = r_\{peak\}/(1 + e^\{(\\alpha (w - W_\{refuge\}))\}\}
+     
+ Here \eqn{W_{refuge}} marks the body weight at which refuge becomes 
+ scarcer for prey. \eqn{r} defines the maximum proportion of fish with
+ access to predation refuge and is always less than or equal to
+ `max_protect`. \eqn{\alpha} controls the rate at which the 
+ availability of refuge decreases with increasing body size. It
+ defaults to a steep slope of 100.
 
  For this method, `method_params` should contain columns named
- `prop_protect` and `max_L` that give the proportion of fish to protect
- and the maximum length protected (cm), respectively.
+ `prop_protect` and `L_refuge` that give the values for \eqn{r}
+ and the length at which refuge becomes scarce in cm.
 
  2. ``binned`` - This method is appropriate for theoretical applications
  and does not rely on empirical data. It sets refuge to a constant
@@ -180,14 +185,15 @@ The mizerReef package provides three methods to define the refuge profile:
  size class \eqn{k}.
 
  For this method, `method_params` should contain columns named
- `start_L`and `end_L` which contain the starting and ending lengths (cm)
- of each size bin and `prop_protect`, the proportion protected within
- each corresponding size bin.
+ `start_L`and `end_L` which contain the starting and ending lengths [cm]
+ of each size bin and `prop_protect`, the proportion of fish protected
+ within each corresponding size bin.
 
- 3. ``data`` -  This method is appropriate when data on the number of
- refuge holes present within defined fish length bins is available. The
- proportion of fish in size class \eqn{k} with access to refuge is given
- by:
+ 3. ``competitive`` - This method is appropriate when refuge density 
+ data is available for the modelled reef. The refuge density describes 
+ the distribution of refuges \eqn{(#/m^2)} across defined fish body size
+ categories. The proportion of fish in size class \eqn{k} with access 
+ to refuge is given by:
 
  \deqn{R_j(w_p) = \tau\cdot\frac{\eta_k}{\sum_{i}\int_{w_{k-1}}^{w_k}
      N_i(w)~dw}  ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~]}
@@ -197,19 +203,19 @@ The mizerReef package provides three methods to define the refuge profile:
  where \eqn{\tau} is the proportion of fish with access to refuge that
  are expected to actually utilize  it, \eqn{\eta_k} is the density of
  refuges in size range \eqn{(w_{k-1}, w_k]} and
-  \eqn{\sum_{i}\int_{w_{k-1}}^{w_k} N_i(w)~dw} gives the total
- number of fish from any group in size range \eqn{(w_{k-1}, w_k]}.
+  \eqn{\sum_{i}\int_{w_{k-1}}^{w_k} N_i(w)~dw} gives the density
+  of fish from any group in size range \eqn{(w_{k-1}, w_k]}.
  This represents the density of competitors for refuges in
  size class \eqn{k}.
 
  For this method, `method_params` should contain columns named
- `start_L`and `end_L` which contain the starting and ending lengths (cm)
+ `start_L`and `end_L` which contain the starting and ending lengths [cm]
  of each size bin and `refuge_density`, the number of refuges available
- in each size bin.
+ in each size bin [no/m^2].
 }\if{html}{\out{</div>}}
 
 This function checks that the supplied refuge parameters are valid, adds
-relevant columns to the \code{species_params} dataframe, and stores refuge
+relevant columns to the \code{species_params} data frame, and stores refuge
 parameters in the \code{other_params} slot of the \code{params} object.
 
 Refuge profile parameters can be input in a spreadsheet program and saved

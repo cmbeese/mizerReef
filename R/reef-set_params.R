@@ -4,13 +4,18 @@
 #'
 #'      mizerReef supports two resource spectra that are not size- structured.
 #'      Algae is consumed by herbivorous fish, while detritus is consumed by
-#'      herbivorous fish and benthic invertebrates.
+#'      herbivorous fish and benthic invertebrates. This function sets the 
+#'      interaction matrix for these resources as well as any default
+#'      parameters necessary to structure them.
 #'
 #'      The resource interaction matrix \eqn{\theta_{ki} modifies the
-#'      interaction of each functional group \eqn{i} with each resource \eqn{k}
-#'      in the model. This can be used for example to allow for different
-#'      spatial overlap among the species. This function checks if provided
-#'      unstructured resource interaction matrices are valid.
+#'      interaction of each functional group \eqn{i} with each unstructured
+#'      resource \eqn{k} in the model. This can be used for example to allow 
+#'      for different diet preferences on each unstructured resource. 
+#'      
+#'      Note that interaction with size structured resources, such as
+#'      plankton, is still set with the `resource_interaction` column of
+#'      the species parameters dataframe. 
 #'
 #' @param params MizerParams object
 #' @param UR_interaction Interaction matrix for unstructured resources
@@ -23,7 +28,10 @@
 #' @param prop_decomp The proportion of waste material that decomposes to
 #'  become part of the detritus pool.
 #' @param d.external The rate at which detritus biomass sinks from the pelagic
-#'  zone and becomes part of the detritus pool in grams per year.
+#'  zone and becomes part of the detritus pool in grams per year. This value 
+#'  is reset to make up any differences in consumption and production in 
+#'  the `[reefSteady()]` function so that steady state abundances match 
+#'  observed values.
 #'
 #' @return `setUResourceParams`: MizerParams object with updated unstructured
 #'  resource parameters
@@ -44,7 +52,7 @@ setURParams <- function(params,
     # check if matrix has right names
     res_cols <- c('algae','detritus')
     if(!setequal(names(UR_interaction), res_cols)){
-        stop("Uresource_interaction needs to have columns named 'algae' and
+        stop("UR_interaction needs to have columns named 'algae' and
              'detritus'.")
     }
 
@@ -99,127 +107,41 @@ setURParams <- function(params,
     return(params)
 }
 
-#' Calculate rho parameter values using a critical feeding level
-#'
-#' This function uses the `Uresource` interaction matrix as well as a
-#' given critical feeding level to find \eqn{\rho_i} for all unstructured
-#' resources. It then stores these values in the `params@species_params`
-#' data frame. There are two unstructured resources in a mizerReef model,
-#' algae and detritus.
-#'
-#' @section The \eqn{\rho_{ki}} Parameter:
-#'
-#'      For each consumer group \eqn{i} and unstructured resource \eqn{k},
-#'      a parameter \eqn{\rho_{ki}} determines the rate at which individuals of
-#'      that functional group encounter unstructured resources. The parameters
-#'      \eqn{\rho_{ki}} have units of \eqn{g^{-n}} per year. They are non-zero
-#'      only for species that forage on resource \eqn{k}.
-#'
-#'      The rate is assumed to scale with the size of the predator raised to
-#'      an allometric exponent \eqn{n} which is taken to be the same as the
-#'      scaling exponent of the maximum intake rate for consumers. The
-#'      encounter rate for unstructured resources is given by:
-#'
-#'      \deqn{ E_{i}(w)= \rho_{ki} w^n B_{k} }{ \rho_{ki} w^n B_{k} }
-#'
-#'      where \eqn{B_{k}} is the biomass of unstructured resource \eqn{k}.
-#'
-#' @section Using critical feeding level to determine \eqn{\rho_{ki}}:
-#'
-#'      This function finds reasonable values for \rho_{ki} parameters given
-#'      a critical feeding level.
-#'
-#'      First, it set the critical feeding level  to the provided value
-#'      for fish at the maximum size. Then it finds the rate at which each the
-#'      functional group is currently encountering food.
-#'
-#'      \eqn{\rho_{ki}} is then set so that if the current encounter rate is
-#'      too low to meet satiation (critical feeding level \eqn{f0}), the group
-#'      feeds on resource \eqn{k} to make up the difference.
-#'
-#' @param params MizerParams object
-#' @param UR_interaction Interaction matrix for unstructured resources
-#'  (species x resource)
-#'
-#' Optional parameters:
-#' @param crit_feed the desired critical feeding level for herbivores and
-#'  detritivores
-#'
-#' @return `setUResourceParams`: MizerParams object with updated unstructured
-#'  resource parameters
-#' @export
-#' @family functions for setting parameters
-setRho <- function(params,
-                   crit_feed = NULL,
-                   n = 3/4, ...){
-    # Determine the necessary detritus and algae encounter rates so that at
-    #maximum size the group has feeding level f0
-    if(is.null(crit_feed)){ crit_feed <- 0.6 }
-    f0 <- set_species_param_default(params@species_params, "f0", crit_feed)$f0
-
-    # Get interaction of each species with detritus and algae
-    ia <- params@species_params$interaction_algae
-    id <- params@species_params$interaction_detritus
-
-    # Calculate encounter rates divided by w^n of largest individuals
-    E <- mizer::getEncounter(params)[, length(params@w)] /
-        (params@w[length(params@w)] ^ n)
-
-    # Calculate rho for each unstructured resource
-    # f0*h/(1-f0) is the encounter rate when feeding level is f0
-    # We subtract E so that if feeding level is too low, they eat
-    # algae to replace it. For unstructured resources
-    # encounter rate = rho * w^n * B_A, and multiply by interaction
-    rho_alg <- pmax(0, f0 * params@species_params$h / (1 - f0) - E) * ia
-    rho_det <- pmax(0, f0 * params@species_params$h / (1 - f0) - E) * id
-
-    # Store new rho values in species_params data frame
-    params@species_params$rho_algae    <- rho_alg
-    params@species_params$rho_detritus <- rho_det
-
-    # Note time sim was modified
-    params@time_modified <- lubridate::now()
-
-    return(params)
-}
-
-
 #' Set the parameters for external mortality
 #'
-#' Checks if given parameters are valid, sets defaults, and then stores them in
-#' the mizerParams object.
+#' mizerReef models contain two sources of external mortality, residual
+#' natural mortality and senescence. This function checks if given parameters 
+#' are valid, sets defaults, and then stores them in the mizerParams object.
+#' 
+#' External mortality implemented by default in mizerReef. You do not need to 
+#' set these parameters. This function should only be used to change default
+#' values.
 #'
-#' mizerReef models contain two sources of external mortality, external
-#' predation and senescence.
-#'
-#' @section External predation:
-#'
-#' The external predation accounts for all the mortality that is not due to
-#' predation by predators included in the model. It is a rate with units
-#'  1/year.
-#'
-#' External predation mortality is assumed to decrease allometrically with
-#' body size, given by:
-#'
-#' \eqn{\mu_{ext}(w) = z_{0.i}}. The value of the constant \eqn{z_0} for each
-#' species is taken from the `z0` column of the species parameter data frame, if
-#' that column exists. Otherwise it is calculated as
-#' \deqn{\mu_{ext}(w) = {\tt z0pre}_i\, w_{inf}^{\tt z0exp}.}{z_{0.i} = z0pre_i w_{inf}^{z0exp}.}
+#' @section Residual natural mortality:
+#' 
+#'      Residual natural mortality accounts for any external predation or
+#'      fishing mortality that is not explicitly included in the model. It is
+#'      assumed to decrease allometrically with body size. Residual natural
+#'      mortality is a rate with units 1/year given by:
+#'      
+#'      \deqn{\mu_{nat.i}(w) = \mu_{nat}\, w^{1-n}.}
+#'           {\mu_{nat.i}(w) = \mu_{nat}\, w^{1-n}.}
+#'           
+#'       Here \eqn{\mu_{nat}} is the residual natural mortality rate at size
+#'       1 g and \eqn{n} is the allometric scaling exponent. In mizerReef, 
+#'       these default to \eqn{\mu_{nat} = 0.2} and \eqn{n = 0.75}.
 #'
 #' @section Senescence mortality:
 #'
-#'      Senescence mortality is implemented by default in mizerReef. You do not
-#'      need to set these parameters. This function should only be used to
-#'      change default values.
-#'
 #'      Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
-#'      mortality caused by external sources such as illness or age. This is
-#'      addition to external mortality, \eqn{\mu_{ext.i}(w)}, which represents
-#'      all mortality that is not due to fishing or predation by predators
-#'      included in the model. The rate of senescence mortality is given by:
+#'      mortality caused by background sources such as illness or age. The 
+#'      rate of senescence mortality (in 1/year) is given by:
 #'
-#'      \deqn{\mu_{sen.i}(w) = k_{sen}\left(\frac{w}{w_{max.i}}\right)^{p_{sen}}}
-#'           {\mu_{sen.i}(w) = k_{sen}(w/w_{max.i})^{p_{sen}}}
+#'      \deqn{\mu_{sen.i}(w) = k_{sen}\left(
+#'                              \frac{log_{10}(w)}{log_{10}(w_{max.i})}
+#'                              \right)^{p_{sen}}}
+#'           {\mu_{sen.i}(w) = k_{sen}
+#'           (log_{10}(w)/log_{10}(w_{max.i}))^{p_{sen}}}
 #'
 #'      where \eqn{k_{sen}} is the rate of senescence mortality, \eqn{p_sen}
 #'      defines the slope of the senescence curve, \eqn{w_max.i} maximum body
@@ -300,42 +222,46 @@ setExtMortParams <- function(params,
 #'  user-defined length bins that are protected from being encountered
 #'  by a predator.
 #'
-#'  A unique refuge profile is generated for each predator x prey combination
-#'  based on the given refuge profile parameters as well as four values from
-#'  `params@species_params`: length to weight conversion values `a` and `b`,
-#'  `refuge_user`, which is true for groups utilize that predation refuge,
-#'  and `bad_pred`, which is true for predators whose foraging is hindered
-#'  by refuge.
+#'  A unique refuge profile is generated for each predator group x 
+#'  prey group x prey size combination based on the given refuge profile
+#'  parameters as well as four values from `params@species_params`: length 
+#'  to weight conversion values `a` and `b`, `refuge_user`, which is true 
+#'  for groups utilize that predation refuge, and `bad_pred`, which is false 
+#'  for predator groups whose body shape or predatory strategy allow them to
+#'  access fish within refuge (e.g. eels).
 #'  
 #'  To ensure some food is always available to predators, the maximum 
 #'  proportion of fish protected by refuge in any size class is set by
 #'  `max_protect`.
 #'
 #'  The refuge profile is used when calculating the food encounter rate in
-#'  [reefEncounter()] and the predation mortality rate in [reefPredMort()]. Its
-#'  entries are dimensionless numbers. If no refuge is available then
-#'  predator-prey interactions are determined entirely by size-preference.
+#'  [reefEncounter()] and the predation mortality rate in [reefPredMort()]. 
+#'  Its entries are dimensionless values between 0 and 1 which represent the
+#'  proportion of fish in the corresponding prey and size categories that are
+#'  hidden within refuge and thus cannot be encountered by predators. If no
+#'  refuge is available then predator-prey interactions are determined 
+#'  entirely by size-preference.
 #'
 #'  The mizerReef package provides three methods to define the refuge profile:
 #'
-#'      1. ``simple`` -  This method is preferred for data-poor reefs or reefs
+#'      1.``sigmoidal`` - This method is preferred for data-poor reefs or reefs
 #'      where the refuge distribution is unknown. It is also ideal for systems
 #'      where only one functional group is expected to be utilizing refuge. The
 #'      proportion of fish with access to refuge \eqn{ R_j(w_p) }$ is given by:
 #'
 #'      \deqn{ R_j(w_p) =
-#'          \frac{r_{peak}}{1 + e^{\left(\alpha (w - W_{refuge})\right)}}}
+#'          \frac{r}{1 + e^{\left(\alpha (w - W_{refuge})\right)}}}
 #'          {R_j(w_p) = r_{peak}/(1 + e^{(\alpha (w - W_{refuge}))}}
 #'          
 #'      Here \eqn{W_{refuge}} marks the body weight at which refuge becomes 
-#'      scarcer for prey. \eqn{r_{peak}} defines the maximum proportion of 
-#'      fish with access to predation refuge and is always less than or equal 
-#'      to `max_protect`. \eqn{\alpha} controls the rate at which the 
+#'      scarcer for prey. \eqn{r} defines the maximum proportion of fish with
+#'      access to predation refuge and is always less than or equal to
+#'      `max_protect`. \eqn{\alpha} controls the rate at which the 
 #'      availability of refuge decreases with increasing body size. It
-#'      defaults to a steep slop of 100.
+#'      defaults to a steep slope of 100.
 #'
 #'      For this method, `method_params` should contain columns named
-#'      `prop_protect` and `L_refuge` that give the values for \eqn{r_{peak}}
+#'      `prop_protect` and `L_refuge` that give the values for \eqn{r}
 #'      and the length at which refuge becomes scarce in cm.
 #'
 #'      2. ``binned`` - This method is appropriate for theoretical applications
@@ -354,10 +280,11 @@ setExtMortParams <- function(params,
 #'      of each size bin and `prop_protect`, the proportion of fish protected
 #'      within each corresponding size bin.
 #'
-#'      3. ``data`` -  This method is appropriate when data on the number of
-#'      refuge holes present within defined fish length bins is available. The
-#'      proportion of fish in size class \eqn{k} with access to refuge is given
-#'      by:
+#'      3. ``competitive`` - This method is appropriate when refuge density 
+#'      data is available for the modelled reef. The refuge density describes 
+#'      the distribution of refuges \eqn{(#/m^2)} across defined fish body size
+#'      categories. The proportion of fish in size class \eqn{k} with access 
+#'      to refuge is given by:
 #'
 #'      \deqn{R_j(w_p) = \tau\cdot\frac{\eta_k}{\sum_{i}\int_{w_{k-1}}^{w_k}
 #'      N_i(w)~dw}  ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~]}
@@ -367,8 +294,8 @@ setExtMortParams <- function(params,
 #'      where \eqn{\tau} is the proportion of fish with access to refuge that
 #'      are expected to actually utilize  it, \eqn{\eta_k} is the density of
 #'      refuges in size range \eqn{(w_{k-1}, w_k]} and
-#'       \eqn{\sum_{i}\int_{w_{k-1}}^{w_k} N_i(w)~dw} gives the total
-#'      number of fish from any group in size range \eqn{(w_{k-1}, w_k]}.
+#'       \eqn{\sum_{i}\int_{w_{k-1}}^{w_k} N_i(w)~dw} gives the density
+#'       of fish from any group in size range \eqn{(w_{k-1}, w_k]}.
 #'      This represents the density of competitors for refuges in
 #'      size class \eqn{k}.
 #'
@@ -378,7 +305,7 @@ setExtMortParams <- function(params,
 #'      in each size bin [no/m^2].
 #'
 #'  This function checks that the supplied refuge parameters are valid, adds
-#'  relevant columns to the `species_params` dataframe, and stores refuge
+#'  relevant columns to the `species_params` data frame, and stores refuge
 #'  parameters in the `other_params` slot of the `params` object.
 #'
 #'  Refuge profile parameters can be input in a spreadsheet program and saved
@@ -387,21 +314,17 @@ setExtMortParams <- function(params,
 #'
 #' @param params MizerParams object
 #' @param method The desired method for setting up benthic refuge,
-#'  can be "simple", "binned", or "data"
+#'  can be "sigmoidal", "binned", or "competitive"
 #' @param method_params A data frame containing values specific to each
 #' method for calculating refuge
 #' @param refuge_user A vector of logical values indicating whether each
 #' functional group uses refuge, TRUE indicates the group uses refuge while
-#' false indicates that they do not. Alternatively,t hese can be included in
-#' the `params@species_params` dataframe.
+#' false indicates that they do not. Alternatively, these can be included in
+#' the `params@species_params` data frame.
 #' @param bad_predator A vector of logical values indicating whether hunting is
 #' inhibited by refuge for this functional group. FALSE indicates that this
 #' species is able to encounter prey within refuge (e.g. eels). Alternatively,
-#' these can also be included in the `params@species_params` dataframe.
-#' @param pisc A vector of logical values indicating whether this
-#' functional group are generally piscivores. FALSE indicates that this group
-#' feeds only from the resource spectra. Alternatively,
-#' these can also be included in the `params@species_params` dataframe.
+#' these can also be included in the `params@species_params` data frame.
 #'
 #' Optional parameters:
 #' @param w_settle  The body weight (g) at which fish settle onto the reef.
@@ -421,8 +344,7 @@ setRefuge <- function(params,
                       tau = NULL,
                       method_params,
                       refuge_user = NULL,
-                      bad_predator = NULL,
-                      pisc = NULL,...) {
+                      bad_predator = NULL,...) {
 
     # Check if mizerParams is valid
     assert_that(is(params, "MizerParams"))
@@ -438,11 +360,11 @@ setRefuge <- function(params,
     no_sp = nrow(params@species_params)
 
     # Check if the user provided one of the available methods
-    method_options <- c('simple','binned','data')
+    method_options <- c('sigmoidal','binned','competitive')
     if(is.null(method)) {
         stop("You must provide the method to calculate the refuge profile.")
     } else if(!is.element(method, method_options)) {
-        stop("Method must be 'simple','binned', or 'data'.")
+        stop("Method must be 'sigmoidal','binned', or 'competitive'.")
     }
 
     # Set default values for parameters used by all methods
@@ -450,9 +372,6 @@ setRefuge <- function(params,
     # Minimum size of fish protected by refuges at measured scale
     if(is.null(w_settle)){
         w_settle <- 0.01
-        # # Calculate minimum weight that can use refuge for each group
-        # w_settle <- params@species_params[["a"]] *
-        #     min_ref_length ^ params@species_params[["b"]]
     } else {
         if(!is.numeric(w_settle)) {
             stop("w_settle should be numeric.")
@@ -500,17 +419,17 @@ setRefuge <- function(params,
 
     cnames = colnames(method_params)
 
-    # Check names of method_params for simple method
-    if (refuge_params$method == "simple") {
+    # Check names of method_params for sigmoidal method
+    if (refuge_params$method == "sigmoidal") {
         if(!("prop_protect" %in% cnames)) {
-            stop("The simple method parameters dataframe needs a column called
+            stop("The sigmoidal method parameters dataframe needs a column called
                  'prop_protect' with the proportion of fish protected.")
         } else if(method_params$prop_protect < 0 ||
                   method_params$prop_protect > 1) {
             stop("prop_protect should be a proportion between 0 and 1")
         }
         if(!("L_refuge" %in% cnames)) {
-            stop("The simple method parameters dataframe needs a column called
+            stop("The sigmoidal method parameters dataframe needs a column called
                  'L_refuge' with the threshhold length (cm) for protected fish.")
         }
         if (is.null(method_params$slope)){ method_params$slope <- 100 }
@@ -540,19 +459,21 @@ setRefuge <- function(params,
     }
 
     # Check names of method_params for binned method
-    if (refuge_params$method == "data") {
+    if (refuge_params$method == "competitive") {
         if(!("start_L" %in% cnames)) {
-            stop("The data method parameters dataframe needs a column called
-                 'start_L' with the starting lengths (cm) for each size bin.")
+            stop("The competitive method parameters dataframe needs a 
+            column called 'start_L' with the starting lengths (cm) for 
+            each size bin.")
         }
         if(!("end_L" %in% cnames)) {
-            stop("The data method parameters dataframe needs a column called
-                 'end_L' with the end lengths (cm) for each size bin.")
+            stop("The competitive method parameters dataframe needs a 
+            column called 'end_L' with the end lengths (cm) for
+            each size bin.")
         }
         if(!("refuge_density" %in% cnames)) {
-            stop("The data method parameters dataframe needs a column called
-                 'refuge_density' with the proportion of fish protected
-                 for each bin.")
+            stop("The competitive method parameters dataframe needs a 
+            column called 'refuge_density' with the proportion of fish 
+            protected for each bin.")
         }
         if (!all(method_params$start_L < method_params$end_L)) {
             stop("All bin start lengths must be less than bin end lengths.")
@@ -577,24 +498,12 @@ setRefuge <- function(params,
         if(is.null(bad_pred)){
             stop("You need to provide values for bad_pred")
         } else if (!is.logical(bad_pred)) {
-            stop("The bad_predr values should be logical.")
+            stop("The bad_pred values should be logical.")
         }
         if(length(refuge_user) != no_sp) {
             stop("bad_pred should have a value for every group.")
         }
         params@species_params$bad_pred <- bad_pred
-    }
-
-    if(!('pisc' %in% colnames(params@species_params))){
-        if(is.null(pisc)){
-            stop("You need to provide values for pisc")
-        } else if (!is.logical(pisc)) {
-            stop("The pisc values should be logical.")
-        }
-        if(length(refuge_user) != no_sp) {
-            stop("bad_pred should have a value for every group.")
-        }
-        params@species_params$pisc <- pisc
     }
 
     # Store in params
