@@ -1,7 +1,9 @@
 # Overwrite mizer's steady() function to also set the detritus and algae
-# to steady state
 
-#' Run reef model to steady state
+#' Project a mizerReef model to steady state
+#' 
+#' This function tune detritus and algae parameters after running
+#' mizer's default projectToSteady function. 
 #'
 #' @return An object of type \linkS4class{MizerParams}
 #'

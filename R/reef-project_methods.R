@@ -38,6 +38,7 @@
 #' @param ... Unused
 #' @return List of rates.
 #' @export
+#' @concept refuge
 #' @family mizer rate functions
 reefRates <- function(params, n, n_pp, n_other,
                       t = 0, effort, rates_fns, ...) {
@@ -115,18 +116,13 @@ reefRates <- function(params, n, n_pp, n_other,
     return(r)
 }
 
-#' Define proportion of fish hidden in predation refuge (inaccessible to
-#' predators) to simulate benthic complexity
+#' Define proportion of fish hidden in predation refuge to simulate 
+#' benthic habitat complexity
 #'
 #' This function calculates the proportion of fish that are not hidden in
-#' predation refuge and thus vulnerable to predation. For the `sigmoidal` and
-#' `binned` methods vulnerability changes over time in response to degradation.
-#'
-#' TO DO: ADD CODE AND DESCRIPTION HERE OF DEGRADATION
-#'
-#' For the `data` method vulnerability is density dependent and changes with
-#' the abundance of competitors for refuge.
-#'
+#' predation refuge and thus vulnerable to being encountered by predators.
+#' 
+#' @inheritSection setRefuge Setting the refuge profile'
 #' @inheritParams reefRates
 #' @param ... Unused
 #'
@@ -134,6 +130,7 @@ reefRates <- function(params, n, n_pp, n_other,
 #'          not protected from predation by refuge
 #'
 #' @export
+#' @concept refuge
 #' @family mizer rate functions
 reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
 
@@ -379,6 +376,7 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
 #' @return A named two dimensional array (predator species x predator size) with
 #'   the encounter rates.
 #' @export
+#' @concept refuge
 #' @family mizer rate functions
 reefEncounter <- function(params, n, n_pp, n_other, t, 
                           vulnerable = reefVulnerable(params, 
@@ -532,6 +530,7 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 #' @return A two dimensional array (prey species x prey size) with the predation
 #'   mortality
 #' @family mizer rate functions
+#' @concept refuge
 #' @export
 reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
                          vulnerable = reefVulnerable(params, n, n_pp,
@@ -597,6 +596,7 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 #'
 #' @return A named two dimensional array (species x size) with the senescence
 #'   mortality rates.
+#' @concept External mortality
 #' @export
 reefSenMort <- function(params, ...) {
 
@@ -653,6 +653,7 @@ reefSenMort <- function(params, ...) {
 #' @return A named two dimensional array (species x size) with the total
 #'   mortality rates.
 #' @family mizer rate functions
+#' @concept External mortality
 #' @export
 reefMort <- function(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) {
     mizerMort(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) +

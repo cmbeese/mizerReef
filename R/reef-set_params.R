@@ -36,6 +36,7 @@
 #' @return `setUResourceParams`: MizerParams object with updated unstructured
 #'  resource parameters
 #' @export
+#' @concept Unstructured resources
 #' @family functions for setting parameters
 setURParams <- function(params,
                         UR_interaction,
@@ -154,6 +155,7 @@ setURParams <- function(params,
 #' @return `setExtMortParams`: MizerParams object with updated mortality
 #'  senescence parameters
 #' @export
+#' @concept External mortality
 #' @family functions for setting parameters
 setExtMortParams <- function(params,
                              ext_mort_params = NULL) {
@@ -336,6 +338,7 @@ setExtMortParams <- function(params,
 #'
 #' @return `setRefuge`: A MizerParams object with updated refuge parameters
 #' @export
+#' @concept refuge
 #' @family functions for setting parameters
 setRefuge <- function(params,
                       method,

@@ -39,6 +39,7 @@ library(plotly)
 #'
 #' @import ggplot2
 #' @export
+#' @concept plots
 #' @family plotting functions
 plotBiomass <- function(sim, species = NULL,
                         start_time, end_time,
@@ -157,6 +158,7 @@ plotlyBiomass <- function(sim,
 #'
 #' @export
 #' @family plotting functions
+#' @concept plots
 #' @seealso [plotting_functions], [setRefuge()]
 plotVulnerable <- function(object,
                            species = NULL,
@@ -249,6 +251,7 @@ plotlyVulnerable <- function(object,
 #'
 #' @export
 #' @family plotting functions
+#' @concept plots
 #' @seealso [plotting_functions], [setRefuge()]
 plotRefuge <- function(object, species = NULL,
                            ...) {
@@ -348,6 +351,7 @@ plotlyRefuge <- function(object,
 #'
 #' @export
 #' @family plotting functions
+#' @concept plots
 #' @seealso [plotting_functions], [setRefuge()]
 plotProductivity <- function(params,
                              species = NULL, time_range, highlight = NULL) {

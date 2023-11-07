@@ -1,5 +1,5 @@
-#' Calculate the total fisheries productivity of each functional group within
-#' a size range at each time step
+#' Calculate fisheries productivity for each functional group above a chosen
+#' minimum fishing size
 #'
 #' Fisheries productivity refers to the rate at which fish biomass is produced
 #' and available for harvest in a given area over a given period of time.
@@ -8,22 +8,27 @@
 #' The productivity \eqn{P_i(w)} of functional group \eqn{i} is given by
 #'
 #'  \deqn{P_i(w) = \int_w^{w+dw} N_i(w) g_i(w) dw}
-#'          {P_i(w) = int_w^{w+dw} N_i(w) g_i(w) dw}
+#'          {P_i(w) = \int_w^{w+dw} N_i(w) g_i(w) dw}
 #'
 #'  \eqn{N_i(w)} is the abundance density (1/m^-2) and \eqn{g_i(w)} is the
 #'  energy rate available for growth after metabolism, movement and
 #'  reproduction have been accounted for (grams/year).
 #'
-#' The productivity is calculated for all fish larger than input parameter
-#' `min_fishing_length`which defaults to \eqn{7 cm} regardless of functional
-#' group.
+#' The productivity is calculated for all fish in the size range between
+#' `min_fishing_length` and `max_fishing_length`which can be the same for 
+#' all functional groups or can be specified as a vector with one value for 
+#' each species in the model.`min_fishing_length` defaults to \eqn{7 cm} 
+#' regardless of functional group and `max_fishing_length` defaults to the 
+#' maximum weight in the model. 
 #'
 #' @param object An object of class `MizerParams` or `MizerSim`.If given a
 #'  \linkS4class{MizerSim} object, uses the growth rates at the final time of a
 #'   simulation to calculate productivity. If given a \linkS4class{MizerParams}
 #'   object, uses the initial growth rates.
-#' @param min_fishing_l The minimum size of fished inidividuals for
+#' @param min_fishing_l The minimum length (cm) of fished individuals for
 #'      productivity estimates. Defaults to 7 cm.
+#' @param max_fishing_l The maximum length (cm) of fished individuals for
+#'      productivity estimates. Defaults to max length. 
 #'
 #' @return If called with a MizerParams object, a vector with the productivity
 #'   in grams/year/m^-2 for each functional group in the model. If called with
@@ -34,7 +39,9 @@
 #' @family summary functions
 #' @concept summary_function
 getProductivity <- function(object,
-                            min_fishing_l = 7,...) {
+                            min_fishing_l = 7,
+                            max_fishing_l = 50,...) {
+    
     if (is(object, "MizerSim")) {
         stop('This functionality is not set up yet you dumbass.')
     }
@@ -42,7 +49,8 @@ getProductivity <- function(object,
     if (is(object, "MizerParams")) {
         params <- object
         size_range <- get_size_range_array(params,
-                                           min_l = min_fishing_l,...)
+                                           min_l = min_fishing_l,
+                                           max_l = max_fishing_l,...)
 
         # NEED TO CHECK ON HOW THIS IS CALCULATED!
         g <- mizer::getEGrowth(params)

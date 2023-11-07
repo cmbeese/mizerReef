@@ -6,6 +6,7 @@
 #' @inherit reefVulnerable
 #'
 #' @export
+#' @concept refuge
 #' @family rate functions
 getVulnerable <- function(params, n = initialN(params),
                           n_pp = initialNResource(params),

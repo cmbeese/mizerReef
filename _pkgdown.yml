@@ -1,42 +1,43 @@
 url: ~
 template:
-  bootstrap: 5
-  bootswatch: cerulean
+    bootstrap: 5
+    bootswatch: cerulean
 
 navbar:
-  structure:
-    left: [home, reference, articles]
-    right: [github]
+    structure:
+        left: [home, reference, articles]
+        right: [github]
     
 home:
-  sidebar:
-    structure: [links, citation, license, dev]
+    sidebar:
+        structure: [links, citation, license, dev]
 
 destination: docs
 
-reference:
-- title: Vulnerability
-- contents:
-  - matches("ulnerable")
-  - matches("efuge")
-- title: Detritus
-- contents:
-  - matches("etritus")
-- title: Algae
-- contents:
-  - matches("lgae")
-- title: Plots
-- contents:
-  - matches("plot")
-- title: Mortality
-- contents:
-  - matches("Mort")
-- title: Others
-- contents:
-  - encounter_contribution
-  - removeSpecies
-  - addSpecies
-  - scaleModel
-- title: Example model
-- contents:
-  - matches("cbn_params")
+# reference:
+# - title: Vulnerability
+# - contents:
+#     - has_concept("refuge")
+# - title: Unstructured Resources
+# - contents:
+#     - has_concept("unstructured resources")
+# - title: External Mortality
+#     - has_concept("External mortality")
+# - title: Plots
+# - contents:
+#     - has_concept("plots")
+# - title: Others
+# - contents:
+#     - reef_steady
+#     - scaleModel
+#     - removeSpecies
+#     - different
+# - title: Example Models
+# - contents:
+#     - cbn_params
+#     - rogers_params
+ 
+ 
+    
+    
+ 
