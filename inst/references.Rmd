@@ -7,8 +7,26 @@ csl: "ecology.csl"
 ```{r}
 library(knitr)
 library(knitcitations)
+# Start with clean bib, choose pandoc
+cleanbib()
+options("citation_format" = "pandoc")
 # bibliography
-
+# Intro
+    # Graham 2012 importance of complexity
+    citep("10.1007/s00338-012-0984-y")
+    # Richardson 2017 functional structure
+    citep("10.1007/s10641-016-0571-0")
+    # Beukers 1998 refuges mediate predator foraging success
+    citep("10.1007/s004420050419")
+    # Almany 2004 habitat complexity mediates predation
+    citep("10.1111/j.0030-1299.2004.13193.x")
+    # Hixon 1993 fish use refuge close to their body size
+    citep("10.2307/2937124")
+    # Nash 2014 size spectra follows refuges
+    citep("10.1111/oik.01314")
+    # mizer paper
+    citep("10.1111/2041-210X.12256")
+    
 # Methods
     # Ackerman 2000 - visual census not accurate for fish under 10 cm
     citep("10.3354/meps206227")
@@ -18,7 +36,9 @@ library(knitcitations)
     citep("10.1002/ecy.2103")
     # Rogers 2018 - less fisheries value
     citep("10.1002/ecy.2103")
-
+    # Newton 2007 - coral reef fisheries are minimally selective
+    citep("10.1016/j.cub.2007.02.054.")
+    
 # Parameter values
     
     # Beese 2023 - parameters taken from there
