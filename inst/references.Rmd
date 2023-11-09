@@ -38,6 +38,8 @@ options("citation_format" = "pandoc")
     citep("10.1002/ecy.2103")
     # Newton 2007 - coral reef fisheries are minimally selective
     citep("10.1016/j.cub.2007.02.054.")
+    # Hatcher 1988 Detritus sink rate 80%
+    citep("10.1016/0169-5347(88)90117-6.")
     
 # Parameter values
     
@@ -54,7 +56,24 @@ options("citation_format" = "pandoc")
 write.bibtex(file="references.bib")
 
 ```
+<!-- # manual references -->
 
+<!-- @Manual{mizerShelf, -->
+<!--     title = {mizerShelf: Mizer Models with Carrion and Detritus Components  -->
+<!--         suitable for continental shelf ecosystems}, -->
+<!--     author = {Gustav Delius and Silvia {de Juan} and Francesc Maynou}, -->
+<!--     year = {2022}, -->
+<!--     note = {R package version 1.0.1,  -->
+<!--         https://github.com/sizespectrum/mizerShelf}, -->
+<!--     url = {https://sizespectrum.org/mizerShelf/}, -->
+<!-- } -->
 
-```
+<!-- @Manual{mizer, -->
+<!--     title = {mizer: Dynamic Multi-Species Size Spectrum Modelling}, -->
+<!--     author = {Gustav Delius and Finlay Scott and Julia Blanchard and Ken Andersen}, -->
+<!--     year = {2023}, -->
+<!--     note = {R package version 2.4.1}, -->
+<!--     url = {https://CRAN.R-project.org/package=mizer}, -->
+<!-- } -->
+
 

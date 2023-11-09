@@ -548,21 +548,24 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     # Create list of vulnerabilities for each predator
     vul <- vector("list", no_sp)
     vul[bad_pred] <- list(vulnerable)
-    vul[good_pred] <- list(1)
+    vul[good_pred] <- list(matrix(1, nrow = no_sp, ncol = length(idx_sp)))
     
     # Loop through predator species to calculate predation mortality on
     # each prey species & size by all predators
     for (i in 1:no_sp){
-        # Predation rate of predator species i on all prey (by size)
-        pr_i <- pred_rate[i, idx_sp, drop = TRUE]
         # Vulnerability rate of all prey (species by size) to predator i
-        vul <- vul[[i]]
+        v <- vul[[i]]
+        # Predation rate of predator species i on all prey (by size)
+        pr_i <- pred_rate[i, idx_sp]
         # vul*pr_i predation mortality on prey (species by size) by predator i 
         # pm + add to predation mortality from other predators
-        pm <- pm + vul*pr_i
+        pm <- pm + v*pr_i
     }
     
-    return(base::t(params@interaction) %*% pm)
+    # Account for interaction of species
+    pred_mort <- base::t(params@interaction) %*% pm
+    
+    return(pred_mort)
 }
 
 

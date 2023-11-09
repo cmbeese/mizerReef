@@ -67,7 +67,8 @@ Biomass estimates for most functional groups were based on data collected
 from relatively un-fished reefs within a marine reserve in Bonaire 
 [@Rogers_2014]. The survey methods used were unable to detect cryptic or 
 nocturnal species, so estimates for carnivorous eels, nocturnal 
-invertivores, and cryptobenthic predators were taken from the literature [@REFERENCES HERE]. Life history parameters for each functional group are 
+invertivores, and cryptobenthic predators were taken from the literature 
+[@REFERENCES HERE]. Life history parameters for each functional group are 
 derived from data on the chosen representative species, the most abundant 
 in each group.
 
@@ -295,7 +296,8 @@ fish with access to refuge in size class $k$.
 ##### Competitive
 
 This method is appropriate when **refuge density** data is available for
-the modeled reef and mirrors he way refuge was defined in @Rogers_2017 and @Rogers_2018. The **refuge density** describes the distribution of refuges 
+the modeled reef and mirrors he way refuge was defined in @Rogers_2017 and 
+@Rogers_2018. The **refuge density** describes the distribution of refuges 
 across defined fish body size categories. The proportion of prey of weight 
 $w_p$ and functional group $j$ with access to refuge $R_j(w_p)$ is given by
 
@@ -515,7 +517,8 @@ and $l$ is measured in centimetres.
 The mortality rate $\mu_i(w)$ of an individual of group $i$ and weight
 $w$ has three sources: predation mortality $\mu_{p.i}(w)$, external
 mortality $\mu_{ext.i}(w)$, fishing mortality $\mu_{f.i}(w)$. External
-mortality is composed of residual natural mortality $\mu_{nat.i}(w)$, and senescence $\mu_{sen.i}(w)$. The mortality rate for group $i$ is then given by: 
+mortality is composed of residual natural mortality $\mu_{nat.i}(w)$, and 
+senescence $\mu_{sen.i}(w)$. The mortality rate for group $i$ is then given by: 
 $$
 \mu_i(w)=\mu_{p.i}(w)+\mu_{ext.i}(w)+\mu_{f.i}(w)
 $$ {#eq-mort} We will now explain each of the terms.
@@ -713,7 +716,9 @@ Skip to [Algae]
 
 The plankton spectrum ranges from 
 $w_0=`r signif(min(params@w_full), digits = 1)`$ to $w_{cutoff}=`r wcutoff`$ 
-grams. The steady state abundance of plankton at size 1g is $\kappa=`r kappa`[g/m^{-2}]$. The slope of the plankton spectrum $\lambda=`r lambda`$. 
+grams. The steady state abundance of plankton at size 1g is 
+$\kappa=`r kappa`[g/m^{-2}]$. The slope of the plankton spectrum is
+$\lambda=`r lambda`$. 
 
 ## Algae
 
