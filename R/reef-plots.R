@@ -267,17 +267,6 @@ plotRefuge <- function(object, species = NULL,
         vul <- getVulnerable(params)
         refuge <- (1-vul)
 
-        # Functional Groups
-        func_groups = c('Eels',
-                        'Farming \n damsels',
-                        'Herbivores',
-                        'Parrotfish',
-                        'Cryptobenthic \n predators',
-                        'Engulfers',
-                        'Grabbers',
-                        'Nocturnal \n invertivores',
-                        'Planktivores')
-
         # selector for desired species
         sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
                                     error_on_empty = TRUE)
@@ -314,12 +303,9 @@ plotRefuge <- function(object, species = NULL,
                                breaks = c(10^-2, 10^0, 10^2, 10^4),
                                labels = c(-2, 0, 2, 4)) +
             scale_y_continuous(name = "Proportion Protected", limits = c(0, 1)) +
-            scale_colour_manual(values = params@linecolour[legend_levels],
-                                labels = func_groups) +
-            scale_linetype_manual(values = params@linetype[legend_levels],
-                                  labels = func_groups) +
-            scale_discrete_manual("linewidth", values = linesize,
-                                  labels = func_groups)
+            scale_colour_manual(values = params@linecolour[legend_levels]) +
+            scale_linetype_manual(values = params@linetype[legend_levels]) +
+            scale_discrete_manual("linewidth", values = linesize)
     }
 }
 

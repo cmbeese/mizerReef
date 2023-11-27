@@ -48,9 +48,9 @@ getProductivity <- function(object,
 
     if (is(object, "MizerParams")) {
         params <- object
-        size_range <- get_size_range_array(params,
-                                           min_l = min_fishing_l,
-                                           max_l = max_fishing_l,...)
+        size_range <- mizer::get_size_range_array(params, 
+                                                  min_l = min_fishing_l, 
+                                                  max_l = max_fishing_l)
 
         # NEED TO CHECK ON HOW THIS IS CALCULATED!
         g <- mizer::getEGrowth(params)

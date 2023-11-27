@@ -190,8 +190,9 @@ getDetritusProduction <- function(params, n = params@initial_n,
                    check.margin = FALSE)
 
     # Decomposition of dead organisms
-    ex_mort <- sum((params@mu_b * n) %*% (params@w * params@dw)) *
-    sen_mort <- sum((senMort(params, n) * n) %*% (params@w * params@dw))
+    ex_mort <- sum((params@mu_b * n) %*% (params@w * params@dw))
+    sen_mort <- getSenMort(params)
+    sen_mort <- sum((sen_mort * n) %*% (params@w * params@dw))
     prop_decomp <- params@other_params$detritus$prop_decomp
 
     # Return vector

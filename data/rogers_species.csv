@@ -1,4 +1,4 @@
-﻿species,w_max,w_min,ks,h,a,b,beta,sigma,gamma,refuge_user,bad_pred,pisc
-predators,3162.27766,0.031622777,0.1,inf,0.025,3,100,1,6.4,TRUE,TRUE,TRUE
-herbivores,3162.27766,0.031622777,0.15,inf,0.025,3,100,1,0.2,TRUE,FALSE,FALSE
-inverts,3162.27766,0.0001,0.15,inf,0.025,3,100,1,0.2,FALSE,FALSE,FALSE
+﻿species,w_max,w_min,biomass_observed,biomass_cutoff,ks,h,a,b,beta,sigma,gamma,refuge_user,bad_pred,pisc
+predators,3162.27766,0.031622777,107.2698124,25,0.1,inf,0.025,3,100,1,6.4,TRUE,TRUE,TRUE
+herbivores,3162.27766,0.031622777,33.79304086,25,0.15,inf,0.025,3,100,1,0.2,TRUE,FALSE,FALSE
+inverts,3162.27766,0.0001,NA,NA,0.15,inf,0.025,3,100,1,0.2,FALSE,FALSE,FALSE

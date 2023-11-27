@@ -21,7 +21,8 @@
 #' @export
 newReefParams <- function(species_params,
                           interaction = NULL,
-                          min_w_pp = 1.0,
+                          min_w_pp = NA,
+                          w_pp_cutoff = 1.0,
                           ext_mort_params = NULL,
                           UR_interaction,
                           algae_growth = NULL,
@@ -42,6 +43,7 @@ newReefParams <- function(species_params,
     params <- newMultispeciesParams(species_params = species_params,
                                     interaction = interaction,
                                     min_w_pp = min_w_pp,
+                                    w_pp_cutoff = w_pp_cutoff,
                                     n = n, p = n, ...)
     
     # Check that a and b parameters are present for all species -
@@ -139,18 +141,13 @@ newReefParams <- function(species_params,
                         bad_predator = bad_predator,
                         pisc = pisc, ...)
 
-    # # Find initial vulnerability
-    # params <- get_initial_vulnerable(params = params, ...)
-
     # Replace mizerRate functions with mizerReef versions
     # mizerRates
     params <- setRateFunction(params, "Rates", "reefRates")
     # mizerEncounter
     params <- setRateFunction(params, "Encounter", "reefEncounter")
-    # mizerFeedingLevel
-    params <- setRateFunction(params, "FeedingLevel", "reefFeedingLevel")
-    # mizerPredRate
-    params <- setRateFunction(params, "PredRate", "reefPredRate")
+    # mizerPredMort
+    params <- setRateFunction(params, "PredMort", "reefPredMort")
 
     params
 }

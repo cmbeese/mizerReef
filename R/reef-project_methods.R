@@ -49,10 +49,10 @@ reefRates <- function(params, n, n_pp, n_other,
     r$vulnerable <- reefVulnerable(
         params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
     
-    # Implement degradation
-    r$degrade <- reefDegrade(
-        params, n = n, n_pp = n_pp, n_other = n_other, 
-        vulnerable = r$vulnerable, t = t, ...)
+    # # Implement degradation
+    # r$degrade <- reefDegrade(
+    #     params, n = n, n_pp = n_pp, n_other = n_other, 
+    #     vulnerable = r$vulnerable, t = t, ...)
     
     ## Growth ----
     # Calculate rate E_{e,i}(w) of encountered food
@@ -91,6 +91,9 @@ reefRates <- function(params, n, n_pp, n_other,
         params, n = n, n_pp = n_pp, n_other = n_other,
         effort = effort, t = t,
         e_growth = r$e_growth, pred_mort = r$pred_mort, ...)
+    # Calculate senescence mortality \mu_i(w)
+    r$mort <- reefSenMort(
+        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
     # Calculate total mortality \mu_i(w)
     r$mort <- rates_fns$Mort(
         params, n = n, n_pp = n_pp, n_other = n_other,
@@ -552,6 +555,7 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     
     # Loop through predator species to calculate predation mortality on
     # each prey species & size by all predators
+    pm <- matrix(0, no_sp, length(idx_sp))
     for (i in 1:no_sp){
         # Vulnerability rate of all prey (species by size) to predator i
         v <- vul[[i]]
@@ -601,7 +605,7 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 #'   mortality rates.
 #' @concept External mortality
 #' @export
-reefSenMort <- function(params, ...) {
+reefSenMort <- function(params, n, n_pp, n_other, t = 0, ...) {
 
     # Pull values from params for use later
     no_sp <- dim(params@interaction)[1]

@@ -13,21 +13,42 @@ cbn_int     <- read.csv("data/cbn_int.csv",     row.names = 1, header = TRUE)
 cbn_UR_int  <- read.csv("data/cbn_UR_int.csv",  row.names = 1, header = TRUE)
 
 # Create some tester refuge scenarios
-methods <- c("simple", "binned", "data")
-# rogers_2014 <- data.frame(max_L = 15, prop_protect = 0.2)
+methods <- c("sigmoidal", "binned", "competitive")
+rogers_2014 <- data.frame(L_refuge = 15, prop_protect = 0.2)
 beese_2023  <- data.frame(start_L = seq(0, 45, 5),
                           end_L = seq(5, 50, 5),
                           prop_protect = c(1, 1, 0.9, rep(0,7)))
-# rogers_2018 <- data.frame(start_L = seq(0, 45, 5),
-#                           end_L = seq(5, 50, 5),
-#                           refuge_density = c(0, 10^5, 10^5, 0, 0))
+rogers_2018 <- data.frame(start_L = seq(0, 45, 5),
+                          end_L = seq(5, 50, 5),
+                          refuge_density = c(0, 10^5, 10^5, 0, 0))
 
 ## SET MODEL -------------------------------------------------------------------
-cbn_params <- newReefParams(species_params = cbn_species,
+cbn_1 <- newReefParams(species_params = cbn_species,
+                       interaction = cbn_int,
+                       UR_interaction = cbn_UR_int,
+                       method = methods[1],
+                       method_params = rogers_2014)
+
+cbn_2 <- newReefParams(species_params = cbn_species,
                             interaction = cbn_int,
                             UR_interaction = cbn_UR_int,
                             method = methods[2],
                             method_params = beese_2023)
+
+cbn_3 <- newReefParams(species_params = cbn_species,
+                            interaction = cbn_int,
+                            UR_interaction = cbn_UR_int,
+                            method = methods[3],
+                            method_params = rogers_2018)
+
+# Refuge plots
+one <- plotRefuge(cbn_1)
+two <- plotRefuge(cbn_3)
+thr <- plotRefuge(cbn_2)
+
+print(one)
+print(two)
+print(thr)
 
 # Save as rda
 save(cbn_params, file = "data/cbn_params.rda")

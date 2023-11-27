@@ -396,7 +396,7 @@ setRefuge <- function(params,
 
     # Proportion of fish with access to refuge that are expected to utilize it
     if(is.null(tau)){
-        tau <- 0.90
+        tau <- 1
     } else {
         if(!is.numeric(tau)) { stop("tau should be numeric.") }
         if(refuge_params$tau < 0 || refuge_params$tau > 1) {

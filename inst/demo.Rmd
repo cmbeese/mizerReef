@@ -1,0 +1,138 @@
+---
+title: "mizerReef Demo"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/3_mizerReef/mizerReef')
+```
+
+## mizerReef Demo
+
+To get started with mizerReef, install the package from GitHub and load
+it.
+
+```{r,eval = FALSE}
+#remotes::install_github("cmbeese/mizerReef")
+library(mizerExperimental)
+library(mizerReef)
+```
+
+To make a mizer reef model, we need some data. First, let's load our
+data into the environment. To make a mizerReef model, you need the
+following: + a species parameter data frame + interaction matrix +
+detritus and algae interaction matrix + refuge profile method + refuge
+profile data
+
+The species parameters should contain the observed biomasses and cutoff
+size for each of the ten functional groups. All other functional group
+parameters will have defaults. The interaction matrix should list a
+value between 0 and 1 for the proportion of time these groups will
+encounter each other for each predator species by prey species
+combination. Similarly, the unstructured resource interaction matrix and
+should contain values between 0 and 1 for each group with the proportion
+of time that they spend feeding on detritus and algae.
+
+```{r}
+# Load species parameter data
+cbn_species <- read.csv("data/cbn_species.csv", row.names = 1, header = TRUE)
+cbn_int     <- read.csv("data/cbn_int.csv",     row.names = 1, header = TRUE)
+cbn_UR_int  <- read.csv("data/cbn_UR_int.csv",  row.names = 1, header = TRUE)
+```
+
+To define the refuge profile, you need to give the method as well as
+some data about the proportion of refuge at different body lengths.
+Let's set up a quick profile for each of the three methods.
+
+```{r}
+# Create some tester refuge scenarios
+methods <- c("sigmoidal", "binned", "competitive")
+sig <- data.frame(L_refuge = 15, prop_protect = 0.2)
+# bin <- data.frame(start_L = seq(0, 45, 5),
+#                   end_L = seq(5, 50, 5),
+#                   prop_protect = c(1, 1, 0.9, rep(0,7)))
+# com <- data.frame(start_L = seq(0, 45, 5),
+#                   end_L = seq(5, 50, 5),
+#                   refuge_density = c(0, 10^5, 10^5, 0, 0))
+```
+
+Now using the command newReefParams and the data frames that we loaded
+in, we can make models for each of our refuge profiles.
+
+```{r, warning = FALSE}
+## SET MODEL -------------------------------------------------------------------
+sig_params <- newReefParams(species_params = cbn_species,
+                       interaction = cbn_int,
+                       UR_interaction = cbn_UR_int,
+                       method = methods[1],
+                       method_params = sig)
+
+# bin_params <- newReefParams(species_params = cbn_species,
+#                             interaction = cbn_int,
+#                             UR_interaction = cbn_UR_int,
+#                             method = methods[2],
+#                             method_params = bin)
+# 
+# com_params <- newReefParams(species_params = cbn_species,
+#                             interaction = cbn_int,
+#                             UR_interaction = cbn_UR_int,
+#                             method = methods[3],
+#                             method_params = com)
+```
+
+We can use the command plotRefuge to see how the refuge profiles turned
+out for each prey group.
+
+```{r}
+# Refuge plots
+plotRefuge(sig_params)
+# plotRefuge(bin_params)
+# plotRefuge(com_params)
+```
+
+Lets project one of these to steady state and have a look at the
+resulting spectra.
+
+```{r}
+## Project to steady state
+sig_sim <- reef_steady(sig_params)
+
+# Plots
+plotSpectra(sig_sim, power = 2)
+```
+
+Those look kind of crazy, let's see how our biomasses match up with
+mizerExperimental and then calibrate them.
+
+```{r}
+plotBiomassVsSpecies(sig_sim)
+sig_sim <- calibrateBiomass(sig_sim)
+plotBiomassVsSpecies(sig_sim)
+```
+
+Now let's get them to match on a group level using matchBiomasses.
+
+```{r}
+sig_sim <- matchBiomasses(sig_sim)
+plotBiomassVsSpecies(sig_sim)
+```
+
+Fab. Okay, now to find a steady state. We use the same process as mizer.
+
+```{r}
+sig_sim <- sig_sim |>
+    matchBiomasses() |> steady() |> matchBiomasses() |> steady() |>
+    matchBiomasses() |> steady() |> matchBiomasses() |> steady() |>
+    matchBiomasses() |> steady() |> matchBiomasses() |> steady() |>
+    matchBiomasses() |> steady() |> matchBiomasses() |> steady() |>
+    matchBiomasses() |> steady() |> matchBiomasses() |> steady()
+```
+
+Now we have a steady state, let's see what it looks like:
+
+```{r}
+plot(sig_sim)
+```

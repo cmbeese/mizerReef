@@ -13,8 +13,8 @@ rogers_int     <- read.csv("data/rogers_int.csv",     row.names = 1, header = TR
 rogers_UR_int  <- read.csv("data/rogers_UR_int.csv",  row.names = 1, header = TRUE)
 
 # Create some tester refuge scenarios
-met <- c("simple", "binned", "data")
-rogers_2014 <- data.frame(max_L = 15, prop_protect = 0.2)
+met <- c("sigmoidal", "binned", "competitive")
+rogers_2014 <- data.frame(L_refuge = 15, prop_protect = 0.2)
 
 ## SET MODEL -------------------------------------------------------------------
 rogers_params <- newReefParams(species_params = rogers_species,
@@ -22,11 +22,6 @@ rogers_params <- newReefParams(species_params = rogers_species,
                                UR_interaction = rogers_UR_int,
                                method = met[1],
                                method_params = rogers_2014)
-
-## USE ORIGINAL MIZER FUNCTION TO INITIALIZE A MODEL
-rogers_params <- newMultispeciesParams(species_params = rogers_species,
-                                interaction = rogers_int,
-                                n = 3/4, p = 3/4)
 
 # Save as rda
 save(rogers_params, file = "data/rogers_params.rda")
