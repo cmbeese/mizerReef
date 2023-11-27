@@ -125,9 +125,6 @@ newReefParams <- function(species_params,
     # Change the external mortality rate in the params object
     mizer::ext_mort(params) <- allo_mort
 
-    # Add in senescence mortality
-    params <- setRateFunction(params, "Mort", "reefMort")
-
     ## ADD REFUGE
 
     # Add parameters
@@ -148,6 +145,8 @@ newReefParams <- function(species_params,
     params <- setRateFunction(params, "Encounter", "reefEncounter")
     # mizerPredMort
     params <- setRateFunction(params, "PredMort", "reefPredMort")
+    # Add in senescence mortality
+    params <- setRateFunction(params, "Mort", "reefMort")
 
     params
 }
