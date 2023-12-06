@@ -6,6 +6,6 @@ Benthic Invertebrates,inverts,50,5,1,100,1,0.025,100,0.025,3,FALSE,FALSE,FALSE
 Parrotfish,parrotfish,64,16,0.6,10000,1,0.0257,240,0.0257,2.93,TRUE,TRUE,FALSE
 Cryptobenthic Piscivores,pisc_crypt,8,3,1,100,2,0.092283497,0.25,0.01122,3.04,FALSE,FALSE,TRUE
 Engulfing Piscivores,pisc_eng,43,16,0.4,250,2.5,0.190101749,30,0.011,3.11,TRUE,TRUE,TRUE
-Grabbing Piscivores,pisc_grab ,80,25,0.1,150,1,0.0174,200,0.0174,3.01,TRUE,TRUE,TRUE
+Grabbing Piscivores,pisc_grab,80,25,0.1,150,1,0.0174,200,0.0174,3.01,TRUE,TRUE,TRUE
 Nocturnal Invertivores,pred_inv,45,17,0.4,5000,2,0.102890252,80,0.012,3.1,TRUE,TRUE,TRUE
 Planktivores,pred_plank,20,8,1,8000,1,0.01259,350,0.01259,3.03,TRUE,TRUE,TRUE

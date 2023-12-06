@@ -5,7 +5,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = 'C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/3_mizerReef/mizerReef')
 ```
@@ -21,20 +21,29 @@ library(mizerExperimental)
 library(mizerReef)
 ```
 
-To make a mizer reef model, we need some data. First, let's load our
-data into the environment. To make a mizerReef model, you need the
-following: + a species parameter data frame + interaction matrix +
-detritus and algae interaction matrix + refuge profile method + refuge
-profile data
+To make a mizerReef model, we will first need some information about the
+reef we intend to model. We will need the following data:
 
-The species parameters should contain the observed biomasses and cutoff
-size for each of the ten functional groups. All other functional group
-parameters will have defaults. The interaction matrix should list a
-value between 0 and 1 for the proportion of time these groups will
-encounter each other for each predator species by prey species
-combination. Similarly, the unstructured resource interaction matrix and
-should contain values between 0 and 1 for each group with the proportion
-of time that they spend feeding on detritus and algae.
+-   a species parameter data frame
+
+    -   Contains observed biomasses and cutoff size for each of the ten
+        functional groups. All other functional group parameters will
+        have defaults.
+
+-   interaction matrix
+
+    -   Contains a list of value betweens 0 and 1 for the proportion of
+        time these groups will encounter each other for each predator
+        species by prey species combination
+
+-   detritus and algae interaction matrix
+
+    -   contain values between 0 and 1 for each group with the
+        proportion of time that they spend feeding on detritus and algae
+
+-   refuge profile method
+
+-   refuge profile data
 
 ```{r}
 # Load species parameter data
