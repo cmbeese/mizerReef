@@ -47,9 +47,9 @@ reef we intend to model. We will need the following data:
 
 ```{r}
 # Load species parameter data
-cbn_species <- read.csv("data/cbn_species.csv", row.names = 1, header = TRUE)
-cbn_int     <- read.csv("data/cbn_int.csv",     row.names = 1, header = TRUE)
-cbn_UR_int  <- read.csv("data/cbn_UR_int.csv",  row.names = 1, header = TRUE)
+cbn_species <- read.csv("data/cbn_species.csv", header = TRUE)
+cbn_int     <- read.csv("data/cbn_int.csv",       row.names = 1, header = TRUE)
+cbn_UR_int  <- read.csv("data/cbn_UR_int.csv",    row.names = 1, header = TRUE)
 ```
 
 To define the refuge profile, you need to give the method as well as
@@ -97,9 +97,11 @@ out for each prey group.
 
 ```{r}
 # Refuge plots
-plotRefuge(sig_params)
+ref <- plotRefuge(sig_params)
+# ggsave('refuge.png', width = 9, height = 5)
 # plotRefuge(bin_params)
 # plotRefuge(com_params)
+print(ref)
 ```
 
 Lets project one of these to steady state and have a look at the
@@ -110,7 +112,9 @@ resulting spectra.
 sig_sim <- reef_steady(sig_params)
 
 # Plots
-plotSpectra(sig_sim, power = 2)
+spectra <- plotSpectra(sig_sim, power = 2)
+#ggsave('spectra.png', width = 7, height = 4)
+print(spectra)
 ```
 
 Those look kind of crazy, let's see how our biomasses match up with
@@ -133,11 +137,8 @@ Fab. Okay, now to find a steady state. We use the same process as mizer.
 
 ```{r}
 sig_sim <- sig_sim |>
-    matchBiomasses() |> steady() |> matchBiomasses() |> steady() |>
-    matchBiomasses() |> steady() |> matchBiomasses() |> steady() |>
-    matchBiomasses() |> steady() |> matchBiomasses() |> steady() |>
-    matchBiomasses() |> steady() |> matchBiomasses() |> steady() |>
-    matchBiomasses() |> steady() |> matchBiomasses() |> steady()
+    matchBiomasses() |> steady() |> matchBiomasses() |> steady() 
+
 ```
 
 Now we have a steady state, let's see what it looks like:

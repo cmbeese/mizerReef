@@ -52,7 +52,8 @@ plotBiomass <- function(sim, species = NULL,
     if (is.null(getComponent(params, "algae"))) {
         if (is.null(getComponent(params, "detritus"))) {
             return(mizer::plotBiomass(sim, species = species,
-                                      start_time = start_time, end_time = end_time,
+                                      start_time = start_time, 
+                                      end_time = end_time,
                                       y_ticks = y_ticks, ylim = ylim,
                                       total = total, background = background,
                                       highlight = highlight,
@@ -79,15 +80,17 @@ plotBiomass <- function(sim, species = NULL,
     }
 
     # Algae
-    alg_biomass <- rowSums(sweep(sim@n_other$algae, 2, params@dw_full * params@w_full, "*"))
+    alg_biomass <- rowSums(sweep(sim@n_other$algae, 2, 
+                                 params@dw_full * params@w_full, "*"))
     times <- as.numeric(names(alg_biomass))
     sel_times <- (times >= start_time) & (times <= end_time)
     br <- data.frame(Year = times[sel_times],
-                     Biomass = d_biomass[sel_times],
+                     Biomass = alg_biomass[sel_times],
                      Species = "Algae")
 
     # Detritus
-    d_biomass <- rowSums(sweep(sim@n_other$detritus, 2, params@dw_full * params@w_full, "*"))
+    d_biomass <- rowSums(sweep(sim@n_other$detritus, 2, 
+                               params@dw_full * params@w_full, "*"))
     times <- as.numeric(names(d_biomass))
     sel_times <- (times >= start_time) & (times <= end_time)
     br <- data.frame(Year = times[sel_times],
@@ -289,7 +292,7 @@ plotRefuge <- function(object, species = NULL,
         names(linesize) <- names(params@linetype[legend_levels])
 
         p <- ggplot(plot_dat, aes(group = Species)) +
-            facet_wrap(~ Species, ncol = 3) +
+            facet_wrap(~ Species) +
             theme(strip.text.x = element_text(size = 6))
             #    strip.background = element_blank(),
             #   strip.text.x =element_blank())
