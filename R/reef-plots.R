@@ -249,6 +249,11 @@ plotlyVulnerable <- function(object,
 #'   species are selected. A vector of species names, or a numeric vector with
 #'   the species indices, or a logical vector indicating for each species
 #'   whether it is to be selected (TRUE) or not.
+#' @param all.sizes If TRUE, then feeding level is plotted also for sizes
+#'   outside a species' size range. Default FALSE.
+#' @param return_data A boolean value that determines whether the formatted 
+#' data used for the plot is returned instead of the plot itself. Default 
+#' value is FALSE.
 #'
 #' @return A ggplot2 object
 #'
@@ -256,17 +261,30 @@ plotlyVulnerable <- function(object,
 #' @family plotting functions
 #' @concept plots
 #' @seealso [plotting_functions], [setRefuge()]
-plotRefuge <- function(object, species = NULL,
+plotRefuge <- function(object, 
+                       species = NULL,
+                       all.sizes = FALSE,
+                       return.data = FALSE,
                            ...) {
+    
+    assert_that(is.flag(all.sizes),
+                is.flag(return.data))
 
     if (is(object, "MizerSim")) {
 
         stop('This functionality is not set up yet you dumbass.')
 
     } else if (is(object, "MizerParams")) {
-
+        
         params <- object
-
+        
+        if (is.null(params@species_params$group_names)){
+            group_names <- params@species_params$species
+        } else {
+            group_names <- params@species_params$group_names
+        }
+        
+        # Calculate proportion of fish in refuge
         vul <- getVulnerable(params)
         refuge <- (1-vul)
 
@@ -278,11 +296,24 @@ plotRefuge <- function(object, species = NULL,
         species <- species[!is.na(species)]
         sel_sp <- which(!is.na(species))
         refuge <- refuge[sel_sp, , drop = FALSE]
-
+        
         # Make data from from selected species
         plot_dat <- data.frame(w = rep(params@w, each = length(species)),
                                value = c(refuge),
                                Species = species)
+        
+        if (!all.sizes) {
+            # Remove vulnerability for sizes outside a species' size range
+            for (sp in species) {
+                plot_dat$value[plot_dat$Species == sp &
+                            (plot_dat$w < params@species_params[sp, "w_min"] |
+                             plot_dat$w > params@species_params[sp, "w_max"])] <- NA
+            }
+            
+            plot_dat <- plot_dat[complete.cases(plot_dat), ]
+        }
+        
+        if (return_data) return(plot_dat)
 
         # Set up colors
         legend_levels <- intersect(names(params@linecolour), plot_dat$Species)
@@ -292,7 +323,7 @@ plotRefuge <- function(object, species = NULL,
         names(linesize) <- names(params@linetype[legend_levels])
 
         p <- ggplot(plot_dat, aes(group = Species)) +
-            facet_wrap(~ Species) +
+            facet_wrap(~ Species, scales = "free_x") +
             theme(strip.text.x = element_text(size = 6))
             #    strip.background = element_blank(),
             #   strip.text.x =element_blank())
@@ -306,9 +337,12 @@ plotRefuge <- function(object, species = NULL,
                                breaks = c(10^-2, 10^0, 10^2, 10^4),
                                labels = c(-2, 0, 2, 4)) +
             scale_y_continuous(name = "Proportion Protected", limits = c(0, 1)) +
-            scale_colour_manual(values = params@linecolour[legend_levels]) +
-            scale_linetype_manual(values = params@linetype[legend_levels]) +
-            scale_discrete_manual("linewidth", values = linesize)
+            scale_colour_manual(values = params@linecolour[legend_levels],
+                                labels = group_names) +
+            scale_linetype_manual(values = params@linetype[legend_levels],
+                                  labels = group_names) +
+            scale_discrete_manual("linewidth", values = linesize,
+                                  labels = group_names)
     }
 }
 

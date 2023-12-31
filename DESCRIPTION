@@ -58,7 +58,7 @@ Collate:
     'reef-plots.R'
     'reef-project_methods.R'
     'reef-rates.R'
-    'reef-set_params.R'
+    'reef-setParams.R'
     'reef-steady.R'
     'reef-summary_methods.R'
 VignetteBuilder: knitr

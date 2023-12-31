@@ -98,6 +98,7 @@ out for each prey group.
 ```{r}
 # Refuge plots
 ref <- plotRefuge(sig_params)
+
 # ggsave('refuge.png', width = 9, height = 5)
 # plotRefuge(bin_params)
 # plotRefuge(com_params)

@@ -515,7 +515,7 @@ individual of functional group $i$ and weight $w$ is $$
   g_i(w) = E_{r.i}(w)\left(1-\psi_i(w)\right).
 $$ {#eq-growth} When food supply does not cover the requirements of
 metabolism and activity, growth and reproduction stops, i.e. there is no
-negative growth.
+negative growth. There is no starvation mortality in mizerReef.
 
 #### Parameter values
 

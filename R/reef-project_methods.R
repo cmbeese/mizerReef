@@ -119,13 +119,13 @@ reefRates <- function(params, n, n_pp, n_other,
     return(r)
 }
 
-#' Define proportion of fish hidden in predation refuge to simulate 
-#' benthic habitat complexity
+#' Find the proportion of fish vulnerable to being encountered by predators 
+#' at each time step
 #'
 #' This function calculates the proportion of fish that are not hidden in
 #' predation refuge and thus vulnerable to being encountered by predators.
 #' 
-#' @inheritSection setRefuge Setting the refuge profile'
+#' @inheritSection setRefuge Setting the refuge profile
 #' @inheritParams reefRates
 #' @param ... Unused
 #'
@@ -136,152 +136,73 @@ reefRates <- function(params, n, n_pp, n_other,
 #' @concept refuge
 #' @family mizer rate functions
 reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
-
+    
     # Extract relevant data from params
     refuge_params <- params@other_params[['refuge_params']]
     method_params <- params@other_params[['method_params']]
-
-    # Pull values from params
-    w <- params@w
-    no_w <- length(params@w)
-    no_sp <- dim(params@interaction)[1]
-
-    # Initialize storage for the array of refuge proportions
-    refuge <- matrix(0, nrow = no_sp, ncol = no_w)
-    rownames(refuge) <- rownames(params@initial_n)
-    colnames(refuge) <- colnames(params@initial_n)
-
+    
     # Set parameters used with all methods
     w_settle    <- refuge_params$w_settle
-    # w_settle    <- params@species_params$w_settle
-    max_protect  <- refuge_params$max_protect
-    tau          <- refuge_params$tau
-
+    max_protect <- refuge_params$max_protect
+    tau         <- refuge_params$tau
+    
+    # Pull no of spcies and size bins
+    no_w <- length(params@w)
+    no_sp <- dim(params@interaction)[1]
+    
     # Store which functional groups use refuge
     refuge_user <- params@species_params$refuge_user
-
-    # Static methods
-    # static = c("sigmoidal", "binned")
-    # if (is.element(refuge_params$method, static)){
-    #
-    #     vulnerable <- params@other_params$initial_vulnerable
-
-    # Sigmoidal method ------------------------------------------------------------
-    if (refuge_params$method == "sigmoidal"){
-
-        # Pull slop and proportion of fish to be protected from method_params
-        prop_protect <- method_params$prop_protect
-        slope <- method_params$slope
-
-        # Convert length to weight
-        W_refuge <- params@species_params[["a"]] *
-            method_params$L_refuge ^ params@species_params[["b"]]
-
-        # Find indices of fish in size range to protect
-        # Set threshold weight - no organisms smaller than min_ref_length
-        # can utilize refuge to escape predators
-        # Loop through species
-        for (i in 1:no_sp){
-            denom <- 1 + exp(slope*(w - W_refuge[i]))
-            refuge[i, ] <- ifelse(w > w_settle, prop_protect/denom, 0)
-        }
-
-    # Binned method ------------------------------------------------------------
-    } else if (refuge_params$method == "binned") {
-
-        # Loop through each refuge bin
-        for (k in 1:nrow(method_params)) {
-
-            # Calculate start and end of weight bins for each functional group
-            # based on unique as and bs
-            start_w <- params@species_params[["a"]] *
-                method_params$start_L[[k]] ^ params@species_params[["b"]]
-
-            end_w  <- params@species_params[["a"]] *
-                method_params$end_L[[k]] ^ params@species_params[["b"]]
-
-            # Set threshold weight - no organisms smaller than w_settle
-            # can utilize refuge to escape predators
-            # idx.sm <- which(start_w < w_settle)
-            # start_w[idx.sm] <- w_settle[idx.sm]
-            start_w[start_w < w_settle] <- w_settle
-
-            # Find indices of fish in size range to protect
-            # TRUE for fish larger than start weight of bin
-            start_n <- t(sapply(start_w, function(x) params@w >= x))
-            # TRUE for fish smaller than end weight of bin
-            end_n <- t(sapply(end_w, function(x) params@w <= x))
-            # TRUE for fish that meet both conditions
-            bin_fish <- start_n & end_n
-
-            # Find indices of functional group x weight that are in size bin k
-            idx.bin = which(bin_fish == TRUE)
-
-            # Set vulnerability for fish in size bin to provided value
-            refuge[idx.bin] = method_params$prop_protect[k]
-        }
-
-    # Data method --------------------------------------------------------------
-    } else if (refuge_params$method == "data") {
-
+    
+    # Static methods -----------------------------------------------------------
+    static = c("sigmoidal", "binned")
+    
+    if (is.element(refuge_params$method, static)){
+        
+        refuge <- params@other_params$refuge
+        vulnerable <- 1 - refuge
+        
+        # Competitive method -------------------------------------------------------
+    } else if (refuge_params$method == "competitive") {
+        
         # Initialize empty list to hold number of competitors for each bin
         competitor_density = numeric(nrow(method_params))
-
+        
+        # Initialize storage for the array of refuge proportions
+        refuge <- matrix(0, nrow = no_sp, ncol = no_w)
+        rownames(refuge) <- rownames(params@initial_n)
+        colnames(refuge) <- colnames(params@initial_n)
+        
         # Loop through each refuge bin
         for (k in 1:nrow(method_params)) {
-
-            # Calculate start and end of weight bins for each functional
-            # group based on unique as and bs
-            start_w <- params@species_params[["a"]] *
-                method_params$start_L[[k]] ^ params@species_params[["b"]]
-
-            end_w  <- params@species_params[["a"]] *
-                method_params$end_L[[k]] ^ params@species_params[["b"]]
-
-            # Set threshold weight - no organisms smaller than
-            # minimum size that can utilize refuge
-            # idx.sm <- which(start_w < w_settle)
-            # start_w[idx.sm] <- w_settle[idx.sm]
-            start_w[start_w < w_settle] <- w_settle
-
-            # Calculate competitor density - number of fish that use refuge in
-            # each size bin
-
-            # Create matrix of boolean values indicating whether fish is
-            # in size range of bin k
-            # TRUE for fish larger than start weight
-            start_n <- t(sapply(start_w, function(x) params@w >= x))
-            # TRUE for fish smaller than end weight
-            end_n <- t(sapply(end_w, function(x) params@w <= x))
-            # TRUE for fish that meet both conditions
-            bin_fish <- start_n & end_n
-
-            # Number of competitors from each functional group in bin
+            
+            # Get indices of fish in size bin k
+            bin.id <- params@other_params$bin.id[[k]]
+            
+            # Creat vector of zeroes and ones
+            bin_fish <- 1:no_w %in% bin.id
+            
+            # Calculate number of competitors from each functional group in bin k
             competitors <- (n * bin_fish) %*% params@dw
-
+            
             # Eliminate functional groups that don't use refuge and sum
             competitor_density[k] <- sum(refuge_user * competitors)
-
-            # Find indices of fish within size bin k
-            ind = which(bin_fish == TRUE)
-
+            
             # Set vulnerability for fish in size bin based on the number of
             # available refuges and the number of competitors
-            refuge[ind] <- ifelse(competitor_density[k] == 0, max_protect,
-                                  tau * method_params$refuge_density[k] /
-                                      competitor_density[k])
+            refuge[,bin.id] <- ifelse(competitor_density[k] == 0, 
+                                      max_protect,
+                                      tau * method_params$refuge_density[k]/competitor_density[k])
+            
+            # Make sure none of the values are higher than maximum protection allowed
+            refuge[refuge > max_protect] = max_protect
+            
+            # Account for species that don't utilize refuge
+            vulnerable = 1 - (refuge_user*refuge)
         }
     }
-
-    # Save results
-    # Make sure none of the values are higher than maximum protection allowed
-    refuge[refuge > max_protect] = max_protect
-
-    # Account for species that don't utilize refuge
-    vulnerable = 1 - (refuge_user*refuge)
-
     return(vulnerable)
 }
+
 
 # #' Degrade coral reef habitat structure by decreasing the availability of 
 # #' refuge at certain sizes
