@@ -17,13 +17,14 @@
 #'
 #' @return Array (species x size) with the encounter rate in g/year.
 #' @export
-#'
+#' @concept Uresources
 encounter_contribution <- function(params, n_other, component, ...) {
     params@other_params[[component]]$rho * n_other[[component]]
 }
 
 
 #' @export
+#' @concept Uresources
 rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
     rescale_algae(rescale_detritus(params, detritus_factor),
                   algae_factor)
@@ -38,18 +39,19 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #'
 #' @param params A MizerParams object
 #' @return An updated MizerParams object
+#' @concept Uresources
 #' @export
 tune_algae_detritus <- function(params) {
 
     # algae
-    ain <- getAlgaeProduction(params) / params@initial_n_other$algae
+    ain  <- getAlgaeProduction(params) / params@initial_n_other$algae
     aout <- algae_consumption(params)
     if (ain < aout) {
         warning("The value for algae growth provided does not produce enough
                 to support this abundance of herbivores. I will increase algae
                 growth to meet the comsumption rate.")
     }
-    params@other_params$algae$algae_growth <- ain - aout
+    params@other_params$algae$algae_growth <- aout
 
     # detritus
     params@other_params$detritus$external <- 0
@@ -75,10 +77,7 @@ tune_algae_detritus <- function(params) {
 #' @return a mizer model object with scaled parameters
 #'
 #' @export
-#'
-#' @examples
-#' params <- scaleModel(CBN_params, 0.5)
-#'
+#' @concept Uresources
 scaleModel <- function(params, factor) {
 
     # Algae

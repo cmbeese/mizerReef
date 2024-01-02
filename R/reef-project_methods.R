@@ -11,8 +11,8 @@
 #'      \item e from [mizerEReproAndGrowth()]
 #'      \item e_repro from [mizerERepro()]
 #'      \item e_growth from [mizerEGrowth()]
-#'      \item pred_rate from [reefPredRate()]
-#'      \item pred_mort from [mizerPredMort()]
+#'      \item pred_rate from [mizerPredRate()]
+#'      \item pred_mort from [reefPredMort()]
 #'      \item sen_mort from [reefSenMort()]
 #'      \item f_mort from [mizerFMort()]
 #'      \item mort from [reefMort()]
@@ -43,16 +43,16 @@
 reefRates <- function(params, n, n_pp, n_other,
                       t = 0, effort, rates_fns, ...) {
     r <- list()
-
-    ## Vulnerability ----
-    # Calculate vulnerability of fish based on complexity
-    r$vulnerable <- reefVulnerable(
-        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
     
     # # Implement degradation
     # r$degrade <- reefDegrade(
     #     params, n = n, n_pp = n_pp, n_other = n_other, 
     #     vulnerable = r$vulnerable, t = t, ...)
+    
+    ## Vulnerability ----
+    # Calculate vulnerability of fish based on complexity
+    r$vulnerable <- reefVulnerable(
+        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
     
     ## Growth ----
     # Calculate rate E_{e,i}(w) of encountered food
@@ -154,7 +154,7 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
     refuge_user <- params@species_params$refuge_user
     
     # Static methods -----------------------------------------------------------
-    static = c("sigmoidal", "binned")
+    static = c("sigmoidal", "binned", "noncomplex")
     
     if (is.element(refuge_params$method, static)){
         
@@ -435,6 +435,35 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
     return(encounter)
 }
 
+#' Reef feeding level
+#'
+#' This function replaces the usual [mizerFeedingLevel()] function and returns 
+#' the a feeding level of 0 for piscivores.
+#'
+#' @inheritParams reefEncounter
+#'
+#' @return A two dimensional array (predator species x predator size) with the
+#'   feeding level.
+#'   
+#' @family mizer rate functions
+#' @concept extmort
+#' @export
+reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,
+                             vulnerable = reefVulnerable(params, 
+                                                         n, n_pp, n_other, t),
+                             ...) {
+    
+    # Get indices of piscivorous groups
+    pisc <- which(params@species_params$piscivore)
+    # Find mizer feeding level and set to 0 for any NAs (if use wants to set h)
+    fl <- mizerFeedingLevel(params, n, n_pp, n_other, t, encounter, ...)
+    fl[is.na(fl)] <- 0
+    # Set predator feeding level to 0
+    fl[pisc,] <- 0
+    
+    return(fl)
+}
+
 #' Get total predation mortality rate needed to project mizer reef model
 #'
 #' Calculates the total predation mortality rate \eqn{\mu_{p,i}(w_p)} (in units
@@ -448,6 +477,8 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 #' function unless an alternative function has been registered, see below.
 #' 
 #' @inheritParams reefRates
+#' @param vulnerable Array (species x size) with the proportion of individuals 
+#'                   that are not protected from predation by refuge
 #' @param pred_rate A two dimensional array (predator species x predator size)
 #'   with the feeding level.
 #'
@@ -521,10 +552,11 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 #' @param t The time for which to do the calculation (Not used by standard
 #'   mizer rate functions but useful for extensions with time-dependent
 #'   parameters.)
+#' @param ... Unused
 #'
 #' @return A named two dimensional array (species x size) with the senescence
 #'   mortality rates.
-#' @concept External mortality
+#' @concept extmort
 #' @export
 reefSenMort <- function(params, n, n_pp, n_other, t = 0, ...) {
 
@@ -581,7 +613,7 @@ reefSenMort <- function(params, n, n_pp, n_other, t = 0, ...) {
 #' @return A named two dimensional array (species x size) with the total
 #'   mortality rates.
 #' @family mizer rate functions
-#' @concept External mortality
+#' @concept extmort
 #' @export
 reefMort <- function(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) {
     mizerMort(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) +

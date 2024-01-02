@@ -7,7 +7,7 @@
 #'
 #' @param params MizerParams
 #' @return The detritus biomass in grams
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 detritus_biomass <- function(params) {
     params@initial_n_other$detritus
@@ -48,7 +48,7 @@ detritus_biomass <- function(params) {
 #'
 #' @return A vector giving the detritus spectrum at the next time step.
 #' @seealso [algae_dynamics()]
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
 
@@ -76,13 +76,15 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #' @param rates A list of rates as returned by [getRates()]
 #'
 #' @return The mass-specific consumption rate of detritus in grams per year.
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 detritus_consumption <- function(params,
                                  n = params@initial_n,
                                  rates = getRates(params)) {
     # With feeding level
-    sum((params@other_params$detritus$rho * n * (1 - rates$feeding_level))
+    feeding_level <- rates$feeding_level
+    feeding_level[is.na(feeding_level)] <- 0
+    sum((params@other_params$detritus$rho * n * (1 - feeding_level))
         %*% params@dw)
 
     # Without feeding level
@@ -96,9 +98,9 @@ detritus_consumption <- function(params,
 #' giving the rate in grams/year at which that species consumes detritus
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores
-#' @seealso [getalgaeProduction()], [algae_dynamics()], [getDetritusConsumption()]
+#' @seealso [getAlgaeProduction()], [algae_dynamics()], [getDetritusConsumption()]
 #' 
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 getDetritusConsumption <- function(params) {
 
@@ -122,7 +124,7 @@ getDetritusConsumption <- function(params) {
 #'
 #' @param params MizerParams
 #' @return A pie chart.
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 plotDetritusConsumption <- function(params) {
     consumption <- getDetritusConsumption(params)
@@ -167,13 +169,12 @@ plotDetritusConsumption <- function(params) {
 #'
 #' @param params MizerParams
 #' @param n A matrix of current species abundances (species x size)
-#' @param n_other Other dynamic components. Only `n_other$algae` is used.
 #' @param rates A list of rates as returned by [getRates()]
 #'
 #' @return A vector with named entries "feces", "decomp", and "external",
 #' giving the rates at which detritus biomass is produced by each of these
 #' sources in grams per year.
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 getDetritusProduction <- function(params, n = params@initial_n,
                                   rates = getRates(params)) {
@@ -228,7 +229,7 @@ plotDetritusProduction <- function(params) {
 #'
 #' @param params A MizerParams object
 #' @return The number giving the expected lifetime in years.
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 detritus_lifetime <- function(params) {
     1 / detritus_consumption(params,
@@ -244,7 +245,7 @@ detritus_lifetime <- function(params) {
 #' abundance while keeping the total consumption of detritus the same (by
 #' adjusting the interaction strength of species with detritus).
 #'
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 `detritus_lifetime<-` <- function(params, value) {
     rescale_detritus(params, value / detritus_lifetime(params))
@@ -262,7 +263,7 @@ detritus_lifetime <- function(params) {
 #' 
 #' @return An updated MizerParams object
 #' 
-#' @concept unstructured resources
+#' @concept Uresources
 #' @export
 rescale_detritus <- function(params, factor) {
     params@initial_n_other[["detritus"]] <-
