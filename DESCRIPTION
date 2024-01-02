@@ -1,5 +1,5 @@
 Package: mizerReef
-Title: MizerReef: Multi-species Size Spectrum Modelling for Coral Reefs
+Title: Mizer Models with Benthic Coupling for Coral Reefs
 Version: 1.0.0
 Date: 2023-31-12
 Authors@R: c(
