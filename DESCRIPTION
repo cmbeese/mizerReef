@@ -1,6 +1,5 @@
 Package: mizerReef
-Title: Mizer Models with Benthic Refuge and unstructured resources suitable for
-    simulating coral reef ecosystems
+Title: MizerReef: Multi-species Size Spectrum Modelling for Coral Reefs
 Version: 1.0.0
 Date: 2023-31-12
 Authors@R: c(
@@ -18,9 +17,10 @@ Authors@R: c(
            email = "alice.rogers@vuw.ac.nz", role = "aut",
            comment = c(ORCID = "0000-0002-7244-0860")))
 Description: This package provides the functionality for setting up and
-    exploring mizer models with benthic refuge and algae, detritus, and 
-    plankton components and includes an example model for a Caribbean 
-    coral reef.
+    exploring mizer models with benthic coupling. New dynamics include
+    predation refuges as well as algae, detritus and plankton components. The
+    package also includes two sets of example parameters for Caribbean coral 
+    reefs.
 License: GPL-3
 Depends: 
     R (>= 3.5.0)
