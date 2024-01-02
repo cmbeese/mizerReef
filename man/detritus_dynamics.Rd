@@ -52,3 +52,4 @@ method to solve the equation numerically.
 \seealso{
 \code{\link[=algae_dynamics]{algae_dynamics()}}
 }
+\concept{Uresources}

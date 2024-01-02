@@ -96,4 +96,5 @@ Other plotting functions:
 \code{\link{plotRefuge}()},
 \code{\link{plotVulnerable}()}
 }
+\concept{plots}
 \concept{plotting functions}

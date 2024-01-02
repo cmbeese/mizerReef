@@ -25,3 +25,4 @@ non-mass-specific consumption rate, use \code{getAlgaeConsumption()}.
 The consumption rate by herbivorous fish is determined by
 \code{other_params(params)$algae$rho}
 }
+\concept{Uresources}

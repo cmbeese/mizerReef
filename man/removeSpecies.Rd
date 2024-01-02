@@ -20,9 +20,4 @@ A MizerParams object with fewer species.
 This calls \code{mizer::removeSpecies()} and in addition removes the relevant
 row from the detritus and algae consumption arrays \code{rho}.
 }
-\examples{
-params <- NWMed_params
-species_params(params)$species
-params <- removeSpecies(params, c("Poor cod", "Horse mackerel"))
-species_params(params)$species
-}
+\concept{helper}

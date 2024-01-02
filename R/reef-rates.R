@@ -37,7 +37,7 @@ getVulnerable <- function(params, n = initialN(params),
 #' @inherit reefSenMort
 #'
 #' @export
-#' @concept external mortality
+#' @concept extmort
 #' @family rate functions
 getSenMort <- function(params, n = initialN(params),
                        n_pp = initialNResource(params),

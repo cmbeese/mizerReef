@@ -7,12 +7,8 @@
 #'   numeric vector of species indices, or a logical vector indicating for each
 #'   species whether it is to be removed (TRUE) or not.
 #' @return A MizerParams object with fewer species.
-#' @examples
-#' params <- NWMed_params
-#' species_params(params)$species
-#' params <- removeSpecies(params, c("Poor cod", "Horse mackerel"))
-#' species_params(params)$species
 #' @export
+#' @concept helper
 removeSpecies <- function(params, species) {
     p <- mizer::removeSpecies(params, species)
     species <- valid_species_arg(params, species,

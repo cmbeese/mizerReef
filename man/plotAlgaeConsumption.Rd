@@ -15,3 +15,4 @@ A pie chart.
 \description{
 Plot algae consumption rates
 }
+\concept{plots}

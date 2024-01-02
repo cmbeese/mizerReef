@@ -12,8 +12,6 @@ getDetritusProduction(params, n = params@initial_n, rates = getRates(params))
 \item{n}{A matrix of current species abundances (species x size)}
 
 \item{rates}{A list of rates as returned by \code{\link[=getRates]{getRates()}}}
-
-\item{n_other}{Other dynamic components. Only \code{n_other$algae} is used.}
 }
 \value{
 A vector with named entries "feces", "decomp", and "external",
@@ -49,3 +47,4 @@ The function returns a vector with the individual contributions for each
 source. These can be summed with \code{sum()} to get the total detritus
 production rate.
 }
+\concept{Uresources}

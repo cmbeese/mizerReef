@@ -39,12 +39,12 @@ By default this function returns a list with the following components:
 \itemize{
 \item predation vulnerability from \code{\link[=reefVulnerable]{reefVulnerable()}}
 \item encounter from \code{\link[=reefEncounter]{reefEncounter()}}
-\item feeding level from \code{\link[=reefFeedingLevel]{reefFeedingLevel()}}
+\item feeding level from \code{\link[=mizerFeedingLevel]{mizerFeedingLevel()}}
 \item e from \code{\link[=mizerEReproAndGrowth]{mizerEReproAndGrowth()}}
 \item e_repro from \code{\link[=mizerERepro]{mizerERepro()}}
 \item e_growth from \code{\link[=mizerEGrowth]{mizerEGrowth()}}
-\item pred_rate from \code{\link[=reefPredRate]{reefPredRate()}}
-\item pred_mort from \code{\link[=mizerPredMort]{mizerPredMort()}}
+\item pred_rate from \code{\link[=mizerPredRate]{mizerPredRate()}}
+\item pred_mort from \code{\link[=reefPredMort]{reefPredMort()}}
 \item sen_mort from \code{\link[=reefSenMort]{reefSenMort()}}
 \item f_mort from \code{\link[=mizerFMort]{mizerFMort()}}
 \item mort from \code{\link[=reefMort]{reefMort()}}
@@ -59,8 +59,10 @@ function if you wish, see \code{\link[=setRateFunction]{setRateFunction()}} for 
 \seealso{
 Other mizer rate functions: 
 \code{\link{reefEncounter}()},
+\code{\link{reefFeedingLevel}()},
 \code{\link{reefMort}()},
 \code{\link{reefPredMort}()},
 \code{\link{reefVulnerable}()}
 }
 \concept{mizer rate functions}
+\concept{refuge}

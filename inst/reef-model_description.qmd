@@ -1,7 +1,5 @@
 ---
 title: "Model Description"
-bibliography: "references.bib"
-csl: "ecology.csl"
 execute: 
   echo: false
 format:
@@ -30,7 +28,7 @@ library(mizer)
 library(mizerExperimental)
 # remotes::install_github("cmbeese/mizerReef")
 library(mizerReef)
-params <- rogers_params
+params <- bonaire_model
 ```
 
 # Introduction

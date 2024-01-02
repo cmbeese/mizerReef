@@ -13,11 +13,11 @@
 #' @importFrom plotly ggplotly
 #' @importFrom lubridate now
 #' @importFrom methods is
-#' @importFrom assertthat assert_that
+#' @importFrom assertthat assert_that is.flag is.number
 #' @importFrom lifecycle deprecated
 #' @importFrom dplyr %>%
+#' @importFrom stats mvfft complete.cases
 #' @md
 #' @keywords internal
 "_PACKAGE"
 
-# #' @rawNamespace import(mizer, except = c(getEncounter,getPredRate))

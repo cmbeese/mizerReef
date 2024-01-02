@@ -6,9 +6,9 @@
 #' Productivity cannot be measured in situ.
 #'
 #' The productivity \eqn{P_i(w)} of functional group \eqn{i} is given by
-#'
-#'  \deqn{P_i(w) = \int_w^{w+dw} N_i(w) g_i(w) dw}
-#'          {P_i(w) = \int_w^{w+dw} N_i(w) g_i(w) dw}
+#' 
+#'     \deqn{P_i(w) = \int_w^{w+dw} \left( N_i(w) + g_i(w) \right) w \, dw.}
+#'          {P_i(w) = \int_w^{w+dw} \left( N_i(w) + g_i(w) \right) w \, dw.}
 #'
 #'  \eqn{N_i(w)} is the abundance density (1/m^-2) and \eqn{g_i(w)} is the
 #'  energy rate available for growth after metabolism, movement and
@@ -29,6 +29,7 @@
 #'      productivity estimates. Defaults to 7 cm.
 #' @param max_fishing_l The maximum length (cm) of fished individuals for
 #'      productivity estimates. Defaults to max length. 
+#' @param ... Unused
 #'
 #' @return If called with a MizerParams object, a vector with the productivity
 #'   in grams/year/m^-2 for each functional group in the model. If called with
@@ -37,7 +38,7 @@
 #'
 #' @export
 #' @family summary functions
-#' @concept summary_function
+#' @concept summary
 getProductivity <- function(object,
                             min_fishing_l = 7,
                             max_fishing_l = 50,...) {

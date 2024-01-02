@@ -6,19 +6,40 @@
 \alias{plotlyRefuge}
 \title{Plot the vulnerability to predation of species by size}
 \usage{
-plotVulnerable(object, species = NULL, ...)
+plotVulnerable(
+  object,
+  species = NULL,
+  all.sizes = FALSE,
+  return_data = FALSE,
+  ...
+)
 
-plotlyVulnerable(object, species = NULL, ...)
+plotlyVulnerable(
+  object,
+  species = NULL,
+  all.sizes = FALSE,
+  return_data = FALSE,
+  ...
+)
 
 plotlyRefuge(object, species = NULL, ...)
 }
 \arguments{
+\item{object}{An object of class \linkS4class{MizerParams}}
+
 \item{species}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a numeric vector with
 the species indices, or a logical vector indicating for each species
 whether it is to be selected (TRUE) or not.}
 
-\item{param}{An object of class \linkS4class{MizerParams}}
+\item{all.sizes}{If TRUE, then feeding level is plotted also for sizes
+outside a species' size range. Default FALSE.}
+
+\item{return_data}{A boolean value that determines whether the formatted
+data used for the plot is returned instead of the plot itself. Default
+value is FALSE.}
+
+\item{...}{unused}
 }
 \value{
 A ggplot2 object
@@ -35,4 +56,5 @@ Other plotting functions:
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()}
 }
+\concept{plots}
 \concept{plotting functions}

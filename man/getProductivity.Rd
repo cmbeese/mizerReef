@@ -2,10 +2,10 @@
 % Please edit documentation in R/reef-summary_methods.R
 \name{getProductivity}
 \alias{getProductivity}
-\title{Calculate the total fisheries productivity of each functional group within
-a size range at each time step}
+\title{Calculate fisheries productivity for each functional group above a chosen
+minimum fishing size}
 \usage{
-getProductivity(object, min_fishing_l = 7, ...)
+getProductivity(object, min_fishing_l = 7, max_fishing_l = 50, ...)
 }
 \arguments{
 \item{object}{An object of class \code{MizerParams} or \code{MizerSim}.If given a
@@ -13,8 +13,13 @@ getProductivity(object, min_fishing_l = 7, ...)
 simulation to calculate productivity. If given a \linkS4class{MizerParams}
 object, uses the initial growth rates.}
 
-\item{min_fishing_l}{The minimum size of fished inidividuals for
+\item{min_fishing_l}{The minimum length (cm) of fished individuals for
 productivity estimates. Defaults to 7 cm.}
+
+\item{max_fishing_l}{The maximum length (cm) of fished individuals for
+productivity estimates. Defaults to max length.}
+
+\item{...}{Unused}
 }
 \value{
 If called with a MizerParams object, a vector with the productivity
@@ -30,16 +35,20 @@ Productivity cannot be measured in situ.
 \details{
 The productivity \eqn{P_i(w)} of functional group \eqn{i} is given by
 
-\deqn{P_i(w) = \int_w^{w+dw} N_i(w) g_i(w) dw}
-{P_i(w) = int_w^{w+dw} N_i(w) g_i(w) dw}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{\deqn{P_i(w) = \int_w^{w+dw} \left( N_i(w) + g_i(w) \right) w \, dw.}
+     \{P_i(w) = \\int_w^\{w+dw\} \\left( N_i(w) + g_i(w) \\right) w \\, dw.\}
+}\if{html}{\out{</div>}}
 
 \eqn{N_i(w)} is the abundance density (1/m^-2) and \eqn{g_i(w)} is the
 energy rate available for growth after metabolism, movement and
 reproduction have been accounted for (grams/year).
 
-The productivity is calculated for all fish larger than input parameter
-\code{min_fishing_length}which defaults to \eqn{7 cm} regardless of functional
-group.
+The productivity is calculated for all fish in the size range between
+\code{min_fishing_length} and \code{max_fishing_length}which can be the same for
+all functional groups or can be specified as a vector with one value for
+each species in the model.\code{min_fishing_length} defaults to \eqn{7 cm}
+regardless of functional group and \code{max_fishing_length} defaults to the
+maximum weight in the model.
 }
+\concept{summary}
 \concept{summary functions}
-\concept{summary_function}

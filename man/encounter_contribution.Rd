@@ -30,3 +30,4 @@ the consumer:
 The coefficient \eqn{\rho_i(w)} is stored as a matrix (species x size) in
 the \code{rho} parameter of the component. It has units 1/year.
 }
+\concept{Uresources}

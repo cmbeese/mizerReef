@@ -17,7 +17,4 @@ a mizer model object with scaled parameters
 \description{
 This function scales various model parameters by a given factor.
 }
-\examples{
-params <- scaleModel(CBN_params, 0.5)
-
-}
+\concept{Uresources}

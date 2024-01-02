@@ -14,30 +14,27 @@ home:
 
 destination: docs
 
-# reference:
-# - title: Vulnerability
-# - contents:
-#     - has_concept("refuge")
-# - title: Unstructured Resources
-# - contents:
-#     - has_concept("unstructured resources")
-# - title: External Mortality
-#     - has_concept("External mortality")
-# - title: Plots
-# - contents:
-#     - has_concept("plots")
-# - title: Others
-# - contents:
-#     - reef_steady
-#     - scaleModel
-#     - removeSpecies
-#     - different
-# - title: Example Models
-# - contents:
-#     - cbn_params
-#     - rogers_params
- 
- 
-    
-    
- 
+reference:
+- title: Setting up a mizerReef model
+- contents:
+    - has_concept("setup")
+- title: Predation Refuge
+- contents:
+    - has_concept("refuge")
+- title: Unstructured Resources
+- contents:
+    - has_concept("Uresources")
+- title: External Mortality
+- contents:
+    - has_concept("extmort")
+- title: Plotting Functions
+- contents:
+    - has_concept("plots")
+- title: Helper Functions
+- contents:
+    - has_concept("helper")
+- title: Summary Functions
+- contents:
+    - has_concept("summary")
+
+

@@ -1,4 +1,4 @@
-# mizerReef
+# <img src= "man/figures/mizerReef_logo.png" align="right" />
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -10,10 +10,10 @@ This package was developed to support the creation and exploration of a generic 
 
 ## Installation
 
-You can install the mizerReef package from GitHub with
+You can install the development version of mizerReef from GitHub with
 
 ```{r}
-remotes::install_github("cmbeese/reefOld")
+remotes::install_github("cmbeese/mizerReef")
 ```
 
 If this gives an error saying “there is no package called remotes” then you also need to do

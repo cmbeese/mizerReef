@@ -2,7 +2,7 @@
 % Please edit documentation in R/reef-steady.R
 \name{reef_steady}
 \alias{reef_steady}
-\title{Run reef model to steady state}
+\title{Project a mizerReef model to steady state}
 \usage{
 reef_steady(
   params,
@@ -15,9 +15,39 @@ reef_steady(
   progress_bar = TRUE
 )
 }
+\arguments{
+\item{params}{A \linkS4class{MizerParams} object}
+
+\item{t_max}{The maximum number of years to run the simulation. Default is 100.}
+
+\item{t_per}{The simulation is broken up into shorter runs of \code{t_per} years,
+after each of which we check for convergence. Default value is 1.5. This
+should be chosen as an odd multiple of the timestep \code{dt} in order to be
+able to detect period 2 cycles.}
+
+\item{dt}{The time step to use in \code{project()}.}
+
+\item{tol}{The simulation stops when the relative change in the egg
+production RDI over \code{t_per} years is less than \code{tol} for every species.}
+
+\item{return_sim}{If TRUE, the function returns the MizerSim object holding
+the result of the simulation run. If FALSE (default) the function returns
+a MizerParams object with the "initial" slots set to the steady state.}
+
+\item{preserve}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+Specifies whether the \code{reproduction_level} should be preserved (default)
+or the maximum reproduction rate \code{R_max} or the reproductive
+efficiency \code{erepro}. See \code{\link[=setBevertonHolt]{setBevertonHolt()}} for an explanation
+of the \code{reproduction_level}.}
+
+\item{progress_bar}{A shiny progress object to implement a progress bar in a
+shiny app. Default FALSE.}
+}
 \value{
 An object of type \linkS4class{MizerParams}
 }
 \description{
-Run reef model to steady state
+This function tune detritus and algae parameters after running
+mizer's default projectToSteady function.
 }
+\concept{setup}

@@ -32,6 +32,9 @@ parameters.)}
 \item{pred_rate}{A two dimensional array (predator species x predator size)
 with the feeding level.}
 
+\item{vulnerable}{Array (species x size) with the proportion of individuals
+that are not protected from predation by refuge}
+
 \item{...}{Unused}
 }
 \value{
@@ -53,8 +56,10 @@ function unless an alternative function has been registered, see below.
 \seealso{
 Other mizer rate functions: 
 \code{\link{reefEncounter}()},
+\code{\link{reefFeedingLevel}()},
 \code{\link{reefMort}()},
 \code{\link{reefRates}()},
 \code{\link{reefVulnerable}()}
 }
 \concept{mizer rate functions}
+\concept{refuge}

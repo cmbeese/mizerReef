@@ -29,7 +29,7 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Chelsey M. Beese \email{beese.c.m$gmail.com} (\href{https://orcid.org/0000-0003-0949-7888}{ORCID})
+  \item Chelsey M. Beese \email{beese.c.m@gmail.com} (\href{https://orcid.org/0000-0003-0949-7888}{ORCID})
   \item Peter J. Mumby \email{p.j.mumby@uq.edu.au} (\href{https://orcid.org/0000-0002-6297-9053}{ORCID})
   \item Alice Rogers \email{alice.rogers@vuw.ac.nz} (\href{https://orcid.org/0000-0002-7244-0860}{ORCID})
 }

@@ -50,3 +50,4 @@ method to solve the equation numerically.
 \seealso{
 \code{\link[=detritus_dynamics]{detritus_dynamics()}}
 }
+\concept{Uresources}

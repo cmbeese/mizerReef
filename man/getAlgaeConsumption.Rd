@@ -17,5 +17,6 @@ This function returns a named vector with one component for each species
 giving the rate in grams/year at which that species consumes algae
 }
 \seealso{
-\code{\link[=getalgaeProduction]{getalgaeProduction()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getalgaeConsumption]{getalgaeConsumption()}}
+\code{\link[=getAlgaeProduction]{getAlgaeProduction()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}
 }
+\concept{Uresources}

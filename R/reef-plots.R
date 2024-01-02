@@ -61,7 +61,7 @@ plotBiomass <- function(sim, species = NULL,
         }
     }
 
-    # User mizer function to create dataframe
+    # User mizer function to create dataframe ----
     df <- mizer::plotBiomass(sim, species = species,
                              start_time = start_time, end_time = end_time,
                              y_ticks = y_ticks, ylim = ylim,
@@ -79,48 +79,39 @@ plotBiomass <- function(sim, species = NULL,
         stop("start_time must be less than end_time")
     }
 
-    # Algae
-    alg_biomass <- rowSums(sweep(sim@n_other$algae, 2, 
-                                 params@dw_full * params@w_full, "*"))
-    times <- as.numeric(names(alg_biomass))
-    sel_times <- (times >= start_time) & (times <= end_time)
-    br <- data.frame(Year = times[sel_times],
-                     Biomass = alg_biomass[sel_times],
-                     Species = "Algae")
+    # Algae ----
+    ba <- unlist(sim@n_other$algae)
+    dim(ba) <- dim(sim@n_other$algae)
+    dimnames(ba) <- dimnames(sim@n_other$algae)
+    times <- as.numeric(dimnames(ba)[[1]])
+    ba <- ba[(times >= start_time) & (times <= end_time), , drop = FALSE]
+    ba <- melt(ba)
+    
+        # Implement ylim and a minimal cutoff and bring columns in desired order
+        min_value <- 1e-20
+        ba <- ba[ba$value >= min_value &
+                     (is.na(ylim[1]) | ba$value >= ylim[1]) &
+                     (is.na(ylim[2]) | ba$value <= ylim[2]), c(1, 3, 2)]
+        names(ba) <- c("Year", "Biomass", "Species")
+        ba$Legend <- ba$Species
+    
+    # Detritus ----
+    bd <- unlist(sim@n_other$detritus)
+    dim(bd) <- dim(sim@n_other$detritus)
+    dimnames(bd) <- dimnames(sim@n_other$detritus)
+    times <- as.numeric(dimnames(bd)[[1]])
+    bd <- bd[(times >= start_time) & (times <= end_time), , drop = FALSE]
+    bd <- melt(bd)
 
-    # Detritus
-    d_biomass <- rowSums(sweep(sim@n_other$detritus, 2, 
-                               params@dw_full * params@w_full, "*"))
-    times <- as.numeric(names(d_biomass))
-    sel_times <- (times >= start_time) & (times <= end_time)
-    br <- data.frame(Year = times[sel_times],
-                     Biomass = d_biomass[sel_times],
-                     Species = "Detritus")
+        # Implement ylim and a minimal cutoff and bring columns in desired order
+        min_value <- 1e-20
+        bd <- bd[bd$value >= min_value &
+                     (is.na(ylim[1]) | bd$value >= ylim[1]) &
+                     (is.na(ylim[2]) | bd$value <= ylim[2]), c(1, 3, 2)]
+        names(bd) <- c("Year", "Biomass", "Species")
+        bd$Legend <- bd$Species
 
-    # Implement ylim and a minimal cutoff
-    min_value <- 1e-20
-    br <- br[br$Biomass >= min_value &
-                 (is.na(ylim[1]) | br$Biomass >= ylim[1]) &
-                 (is.na(ylim[2]) | br$Biomass <= ylim[2]), c(1, 2, 3)]
-    br$Legend <- br$Species
-
-    # other components
-    bc <- unlist(sim@n_other)
-    dim(bc) <- dim(sim@n_other)
-    dimnames(bc) <- dimnames(sim@n_other)
-    times <- as.numeric(dimnames(bc)[[1]])
-    bc <- bc[(times >= start_time) & (times <= end_time), , drop = FALSE]
-    bc <- melt(bc)
-
-    # Implement ylim and a minimal cutoff and bring columns in desired order
-    min_value <- 1e-20
-    bc <- bc[bc$value >= min_value &
-                 (is.na(ylim[1]) | bc$value >= ylim[1]) &
-                 (is.na(ylim[2]) | bc$value <= ylim[2]), c(1, 3, 2)]
-    names(bc) <- c("Year", "Biomass", "Species")
-    bc$Legend <- bc$Species
-
-    plot_dat <- rbind(df, bc, br)
+    plot_dat <- rbind(df, ba, bd)
     if (return_data) return(plot_dat)
 
     plotDataFrame(plot_dat, params, xlab = "Year", ylab = "Biomass [g]",
@@ -151,100 +142,7 @@ plotlyBiomass <- function(sim,
 #' When called with a \linkS4class{MizerParams}
 #' object the initial vulnerability is plotted.
 #'
-#' @param param An object of class \linkS4class{MizerParams}
-#' @param species The species to be selected. Optional. By default all
-#'   species are selected. A vector of species names, or a numeric vector with
-#'   the species indices, or a logical vector indicating for each species
-#'   whether it is to be selected (TRUE) or not.
-#'
-#' @return A ggplot2 object
-#'
-#' @export
-#' @family plotting functions
-#' @concept plots
-#' @seealso [plotting_functions], [setRefuge()]
-plotVulnerable <- function(object,
-                           species = NULL,
-                           ...) {
-
-    if (is(object, "MizerSim")) {
-
-        stop('This functionality is not set up yet you dumbass
-             .')
-    } else if (is(object, "MizerParams")) {
-
-        params <- object
-        vul <- getVulnerable(params)
-
-        func_groups = c('Eels',
-                        'Farming \n damsels',
-                        'Herbivores',
-                        'Parrotfish',
-                        'Cryptobenthic \n predators',
-                        'Engulfers',
-                        'Grabbers',
-                        'Nocturnal \n invertivores',
-                        'Planktivores')
-
-        # selector for desired species
-        sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
-                                    error_on_empty = TRUE)
-        species <- dimnames(params@initial_n)$sp[sel_sp]
-        species <- gsub('inverts',NA,species)
-        species <- species[!is.na(species)]
-        sel_sp <- which(!is.na(species))
-        vul <- vul[sel_sp, , drop = FALSE]
-
-        # Make data from from selected species
-        plot_dat <- data.frame(w = rep(params@w, each = length(species)),
-                               value = c(vul),
-                               Species = species)
-
-        # Set up colors
-        legend_levels <- intersect(names(params@linecolour), plot_dat$Species)
-        plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
-        linesize <- rep(0.8, length(legend_levels))
-        names(linesize) <- names(params@linetype[legend_levels])
-
-        p <- ggplot(plot_dat, aes(group = Species)) +
-                    facet_wrap(~ Species, ncol = 3) +
-                    theme(strip.background = element_blank(),
-                          strip.text.x = element_blank())
-
-        p + geom_line(aes(x = w, y = value,
-                          colour = Legend, linetype = Legend,
-                          linewidth = Legend)) +
-            labs(colour = 'Functional Group', linetype = 'Functional Group',
-                 linewidth = 'Functional Group') +
-            scale_x_continuous(name = "Log Size [g]", trans = "log10",) +
-            scale_y_continuous(name = "Proportion Protected", limits = c(0, 1)) +
-            scale_colour_manual(values = params@linecolour[legend_levels],
-                                labels = func_groups) +
-            scale_linetype_manual(values = params@linetype[legend_levels],
-                                  labels = func_groups) +
-            scale_discrete_manual("linewidth", values = linesize,
-                                  labels = c(func_groups))
-    }
-}
-
-
-#' @rdname plotVulnerable
-#' @export
-plotlyVulnerable <- function(object,
-                             species = NULL,
-                             ...) {
-
-    argg <- as.list(environment())
-    ggplotly(do.call("plotVulnerable", argg),
-             tooltip = c("Species", "w", "value"))
-}
-
-#' Plot the refuge profile, species by size
-#'
-#' When called with a \linkS4class{MizerParams}
-#' object the initial vulnerability is plotted.
-#'
-#' @param param An object of class \linkS4class{MizerParams}
+#' @param object An object of class \linkS4class{MizerParams}
 #' @param species The species to be selected. Optional. By default all
 #'   species are selected. A vector of species names, or a numeric vector with
 #'   the species indices, or a logical vector indicating for each species
@@ -254,6 +152,148 @@ plotlyVulnerable <- function(object,
 #' @param return_data A boolean value that determines whether the formatted 
 #' data used for the plot is returned instead of the plot itself. Default 
 #' value is FALSE.
+#' @param ... unused
+#'
+#' @return A ggplot2 object
+#'
+#' @export
+#' @family plotting functions
+#' @concept plots
+#' @seealso [plotting_functions], [setRefuge()]
+plotVulnerable <- function(object, 
+                           species = NULL,
+                           all.sizes = FALSE,
+                           return_data = FALSE,...) {
+    
+    assert_that(is.flag(all.sizes),
+                is.flag(return_data))
+    
+    if (is(object, "MizerSim")) {
+        
+        # sim values ----
+        
+        stop('This functionality is not set up yet you dumbass.')
+        
+    } else if (is(object, "MizerParams")) {
+        
+        # params values ----
+        params <- object
+        sp <- params@species_params
+        no_sp <- dim(params@interaction)[1]
+        
+        if (is.null(params@species_params$group_names)){
+            group_names <- params@species_params$species
+        } else {
+            group_names <- params@species_params$group_names
+        }
+        
+        # Calculate proportion of fish in refuge
+        vul <- getVulnerable(params)
+        refuge <- (1-vul)
+        
+        # species selector ----
+        sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
+                                    error_on_empty = TRUE)
+        species <- dimnames(params@initial_n)$sp[sel_sp]
+        species <- gsub('inverts',NA,species)
+        species <- species[!is.na(species)]
+        sel_sp <- which(!is.na(species))
+        refuge <- refuge[sel_sp, , drop = FALSE]
+        
+        # Convert length bins in to weight bins for each functional group
+        group_length_bins <- matrix(0, nrow = length(species), ncol = length(params@w))
+        for (i in 1:length(species)) {
+            group_length_bins[i,] <- (params@w / sp$a[i])^(1 / sp$b[i])
+        }
+        group_length_bins <- group_length_bins[sel_sp, , drop = FALSE]
+        
+        # Set x axis limit for plots
+        x_limit = max(sp$l_max)
+        
+        # data frame from selected species -----
+        plot_dat <- data.frame(w = rep(params@w, each = length(species)),
+                               l = c(group_length_bins),
+                               value = c(refuge),
+                               Species = species)
+        
+        if (!all.sizes) {
+            # Remove vulnerability for sizes outside a species' size range
+            for (sp in species) {
+                plot_dat$value[plot_dat$Species == sp &
+                                   (plot_dat$w < params@species_params[sp, "w_min"] |
+                                        plot_dat$w > params@species_params[sp, "w_max"])] <- NA
+            }
+            
+            plot_dat <- plot_dat[complete.cases(plot_dat), ]
+        }
+        
+        if (return_data) return(plot_dat)
+        
+        # colors ----
+        legend_levels <- intersect(names(params@linecolour), plot_dat$Species)
+        plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
+        plot_dat$Species <- factor(plot_dat$Species, levels = legend_levels)
+        linesize <- rep(0.8, length(legend_levels))
+        names(linesize) <- names(params@linetype[legend_levels])
+        
+        # faceting ----
+        p <- ggplot(plot_dat, aes(group = Species)) +
+            facet_wrap(~ Species, scales = "free_x") +
+            theme(strip.text.x = element_text(size = 6))
+        #   strip.background = element_blank(),
+        #   strip.text.x =element_blank())
+        
+        # plot ----
+        p + geom_line(aes(x = l, y = value,
+                          colour = Legend, linetype = Legend,
+                          linewidth = Legend)) +
+            labs(colour = 'Functional Group', linetype = 'Functional Group',
+                 linewidth = 'Functional Group') +
+            scale_x_continuous(name = "Total Length [cm]",
+                               limits = c(0,x_limit)) +
+            # scale_x_continuous(name = "Log Size [g]", trans = "log10",
+            #                    breaks = c(10^-2, 10^0, 10^2, 10^4),
+            #                    labels = c(-2, 0, 2, 4)) +
+            scale_y_continuous(name = "Proportion Protected", limits = c(0, 1)) +
+            scale_colour_manual(values = params@linecolour[legend_levels],
+                                labels = group_names) +
+            scale_linetype_manual(values = params@linetype[legend_levels],
+                                  labels = group_names) +
+            scale_discrete_manual("linewidth", values = linesize,
+                                  labels = group_names)
+    }
+}
+
+
+#' @rdname plotVulnerable
+#' @export
+plotlyVulnerable <- function(object,
+                             species = NULL,
+                             all.sizes = FALSE,
+                             return_data = FALSE,...) {
+
+    argg <- as.list(environment())
+    ggplotly(do.call("plotVulnerable", argg),
+             tooltip = c("Species", "w", "value"))
+}
+
+
+#' Plot the refuge profile, species by size
+#'
+#' When called with a \linkS4class{MizerParams}
+#' object the initial vulnerability is plotted.
+#'
+#' @param object An object of class \linkS4class{MizerParams}
+#' @param species The species to be selected. Optional. By default all
+#'   species are selected. A vector of species names, or a numeric vector with
+#'   the species indices, or a logical vector indicating for each species
+#'   whether it is to be selected (TRUE) or not.
+#' @param all.sizes If TRUE, then feeding level is plotted also for sizes
+#'   outside a species' size range. Default FALSE.
+#' @param return_data A boolean value that determines whether the formatted 
+#' data used for the plot is returned instead of the plot itself. Default 
+#' value is FALSE.
+#' @param ... unused
 #'
 #' @return A ggplot2 object
 #'
@@ -264,19 +304,23 @@ plotlyVulnerable <- function(object,
 plotRefuge <- function(object, 
                        species = NULL,
                        all.sizes = FALSE,
-                       return.data = FALSE,
-                           ...) {
+                       return_data = FALSE,...) {
     
     assert_that(is.flag(all.sizes),
-                is.flag(return.data))
+                is.flag(return_data))
 
     if (is(object, "MizerSim")) {
+        
+        # sim values ----
 
         stop('This functionality is not set up yet you dumbass.')
 
     } else if (is(object, "MizerParams")) {
         
+        # params values ----
         params <- object
+        sp <- params@species_params
+        no_sp <- dim(params@interaction)[1]
         
         if (is.null(params@species_params$group_names)){
             group_names <- params@species_params$species
@@ -288,7 +332,7 @@ plotRefuge <- function(object,
         vul <- getVulnerable(params)
         refuge <- (1-vul)
 
-        # selector for desired species
+        # species selector ----
         sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
                                     error_on_empty = TRUE)
         species <- dimnames(params@initial_n)$sp[sel_sp]
@@ -297,8 +341,19 @@ plotRefuge <- function(object,
         sel_sp <- which(!is.na(species))
         refuge <- refuge[sel_sp, , drop = FALSE]
         
-        # Make data from from selected species
+        # Convert length bins in to weight bins for each functional group
+        group_length_bins <- matrix(0, nrow = length(species), ncol = length(params@w))
+        for (i in 1:length(species)) {
+            group_length_bins[i,] <- (params@w / sp$a[i])^(1 / sp$b[i])
+        }
+        group_length_bins <- group_length_bins[sel_sp, , drop = FALSE]
+        
+        # Set x axis limit for plots
+        x_limit = max(sp$l_max)
+        
+        # data frame from selected species -----
         plot_dat <- data.frame(w = rep(params@w, each = length(species)),
+                               l = c(group_length_bins),
                                value = c(refuge),
                                Species = species)
         
@@ -315,27 +370,31 @@ plotRefuge <- function(object,
         
         if (return_data) return(plot_dat)
 
-        # Set up colors
+        # colors ----
         legend_levels <- intersect(names(params@linecolour), plot_dat$Species)
         plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
         plot_dat$Species <- factor(plot_dat$Species, levels = legend_levels)
         linesize <- rep(0.8, length(legend_levels))
         names(linesize) <- names(params@linetype[legend_levels])
-
+        
+        # faceting ----
         p <- ggplot(plot_dat, aes(group = Species)) +
             facet_wrap(~ Species, scales = "free_x") +
             theme(strip.text.x = element_text(size = 6))
-            #    strip.background = element_blank(),
+            #   strip.background = element_blank(),
             #   strip.text.x =element_blank())
-
-        p + geom_line(aes(x = w, y = value,
+        
+        # plot ----
+        p + geom_line(aes(x = l, y = value,
                           colour = Legend, linetype = Legend,
                           linewidth = Legend)) +
             labs(colour = 'Functional Group', linetype = 'Functional Group',
                  linewidth = 'Functional Group') +
-            scale_x_continuous(name = "Log Size [g]", trans = "log10",
-                               breaks = c(10^-2, 10^0, 10^2, 10^4),
-                               labels = c(-2, 0, 2, 4)) +
+            scale_x_continuous(name = "Total Length [cm]",
+                               limits = c(0,x_limit)) +
+            # scale_x_continuous(name = "Log Size [g]", trans = "log10",
+            #                    breaks = c(10^-2, 10^0, 10^2, 10^4),
+            #                    labels = c(-2, 0, 2, 4)) +
             scale_y_continuous(name = "Proportion Protected", limits = c(0, 1)) +
             scale_colour_manual(values = params@linecolour[legend_levels],
                                 labels = group_names) +
@@ -364,11 +423,16 @@ plotlyRefuge <- function(object,
 #' When called with a \linkS4class{MizerParams}
 #' object the steady state productivity is plotted.
 #'
-#' @param param An object of class \linkS4class{MizerParams}
+#' @param object An object of class \linkS4class{MizerParams}
 #' @param species The species to be selected. Optional. By default all
 #'   species are selected. A vector of species names, or a numeric vector with
 #'   the species indices, or a logical vector indicating for each species
 #'   whether it is to be selected (TRUE) or not.
+#' @param start_time The first time to be plotted. Default is the beginning of
+#'   the time series.
+#' @param end_time The last time to be plotted. Default is the end of the time
+#'   series.
+#' @param ... unused
 #'
 #' @return A ggplot2 object
 #'
@@ -376,18 +440,22 @@ plotlyRefuge <- function(object,
 #' @family plotting functions
 #' @concept plots
 #' @seealso [plotting_functions], [setRefuge()]
-plotProductivity <- function(params,
-                             species = NULL, time_range, highlight = NULL) {
+plotProductivity <- function(object,
+                             species = NULL,
+                             start_time = NULL, end_time = NULL,...) {
 
     if (is(object, "MizerSim")) {
 
-        stop('This functionality is not set up yet you dumbass
-             .')
+        stop('This functionality is not set up yet you dumbass.')
+        
     } else if (is(object, "MizerParams")) {
-
+        
+        # Saves as params
+        params <- object
+        # params object ----
         prod <- getProductivity(params)
 
-        # selector for desired species
+        # species selector ----
         sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
                                     error_on_empty = TRUE)
         species <- dimnames(params@initial_n)$sp[sel_sp]
@@ -396,17 +464,17 @@ plotProductivity <- function(params,
         sel_sp <- which(!is.na(species))
         prod <- prod[sel_sp, , drop = FALSE]
 
-        # Make data from from selected species
-        plot_dat <- data.frame(value = prod,Species = species)
+        # data frame from selected species ----
+        plot_dat <- data.frame(value = prod, Species = species)
 
-        # Set up colors
+        # colors ----
         legend_levels <- intersect(names(params@linecolour), plot_dat$Species)
         plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
         linesize <- rep(0.8, length(legend_levels))
         names(linesize) <- names(params@linetype[legend_levels])
-
+        
+        # plot ----
         p <- ggplot(plot_dat, aes(group = Species))
-
         p + geom_bar(aes(x = Species, y = value,
                          colour = Legend, linetype = Legend,
                          linewidth = Legend)) +
@@ -418,11 +486,14 @@ plotProductivity <- function(params,
 #' @rdname plotProductivity
 #' @export
 plotlyProductivity <- function(object,
-                             species = NULL,
-                             ...) {
+                               species = NULL,...) {
 
     argg <- as.list(environment())
     ggplotly(do.call("plotProductivity", argg),
              tooltip = c("Species", "value"))
 }
 
+
+# Set global variables
+utils::globalVariables(c("Rate", "Consumer", "Producer",
+                         "Species", "l", "value", "Legend"))

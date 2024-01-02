@@ -5,17 +5,31 @@
 \alias{plotlyProductivity}
 \title{Plot the productivity of each species}
 \usage{
-plotProductivity(params, species = NULL, time_range, highlight = NULL)
+plotProductivity(
+  object,
+  species = NULL,
+  start_time = NULL,
+  end_time = NULL,
+  ...
+)
 
 plotlyProductivity(object, species = NULL, ...)
 }
 \arguments{
+\item{object}{An object of class \linkS4class{MizerParams}}
+
 \item{species}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a numeric vector with
 the species indices, or a logical vector indicating for each species
 whether it is to be selected (TRUE) or not.}
 
-\item{param}{An object of class \linkS4class{MizerParams}}
+\item{start_time}{The first time to be plotted. Default is the beginning of
+the time series.}
+
+\item{end_time}{The last time to be plotted. Default is the end of the time
+series.}
+
+\item{...}{unused}
 }
 \value{
 A ggplot2 object
@@ -32,4 +46,5 @@ Other plotting functions:
 \code{\link{plotRefuge}()},
 \code{\link{plotVulnerable}()}
 }
+\concept{plots}
 \concept{plotting functions}

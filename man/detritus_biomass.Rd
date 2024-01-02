@@ -18,3 +18,4 @@ decomposing dead organisms and feces. Similar to algae, the detritus
 resource is not size structured because herbivores of any size feed on
 detritus on coral reefs.
 }
+\concept{Uresources}

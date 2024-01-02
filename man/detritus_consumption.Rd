@@ -25,3 +25,4 @@ non-mass-specific consumption rate, use \code{getDetritusConsumption()}.
 The consumption rate by detritivorous fish is determined by
 \code{other_params(params)$detritus$rho}
 }
+\concept{Uresources}

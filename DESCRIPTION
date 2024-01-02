@@ -9,7 +9,7 @@ Authors@R: c(
            role = c("cre", "aut", "cph"),
            comment = c(ORCID = "0000-0003-4092-8228")),
     person("Chelsey M.", "Beese",
-           email = "beese.c.m$gmail.com", role = "aut",
+           email = "beese.c.m@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0003-0949-7888")),
     person("Peter J.", "Mumby",
            email = "p.j.mumby@uq.edu.au", role = "aut",
@@ -31,7 +31,11 @@ Imports:
     lubridate,
     methods,
     ggplot2,
-    plotly
+    plotly,
+    dplyr,
+    splus2R,
+    stats,
+    lifecycle
 Suggests: 
     knitr,
     patchwork,
@@ -61,5 +65,6 @@ Collate:
     'reef-setParams.R'
     'reef-steady.R'
     'reef-summary_methods.R'
+    'reef-rhoControl.R'
 VignetteBuilder: knitr
 

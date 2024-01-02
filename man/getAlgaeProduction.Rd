@@ -20,3 +20,4 @@ chosen steady state abundances.
 \seealso{
 \code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}
 }
+\concept{Uresources}

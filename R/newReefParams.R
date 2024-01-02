@@ -2,35 +2,40 @@
 #'
 #' Sets up a multi-species size spectrum model with additional unstructured
 #' resource components, senescence mortality, and predation refuge.
-#'
-#' @inheritParams setURParams
-#' @inheritParams setRho
-#' @inheritParams setExtMortParams
-#' @inheritParams setRefuge
-#'
-#' @param n Allometric growth exponent (also used as metabolic exponent p)
-#' @param ... Extra parameters to be passed to [newMultispeciesParams()]
-#'
-#' @return An object of type \linkS4class{MizerParams}
-#'
-#' All the parameters will be mentioned in the following sections.
+#' 
 #' @inheritSection setURParams Adding unstructured resources
 #' @inheritSection setExtMortParams Senescence mortality
 #' @inheritSection setRefuge Setting the refuge profile
-#'
+#' 
 #' @export
+#' @inheritParams setURParams
+#' @inheritParams setExtMortParams
+#' @inheritParams setRefuge
+#' @param species_params A functional group parameter data frame
+#' @param interaction The group specific interaction matrix, \eqn{\theta_{ij}}
+#' @param min_w_pp Minimum size of plankton in grams
+#' @param w_pp_cutoff Maximum size of plankton in grams
+#' @param n Growth exponent (also used as metabolic exponent p)
+#' @param crit_feed Critical feeding level
+#' @param ... Extra parameters to be passed to [newMultispeciesParams()]
+#'
+#' @param n Allometric growth exponent (also used as metabolic exponent p)
+#' @param ... Extra parameters to be passed to [newMultispeciesParams()]
+#' @concept setup
+#' @return An object of type \linkS4class{MizerParams}
 newReefParams <- function(# Original mizer parameters
                             species_params, interaction = NULL, 
                             crit_feed = NULL,
                             min_w_pp = NA, w_pp_cutoff = 1.0, n = 3/4,
                           # Parameters for setting up refuge
                             method, method_params, 
-                            refuge_user = NULL, bad_pred = NULL,
+                            refuge_user = NULL, bad_pred = NULL, 
+                            piscivore = NULL,
                             a_bar = NULL, b_bar = NULL,
                             w_settle = NULL, max_protect = NULL, tau = NULL,
                           # Parameters for unstructured resources
                             UR_interaction, 
-                            algae_growth = NULL,
+                            algae_growth = NULL, scale_rho_a = NULL,
                             prop_decomp = NULL, d.external = NULL,
                           # Parameters for external mortality
                             ext_mort_params = NULL, ...) {
@@ -48,6 +53,7 @@ newReefParams <- function(# Original mizer parameters
                         method_params = method_params,
                         refuge_user = refuge_user, 
                         bad_pred = bad_pred,
+                        piscivore = piscivore,
                         a_bar = a_bar, b_bar = b_bar,
                         w_settle = w_settle, 
                         max_protect = max_protect, tau = tau, ...)
@@ -59,6 +65,7 @@ newReefParams <- function(# Original mizer parameters
     params <- setURParams(params = params,
                           UR_interaction = UR_interaction,
                           algae_growth = algae_growth,
+                          scale_rho_a = scale_rho_a,
                           prop_decomp = prop_decomp,
                           d.external = d.external)
     
@@ -70,7 +77,7 @@ newReefParams <- function(# Original mizer parameters
     # Algae & Detritus ----
     ### Calculate Rho ----
         # Determine the necessary detritus and algae encounter rates so that at
-        #maximum size the group has feeding level f0
+        # maximum size the group has feeding level f0
         if(is.null(crit_feed)){ crit_feed <- 0.6 }
         f0 <- set_species_param_default(params@species_params, "f0", crit_feed)$f0
         
@@ -90,13 +97,14 @@ newReefParams <- function(# Original mizer parameters
         rho_alg <- pmax(0, f0 * params@species_params$h / (1 - f0) - E) * ia
         rho_det <- pmax(0, f0 * params@species_params$h / (1 - f0) - E) * id
         
-        # Store new rho values in species_params data frame
-        params@species_params$rho_algae    <- rho_alg
-        params@species_params$rho_detritus <- rho_det
+        # Set rho to 0 for predators with no max consumption rate
+        rho_alg[is.na(rho_alg)] <- 0
+        rho_det[is.na(rho_det)] <- 0
         
-        # # Function to calculate rho - why doesn't this work?
-        # params <- setRho(params = params,
-        #                  crit_feed = crit_feed, n = n)
+        # Store new rho values in species_params data frame
+        scale_rho_a <- params@other_params$scale_rho_a
+        params@species_params$rho_algae    <- scale_rho_a*rho_alg
+        params@species_params$rho_detritus <- rho_det
     
         # Calculate rho * w^n for use in algae and detritus dynamic functions
         rho_alg <- outer(params@species_params$rho_algae, params@w ^ n)
@@ -104,7 +112,7 @@ newReefParams <- function(# Original mizer parameters
     
     ### Algae Component - Add in algae ----
     params <- setComponent(
-        params, "algae", initial_value = 1,
+        params, "algae", initial_value = 2e3,
         dynamics_fun = "algae_dynamics",
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_alg,
@@ -112,7 +120,7 @@ newReefParams <- function(# Original mizer parameters
     
     ### Detritus component - Add in detritus ----
     params <- setComponent(
-        params, "detritus", initial_value = 1,
+        params, "detritus", initial_value = 100,
         dynamics_fun = "detritus_dynamics",
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_det,
@@ -131,12 +139,14 @@ newReefParams <- function(# Original mizer parameters
         # Change the external mortality rate in the params object
         mizer::ext_mort(params) <- allo_mort
 
-    # Refuge ----
+    # Changes rates for refuge ----
         # Replace mizerRate functions with mizerReef versions
         # mizerRates
         params <- setRateFunction(params, "Rates", "reefRates")
         # mizerEncounter
         params <- setRateFunction(params, "Encounter", "reefEncounter")
+        # mizerFeedingLevel
+        params <- setRateFunction(params, "FeedingLevel", "reefFeedingLevel")
         # mizerPredMort
         params <- setRateFunction(params, "PredMort", "reefPredMort")
         # Add in senescence mortality
