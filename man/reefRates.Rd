@@ -39,7 +39,7 @@ By default this function returns a list with the following components:
 \itemize{
 \item predation vulnerability from \code{\link[=reefVulnerable]{reefVulnerable()}}
 \item encounter from \code{\link[=reefEncounter]{reefEncounter()}}
-\item feeding level from \code{\link[=mizerFeedingLevel]{mizerFeedingLevel()}}
+\item feeding level from \code{\link[=reefFeedingLevel]{reefFeedingLevel()}}
 \item e from \code{\link[=mizerEReproAndGrowth]{mizerEReproAndGrowth()}}
 \item e_repro from \code{\link[=mizerERepro]{mizerERepro()}}
 \item e_growth from \code{\link[=mizerEGrowth]{mizerEGrowth()}}
