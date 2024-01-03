@@ -67,6 +67,21 @@ giving the rate in grams/year at which that species consumes algae</p>
 <p>A named vector with the consumption rates from herbivores</p>
     </div>
     <div class="section level2">
+    <h2 id="algae-consumption">Algae consumption<a class="anchor" aria-label="anchor" href="#algae-consumption"></a></h2>
+    
+
+
+<p>The rate at which herbivorous consumer groups encounter algal
+biomass \(E_{i.A}(w)\) is controlled by the parameter
+\(\rho_{A.i}\). It scales with the size of the consumer raised to
+an allometric exponent \(m_alg\) which is taken from empirical data.</p>
+<p>$$E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A$$</p>
+<p>The mass specific consumption rate then accounts for the preference of
+functional group $i$ for algae, \(\theta_{i.A}\). This gives the
+mass-specific algae consumption rate:</p>
+<p>$$c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw$$</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="getAlgaeProduction.html">getAlgaeProduction()</a></code>, <code><a href="algae_dynamics.html">algae_dynamics()</a></code>, <code>getAlgaeConsumption()</code></p></div>
     </div>
