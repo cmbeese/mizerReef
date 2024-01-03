@@ -117,7 +117,7 @@ plotBiomass <- function(sim, species = NULL,
     plotDataFrame(plot_dat, params, xlab = "Year", ylab = "Biomass [g]",
                   ytrans = "log10",
                   y_ticks = y_ticks, highlight = highlight,
-                  legend_var = "Legend")
+                  legend_var = "Functional Group")
 }
 
 #' @rdname plotBiomass
@@ -134,7 +134,7 @@ plotlyBiomass <- function(sim,
                           ...) {
     argg <- c(as.list(environment()), list(...))
     ggplotly(do.call("plotBiomass", argg),
-             tooltip = c("Species", "Year", "Biomass"))
+             tooltip = c("Functional Group", "Year", "Biomass"))
 }
 
 #' Plot the vulnerability to predation of species by size
@@ -274,7 +274,7 @@ plotlyVulnerable <- function(object,
 
     argg <- as.list(environment())
     ggplotly(do.call("plotVulnerable", argg),
-             tooltip = c("Species", "w", "value"))
+             tooltip = c("Functional Group", "w", "value"))
 }
 
 
@@ -406,7 +406,7 @@ plotRefuge <- function(object,
 }
 
 
-#' @rdname plotVulnerable
+#' @rdname plotRefuge
 #' @export
 plotlyRefuge <- function(object,
                              species = NULL,
@@ -414,7 +414,7 @@ plotlyRefuge <- function(object,
 
     argg <- as.list(environment())
     ggplotly(do.call("plotRefuge", argg),
-             tooltip = c("Species", "w", "value"))
+             tooltip = c("Functional Group", "w", "value"))
 }
 
 

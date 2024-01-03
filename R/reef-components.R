@@ -84,7 +84,7 @@ tune_algae_detritus <- function(params) {
 #' @param factor a numeric value by which to scale the model
 #'
 #' @return a mizer model object with scaled parameters
-#'  @concept Uresources
+#' @concept Uresources
 #' @export
 scaleModel <- function(params, factor) {
 

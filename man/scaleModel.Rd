@@ -13,8 +13,8 @@ scaleModel(params, factor)
 }
 \value{
 a mizer model object with scaled parameters
-@concept Uresources
 }
 \description{
 This function scales various model parameters by a given factor.
 }
+\concept{Uresources}
