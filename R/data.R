@@ -9,7 +9,7 @@
 #'
 #' @format A MizerParams object
 #' @source PhD Thesis
-#bonaire_model
+"bonaire_model"
 
 #' species_params for thesis, chapter 3 vignettes
 #'

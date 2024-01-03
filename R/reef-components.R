@@ -19,6 +19,7 @@
 #' @export
 #' @concept Uresources
 encounter_contribution <- function(params, n_other, component, ...) {
+    
     params@other_params[[component]]$rho * n_other[[component]]
 }
 
@@ -58,7 +59,7 @@ tune_algae_detritus <- function(params) {
     if (ain < aout) {
         warning("The value for algae growth provided does not produce enough
                 to support this abundance of herbivores. I will increase algae
-                growth to meet the comsumption rate.")
+                growth to meet the consumption rate.")
     }
     params@other_params$algae$algae_growth <- aout
 
@@ -69,7 +70,7 @@ tune_algae_detritus <- function(params) {
     if (din < dout) {
         warning("Detrital production is not high enough to support this 
                 abundance of detritivores. I will increase external
-                input to meet the comsumption rate.")
+                input to meet the consumption rate.")
     }
     params@other_params$detritus$external <- dout - din
 

@@ -2,9 +2,12 @@
 % Please edit documentation in R/reef-plots.R
 \name{plotRefuge}
 \alias{plotRefuge}
+\alias{plotlyRefuge}
 \title{Plot the refuge profile, species by size}
 \usage{
 plotRefuge(object, species = NULL, all.sizes = FALSE, return_data = FALSE, ...)
+
+plotlyRefuge(object, species = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerParams}}

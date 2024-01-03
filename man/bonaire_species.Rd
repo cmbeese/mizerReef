@@ -3,30 +3,17 @@
 \docType{data}
 \name{bonaire_species}
 \alias{bonaire_species}
-\title{MizerParams object object for thesis, chapter 4 Caribbean model
-with 10 functional groups}
+\title{species_params for thesis, chapter 3 vignettes}
 \format{
-A MizerParams object
-
-A MizerParams object
-
 A MizerParams object
 }
 \source{
-PhD Thesis
-cbn_params"
-MizerParams object for thesis, chapter 3 vignettes
-
-PhD Thesis
-species_params for thesis, chapter 3 vignettes
-
 PhD Thesis
 }
 \usage{
 bonaire_species
 }
 \description{
-MizerParams object object for thesis, chapter 4 Caribbean model
-with 10 functional groups
+species_params for thesis, chapter 3 vignettes
 }
 \keyword{datasets}

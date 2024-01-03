@@ -3,7 +3,6 @@
 \name{plotVulnerable}
 \alias{plotVulnerable}
 \alias{plotlyVulnerable}
-\alias{plotlyRefuge}
 \title{Plot the vulnerability to predation of species by size}
 \usage{
 plotVulnerable(
@@ -21,8 +20,6 @@ plotlyVulnerable(
   return_data = FALSE,
   ...
 )
-
-plotlyRefuge(object, species = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerParams}}
