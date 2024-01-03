@@ -810,11 +810,10 @@ biomass. The proportionality factor $c_A$, which we refer to as the
 For each consumer species $i$, a parameter $\rho_{A.i}$ determines the
 rate at which individuals of that species encounter algal biomass. The
 rate is assumed to scale with the size of the herbivore raised to an
-allometric exponent $n$ which is taken to be the same as the scaling
-exponent of the maximum intake rate for consumers,
+allometric exponent $m_{alg}$ taken from @vanRooji1988. 
 
 $$
-E_{i.A}(w)=\rho_{i.A}\, w^n\,B_A
+E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A
 $$ {#eq-EC}
 
 Finally we take into account the preference of herbivorous group $i$ for
@@ -901,13 +900,13 @@ factor $c_D$, which we refer to as the "mass-specific consumption rate",
 depends on the abundance of consumers.
 
 For each consumer species $i$, a parameter $\rho_{D.i}$ determines the
-rate at which individuals of that species encounter algal biomass. The
+rate at which individuals of that species encounter detrital biomass. The
 rate is assumed to scale with the size of the consumer raised to an
-allometric exponent $n$ which is taken to be the same as the scaling
+allometric exponent $M_{det}$ which is taken to be the same as the scaling
 exponent of the maximum intake rate for consumers,
 
 $$
-E_{i.D}(w)=\rho_{i.D}\, w^n\,B_D
+E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D
 $$
 
 Finally we take into account the preference of species group $i$ for

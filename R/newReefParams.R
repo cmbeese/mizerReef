@@ -34,8 +34,9 @@ newReefParams <- function(# Original mizer parameters
                             a_bar = NULL, b_bar = NULL,
                             w_settle = NULL, max_protect = NULL, tau = NULL,
                           # Parameters for unstructured resources
-                            UR_interaction, 
-                            algae_growth = NULL, scale_rho_a = NULL,
+                            UR_interaction, exp_alg = NULL, exp_det = NULL,
+                            algae_growth = NULL, 
+                            scale_rho_a = NULL, scale_rho_d = NULL,
                             prop_decomp = NULL, d.external = NULL,
                           # Parameters for external mortality
                             ext_mort_params = NULL, ...) {
@@ -60,12 +61,15 @@ newReefParams <- function(# Original mizer parameters
     
     params <- getRefuge(params,...)
     
-
+    if(is.null(exp_det)){exp_det <- n}
     ### Unstructured resources ----
     params <- setURParams(params = params,
                           UR_interaction = UR_interaction,
+                          exp_alg = exp_alg,
+                          exp_det = exp_det,
                           algae_growth = algae_growth,
                           scale_rho_a = scale_rho_a,
+                          scale_rho_d = scale_rho_d,
                           prop_decomp = prop_decomp,
                           d.external = d.external)
     
@@ -103,12 +107,15 @@ newReefParams <- function(# Original mizer parameters
         
         # Store new rho values in species_params data frame
         scale_rho_a <- params@other_params$scale_rho_a
+        scale_rho_d <- params@other_params$scale_rho_d
         params@species_params$rho_algae    <- scale_rho_a*rho_alg
-        params@species_params$rho_detritus <- rho_det
+        params@species_params$rho_detritus <- scale_rho_d*rho_det
     
         # Calculate rho * w^n for use in algae and detritus dynamic functions
-        rho_alg <- outer(params@species_params$rho_algae, params@w ^ n)
-        rho_det <- outer(params@species_params$rho_detritus, params@w ^ n)
+        exp_alg <- params@other_params$exp_alg
+        exp_det <- params@other_params$exp_det
+        rho_alg <- outer(params@species_params$rho_algae, params@w ^ exp_alg)
+        rho_det <- outer(params@species_params$rho_detritus, params@w ^ exp_det)
     
     ### Algae Component - Add in algae ----
     params <- setComponent(

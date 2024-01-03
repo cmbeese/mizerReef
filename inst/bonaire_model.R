@@ -40,12 +40,13 @@ library(assertthat)
 ## SET MODEL -------------------------------------------------------------------
 bonaire_model <- newReefParams(species_params = bonaire_species,
                                interaction = bonaire_int,
-                               scale_rho_a = 1,
+                               scale_rho_a = 1, exp_alg = 0.75,
                                method = method[1],
                                method_params = bonaire_refuge)
 
 ## Project to steady state
 bonaire_model <- reef_steady(bonaire_model)
+
 
 bonaire_model <- calibrateBiomass(bonaire_model)
 bonaire_model <- matchBiomasses(bonaire_model)

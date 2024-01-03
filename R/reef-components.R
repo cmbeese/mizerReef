@@ -22,9 +22,18 @@ encounter_contribution <- function(params, n_other, component, ...) {
     params@other_params[[component]]$rho * n_other[[component]]
 }
 
-
-#' @export
+#' Rescale algae and detritus biomass without changing anything else
+#'
+#' This multiplies the algae & detritus biomass by a factor and divides the
+#' interaction between all groups and unstructured resource by the same
+#' factor, so as to keep the total consumption of these resources unchanged.
+#' 
+#' @param params A MizerParams object
+#' @param algae_factor A number to scale algae by
+#' @param detritus_factor A number to scale detritus by
+#' @return An updated MizerParams object
 #' @concept Uresources
+#' @export
 rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
     rescale_algae(rescale_detritus(params, detritus_factor),
                   algae_factor)
@@ -98,6 +107,14 @@ scaleModel <- function(params, factor) {
     mizer::scaleModel(params, factor)
 }
 
+
+#' Hold resource dynamics constant
+#' 
+#' @param params MizerParams object
+#' @param n_other Biomasses of unstructured components
+#' @param component Name of component to view dynamics for
+#' @param ... Unused
+#' 
 #' @export
 constant_dynamics <- function(params, n_other, component, ...) {
     n_other[[component]]

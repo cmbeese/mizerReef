@@ -22,8 +22,11 @@ newReefParams(
   max_protect = NULL,
   tau = NULL,
   UR_interaction,
+  exp_alg = NULL,
+  exp_det = NULL,
   algae_growth = NULL,
   scale_rho_a = NULL,
+  scale_rho_d = NULL,
   prop_decomp = NULL,
   d.external = NULL,
   ext_mort_params = NULL,
@@ -89,18 +92,34 @@ actually use it. Defaults to 1.}
 
 Optional parameters:}
 
+\item{exp_alg}{The allometric exponent for the consumption rate of
+algae. Defaults to 0.86.}
+
+\item{exp_det}{The allometric exponent for the consumption rate of
+detritus. Defaults to the same value used for the
+scaling exponent of the maximum intake rate for
+fish consumers.}
+
 \item{algae_growth}{The initial growth rate of algae in grams/year/m^-2.
-This value is reset to match consumption in the \verb{[reefSteady()]}  function
-so that steady state abundances match given values.}
+This value is reset to match consumption in the
+\verb{[reefSteady()]}  function so that steady state
+abundances match given values.}
+
+\item{scale_rho_a}{A factor to multiply rho values by for algae
+encounter rate. Used in steady state tuning.}
+
+\item{scale_rho_d}{A factor to multiply rho values by for detritus
+encounter rate. Used in steady state tuning.}
 
 \item{prop_decomp}{The proportion of waste material that decomposes to
 become part of the detritus pool.}
 
-\item{d.external}{The rate at which detritus biomass sinks from the pelagic
-zone and becomes part of the detritus pool in grams per year. This value
-is reset to make up any differences in consumption and production in
-the \verb{[reefSteady()]} function so that steady state abundances match
-observed values.}
+\item{d.external}{The rate at which detritus biomass sinks from the
+pelagic zone and becomes part of the detritus pool
+in grams per year. This value is reset to make up any
+differences in consumption and production in the
+\verb{[reefSteady()]} function so that steady state
+abundances match observed values.}
 
 \item{ext_mort_params}{Named list containing desired mortality parameters}
 
@@ -129,7 +148,7 @@ resource components, senescence mortality, and predation refuge.
  
  Note that interaction with size structured resources, such as
  plankton, is still set with the `resource_interaction` column of
- the species parameters dataframe. 
+ the species parameters dataframe.
 }\if{html}{\out{</div>}}
 }
 

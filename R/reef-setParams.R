@@ -1,4 +1,4 @@
-#' Checks unstructured resource interaction matrix
+#' Checks unstructured resource parameters and interaction matrix
 #'
 #' @section Adding unstructured resources:
 #'
@@ -15,38 +15,67 @@
 #'      
 #'      Note that interaction with size structured resources, such as
 #'      plankton, is still set with the `resource_interaction` column of
-#'      the species parameters dataframe. 
+#'      the species parameters dataframe.
+#'      
+#' @inheritSection getDetritusConsumption Detritus consumption
+#' @inheritSection getDetritusProduction Detritus production
+#' @inheritSection algae_consumption Algae consumption
 #'
 #' @param params MizerParams object
 #' @param UR_interaction Interaction matrix for unstructured resources
 #'  (species x resource)
 #'
 #' Optional parameters:
-#' @param algae_growth The initial growth rate of algae in grams/year/m^-2.
-#'  This value is reset to match consumption in the `[reefSteady()]`  function
-#'  so that steady state abundances match given values.
-#' @param prop_decomp The proportion of waste material that decomposes to
-#'  become part of the detritus pool.
-#' @param d.external The rate at which detritus biomass sinks from the pelagic
-#'  zone and becomes part of the detritus pool in grams per year. This value 
-#'  is reset to make up any differences in consumption and production in 
-#'  the `[reefSteady()]` function so that steady state abundances match 
-#'  observed values.
+#' @param exp_alg       The allometric exponent for the consumption rate of
+#'                      algae. Defaults to 0.86.
+#' 
+#' @param exp_det       The allometric exponent for the consumption rate of
+#'                      detritus. Defaults to the same value used for the 
+#'                      scaling exponent of the maximum intake rate for 
+#'                      fish consumers.
+#' 
+#' @param scale_rho_a   A factor to multiply rho values by for algae
+#'                      encounter rate. Used in steady state tuning.
+#' 
+#' @param scale_rho_d   A factor to multiply rho values by for detritus
+#'                      encounter rate. Used in steady state tuning.
+#' 
+#' @param algae_growth  The initial growth rate of algae in grams/year/m^-2.
+#'                      This value is reset to match consumption in the 
+#'                      `[reefSteady()]`  function so that steady state 
+#'                      abundances match given values.
+#'                      
+#' @param prop_decomp   The proportion of waste material that decomposes to
+#'                      become part of the detritus pool.
+#'                      
+#' @param d.external    The rate at which detritus biomass sinks from the 
+#'                      pelagic zone and becomes part of the detritus pool 
+#'                      in grams per year. This value is reset to make up any 
+#'                      differences in consumption and production in the 
+#'                      `[reefSteady()]` function so that steady state 
+#'                      abundances match observed values.
 #'
 #' @return `setUResourceParams`: MizerParams object with updated unstructured
 #'  resource parameters
 #' @concept Uresources 
 #' @export
 setURParams <- function(params,
-                        UR_interaction = NULL,
-                        algae_growth = NULL, scale_rho_a = NULL,
+                        # Preference for resource
+                        UR_interaction = NULL, 
+                        # Encounter rate
+                        exp_alg = NULL, exp_det = NULL,
+                        scale_rho_a = NULL, scale_rho_d = NULL,
+                        # Resource Production
+                        algae_growth = NULL, 
                         prop_decomp = NULL, d.external = NULL) {
+    
     # object check ----
         # Check if mizerParams is valid
         assert_that(is(params, "MizerParams"))
 
         # Find number of species for checks
         no_sp = nrow(params@species_params)
+        
     # interaction ----
     # Check if user included in species params
     res_cols <- c('interaction_algae','interaction_detritus')
@@ -99,6 +128,33 @@ setURParams <- function(params,
     }
         
     # other parameters ----
+        
+        ## Encounter rates rho and exp ----
+        # Set default exp_alg
+        if(is.null(exp_alg)){ params@other_params$exp_alg <- 0.86
+        } else {
+            if (!is.numeric(exp_alg)){
+                stop("exp_alg should be a numerical value.")
+            }
+            if (exp_alg < 0){
+                stop("exp_alg must be non-negative.")
+            }
+            params@other_params$exp_alg <- exp_alg 
+        }
+        
+        # Set default exp_det
+        if(is.null(exp_det)){ params@other_params$exp_det <- 0.75
+        } else {
+            if (!is.numeric(exp_det)){
+                stop("exp_det should be a numerical value.")
+            }
+            if (exp_det < 0){
+                stop("exp_det must be non-negative.")
+            }
+            params@other_params$exp_det <- exp_det 
+        }
+        
+        
         # Set default scale_rho_a
         if(is.null(scale_rho_a)){ params@other_params$scale_rho_a <- 1
         } else {
@@ -111,8 +167,21 @@ setURParams <- function(params,
             params@other_params$scale_rho_a <- scale_rho_a 
         }
         
+        # Set default scale_rho_d
+        if(is.null(scale_rho_d)){ params@other_params$scale_rho_d <- 1
+        } else {
+            if (!is.numeric(scale_rho_d)){
+                stop("scale_rho_d should be a numerical value.")
+            }
+            if (scale_rho_d < 0){
+                stop("scale_rho_d must be non-negative.")
+            }
+            params@other_params$scale_rho_d <- scale_rho_d 
+        }
+        
+        ## Production ----
         # Set default algae growth rate
-        if(is.null(algae_growth)){ params@other_params$algae_growth <- 1e6
+        if(is.null(algae_growth)){ params@other_params$algae_growth < 2e3
         } else {
             if (!is.numeric(algae_growth)){
                 stop("algae_growth should be a numerical value.")

@@ -442,6 +442,8 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 #' the a feeding level of 0 for piscivores.
 #'
 #' @inheritParams reefEncounter
+#' @param encounter A two dimensional array (predator species x predator size) 
+#'                  with the encounter rate.
 #'
 #' @return A two dimensional array (predator species x predator size) with the
 #'   feeding level.

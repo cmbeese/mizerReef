@@ -29,6 +29,9 @@ ecosystem}
 mizer rate functions but useful for extensions with time-dependent
 parameters.)}
 
+\item{encounter}{A two dimensional array (predator species x predator size)
+with the encounter rate.}
+
 \item{vulnerable}{A two dimensional array (prey species x prey size) with
 the proportion of prey vulnerable to being encountered.}
 
