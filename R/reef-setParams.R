@@ -112,7 +112,7 @@ setURParams <- function(params,
         }
         
         # Set default algae growth rate
-        if(is.null(algae_growth)){ params@other_params$algae_growth <- 1000
+        if(is.null(algae_growth)){ params@other_params$algae_growth <- 1e6
         } else {
             if (!is.numeric(algae_growth)){
                 stop("algae_growth should be a numerical value.")

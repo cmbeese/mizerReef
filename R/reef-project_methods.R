@@ -56,11 +56,13 @@ reefRates <- function(params, n, n_pp, n_other,
     
     ## Growth ----
     # Calculate rate E_{e,i}(w) of encountered food
-    r$encounter <- rates_fns$Encounter(
+    r$encounter <- reefEncounter(
+        # rates_fns$Encounter(
         params, n = n, n_pp = n_pp, n_other = n_other,
         vulnerable = r$vulnerable, t = t, ...)
     # Calculate feeding level f_i(w)
-    r$feeding_level <- rates_fns$FeedingLevel(
+    r$feeding_level <- reefFeedingLevel(
+        # rates_fns$FeedingLevel(
         params, n = n, n_pp = n_pp, n_other = n_other,
         encounter = r$encounter, t = t, ...)
     # Calculate the energy available for reproduction and growth
@@ -83,7 +85,8 @@ reefRates <- function(params, n, n_pp, n_other,
         feeding_level = r$feeding_level, vulnerable = r$vulnerable,
         t = t, ...)
     # Calculate predation mortality on fish \mu_{p,i}(w)
-    r$pred_mort <- rates_fns$PredMort(
+    r$pred_mort <- reefPredMort(
+        # rates_fns$PredMort(
         params, n = n, n_pp = n_pp, n_other = n_other,
         pred_rate = r$pred_rate, t = t, ...)
     # Calculate fishing mortality
@@ -91,11 +94,9 @@ reefRates <- function(params, n, n_pp, n_other,
         params, n = n, n_pp = n_pp, n_other = n_other,
         effort = effort, t = t,
         e_growth = r$e_growth, pred_mort = r$pred_mort, ...)
-    # Calculate senescence mortality \mu_i(w)
-    r$mort <- reefSenMort(
-        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
     # Calculate total mortality \mu_i(w)
-    r$mort <- rates_fns$Mort(
+    r$mort <- reefMort(
+        # rates_fns$Mort(
         params, n = n, n_pp = n_pp, n_other = n_other,
         f_mort = r$f_mort, pred_mort = r$pred_mort, t = t, ...)
 

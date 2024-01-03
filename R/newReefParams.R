@@ -112,7 +112,7 @@ newReefParams <- function(# Original mizer parameters
     
     ### Algae Component - Add in algae ----
     params <- setComponent(
-        params, "algae", initial_value = 2e3,
+        params, "algae", initial_value = 1,
         dynamics_fun = "algae_dynamics",
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_alg,
@@ -120,7 +120,7 @@ newReefParams <- function(# Original mizer parameters
     
     ### Detritus component - Add in detritus ----
     params <- setComponent(
-        params, "detritus", initial_value = 100,
+        params, "detritus", initial_value = 1,
         dynamics_fun = "detritus_dynamics",
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_det,

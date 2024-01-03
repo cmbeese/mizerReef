@@ -1,15 +1,16 @@
 Package: mizerReef
 Title: Mizer Models with Benthic Coupling for Coral Reefs
 Version: 1.0.0
-Date: 2023-31-12
+Date: 2024-31-01
 Authors@R: c(
+    person("Chelsey M.", "Beese",
+           email = "beese.c.m@gmail.com",
+           comment = c(ORCID = "0000-0003-0949-7888"),
+           role = c("cre", "aut")),
     person("Gustav", "Delius",
            email = "gustav.delius@york.ac.uk", 
-           role = c("cre", "aut", "cph"),
+           role = c("aut", "cph"),
            comment = c(ORCID = "0000-0003-4092-8228")),
-    person("Chelsey M.", "Beese",
-           email = "beese.c.m@gmail.com", role = "aut",
-           comment = c(ORCID = "0000-0003-0949-7888")),
     person("Peter J.", "Mumby",
            email = "p.j.mumby@uq.edu.au", role = "aut",
            comment = c(ORCID = "0000-0002-6297-9053")),
@@ -65,5 +66,4 @@ Collate:
     'reef-setParams.R'
     'reef-steady.R'
     'reef-summary_methods.R'
-    'reef-rhoControl.R'
 VignetteBuilder: knitr
