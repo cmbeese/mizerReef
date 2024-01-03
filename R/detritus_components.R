@@ -101,25 +101,25 @@ detritus_consumption <- function(params,
 #' 
 #' @section Detritus consumption:
 #' 
-#'      The rate at which detritivorous consumer groups encounter detrital 
-#'      biomass \eqn{E_{i.D}(w)} is controlled by the parameter 
-#'      \eqn{\rho_{D.i}}. It scales with the size of the consumer raised to 
-#'      an allometric exponent \eqn{m_{det}} which is taken to be the same as 
-#'      the scaling exponent of the maximum intake rate for fish consumers.
-#'      
-#'      \deqn{E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D }{
-#'            E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D}
+#'  The rate at which detritivorous consumer groups encounter detrital 
+#'  biomass \eqn{E_{i.D}(w)} is controlled by the parameter 
+#'  \eqn{\rho_{D.i}}. It scales with the size of the consumer raised to 
+#'  an allometric exponent \eqn{m_{det}} which is taken to be the same as 
+#'  the scaling exponent of the maximum intake rate for fish consumers.
+#'  
+#'  \deqn{E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D }{
+#'        E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D}
+#'          
+#'  The mass specific consumption rate then accounts for the preference of 
+#'  functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding 
+#'  level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
+#'  rate:
+#'  
+#'  \deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+#'              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
+#'        c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+#'              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
 #'              
-#'      The mass specific consumption rate then accounts for the preference of 
-#'      functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding 
-#'      level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
-#'      rate:
-#'      
-#'      \deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
-#'                  N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
-#'            c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
-#'                  N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
-#'
 #' 
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores
@@ -182,39 +182,39 @@ plotDetritusConsumption <- function(params) {
 #' 
 #' @section Detritus production:
 #'    
-#'      The rate \eqn{p_D} at which detritus biomass is produced by the 
-#'      ecosystem has contributions from three sources:
-#'      
-#'      \deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
-#'            p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
-#'            
-#'      \eqn{p_{D.f}} comes from the biomass that is consumed but not 
-#'      assimilated and is given by:
-#'      
-#'      \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
-#'            p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
-#'            
-#'      \eqn{p_{D.d}} comes from the biomass of fish that die as a result of 
-#'      external mortality. External mortality includes local deaths that lead 
-#'      to detritus but also deaths due to predation by species that are not
-#'      explicitly modelled, for example transient predators, mammals, or sea 
-#'      birds. Thus, only a proportion `prop_decomp` of this material 
-#'      decomposes to detritus. The detritus production from decomposing 
-#'      dead organisms is given by:
-#'      
-#'      \deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
-#'                      \mathtt{prop\_decomp}\,
-#'                      \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
-#'          p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
-#'                      \mathtt{prop\_decomp}\,
-#'                      \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
-#'                      
-#'      \eqn{p_{D.ext}} is the rate at which detritus enters the system from
-#'      unmodelled or external sources. For coral reefs, this includes detritus
-#'      produced by sponges and coral mucous as well as waste material that 
-#'      sinks in from the pelagic zone. This rate is a model parameter 
-#'      independent of any other model component. It is set so that production 
-#'      and consumption are equal for the chosen steady state abundances.
+#'  The rate \eqn{p_D} at which detritus biomass is produced by the 
+#'  ecosystem has contributions from three sources:
+#'  
+#'  \deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
+#'        p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
+#'        
+#'  \eqn{p_{D.f}} comes from the biomass that is consumed but not 
+#'  assimilated and is given by:
+#'  
+#'  \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
+#'        p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
+#'        
+#'  \eqn{p_{D.d}} comes from the biomass of fish that die as a result of 
+#'  external mortality. External mortality includes local deaths that lead 
+#'  to detritus but also deaths due to predation by species that are not
+#'  explicitly modelled, for example transient predators, mammals, or sea 
+#'  birds. Thus, only a proportion `prop_decomp` of this material 
+#'  decomposes to detritus. The detritus production from decomposing 
+#'  dead organisms is given by:
+#'  
+#'  \deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+#'                  \mathtt{prop\_decomp}\,
+#'                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
+#'      p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+#'                  \mathtt{prop\_decomp}\,
+#'                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
+#'                  
+#'  \eqn{p_{D.ext}} is the rate at which detritus enters the system from
+#'  unmodelled or external sources. For coral reefs, this includes detritus
+#'  produced by sponges and coral mucous as well as waste material that 
+#'  sinks in from the pelagic zone. This rate is a model parameter 
+#'  independent of any other model component. It is set so that production 
+#'  and consumption are equal for the chosen steady state abundances.
 #'
 #' @param params MizerParams
 #' @param n A matrix of current species abundances (species x size)
