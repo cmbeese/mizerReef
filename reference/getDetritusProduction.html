@@ -82,21 +82,48 @@ sources in grams per year.</p>
 <ol><li><p>consumed biomass not assimilated by predators ("feces"),</p></li>
 <li><p>decomposing dead organisms ("decomp"),</p></li>
 <li><p>the pelagic zone ("external").</p></li>
-</ol><p>mizerReef models include two sources of external mortality to describe all
-deaths by natural causes that are not due to predation by the modelled
-species. External mortality includes deaths that lead to detritus, but also
-deaths due to predation by species that are not explicitly modelled, for
-example transient predators, mammals, or sea birds. Thus, only a proportion
-of this material will stay in the system to decompose. The parameter
-<code>prop_decomp</code> describes the proportion of external mortality that stays in
-the system and decomposes to detritus.</p>
-<p>External detritus is waste material that sinks in from the pelagic zone.
-This rate is a model parameter independent of any other model component. It
-is set so that production and consumption are equal for chosen steady state
-abundances.</p>
-<p>The function returns a vector with the individual contributions for each
+</ol><p>This function returns a vector with the individual contributions for each
 source. These can be summed with <code><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum()</a></code> to get the total detritus
 production rate.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="detritus-production">Detritus production<a class="anchor" aria-label="anchor" href="#detritus-production"></a></h2>
+    
+
+
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a> The rate \eqn{p_D} at which detritus biomass is produced by the </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a> ecosystem has contributions from three sources<span class="sc">:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> \deqn{p_D <span class="ot">=</span> p_{D.f} <span class="sc">+</span> p_{D.d} <span class="sc">+</span> p_{D.ext}}{</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>           p_D <span class="ot">=</span> p_{D.f} <span class="sc">+</span> p_{D.d} <span class="sc">+</span> p_{D.ext}}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> \eqn{p_{D.f}} comes from the biomass that is consumed but not </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a> assimilated and is given by<span class="sc">:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a> \deqn{p_{D.f} <span class="ot">=</span> \<span class="fu">sum_i</span>(<span class="dv">1</span><span class="sc">-</span>\alpha_i)\int <span class="fu">E_i</span>(w)\,dw}{</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>           p_{D.f} <span class="ot">=</span> \<span class="fu">sum_i</span>(<span class="dv">1</span><span class="sc">-</span>\alpha_i)\int <span class="fu">E_i</span>(w)\,dw}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a> \eqn{p_{D.d}} comes from the biomass of fish that die as a result of </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a> external mortality. External mortality includes local deaths that lead </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a> to detritus but also deaths due to predation by species that are not</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a> explicitly modelled, <span class="cf">for</span> example transient predators, mammals, or sea </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a> birds. Thus, only a proportion <span class="st">`</span><span class="at">prop_decomp</span><span class="st">`</span> of this material </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a> decomposes to detritus. The detritus production from decomposing </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a> dead organisms is given by<span class="sc">:</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a> \deqn{p_{D.d} <span class="ot">=</span> \sum_i\int\mu_{seni.i}(w)<span class="fu">N_i</span>(w)w\,dw <span class="sc">+</span> </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>                     \mathtt{prop\_decomp}\,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>                     \sum_i\int\mu_{nat.i}(w)<span class="fu">N_i</span>(w)w\,dw}{</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>         p_{D.d} <span class="ot">=</span> \sum_i\int\mu_{seni.i}(w)<span class="fu">N_i</span>(w)w\,dw <span class="sc">+</span> </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>                     \mathtt{prop\_decomp}\,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                     \sum_i\int\mu_{nat.i}(w)<span class="fu">N_i</span>(w)w\,dw}</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>                 </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a> \eqn{p_{D.ext}} is the rate at which detritus enters the system from</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a> unmodelled or external sources. For coral reefs, this includes detritus</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a> produced by sponges and coral mucous as well as waste material that </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a> sinks <span class="cf">in</span> from the pelagic zone. This rate is a model parameter </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a> independent of any other model component. It is set so that production </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a> and consumption are equal <span class="cf">for</span> the chosen steady state abundances.</span></code></pre><p></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -67,6 +67,30 @@ giving the rate in grams/year at which that species consumes detritus</p>
 <p>A named vector with the consumption rates from herbivores</p>
     </div>
     <div class="section level2">
+    <h2 id="detritus-consumption">Detritus consumption<a class="anchor" aria-label="anchor" href="#detritus-consumption"></a></h2>
+    
+
+
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a> The rate at which detritivorous consumer groups encounter detrital </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a> biomass \eqn{E_{i.D}(w)} is controlled by the parameter </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> \eqn{\rho_{D.i}}. It scales with the size of the consumer raised to </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> an allometric exponent \eqn{m_{det}} which is taken to be the same as </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> the scaling exponent of the maximum intake rate <span class="cf">for</span> fish consumers.</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> \deqn{E_{i.D}(w)<span class="ot">=</span>\rho_{i.D}\, w<span class="sc">^</span>{m_{det}}\,B_D }{</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>           E_{i.D}(w)<span class="ot">=</span>\rho_{i.D}\, w<span class="sc">^</span>{m_{det}}\,B_D}</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a> The mass specific consumption rate then accounts <span class="cf">for</span> the preference of </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> functional group <span class="sc">$</span>i<span class="sc">$</span> <span class="cf">for</span> detritus, \eqn{\theta_{i.D}} and the feeding </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a> level \eqn{<span class="fu">f_i</span>(w)}. This gives the mass<span class="sc">-</span>specific detritus consumption</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a> rate<span class="sc">:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a> \deqn{c_D <span class="ot">=</span> \sum_i\int\rho_{i.D}\, w<span class="sc">^</span>{m_{det}} </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">N_i</span>(w) \<span class="fu">left</span>(<span class="dv">1</span><span class="sc">-</span><span class="fu">f_i</span>(w)\right) \theta_{i.D}\,dw}{</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>           c_D <span class="ot">=</span> \sum_i\int\rho_{i.D}\, w<span class="sc">^</span>{m_{det}} </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">N_i</span>(w) \<span class="fu">left</span>(<span class="dv">1</span><span class="sc">-</span><span class="fu">f_i</span>(w)\right) \theta_{i.D}\,dw}</span></code></pre><p></p></div>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="getAlgaeProduction.html">getAlgaeProduction()</a></code>, <code><a href="algae_dynamics.html">algae_dynamics()</a></code>, <code>getDetritusConsumption()</code></p></div>
     </div>

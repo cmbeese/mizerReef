@@ -69,8 +69,11 @@ resource components, senescence mortality, and predation refuge.</p>
 <span>  max_protect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tau <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">UR_interaction</span>,</span>
+<span>  exp_alg <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  exp_det <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  algae_growth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_rho_a <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scale_rho_d <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prop_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  d.external <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ext_mort_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -171,10 +174,33 @@ actually use it. Defaults to 1.</p></dd>
 <p>Optional parameters:</p></dd>
 
 
+<dt>exp_alg</dt>
+<dd><p>The allometric exponent for the consumption rate of
+algae. Defaults to 0.86.</p></dd>
+
+
+<dt>exp_det</dt>
+<dd><p>The allometric exponent for the consumption rate of
+detritus. Defaults to the same value used for the
+scaling exponent of the maximum intake rate for
+fish consumers.</p></dd>
+
+
 <dt>algae_growth</dt>
 <dd><p>The initial growth rate of algae in grams/year/m^-2.
-This value is reset to match consumption in the <code>[reefSteady()]</code>  function
-so that steady state abundances match given values.</p></dd>
+This value is reset to match consumption in the
+<code>[reefSteady()]</code>  function so that steady state
+abundances match given values.</p></dd>
+
+
+<dt>scale_rho_a</dt>
+<dd><p>A factor to multiply rho values by for algae
+encounter rate. Used in steady state tuning.</p></dd>
+
+
+<dt>scale_rho_d</dt>
+<dd><p>A factor to multiply rho values by for detritus
+encounter rate. Used in steady state tuning.</p></dd>
 
 
 <dt>prop_decomp</dt>
@@ -183,11 +209,12 @@ become part of the detritus pool.</p></dd>
 
 
 <dt>d.external</dt>
-<dd><p>The rate at which detritus biomass sinks from the pelagic
-zone and becomes part of the detritus pool in grams per year. This value
-is reset to make up any differences in consumption and production in
-the <code>[reefSteady()]</code> function so that steady state abundances match
-observed values.</p></dd>
+<dd><p>The rate at which detritus biomass sinks from the
+pelagic zone and becomes part of the detritus pool
+in grams per year. This value is reset to make up any
+differences in consumption and production in the
+<code>[reefSteady()]</code> function so that steady state
+abundances match observed values.</p></dd>
 
 
 <dt>ext_mort_params</dt>
@@ -224,7 +251,7 @@ observed values.</p></dd>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a> Note that interaction with size structured resources, such as</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a> plankton, is still set with the <span class="st">`</span><span class="at">resource_interaction</span><span class="st">`</span> column of</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a> the species parameters dataframe. </span></code></pre><p></p></div>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a> the species parameters dataframe.</span></code></pre><p></p></div>
     </div>
     <div class="section level2">
     <h2 id="senescence-mortality">Senescence mortality<a class="anchor" aria-label="anchor" href="#senescence-mortality"></a></h2>
