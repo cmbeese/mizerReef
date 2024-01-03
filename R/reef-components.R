@@ -114,7 +114,7 @@ scaleModel <- function(params, factor) {
 #' @param n_other Biomasses of unstructured components
 #' @param component Name of component to view dynamics for
 #' @param ... Unused
-#' 
+#' @concept UResources
 #' @export
 constant_dynamics <- function(params, n_other, component, ...) {
     n_other[[component]]
