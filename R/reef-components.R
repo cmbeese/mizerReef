@@ -84,9 +84,8 @@ tune_algae_detritus <- function(params) {
 #' @param factor a numeric value by which to scale the model
 #'
 #' @return a mizer model object with scaled parameters
-#'
+#'  @concept Uresources
 #' @export
-#' @concept Uresources
 scaleModel <- function(params, factor) {
 
     # Algae
@@ -114,7 +113,7 @@ scaleModel <- function(params, factor) {
 #' @param n_other Biomasses of unstructured components
 #' @param component Name of component to view dynamics for
 #' @param ... Unused
-#' @concept UResources
+#' @concept Uresources
 #' @export
 constant_dynamics <- function(params, n_other, component, ...) {
     n_other[[component]]

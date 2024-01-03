@@ -18,4 +18,4 @@ constant_dynamics(params, n_other, component, ...)
 \description{
 Hold resource dynamics constant
 }
-\concept{UResources}
+\concept{Uresources}
