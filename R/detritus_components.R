@@ -21,20 +21,20 @@ detritus_biomass <- function(params) {
 #'
 #' The time evolution of the detritus biomass \eqn{B} is described by
 #'
-#' \deqn{dB/dt = \tt{production} - \tt{consumption} * B + \tt{external}}{dB/dt = production - consumption * B + external}
+#' \deqn{dB/dt = \tt{production} - \tt{consumption} \cdot B + \tt{external}}{
+#'       dB/dt = production - consumption * B + external}
 #'
-#' where
-#'  * `consumption` is the mass-specific rate of consumption, calculated with
-#'     `detritus_consumption()`
-#'  * `production` is the rate at which the rest of the system produces
-#'    detritus biomass, calculate with `getDetritusProduction()`
-#'
+#' where `consumption` is the mass-specific rate of consumption, calculated 
+#' with `detritus_consumption()`and `production` is the rate at which the 
+#' rest of the system produces detritus biomass, calculate with 
+#' `getDetritusProduction()`.
+#' 
 #' The dynamical equation is solved analytically to
 #' \deqn{B(t+dt) = B(t)\exp(-\tt{consumption} \cdot dt)
-#'   +\frac{\tt{production}}{\tt{consumption}}
-#'   (1-\exp(-\tt{consumption} \cdot dt)).}{B(t+dt)
-#'   = B(t) exp(-consumption * dt)
-#'   +production/consumption * (1 - exp(-consumption * dt)).}
+#'               + \frac{\tt{production}}{\tt{consumption}}
+#'                 (1-\exp(-\tt{consumption} \cdot dt)).}{
+#'       B(t+dt) = B(t) exp(-consumption * dt) 
+#'               + production/consumption * (1 - exp(-consumption * dt)).}
 #'
 #' This avoids the stability problems that would arise if we used the Euler
 #' method to solve the equation numerically.
