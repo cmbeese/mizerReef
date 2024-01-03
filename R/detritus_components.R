@@ -47,7 +47,8 @@ detritus_biomass <- function(params) {
 #' @param ... Unused
 #'
 #' @return A vector giving the detritus spectrum at the next time step.
-#' @seealso [algae_dynamics(), detritus_consumption(), getDetritusConsumption(), getDetritusProduction()]
+#' @seealso [algae_dynamics()], [detritus_consumption()], 
+#'          [getDetritusConsumption()], [getDetritusProduction()]
 #' @concept Uresources
 #' @export
 detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {

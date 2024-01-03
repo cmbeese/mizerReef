@@ -48,6 +48,7 @@ This avoids the stability problems that would arise if we used the Euler
 method to solve the equation numerically.
 }
 \seealso{
-\code{\link[=detritus_dynamics]{detritus_dynamics()}}
+\code{\link[=detritus_dynamics]{detritus_dynamics()}}, \code{\link[=algae_consumption]{algae_consumption()}},
+\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}
 }
 \concept{Uresources}
