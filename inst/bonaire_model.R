@@ -77,6 +77,7 @@ save(bonaire_species, file = "C:/Users/DELL/OneDrive - Victoria University of We
 save(bonaire_int,     file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_int.rda")
 save(bonaire_refuge,  file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_refuge.rda")
 
-
+# Build website ----------------------------------------------------------------
+pkgdown::build_site()
 
 
