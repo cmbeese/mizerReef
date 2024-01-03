@@ -28,21 +28,20 @@ The rho parameter for herbivorous fish groups is stored in
 \section{Algae consumption}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ The rate at which herbivorous consumer groups encounter algal 
- biomass \eqn{E_{i.A}(w)} is controlled by the parameter 
- \eqn{\rho_{A.i}}. It scales with the size of the consumer raised to 
- an allometric exponent \eqn{m_alg} which is taken from empirical data.
- 
- \deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
-           E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}
-         
- The mass specific consumption rate then accounts for the preference of 
- functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the 
- mass-specific algae consumption rate:
- 
- \deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
-           c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}
-}\if{html}{\out{</div>}}
+The rate at which herbivorous consumer groups encounter algal
+biomass \eqn{E_{i.A}(w)} is controlled by the parameter
+\eqn{\rho_{A.i}}. It scales with the size of the consumer raised to
+an allometric exponent \eqn{m_alg} which is taken from empirical data.
+
+\deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
+       E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}
+
+The mass specific consumption rate then accounts for the preference of
+functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the
+mass-specific algae consumption rate:
+
+\deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
+       c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}
 }
 
 \concept{Uresources}

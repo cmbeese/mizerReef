@@ -36,40 +36,39 @@ production rate.
 \section{Detritus production}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ The rate \eqn{p_D} at which detritus biomass is produced by the 
- ecosystem has contributions from three sources:
- 
- \deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
-           p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
-       
- \eqn{p_{D.f}} comes from the biomass that is consumed but not 
- assimilated and is given by:
- 
- \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
-           p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
-       
- \eqn{p_{D.d}} comes from the biomass of fish that die as a result of 
- external mortality. External mortality includes local deaths that lead 
- to detritus but also deaths due to predation by species that are not
- explicitly modelled, for example transient predators, mammals, or sea 
- birds. Thus, only a proportion `prop_decomp` of this material 
- decomposes to detritus. The detritus production from decomposing 
- dead organisms is given by:
- 
- \deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
-                     \mathtt{prop\_decomp}\,
-                     \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
-         p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
-                     \mathtt{prop\_decomp}\,
-                     \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
-                 
- \eqn{p_{D.ext}} is the rate at which detritus enters the system from
- unmodelled or external sources. For coral reefs, this includes detritus
- produced by sponges and coral mucous as well as waste material that 
- sinks in from the pelagic zone. This rate is a model parameter 
- independent of any other model component. It is set so that production 
- and consumption are equal for the chosen steady state abundances.
-}\if{html}{\out{</div>}}
+The rate \eqn{p_D} at which detritus biomass is produced by the
+ecosystem has contributions from three sources:
+
+\deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
+       p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
+
+\eqn{p_{D.f}} comes from the biomass that is consumed but not
+assimilated and is given by:
+
+\deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
+       p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
+
+\eqn{p_{D.d}} comes from the biomass of fish that die as a result of
+external mortality. External mortality includes local deaths that lead
+to detritus but also deaths due to predation by species that are not
+explicitly modelled, for example transient predators, mammals, or sea
+birds. Thus, only a proportion \code{prop_decomp} of this material
+decomposes to detritus. The detritus production from decomposing
+dead organisms is given by:
+
+\deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+                 \mathtt{prop\_decomp}\,
+                 \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
+     p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+                 \mathtt{prop\_decomp}\,
+                 \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
+
+\eqn{p_{D.ext}} is the rate at which detritus enters the system from
+unmodelled or external sources. For coral reefs, this includes detritus
+produced by sponges and coral mucous as well as waste material that
+sinks in from the pelagic zone. This rate is a model parameter
+independent of any other model component. It is set so that production
+and consumption are equal for the chosen steady state abundances.
 }
 
 \concept{Uresources}

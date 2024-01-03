@@ -83,84 +83,81 @@ Checks unstructured resource parameters and interaction matrix
 \section{Detritus consumption}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ The rate at which detritivorous consumer groups encounter detrital 
- biomass \eqn{E_{i.D}(w)} is controlled by the parameter 
- \eqn{\rho_{D.i}}. It scales with the size of the consumer raised to 
- an allometric exponent \eqn{m_{det}} which is taken to be the same as 
- the scaling exponent of the maximum intake rate for fish consumers.
- 
- \deqn{E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D }{
-           E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D}
-         
- The mass specific consumption rate then accounts for the preference of 
- functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding 
- level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
- rate:
- 
- \deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
-                 N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
-           c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
-                 N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
-}\if{html}{\out{</div>}}
+The rate at which detritivorous consumer groups encounter detrital
+biomass \eqn{E_{i.D}(w)} is controlled by the parameter
+\eqn{\rho_{D.i}}. It scales with the size of the consumer raised to
+an allometric exponent \eqn{m_{det}} which is taken to be the same as
+the scaling exponent of the maximum intake rate for fish consumers.
+
+\deqn{E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D }{
+       E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D}
+
+The mass specific consumption rate then accounts for the preference of
+functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding
+level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
+rate:
+
+\deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+             N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
+       c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+             N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
 }
 
 \section{Detritus production}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ The rate \eqn{p_D} at which detritus biomass is produced by the 
- ecosystem has contributions from three sources:
- 
- \deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
-           p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
-       
- \eqn{p_{D.f}} comes from the biomass that is consumed but not 
- assimilated and is given by:
- 
- \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
-           p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
-       
- \eqn{p_{D.d}} comes from the biomass of fish that die as a result of 
- external mortality. External mortality includes local deaths that lead 
- to detritus but also deaths due to predation by species that are not
- explicitly modelled, for example transient predators, mammals, or sea 
- birds. Thus, only a proportion `prop_decomp` of this material 
- decomposes to detritus. The detritus production from decomposing 
- dead organisms is given by:
- 
- \deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
-                     \mathtt{prop\_decomp}\,
-                     \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
-         p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
-                     \mathtt{prop\_decomp}\,
-                     \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
-                 
- \eqn{p_{D.ext}} is the rate at which detritus enters the system from
- unmodelled or external sources. For coral reefs, this includes detritus
- produced by sponges and coral mucous as well as waste material that 
- sinks in from the pelagic zone. This rate is a model parameter 
- independent of any other model component. It is set so that production 
- and consumption are equal for the chosen steady state abundances.
-}\if{html}{\out{</div>}}
+The rate \eqn{p_D} at which detritus biomass is produced by the
+ecosystem has contributions from three sources:
+
+\deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
+       p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
+
+\eqn{p_{D.f}} comes from the biomass that is consumed but not
+assimilated and is given by:
+
+\deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
+       p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
+
+\eqn{p_{D.d}} comes from the biomass of fish that die as a result of
+external mortality. External mortality includes local deaths that lead
+to detritus but also deaths due to predation by species that are not
+explicitly modelled, for example transient predators, mammals, or sea
+birds. Thus, only a proportion \code{prop_decomp} of this material
+decomposes to detritus. The detritus production from decomposing
+dead organisms is given by:
+
+\deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+                 \mathtt{prop\_decomp}\,
+                 \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
+     p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+                 \mathtt{prop\_decomp}\,
+                 \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
+
+\eqn{p_{D.ext}} is the rate at which detritus enters the system from
+unmodelled or external sources. For coral reefs, this includes detritus
+produced by sponges and coral mucous as well as waste material that
+sinks in from the pelagic zone. This rate is a model parameter
+independent of any other model component. It is set so that production
+and consumption are equal for the chosen steady state abundances.
 }
 
 \section{Algae consumption}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ The rate at which herbivorous consumer groups encounter algal 
- biomass \eqn{E_{i.A}(w)} is controlled by the parameter 
- \eqn{\rho_{A.i}}. It scales with the size of the consumer raised to 
- an allometric exponent \eqn{m_alg} which is taken from empirical data.
- 
- \deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
-           E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}
-         
- The mass specific consumption rate then accounts for the preference of 
- functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the 
- mass-specific algae consumption rate:
- 
- \deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
-           c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}
-}\if{html}{\out{</div>}}
+The rate at which herbivorous consumer groups encounter algal
+biomass \eqn{E_{i.A}(w)} is controlled by the parameter
+\eqn{\rho_{A.i}}. It scales with the size of the consumer raised to
+an allometric exponent \eqn{m_alg} which is taken from empirical data.
+
+\deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
+       E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}
+
+The mass specific consumption rate then accounts for the preference of
+functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the
+mass-specific algae consumption rate:
+
+\deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
+       c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}
 }
 
 \concept{Uresources}

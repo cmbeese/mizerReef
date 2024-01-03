@@ -46,7 +46,7 @@ algae_biomass <- function(params) {
 #' @param ... Unused
 #'
 #' @return A single number giving the algae biomass at next time step
-#' @seealso [detritus_dynamics()]
+#' @seealso [detritus_dynamics(), algae_consumption(), getAlgaeConsumption(), getAlgaeProduction()]
 #' @concept Uresources
 #' @export
 algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
@@ -113,6 +113,8 @@ algae_consumption <- function(params,
 #'
 #' This function returns a named vector with one component for each species
 #' giving the rate in grams/year at which that species consumes algae
+#' 
+#' @inheritSection algae_comsumption Algae consumption
 #'
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores

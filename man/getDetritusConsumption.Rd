@@ -19,25 +19,24 @@ giving the rate in grams/year at which that species consumes detritus
 \section{Detritus consumption}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ The rate at which detritivorous consumer groups encounter detrital 
- biomass \eqn{E_{i.D}(w)} is controlled by the parameter 
- \eqn{\rho_{D.i}}. It scales with the size of the consumer raised to 
- an allometric exponent \eqn{m_{det}} which is taken to be the same as 
- the scaling exponent of the maximum intake rate for fish consumers.
- 
- \deqn{E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D }{
-           E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D}
-         
- The mass specific consumption rate then accounts for the preference of 
- functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding 
- level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
- rate:
- 
- \deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
-                 N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
-           c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
-                 N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
-}\if{html}{\out{</div>}}
+The rate at which detritivorous consumer groups encounter detrital
+biomass \eqn{E_{i.D}(w)} is controlled by the parameter
+\eqn{\rho_{D.i}}. It scales with the size of the consumer raised to
+an allometric exponent \eqn{m_{det}} which is taken to be the same as
+the scaling exponent of the maximum intake rate for fish consumers.
+
+\deqn{E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D }{
+       E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D}
+
+The mass specific consumption rate then accounts for the preference of
+functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding
+level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
+rate:
+
+\deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+             N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
+       c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+             N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
 }
 
 \seealso{
