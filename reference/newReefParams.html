@@ -62,7 +62,7 @@ resource components, senescence mortality, and predation refuge.</p>
 <span>  <span class="va">method_params</span>,</span>
 <span>  refuge_user <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  bad_pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  piscivore <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  satiation <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  a_bar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  b_bar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  w_settle <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -133,10 +133,11 @@ within refuge (e.g. eels). Must be included here if not in
 the <code>params@species_params</code> data frame.</p></dd>
 
 
-<dt>piscivore</dt>
+<dt>satiation</dt>
 <dd><p>Optional. A vector of logical values indicating whether
-this functional group consumes other fish. Must be included
-here if not in the <code>params@species_params</code> data frame.</p></dd>
+feeding level should be turned on for this functional group.
+Must be included here if not in the
+<code>params@species_params</code> data frame.</p></dd>
 
 
 <dt>a_bar</dt>

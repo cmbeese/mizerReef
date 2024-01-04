@@ -89,15 +89,15 @@ current detritus biomass.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The time evolution of the detritus biomass \(B\) is described by</p>
-<p>$$dB/dt = \tt{production} - \tt{consumption} * B + \tt{external}$$</p>
-<p>where</p><ul><li><p><code>consumption</code> is the mass-specific rate of consumption, calculated with
-<code><a href="detritus_consumption.html">detritus_consumption()</a></code></p></li>
-<li><p><code>production</code> is the rate at which the rest of the system produces
-detritus biomass, calculate with <code><a href="getDetritusProduction.html">getDetritusProduction()</a></code></p></li>
-</ul><p>The dynamical equation is solved analytically to
+<p>$$dB/dt = \tt{production} - \tt{consumption} \cdot B + \tt{external}$$</p>
+<p>where <code>consumption</code> is the mass-specific rate of consumption, calculated
+with <code><a href="detritus_consumption.html">detritus_consumption()</a></code>and <code>production</code> is the rate at which the
+rest of the system produces detritus biomass, calculate with
+<code><a href="getDetritusProduction.html">getDetritusProduction()</a></code>.</p>
+<p>The dynamical equation is solved analytically to
 $$B(t+dt) = B(t)\exp(-\tt{consumption} \cdot dt)
-  +\frac{\tt{production}}{\tt{consumption}}
-  (1-\exp(-\tt{consumption} \cdot dt)).$$</p>
+              + \frac{\tt{production}}{\tt{consumption}}
+                (1-\exp(-\tt{consumption} \cdot dt)).$$</p>
 <p>This avoids the stability problems that would arise if we used the Euler
 method to solve the equation numerically.</p>
     </div>

@@ -89,16 +89,14 @@ algae biomass</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The time evolution of the algae biomass \(B\) is described by</p>
-<p>$$dB/dt = \tt{production} - \tt{consumption} * B$$</p>
-<p>where
-*<code>consumption</code> is the mass-specific rate of consumption calculated
-with <code><a href="algae_consumption.html">algae_consumption()</a></code>,
-*<code>production</code> is the rate at which algae grows, calculated
-with <code><a href="getAlgaeProduction.html">getAlgaeProduction()</a></code>.</p>
+<p>$$dB/dt = \tt{production} - \tt{consumption} \cdot B$$</p>
+<p>where  <code>consumption</code> is the mass-specific rate of consumption calculated
+with <code><a href="algae_consumption.html">algae_consumption()</a></code> and <code>production</code> is the rate at which algae
+grows, calculated with <code><a href="getAlgaeProduction.html">getAlgaeProduction()</a></code>.</p>
 <p>The dynamical equation is solved analytically to</p>
-<p>$$B(t+dt) = B(t)\exp(-\tt{consumption} \cdot dt)
-  +\frac{\tt{production}}{\tt{consumption}}
-  (1-\exp(-\tt{consumption} \cdot dt)).$$</p>
+<p>$$B(t+dt) = B(t) e^{(-\tt{consumption} \cdot dt)}
+             +\frac{\tt{production}}{\tt{consumption}}
+             (1- e^{(-\tt{consumption} \cdot dt)}).$$</p>
 <p>This avoids the stability problems that would arise if we used the Euler
 method to solve the equation numerically.</p>
     </div>
