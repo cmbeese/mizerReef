@@ -10,16 +10,16 @@ library(assertthat)
 #### Parameters ----------------------------------------------------------------
 
 # When new parameters need to be loaded 
-    # setwd("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes")
-    # 
-    # # Load species parameter data
-    # bonaire_species <- read.csv("bonaire_species.csv")
-    # bonaire_int     <- read.csv("bonaire_int.csv",  row.names = 1)
-    # 
-    # # Create some tester refuge scenarios
-    # method <- c("sigmoidal", "noncomplex")
-    # bonaire_refuge <- data.frame(L_refuge = 20, prop_protect = 0.4)
-    # 
+    setwd("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes")
+
+    # Load species parameter data
+    bonaire_species <- read.csv("bonaire_species.csv")
+    bonaire_int     <- read.csv("bonaire_int.csv",  row.names = 1)
+
+    # Create some tester refuge scenarios
+    method <- c("sigmoidal", "noncomplex")
+    bonaire_refuge <- data.frame(L_refuge = 20, prop_protect = 0.4)
+
 
 # When we can we use saved .rda files
     bonaire_species <- bonaire_species
@@ -28,20 +28,19 @@ library(assertthat)
     method <- c("sigmoidal", "noncomplex")
     
 # Current steady state attempt:
-    # Remove feeding level for all groups
-    # bonaire_species$piscivore <- c(TRUE, TRUE, FALSE)
-    bonaire_species$piscivore <- rep(TRUE)
-    # Try increasing rho
-    #scale_rho_a <- 2
-    #scale_rho_d <- 1
-    
+    # # Remove feeding level for all groups
+         bonaire_species$satiation <- rep(FALSE)
+    # # Try increasing rho
+    #     scale_rho_a <- 2
+    #     scale_rho_d <- 1
+
 # Other things tried:
     # # Try widening predation kernels
-    # bonaire_species$ sigma <- rep(2)
+        # bonaire_species$sigma <- rep(2)
     # # Reduce the proportion of fish that protected
-    # bonaire_refuge$prop_protect <- 0.2
+        # bonaire_refuge$prop_protect <- 0.2
     # # Let predators feed equally from all spectra
-    # bonaire_int[1,] <- rep(1)
+        # bonaire_int[1,] <- rep(1)
 
 # Base mizer to look at differences with unstructured resources
 # params <- newMultispeciesParams(species_params = bonaire_species,
@@ -53,8 +52,8 @@ library(assertthat)
 ## Set model -------------------------------------------------------------------
 bonaire_model <- newReefParams(species_params = bonaire_species,
                                interaction = bonaire_int,
-                               #scale_rho_a = scale_rho_a,
-                               #scale_rho_d = scale_rho_d,
+                               # scale_rho_a = scale_rho_a,
+                               # scale_rho_d = scale_rho_d,
                                method = method[1],
                                method_params = bonaire_refuge)
 
@@ -129,10 +128,14 @@ data.frame(age_mat_model, age_mat_observed)
 bonaire_model <- tuneParams(bonaire_model)
 
 # Save as rda ------------------------------------------------------------------
-save(bonaire_model,   file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_model.rda")
-save(bonaire_species, file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_species.rda")
-save(bonaire_int,     file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_int.rda")
-save(bonaire_refuge,  file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_refuge.rda")
+
+    # Params object
+    save(bonaire_model,   file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_model.rda")
+
+# CSV Files
+    save(bonaire_species, file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_species.rda")
+    save(bonaire_int,     file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_int.rda")
+    save(bonaire_refuge,  file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_refuge.rda")
 
 # Build website ----------------------------------------------------------------
 pkgdown::build_site()

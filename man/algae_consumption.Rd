@@ -34,14 +34,14 @@ biomass \eqn{E_{i.A}(w)} is controlled by the parameter
 an allometric exponent \eqn{m_alg} which is taken from empirical data.
 
 \deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
-       E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}
+       E_{i.A}(w)= rho_{i.A}\, w^{m_{alg}}\,B_A}
 
 The mass specific consumption rate then accounts for the preference of
 functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the
 mass-specific algae consumption rate:
 
 \deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
-       c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}
+       c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}
 }
 
 \concept{Uresources}

@@ -30,7 +30,7 @@ newReefParams <- function(# Original mizer parameters
                           # Parameters for setting up refuge
                             method, method_params, 
                             refuge_user = NULL, bad_pred = NULL, 
-                            piscivore = NULL,
+                            satiation = NULL,
                             a_bar = NULL, b_bar = NULL,
                             w_settle = NULL, max_protect = NULL, tau = NULL,
                           # Parameters for unstructured resources
@@ -54,7 +54,7 @@ newReefParams <- function(# Original mizer parameters
                         method_params = method_params,
                         refuge_user = refuge_user, 
                         bad_pred = bad_pred,
-                        piscivore = piscivore,
+                        satiation = satiation,
                         a_bar = a_bar, b_bar = b_bar,
                         w_settle = w_settle, 
                         max_protect = max_protect, tau = tau, ...)

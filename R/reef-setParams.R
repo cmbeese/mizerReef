@@ -460,9 +460,10 @@ setExtMortParams <- function(params,
 #'                  within refuge (e.g. eels). Must be included here if not in 
 #'                  the `params@species_params` data frame.
 #'                  
-#' @param piscivore Optional. A vector of logical values indicating whether 
-#'                  this functional group consumes other fish. Must be included 
-#'                  here if not in the `params@species_params` data frame.
+#' @param satiation Optional. A vector of logical values indicating whether 
+#'                  feeding level should be turned on for this functional group.
+#'                  Must be included here if not in the 
+#'                  `params@species_params` data frame.
 #'
 #' @param w_settle  Optional. The body weight (g) at which fish settle onto the 
 #'                  reef. Fish smaller than this are considered to be larval 
@@ -489,7 +490,7 @@ setExtMortParams <- function(params,
 #' @export
 setRefuge <- function(params, method, method_params = NULL,
                       # Parameters specific to each group
-                      refuge_user = NULL, bad_pred = NULL, piscivore = NULL,
+                      refuge_user = NULL, bad_pred = NULL, satiation = NULL,
                       # Parameters used by all methods
                       a_bar = NULL, b_bar = NULL,
                       w_settle = NULL, max_protect = NULL, tau = NULL,...) {
@@ -540,17 +541,17 @@ setRefuge <- function(params, method, method_params = NULL,
             params@species_params$bad_pred <- bad_pred
         }
     
-        # Check that piscivore is logical and the right length
-        if(!('piscivore' %in% colnames(params@species_params))){
-            if(is.null(piscivore)){
-                stop("You need to provide values for piscivore")
-            } else if (!is.logical(piscivore)) {
-                stop("The refuge_user values should be logical.")
+        # Check that satiation is logical and the right length
+        if(!('satiation' %in% colnames(params@species_params))){
+            if(is.null(satiation)){
+                stop("You need to provide values for satiation")
+            } else if (!is.logical(satiation)) {
+                stop("The satiation values should be logical.")
             }
-            if(length(piscivore) != no_sp) {
-                stop("piscivore should have a value for every group.")
+            if(length(satiation) != no_sp) {
+                stop("satiation should have a value for every group.")
             }
-            params@species_params$piscivore <- piscivore
+            params@species_params$satiation <- satiation
         }
     
     # refuge_params set up and checks ----
@@ -752,6 +753,9 @@ setRefuge <- function(params, method, method_params = NULL,
 #' @export
 getRefuge <- function(params, ...) {
     
+    # object - Check if mizerParams is valid ----
+    assert_that(is(params, "MizerParams"))
+    
     # Extract relevant data from params
     refuge_params <- params@other_params[['refuge_params']]
     method_params <- params@other_params[['method_params']]
@@ -925,6 +929,150 @@ getRefuge <- function(params, ...) {
     return(params)
 }
 
+#' Change the refuge parameters for a model after steady state
+#'
+#' This is a wrapper function for the [setRefuge()] and [getRefuge()] 
+#' functions that allows users to easily change refuge parameters on an
+#' existing mizer model. This will take it out of steady state, and users
+#' should run [reef_steady()] after this function to return to steady state. 
+#' 
+#' @inheritSection setRefuge Setting the refuge profile
+#' 
+#' @param params a mizer params object
+#' 
+#' @param new_method    The new method to be used for setting the refuge 
+#'                      profile. Options are "sigmoidal", "binned", 
+#'                      "competitive", or "noncomplex". If no method is
+#'                      provided, this defaults to the same method as is
+#'                      currently being used in the simulation. 
+#'                  
+#' @param new_method_params  A data frame containing values specific to each
+#'                          method for calculating refuge. Only necessary if 
+#'                          changing methods. 
+#'                          
+#' @param new_L_refuge  To be used with "sigmoidal" method only. The new value
+#'                      for the length at which refuge becomes scarce in cm.
+#'                      
+#' @param new_prop_protect  To be used with "sigmoidal" method only. The new 
+#'                          value for the maximum proportion of fish to protect.
+#'                          
+#' @param scale_bin_prop    To be use with the "binned" method only. A number
+#'                          or vector of numbers to multiply the `prop_protect`
+#'                          values by for each size bin. Changes the proportion 
+#'                          of fish protected.
+#'                          
+#' @param ... Unused
+#'
+#' @return A mizer params object with updated refuge profiles
+#' @concept refuge
+#' @export
+newRefuge <- function(params,
+                      # Fully changing method
+                      new_method = NULL, new_method_params = NULL,
+                      # Sigmoidal - changing refuge length prop protect
+                      new_L_refuge = NULL, new_prop_protect = NULL,
+                      # Binned - scaling bin prop 
+                      scale_bin_prop = NULL, ...) {
     
+    # Check that the user provided at least one new input
+        inputs <- list(new_method, new_method_params, 
+                    new_L_refuge, new_prop_protect,
+                    scale_bin_prop)
+        if (all(sapply(inputs, is.null))) {
+            stop("Error: At least one input must be provided.")
+        }
+    
+    # object check ----
+        # Check if given mizerParams object is valid
+        assert_that(is(params, "MizerParams"))
+        
+        # Extract relevant data from params
+        refuge_params <- params@other_params[['refuge_params']]
+        method_params <- params@other_params[['method_params']]
+    
+    # method checks ----
+        # Check if the user provided one of the available refuge profile methods
+        m_opt <- c('sigmoidal','binned','competitive','noncomplex')
+        if(is.null(new_method)) {
+            # If user did not provide a method, use old one
+            new_method <- refuge_params$method
+        # If user did provide a method, check that it's one of the options
+        } else if(!is.element(new_method, m_opt)) {
+            stop("Method must be 'sigmoidal','binned', 'competitive', 'noncomplex'.")
+        }
+    
+    #  method_params checks ----
+        if (new_method != "noncomplex"){
+            # check if method_params provided
+            if (is.null(new_method_params)) {
+                # Return an error if they are trying to switch to methods
+                if(refuge_params$method != new_method){
+                    stop("You must provide a new method_params data frame to
+                         switch methods.") 
+                }
+                # Check method
+                ## Sigmoidal ----
+                if (new_method == "sigmoidal") {
+                    # Check if new L or new_prop given
+                    if(is.null(new_L_refuge) || is.null(new_prop_protect)){
+                       stop("You must provide either a new L_refuge, a new
+                             prop_protect, or a new method_params data frame.") 
+                    }
+                    # If new L_refuge given, check that it's positive
+                    if(!is.null(new_L_refuge)){
+                        if(new_L_refuge < 0) {
+                            stop("new_L_refuge must be non-negative.")
+                        }
+                    } else { new_L_refuge <- method_params$L_refuge }
+                    # If new prop_protect given, check that it's between 0 and 1
+                    if(!is.null(new_prop_protect)){
+                        if(method_params$prop_protect < 0 ||
+                           method_params$prop_protect > 1) {
+                        stop("prop_protect should be a proportion between 0 and 1.")
+                        }
+                    } else { new_prop_protect <- method_params$prop_protect }
+                    new_mp <- as.data.frame(new_L_refuge, new_prop_protect)
+                    names(new_mp) <- names(method_params)
+                ## Scale Binned ----
+                } else if (new_method == "binned" || new_method == "competitive") {
+                    # Find number of bins used in old method
+                    no_bins <- length(method_params)
+                    if(is.null(scale_bin)){
+                        stop("You must provide either a value or vector of values
+                             for scale_bin or a new method_params data frame.") 
+                    }
+                    # Make sure scaling vector is the right length
+                    if(!(length(scale_bin) == 1) || 
+                       !(length(scale_bin) == no_bins)){
+                        stop("scale_bin must have length 1 or have an value
+                             for every bin.")
+                    }
+                    # Check that scale_bin_prop is positive
+                    if(scale_bin < 0) {
+                        stop("scale_bin must be non-negative.")
+                    }
+                    # Calculate new bins
+                    if (new_method == "binned"){ 
+                        new_mp <- method_params
+                        new_mp$prop_protect <- scale_bin * new_mp$prop_protect
+                        
+                    } else {
+                        new_mp <- method_params
+                        new_mp$refuge_density <- scale_bin * new_mp$refuge_density
+                    }
+                }
+            } 
+            new_mp <- new_method_params
+        }
+        
+    # Update parameters ----
+        params <- setRefuge(params = params, 
+                            method = new_method,
+                            method_params = new_mp)
+        
+        params <- getRefuge(params = params)
+}
+
+
 
 

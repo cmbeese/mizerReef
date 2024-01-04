@@ -457,12 +457,12 @@ reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,
                              ...) {
     
     # Get indices of piscivorous groups
-    pisc <- which(params@species_params$piscivore)
+    sat <- which(!params@species_params$satiation)
     # Find mizer feeding level and set to 0 for any NAs (if use wants to set h)
     fl <- mizerFeedingLevel(params, n, n_pp, n_other, t, encounter, ...)
     fl[is.na(fl)] <- 0
     # Set predator feeding level to 0
-    fl[pisc,] <- 0
+    fl[sat,] <- 0
     
     return(fl)
 }

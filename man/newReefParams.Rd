@@ -15,7 +15,7 @@ newReefParams(
   method_params,
   refuge_user = NULL,
   bad_pred = NULL,
-  piscivore = NULL,
+  satiation = NULL,
   a_bar = NULL,
   b_bar = NULL,
   w_settle = NULL,
@@ -64,9 +64,10 @@ FALSE indicates that this species is able to encounter prey
 within refuge (e.g. eels). Must be included here if not in
 the \code{params@species_params} data frame.}
 
-\item{piscivore}{Optional. A vector of logical values indicating whether
-this functional group consumes other fish. Must be included
-here if not in the \code{params@species_params} data frame.}
+\item{satiation}{Optional. A vector of logical values indicating whether
+feeding level should be turned on for this functional group.
+Must be included here if not in the
+\code{params@species_params} data frame.}
 
 \item{a_bar}{Optional. The average length to weight conversion value
 \eqn{\bar{a}} and \eqn{\bar{b}} describe the fish dummies used

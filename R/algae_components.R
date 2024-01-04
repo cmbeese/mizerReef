@@ -21,7 +21,7 @@ algae_biomass <- function(params) {
 #' The time evolution of the algae biomass \eqn{B} is described by
 #'
 #' \deqn{dB/dt = \tt{production} - \tt{consumption} \cdot B}{
-#'       dB/dt = production - consumption \cdot B}
+#'       dB/dt = production - consumption * B}
 #'
 #' where  `consumption` is the mass-specific rate of consumption calculated
 #' with `algae_consumption()` and `production` is the rate at which algae 
@@ -80,14 +80,14 @@ algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #'  an allometric exponent \eqn{m_alg} which is taken from empirical data.
 #'  
 #'  \deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
-#'        E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}
+#'        E_{i.A}(w)= rho_{i.A}\, w^{m_{alg}}\,B_A}
 #'          
 #'  The mass specific consumption rate then accounts for the preference of 
 #'  functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the 
 #'  mass-specific algae consumption rate:
 #'  
 #'  \deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
-#'        c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}
+#'        c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}
 #'
 #' @param params MizerParams
 #' @param n A matrix of current species abundances (species x size)
