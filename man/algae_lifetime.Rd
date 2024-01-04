@@ -25,4 +25,4 @@ The number giving the expected lifetime in years.
 The expected algae lifetime is defined as the inverse of the
 mass-specific algae consumption rate.
 }
-\concept{Uresources}
+\concept{algae}

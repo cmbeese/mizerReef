@@ -19,7 +19,7 @@ library(assertthat)
     # Create some tester refuge scenarios
     method <- c("sigmoidal", "noncomplex")
     bonaire_refuge <- data.frame(L_refuge = 20, prop_protect = 0.4)
-
+    # bonaire_species$linecolour <- c("#8E0408","#578979","#D89958")
 
 # When we can we use saved .rda files
     bonaire_species <- bonaire_species
@@ -29,10 +29,13 @@ library(assertthat)
     
 # Current steady state attempt:
     # # Remove feeding level for all groups
-         bonaire_species$satiation <- rep(FALSE)
+    #     bonaire_species$satiation <- rep(FALSE)
     # # Try increasing rho
     #     scale_rho_a <- 2
     #     scale_rho_d <- 1
+    # # Try setting a reasonable invertebrate biomass - is it absolutely
+    # # necessary for me to have data for this?
+        bonaire_species$biomass_observed[bonaire_species$species == 'inverts'] <- 20
 
 # Other things tried:
     # # Try widening predation kernels
@@ -54,8 +57,13 @@ bonaire_model <- newReefParams(species_params = bonaire_species,
                                interaction = bonaire_int,
                                # scale_rho_a = scale_rho_a,
                                # scale_rho_d = scale_rho_d,
+                               # method = method[2])
                                method = method[1],
                                method_params = bonaire_refuge)
+        
+bonaire_model@linecolour["predators"] <-"#8E0408"
+bonaire_model@linecolour["inverts"] <- "#D89958"
+bonaire_model@linecolour["herbivores"] <- "#578979"
 
 ## Project to steady state
 bonaire_model <- reef_steady(bonaire_model)
@@ -139,5 +147,4 @@ bonaire_model <- tuneParams(bonaire_model)
 
 # Build website ----------------------------------------------------------------
 pkgdown::build_site()
-
 

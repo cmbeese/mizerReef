@@ -7,7 +7,7 @@
 #'
 #' @param params MizerParams
 #' @return The algae biomass in grams
-#' @concept Uresources
+#' @concept algae
 #' @export
 algae_biomass <- function(params) {
     params@initial_n_other$algae
@@ -48,7 +48,7 @@ algae_biomass <- function(params) {
 #' @return A single number giving the algae biomass at next time step
 #' @seealso [detritus_dynamics()], [algae_consumption()], 
 #'          [getAlgaeConsumption()], [getAlgaeProduction()]
-#' @concept Uresources
+#' @concept algae
 #' @export
 algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 
@@ -77,7 +77,7 @@ algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #'  The rate at which herbivorous consumer groups encounter algal 
 #'  biomass \eqn{E_{i.A}(w)} is controlled by the parameter 
 #'  \eqn{\rho_{A.i}}. It scales with the size of the consumer raised to 
-#'  an allometric exponent \eqn{m_alg} which is taken from empirical data.
+#'  an allometric exponent \eqn{m_{alg}} which is taken from empirical data.
 #'  
 #'  \deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
 #'        E_{i.A}(w)= rho_{i.A}\, w^{m_{alg}}\,B_A}
@@ -94,7 +94,7 @@ algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #' @param rates A list of rates as returned by [getRates()]
 #'
 #' @return The mass-specific consumption rate of algae in grams per year.
-#' @concept Uresources
+#' @concept algae
 #' @export
 algae_consumption <- function(params,
                               n = params@initial_n,
@@ -120,7 +120,7 @@ algae_consumption <- function(params,
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores
 #' @seealso [getAlgaeProduction()], [algae_dynamics()], [getAlgaeConsumption()]
-#' @concept Uresources
+#' @concept algae
 #' @export
 getAlgaeConsumption <- function(params) {
 
@@ -170,7 +170,7 @@ plotAlgaeConsumption <- function(params) {
 #'
 #' @return The annual growth rate of algae per square meter
 #' @seealso [getAlgaeConsumption()], [algae_dynamics()], [getAlgaeProduction()]
-#' @concept Uresources
+#' @concept algae
 #' @export
 getAlgaeProduction <- function(params) {
     return(params@other_params$algae$algae_growth)
@@ -203,7 +203,7 @@ getAlgaeProduction <- function(params) {
 #'
 #' @param params A MizerParams object
 #' @return The number giving the expected lifetime in years.
-#' @concept Uresources
+#' @concept algae
 #' @export
 algae_lifetime <- function(params) {
     1 / algae_consumption(params,
@@ -219,7 +219,7 @@ algae_lifetime <- function(params) {
 #' abundance while keeping the total consumption of algae the same (by
 #' adjusting the interaction strength of species with algae).
 #' 
-#' @concept Uresources
+#' @concept algae
 #' @export
 `algae_lifetime<-` <- function(params, value) {
     rescale_algae(params, value / algae_lifetime(params))
@@ -234,7 +234,7 @@ algae_lifetime <- function(params) {
 #' @param params A MizerParams object
 #' @param factor A number
 #' @return An updated MizerParams object
-#' @concept Uresources
+#' @concept algae
 #' @export
 rescale_algae <- function(params, factor) {
     params@initial_n_other[["algae"]] <-

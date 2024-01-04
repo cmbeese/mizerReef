@@ -31,7 +31,7 @@ The rho parameter for herbivorous fish groups is stored in
 The rate at which herbivorous consumer groups encounter algal
 biomass \eqn{E_{i.A}(w)} is controlled by the parameter
 \eqn{\rho_{A.i}}. It scales with the size of the consumer raised to
-an allometric exponent \eqn{m_alg} which is taken from empirical data.
+an allometric exponent \eqn{m_{alg}} which is taken from empirical data.
 
 \deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
        E_{i.A}(w)= rho_{i.A}\, w^{m_{alg}}\,B_A}
@@ -44,4 +44,4 @@ mass-specific algae consumption rate:
        c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}
 }
 
-\concept{Uresources}
+\concept{algae}

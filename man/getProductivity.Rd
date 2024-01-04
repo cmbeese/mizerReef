@@ -5,13 +5,14 @@
 \title{Calculate fisheries productivity for each functional group above a chosen
 minimum fishing size}
 \usage{
-getProductivity(object, min_fishing_l = 7, max_fishing_l = 50, ...)
+getProductivity(object, min_fishing_l = 7, max_fishing_l = NULL, ...)
 }
 \arguments{
-\item{object}{An object of class \code{MizerParams} or \code{MizerSim}.If given a
-\linkS4class{MizerSim} object, uses the growth rates at the final time of a
-simulation to calculate productivity. If given a \linkS4class{MizerParams}
-object, uses the initial growth rates.}
+\item{object}{An object of class \code{MizerParams} or \code{MizerSim}. If given a
+\linkS4class{MizerSim} object, uses the growth rates at the
+final time of a simulation to calculate productivity. If
+given a \linkS4class{MizerParams} object, uses the initial
+growth rates.}
 
 \item{min_fishing_l}{The minimum length (cm) of fished individuals for
 productivity estimates. Defaults to 7 cm.}
@@ -28,20 +29,25 @@ a MizerSim object, an array (time x species) containing the productivity
 at each time step for all species.
 }
 \description{
+Calculate fisheries productivity for each functional group above a chosen
+minimum fishing size
+}
+\section{Potential fisheries productivity}{
+
+
 Fisheries productivity refers to the rate at which fish biomass is produced
 and available for harvest in a given area over a given period of time.
 Productivity cannot be measured in situ.
-}
-\details{
+
 The productivity \eqn{P_i(w)} of functional group \eqn{i} is given by
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{\deqn{P_i(w) = \int_w^{w+dw} \left( N_i(w) + g_i(w) \right) w \, dw.}
-     \{P_i(w) = \\int_w^\{w+dw\} \\left( N_i(w) + g_i(w) \\right) w \\, dw.\}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{\deqn{P_i(w) = \int_w^{w+dw} \left( N_i(w) + E_{R.i}(w) \right) w \, dw.}
+     \{P_i(w) = \\int_w^\{w+dw\} ( N_i(w) + E_\{R.i\}(w)) w \\, dw.\}
 }\if{html}{\out{</div>}}
 
-\eqn{N_i(w)} is the abundance density (1/m^-2) and \eqn{g_i(w)} is the
-energy rate available for growth after metabolism, movement and
-reproduction have been accounted for (grams/year).
+\eqn{N_i(w)} is the abundance density (1/m^-2) and \eqn{E_{R.i}}
+is the energy rate available for growth after metabolism and movement have
+been accounted for (grams/year).
 
 The productivity is calculated for all fish in the size range between
 \code{min_fishing_length} and \code{max_fishing_length}which can be the same for
@@ -50,5 +56,6 @@ each species in the model.\code{min_fishing_length} defaults to \eqn{7 cm}
 regardless of functional group and \code{max_fishing_length} defaults to the
 maximum weight in the model.
 }
+
 \concept{summary}
 \concept{summary functions}

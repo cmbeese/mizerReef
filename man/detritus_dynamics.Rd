@@ -51,4 +51,4 @@ method to solve the equation numerically.
 \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=detritus_consumption]{detritus_consumption()}},
 \code{\link[=getDetritusConsumption]{getDetritusConsumption()}}, \code{\link[=getDetritusProduction]{getDetritusProduction()}}
 }
-\concept{Uresources}
+\concept{detritus}

@@ -71,4 +71,4 @@ independent of any other model component. It is set so that production
 and consumption are equal for the chosen steady state abundances.
 }
 
-\concept{Uresources}
+\concept{detritus}

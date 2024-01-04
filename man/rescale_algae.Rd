@@ -19,4 +19,4 @@ This multiplies the algae biomass by a factor and divides the
 interaction between all species and algae by the same
 factor, so as to keep the total consumption of algae unchanged.
 }
-\concept{Uresources}
+\concept{algae}

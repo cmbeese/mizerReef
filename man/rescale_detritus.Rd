@@ -21,4 +21,4 @@ factor, so as to keep the total consumption of detritus unchanged.
 It also divides the mass-specific rate of decomposition by the same
 factor so that the total detritus decomposition rate stays the same.
 }
-\concept{Uresources}
+\concept{detritus}

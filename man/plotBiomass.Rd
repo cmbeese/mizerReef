@@ -37,12 +37,13 @@ plotlyBiomass(
 \item{sim}{An object of class \linkS4class{MizerSim}}
 
 \item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric vector with
-the groups indices, or a logical vector indicating for each groups
-whether it is to be selected (TRUE) or not.}
+groups are selected. A vector of groups names, or a numeric
+vector with the groups indices, or a logical vector
+indicating for each group whether it is to be selected
+(TRUE) or not.}
 
-\item{start_time}{The first time to be plotted. Default is the beginning of
-the time series.}
+\item{start_time}{The first time to be plotted. Default is the beginning
+of the time series.}
 
 \item{end_time}{The last time to be plotted. Default is the end of the time
 series.}
@@ -50,21 +51,21 @@ series.}
 \item{y_ticks}{The approximate number of ticks desired on the y axis.}
 
 \item{ylim}{A numeric vector of length two providing lower and upper limits
-for the y axis. Use NA to refer to the existing minimum or maximum. Any
-values below 1e-20 are always cut off.}
+for the y axis. Use NA to refer to the existing minimum or
+maximum. Any values below 1e-20 are always cut off.}
 
 \item{total}{A boolean value that determines whether the total biomass from
-all species is plotted as well. Default is FALSE.}
+species is plotted as well. Default is FALSE.}
 
-\item{background}{A boolean value that determines whether background species
-are included. Ignored if the model does not contain background species.
-Default is TRUE.}
+\item{background}{A boolean value that determines whether background
+species are included. Ignored if the model does not
+contain background species. Default is TRUE.}
 
 \item{highlight}{Name or vector of names of the species to be highlighted.}
 
-\item{return_data}{A boolean value that determines whether the formatted data
-used for the plot is returned instead of the plot itself. Default value is
-FALSE}
+\item{return_data}{A boolean value that determines whether the formatted
+data used for the plot is returned instead of the plot
+itself. Default value is FALSE}
 
 \item{...}{
   Arguments passed on to \code{\link[mizer:get_size_range_array]{mizer::get_size_range_array}}
@@ -85,15 +86,18 @@ frame with the four variables 'Year', 'Biomass', 'Species', 'Legend' is
 returned.
 }
 \description{
-After running a projection, the biomass of each species and each
+After running a projection, the biomass of each functional group and each
 unstructured component can be plotted against time. The biomass is
 calculated within user defined size limits (min_w, max_w, min_l, max_l, see
 \code{\link[=get_size_range_array]{get_size_range_array()}}).
 }
 \seealso{
 Other plotting functions: 
+\code{\link{plot2Productivity}()},
+\code{\link{plot2TotalBiomass}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}
 }
 \concept{plots}

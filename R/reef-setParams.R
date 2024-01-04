@@ -1010,11 +1010,11 @@ newRefuge <- function(params,
                     stop("You must provide a new method_params data frame to
                          switch methods.") 
                 }
-                # Check method
+                # Check method ----
                 ## Sigmoidal ----
                 if (new_method == "sigmoidal") {
                     # Check if new L or new_prop given
-                    if(is.null(new_L_refuge) || is.null(new_prop_protect)){
+                    if (all(is.null(new_L_refuge), is.null(new_prop_protect))){
                        stop("You must provide either a new L_refuge, a new
                              prop_protect, or a new method_params data frame.") 
                     }
@@ -1031,9 +1031,12 @@ newRefuge <- function(params,
                         stop("prop_protect should be a proportion between 0 and 1.")
                         }
                     } else { new_prop_protect <- method_params$prop_protect }
-                    new_mp <- as.data.frame(new_L_refuge, new_prop_protect)
-                    names(new_mp) <- names(method_params)
-                ## Scale Binned ----
+                    
+                    new_mp <- method_params
+                    new_mp$L_refuge <- new_L_refuge
+                    new_mp$prop_protect = new_prop_protect
+                    
+                    ## Binned or Competitive ----
                 } else if (new_method == "binned" || new_method == "competitive") {
                     # Find number of bins used in old method
                     no_bins <- length(method_params)
@@ -1061,8 +1064,7 @@ newRefuge <- function(params,
                         new_mp$refuge_density <- scale_bin * new_mp$refuge_density
                     }
                 }
-            } 
-            new_mp <- new_method_params
+            } else { new_mp <- new_method_params }
         }
         
     # Update parameters ----

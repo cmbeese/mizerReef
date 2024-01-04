@@ -48,4 +48,4 @@ rate:
              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
 }
 
-\concept{Uresources}
+\concept{detritus}

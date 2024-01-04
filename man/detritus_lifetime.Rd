@@ -25,4 +25,4 @@ The number giving the expected lifetime in years.
 The expected detritus lifetime is defined as the inverse of the
 mass-specific detritus consumption rate.
 }
-\concept{Uresources}
+\concept{detritus}
