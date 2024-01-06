@@ -956,10 +956,9 @@ getRefuge <- function(params, ...) {
 #' @param new_prop_protect  To be used with "sigmoidal" method only. The new 
 #'                          value for the maximum proportion of fish to protect.
 #'                          
-#' @param scale_bin_prop    To be use with the "binned" method only. A number
-#'                          or vector of numbers to multiply the `prop_protect`
-#'                          values by for each size bin. Changes the proportion 
-#'                          of fish protected.
+#' @param scale_bin To be use with the "binned" method only. A number or vector 
+#'                  of numbers to multiply the `prop_protect` values by for 
+#'                  each size bin. Changes the proportion of fish protected.
 #'                          
 #' @param ... Unused
 #'
@@ -972,12 +971,12 @@ newRefuge <- function(params,
                       # Sigmoidal - changing refuge length prop protect
                       new_L_refuge = NULL, new_prop_protect = NULL,
                       # Binned - scaling bin prop 
-                      scale_bin_prop = NULL, ...) {
+                      scale_bin = NULL, ...) {
     
     # Check that the user provided at least one new input
         inputs <- list(new_method, new_method_params, 
                     new_L_refuge, new_prop_protect,
-                    scale_bin_prop)
+                    scale_bin)
         if (all(sapply(inputs, is.null))) {
             stop("Error: At least one input must be provided.")
         }
@@ -1067,7 +1066,7 @@ newRefuge <- function(params,
             } else { new_mp <- new_method_params }
         }
         
-    # Update parameters ----
+    #### Update parameters ----
         params <- setRefuge(params = params, 
                             method = new_method,
                             method_params = new_mp)

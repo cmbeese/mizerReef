@@ -10,7 +10,7 @@ newRefuge(
   new_method_params = NULL,
   new_L_refuge = NULL,
   new_prop_protect = NULL,
-  scale_bin_prop = NULL,
+  scale_bin = NULL,
   ...
 )
 }
@@ -33,10 +33,9 @@ for the length at which refuge becomes scarce in cm.}
 \item{new_prop_protect}{To be used with "sigmoidal" method only. The new
 value for the maximum proportion of fish to protect.}
 
-\item{scale_bin_prop}{To be use with the "binned" method only. A number
-or vector of numbers to multiply the \code{prop_protect}
-values by for each size bin. Changes the proportion
-of fish protected.}
+\item{scale_bin}{To be use with the "binned" method only. A number or vector
+of numbers to multiply the \code{prop_protect} values by for
+each size bin. Changes the proportion of fish protected.}
 
 \item{...}{Unused}
 }

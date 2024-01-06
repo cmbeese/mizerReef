@@ -40,22 +40,25 @@ itself. Default value is FALSE.}
 \item{...}{unused}
 }
 \value{
-A ggplot2 object
+A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
+frame the vulnerability at each size
 }
 \description{
-When called with a \linkS4class{MizerParams}
-object the initial vulnerability is plotted.
+When called with a \linkS4class{MizerParams} object the initial
+vulnerability is plotted. The complement of refuge.
 }
 \seealso{
-\link{plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}
+\link{plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotRefuge]{plotRefuge()}}
 
 Other plotting functions: 
 \code{\link{plot2Productivity}()},
 \code{\link{plot2TotalBiomass}()},
 \code{\link{plotBiomass}()},
+\code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()}
 }
-\concept{plots}
 \concept{plotting functions}
+\concept{refuge}

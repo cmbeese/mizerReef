@@ -31,19 +31,21 @@ itself. Default value is FALSE.}
 A ggplot2 object
 }
 \description{
-When called with a \linkS4class{MizerParams}
-object the initial vulnerability is plotted.
+When called with a \linkS4class{MizerParams} object the initial
+refuge profile is plotted. The complement of vulnerability.
 }
 \seealso{
-\link{plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}
+\link{plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotVulnerable]{plotVulnerable()}}
 
 Other plotting functions: 
 \code{\link{plot2Productivity}()},
 \code{\link{plot2TotalBiomass}()},
 \code{\link{plotBiomass}()},
+\code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
+\code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}
 }
-\concept{plots}
 \concept{plotting functions}
+\concept{refuge}

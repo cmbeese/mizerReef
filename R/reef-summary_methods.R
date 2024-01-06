@@ -42,8 +42,9 @@
 #'                      productivity estimates. Defaults to 7 cm.
 #'                      
 #' @param max_fishing_l The maximum length (cm) of fished individuals for
-#'                      productivity estimates. Defaults to max length. 
-#' @param ... Unused
+#'                      productivity estimates. Defaults to max length.
+#'                       
+#' @inheritDotParams mizer::get_size_range_array -params
 #'
 #' @return If called with a MizerParams object, a vector with the productivity
 #'   in grams/year/m^-2 for each functional group in the model. If called with

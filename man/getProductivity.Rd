@@ -20,7 +20,18 @@ productivity estimates. Defaults to 7 cm.}
 \item{max_fishing_l}{The maximum length (cm) of fished individuals for
 productivity estimates. Defaults to max length.}
 
-\item{...}{Unused}
+\item{...}{
+  Arguments passed on to \code{\link[mizer:get_size_range_array]{mizer::get_size_range_array}}
+  \describe{
+    \item{\code{min_w}}{Smallest weight in size range. Defaults to smallest weight in
+the model.}
+    \item{\code{max_w}}{Largest weight in size range. Defaults to largest weight in the
+model.}
+    \item{\code{min_l}}{Smallest length in size range. If supplied, this takes
+precedence over \code{min_w}.}
+    \item{\code{max_l}}{Largest length in size range. If supplied, this takes precedence
+over \code{max_w}.}
+  }}
 }
 \value{
 If called with a MizerParams object, a vector with the productivity

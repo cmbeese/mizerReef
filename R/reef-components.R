@@ -40,7 +40,7 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
                   algae_factor)
 }
 
-#' Tune algae and detritus to steady state
+#' Tune unstructured resources (algae and detritus) to steady state
 #'
 #' This first sets the rate of degradation of algae so that for the given
 #' abundances, the algae is at steady state. It then sets the rate at which
@@ -48,10 +48,13 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' the given abundances the detritus is at steady state.
 #'
 #' @param params A MizerParams object
+#' @param ... unused
 #' @return An updated MizerParams object
 #' @concept Uresources
+#' 
 #' @export
-tune_algae_detritus <- function(params) {
+#' 
+tuneUR <- function(params,...) {
 
     # algae
     ain  <- getAlgaeProduction(params) / params@initial_n_other$algae

@@ -24,14 +24,16 @@
 #'   of the `reproduction_level`.
 #' @param progress_bar A shiny progress object to implement a progress bar in a
 #'   shiny app. Default FALSE. 
-#'
+#'   
+#' @inheritDotParams tuneUR
+#' 
 #' @return An object of type \linkS4class{MizerParams}
 #' @concept setup
 #' @export
 reef_steady <- function(params, t_max = 100, t_per = 1.5, dt = 0.1,
                         tol = 0.1 * dt, return_sim = FALSE,
                         preserve = c("reproduction_level", "erepro", "R_max"),
-                        progress_bar = TRUE) {
+                        progress_bar = TRUE,...) {
 
     # Check if params are valid
     params <- validParams(params)
@@ -78,8 +80,9 @@ reef_steady <- function(params, t_max = 100, t_per = 1.5, dt = 0.1,
     n_pp <- params@initial_n_pp
     n_other <- params@initial_n_other
     rates <- getRates(params)
-
-    params <- tune_algae_detritus(params)
+    
+    # algae and detritus ----
+    params <- tuneUR(params = params)
 
     if (preserve == "reproduction_level") {
         params <- setBevertonHolt(params,

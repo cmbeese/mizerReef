@@ -262,9 +262,9 @@ getDetritusProduction <- function(params, n = params@initial_n,
 #' @export
 plotDetritusProduction <- function(params) {
     production <- getDetritusProduction(params)
-    df <- data.frame(Producer = names(production),
+    df <- data.frame(Source = names(production),
                      Rate = production)
-    ggplot(df, aes(x = "", y = Rate, fill = Producer)) +
+    ggplot(df, aes(x = "", y = Rate, fill = Source)) +
         geom_bar(stat = "identity", width = 1) +
         coord_polar("y", start = 0) +
         labs(title = "Detritus production rate [g/year]",

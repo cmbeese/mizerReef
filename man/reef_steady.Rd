@@ -12,7 +12,8 @@ reef_steady(
   tol = 0.1 * dt,
   return_sim = FALSE,
   preserve = c("reproduction_level", "erepro", "R_max"),
-  progress_bar = TRUE
+  progress_bar = TRUE,
+  ...
 )
 }
 \arguments{
@@ -42,6 +43,12 @@ of the \code{reproduction_level}.}
 
 \item{progress_bar}{A shiny progress object to implement a progress bar in a
 shiny app. Default FALSE.}
+
+\item{...}{
+  Arguments passed on to \code{\link[=tuneUR]{tuneUR}}
+  \describe{
+    \item{\code{}}{}
+  }}
 }
 \value{
 An object of type \linkS4class{MizerParams}
