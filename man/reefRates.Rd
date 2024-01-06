@@ -23,7 +23,8 @@ parameters.)}
 \item{effort}{The effort for each fishing gear}
 
 \item{rates_fns}{Named list of the functions to call to calculate the rates.
-Note that this list holds the functions themselves, not their names.}
+Note that this list holds the functions themselves, not
+their names.}
 
 \item{...}{Unused}
 }
@@ -65,4 +66,4 @@ Other mizer rate functions:
 \code{\link{reefVulnerable}()}
 }
 \concept{mizer rate functions}
-\concept{refuge}
+\concept{refugeRates}

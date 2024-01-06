@@ -2,7 +2,7 @@
 % Please edit documentation in R/reef-setParams.R
 \name{newRefuge}
 \alias{newRefuge}
-\title{Change the refuge parameters for a model after steady state}
+\title{Change the refuge parameters for a model}
 \usage{
 newRefuge(
   params,
@@ -15,7 +15,7 @@ newRefuge(
 )
 }
 \arguments{
-\item{params}{a mizer params object}
+\item{params}{a mizer object}
 
 \item{new_method}{The new method to be used for setting the refuge
 profile. Options are "sigmoidal", "binned",
@@ -40,7 +40,7 @@ each size bin. Changes the proportion of fish protected.}
 \item{...}{Unused}
 }
 \value{
-A mizer params object with updated refuge profiles
+A mizer object with updated refuge profiles
 }
 \description{
 This is a wrapper function for the \code{\link[=setRefuge]{setRefuge()}} and \code{\link[=getRefuge]{getRefuge()}}
@@ -168,4 +168,4 @@ as a .csv file. The data can then be read into R using the command
 \code{read.csv()}.
 }
 
-\concept{refuge}
+\concept{refugeParams}

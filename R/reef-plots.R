@@ -30,7 +30,7 @@ library(dplyr)
 #' @export
 #' 
 #' @family plotting functions
-#' @concept refuge
+#' @concept refugePlots
 #' @seealso [plotting_functions], [setRefuge()], [plotRefuge()]
 plotVulnerable <- function(object, 
                            species = NULL,
@@ -177,7 +177,7 @@ plotlyVulnerable <- function(object,
 #'
 #' @export
 #' @family plotting functions
-#' @concept refuge
+#' @concept refugePlots
 #' @seealso [plotting_functions], [setRefuge()], [plotVulnerable()]
 plotRefuge <- function(object, 
                        species = NULL,

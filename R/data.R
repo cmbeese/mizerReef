@@ -23,7 +23,7 @@
 #' @source PhD Thesis
 "bonaire_int"
 
-#' refuge paramters for thesis, chapter 3 vignettes
+#' refuge parameters for thesis, chapter 3 vignettes
 #'
 #' @format A MizerParams object
 #' @source PhD Thesis

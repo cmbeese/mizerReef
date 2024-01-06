@@ -19,9 +19,7 @@ for coral reefs where we could compare areas based on their benthic complexity.
 Useful links:
 \itemize{
   \item \url{https://sizespectrum.org/mizerReef/}
-  \item \url{https://github.com/sizespectrum/mizerReef}
   \item \url{https://cmbeese.github.io/mizerReef/}
-  \item Report bugs at \url{https://github.com/sizespectrum/mizerReef/issues}
 }
 
 }

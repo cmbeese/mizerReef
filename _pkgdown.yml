@@ -19,14 +19,32 @@ home:
 destination: docs
 reference:
 - title: Setting up a mizerReef model
-    desc: These functions are used to set up a new model
+  desc:  >
+        These functions are for setting up a new mizerReef model and finding a
+        steady state for the dynamical system.
 - contents: has_concept("setup")
 - title: Predation Refuge
-    desc: These functions set up predation refuge. 
-- contents: has_concept("refuge")
+  desc:  >
+        These functions set up the mediation of predation with refuge.
+- subtitle: Setting the refuge parameters
+  desc:  >
+        These functions allow users to set or change the refuge profile.
+- contents: has_concept("refugeParams")
+- subtitle: New Rate Functions
+  desc:  >
+        These functions supplement or replace mizer's default rate functions
+        so that refuge impacts simulations.
+- contents: has_concept("refugeRates")
+- subtitle: Plotting the refuge profile
+  desc:  >
+        These functions allow users visualize the refuge profile for different
+        functional groups in terms of their body length.
+- contents: has_concept("refugePlots")
 - title: Unstructured Resources
-    desc: These functions set up the dynamics for the algae and detritus 
-    resources.
+  desc:  >
+        These functions set up the production and consumption dynamics for the 
+        algae and detritus resources and provide some plotting abilities to
+        assess these dynamics.
 - subtitle: Algae
 - contents: has_concept("algae")
 - subtitle: Detritus
@@ -34,20 +52,25 @@ reference:
 - subtitle: Other Components
 - contents: has_concept("Uresources")
 - title: External Mortality
-    desc: These functions set up external mortality. 
+  desc:  >
+        These functions add size-dependent senescence mortality to mizerReef 
+        models.
 - contents: has_concept("extmort")
-- title: Summary Plots
-    desc: These functions allow you to plot model results and compare the 
-    results of different models. 
-- contents: has_concept("summary plots")
-- title: Helper Functions
-- contents: has_concept("helper")
 - title: Summary Functions
 - contents: has_concept("summary")
+- title: Summary Plots 
+  desc:  >
+        These functions plot some summary statistics and allow for the 
+        comparison of results between different models. 
+- contents: has_concept("sumplots")
+- title: Helper Functions
+- contents: has_concept("helper")
 - title: Example Parameters
+  desc:  >
+        These files hold example parameters and mizer params object to explore
+        a model set up to emulate the coral reefs of Bonaire.
 - contents: 
     - bonaire_int
     - bonaire_refuge
     - bonaire_species
     - bonaire_model
-

@@ -193,4 +193,4 @@ as a .csv file. The data can then be read into R using the command
 \code{read.csv()}.
 }
 
-\concept{refuge}
+\concept{refugeParams}

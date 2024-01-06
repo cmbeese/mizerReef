@@ -258,7 +258,7 @@ getDetritusProduction <- function(params, n = params@initial_n,
 #'
 #' @param params MizerParams
 #' @return A pie chart.
-#' @concept plots
+#' @concept detritus
 #' @export
 plotDetritusProduction <- function(params) {
     production <- getDetritusProduction(params)

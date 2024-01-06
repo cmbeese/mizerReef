@@ -106,4 +106,4 @@ Other plotting functions:
 \code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
-\concept{summary plots}
+\concept{sumplots}

@@ -3,7 +3,7 @@
 \docType{data}
 \name{bonaire_refuge}
 \alias{bonaire_refuge}
-\title{refuge paramters for thesis, chapter 3 vignettes}
+\title{refuge parameters for thesis, chapter 3 vignettes}
 \format{
 A MizerParams object
 }
@@ -14,6 +14,6 @@ PhD Thesis
 bonaire_refuge
 }
 \description{
-refuge paramters for thesis, chapter 3 vignettes
+refuge parameters for thesis, chapter 3 vignettes
 }
 \keyword{datasets}

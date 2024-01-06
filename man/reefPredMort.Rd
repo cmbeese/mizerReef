@@ -62,4 +62,4 @@ Other mizer rate functions:
 \code{\link{reefVulnerable}()}
 }
 \concept{mizer rate functions}
-\concept{refuge}
+\concept{refugeRates}

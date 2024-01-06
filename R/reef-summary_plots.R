@@ -59,7 +59,7 @@ utils::globalVariables(c("Species", "value", "Model", "Legend",
 #' @import ggplot2
 #' @export
 #' 
-#' @concept summary plots
+#' @concept sumplots
 #' @family plotting functions
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
@@ -201,7 +201,7 @@ plotlyBiomass <- function(sim,
 #' @import ggplot2
 #' @export
 #' 
-#' @concept summary plots
+#' @concept sumplots
 #' @family plotting functions
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
@@ -334,7 +334,7 @@ plotlyProductivity <- function(object,
 #' @import ggplot2
 #' @export
 #' 
-#' @concept summary plots
+#' @concept sumplots
 #' @family plotting functions
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
@@ -461,7 +461,7 @@ plotly2Productivity <- function(object,
 #' @import ggplot2
 #' @export
 #' 
-#' @concept summary plots
+#' @concept sumplots
 #' @family plotting functions
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
@@ -561,7 +561,7 @@ plotlyProductivityRelative <- function(object,
 #' @export
 #' 
 #' @family plotting functions
-#' @concept summary plots
+#' @concept sumplots
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
 #'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
 plotTotalBiomass <- function(object,
@@ -660,7 +660,7 @@ plotlyTotalBiomass <- function(object,
 #' @import ggplot2
 #' @export
 #' 
-#' @concept summary plots
+#' @concept sumplots
 #' @family plotting functions
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
@@ -760,7 +760,7 @@ plotly2TotalBiomass <- function(object,
 #' @import ggplot2
 #' @export
 #' 
-#' @concept summary plots
+#' @concept sumplots
 #' @family plotting functions
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],

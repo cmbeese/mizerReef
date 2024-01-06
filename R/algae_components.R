@@ -145,7 +145,7 @@ getAlgaeConsumption <- function(params) {
 #'
 #' @param params MizerParams
 #' @return A pie chart.
-#' @concept plots
+#' @concept algae
 #' @export
 plotAlgaeConsumption <- function(params) {
     consumption <- getAlgaeConsumption(params)

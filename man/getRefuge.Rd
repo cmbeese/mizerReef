@@ -2,8 +2,8 @@
 % Please edit documentation in R/reef-setParams.R
 \name{getRefuge}
 \alias{getRefuge}
-\title{Defines refuge length bins by functional group, sets proportion of fish
-in refuge}
+\title{Finds the refuge length bins by functional group and stores them
+params}
 \usage{
 getRefuge(params, ...)
 }
@@ -16,11 +16,12 @@ getRefuge(params, ...)
 A mizer params object with updated refuge profiles
 }
 \description{
-This is an internal helper function to be used after refuge parameters
-are set by the \code{\link[=setRefuge]{setRefuge()}} function.It calculates the proportion of fish
+This function is designed to be used after refuge parameters are set by the
+\code{\link[=setRefuge]{setRefuge()}} function. It calculates the proportion of fish
 that are in predation refuge for the density-independent sigmoidal and
 binned methods. For the competitive method, it finds the indices of fish
-within the prescribed size bins.
+within the prescribed size bins. These values are used by \code{\link[=reefVulnerable]{reefVulnerable()}}
+to set the vulnerability to predation at each time step.
 }
 \details{
 For all methods, this function calculates the starting and ending body
@@ -149,4 +150,4 @@ as a .csv file. The data can then be read into R using the command
 \code{read.csv()}.
 }
 
-\concept{refuge}
+\concept{refugeParams}

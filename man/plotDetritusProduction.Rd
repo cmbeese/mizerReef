@@ -15,4 +15,4 @@ A pie chart.
 \description{
 Plot detritus production rates from each source
 }
-\concept{plots}
+\concept{detritus}

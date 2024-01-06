@@ -2,16 +2,9 @@
 % Please edit documentation in R/reef-rates.R
 \name{getVulnerable}
 \alias{getVulnerable}
-\title{Get vulnerability level}
+\title{Get vulnerability level at in time range t}
 \usage{
-getVulnerable(
-  params,
-  n = initialN(params),
-  n_pp = initialNResource(params),
-  n_other = initialNOther(params),
-  t = 0,
-  ...
-)
+getVulnerable(params, n, n_pp, n_other, time_range, drop = TRUE, ...)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}
@@ -23,19 +16,36 @@ getVulnerable(
 \item{n_other}{A list of abundances for other dynamical components of the
 ecosystem}
 
-\item{t}{The time for which to do the calculation (Not used by standard
-mizer rate functions but useful for extensions with time-dependent
-parameters.)}
+\item{time_range}{A vector of times. Only the range of times is relevant,
+i.e., all times between the smallest and largest will be selected.
+The time_range can be character or numeric.}
+
+\item{drop}{If \code{TRUE} then any dimension of length 1 will be removed
+from the returned array.}
 
 \item{...}{Unused}
+
+\item{object}{A \code{MizerParams} object or a \code{MizerSim} object}
 }
 \value{
-Array (species x size) with the proportion of individuals that are
-not protected from predation by refuge
+If a \code{MizerParams} object is passed in, the function returns a two
+dimensional array (prey species x prey size) based on the
+abundances also passed in.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{     If a `MizerSim` object is passed in, the function returns a three
+     dimensional array (time step x prey species x prey size) 
+     with the vulnerability calculated at every time step in the 
+     simulation. If \code{drop = TRUE} then the dimension of length 1 
+     will be removed from the returned array.
+}\if{html}{\out{</div>}}
 }
 \description{
 Returns the proportion of fish at size \eqn{w} that are not hidden in
 predation refuge and thus vulnerable to being encountered by predators.
+}
+\details{
+This function uses \code{\link[=reefVulnerable]{reefVulnerable()}} to calculate the vulnerability to
+predation.
 }
 \section{Setting the refuge profile}{
 
@@ -162,4 +172,4 @@ Other rate functions:
 \code{\link{getSenMort}()}
 }
 \concept{rate functions}
-\concept{refuge}
+\concept{refugeRates}

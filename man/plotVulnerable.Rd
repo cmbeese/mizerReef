@@ -61,4 +61,4 @@ Other plotting functions:
 \code{\link{plotTotalBiomass}()}
 }
 \concept{plotting functions}
-\concept{refuge}
+\concept{refugePlots}

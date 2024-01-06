@@ -2,7 +2,7 @@
 % Please edit documentation in R/reef-rates.R
 \name{getSenMort}
 \alias{getSenMort}
-\title{Get senescence mortality}
+\title{Get the size specific senescence mortality rate}
 \usage{
 getSenMort(
   params,
@@ -34,7 +34,7 @@ A named two dimensional array (species x size) with the senescence
 mortality rates.
 }
 \description{
-Returns the rate of senescence mortality at each size.
+Returns the rate of senescence mortality at each size by functional group.
 }
 \section{Senescence mortality}{
 

@@ -25,20 +25,28 @@
 #' function if you wish, see [setRateFunction()] for details.
 #'
 #' @param params A \linkS4class{MizerParams} object
+#' 
 #' @param n A matrix of species abundances (species x size).
+#' 
 #' @param n_pp A vector of the resource abundance by size
-#' @param n_other A list of abundances for other dynamical components of the
-#'   ecosystem
+#' 
+#' @param n_other   A list of abundances for other dynamical components of the
+#'                  ecosystem
+#'                  
 #' @param t The time for which to do the calculation (Not used by standard
-#'   mizer rate functions but useful for extensions with time-dependent
-#'   parameters.)
+#'          mizer rate functions but useful for extensions with time-dependent
+#'          parameters.)
+#'          
 #' @param effort The effort for each fishing gear
+#' 
 #' @param rates_fns Named list of the functions to call to calculate the rates.
-#'   Note that this list holds the functions themselves, not their names.
+#'                  Note that this list holds the functions themselves, not 
+#'                  their names.
+#'                  
 #' @param ... Unused
 #' @return List of rates.
 #' @export
-#' @concept refuge
+#' @concept refugeRates
 #' @family mizer rate functions
 reefRates <- function(params, n, n_pp, n_other,
                       t = 0, effort, rates_fns, ...) {
@@ -134,7 +142,7 @@ reefRates <- function(params, n, n_pp, n_other,
 #'          not protected from predation by refuge
 #'
 #' @export
-#' @concept refuge
+#' @concept refugeRates
 #' @family mizer rate functions
 reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
     
@@ -301,7 +309,7 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
 #' @return A named two dimensional array (predator species x predator size) with
 #'   the encounter rates.
 #' @export
-#' @concept refuge
+#' @concept refugeRates
 #' @family mizer rate functions
 reefEncounter <- function(params, n, n_pp, n_other, t, 
                           vulnerable = reefVulnerable(params, 
@@ -488,7 +496,7 @@ reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,
 #' @return A two dimensional array (prey species x prey size) with the predation
 #'   mortality
 #' @family mizer rate functions
-#' @concept refuge
+#' @concept refugeRates
 #' @export
 reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
                          vulnerable = reefVulnerable(params, n, n_pp,

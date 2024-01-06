@@ -160,4 +160,4 @@ Other mizer rate functions:
 \code{\link{reefRates}()}
 }
 \concept{mizer rate functions}
-\concept{refuge}
+\concept{refugeRates}

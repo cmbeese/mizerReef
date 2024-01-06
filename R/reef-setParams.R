@@ -486,7 +486,7 @@ setExtMortParams <- function(params,
 #' @param ... unused
 #'
 #' @return  A MizerParams object with updated refuge parameters
-#' @concept refuge
+#' @concept refugeParams
 #' @export
 setRefuge <- function(params, method, method_params = NULL,
                       # Parameters specific to each group
@@ -728,14 +728,15 @@ setRefuge <- function(params, method, method_params = NULL,
     return(params)
 }
 
-#' Defines refuge length bins by functional group, sets proportion of fish 
-#' in refuge
+#' Finds the refuge length bins by functional group and stores them
+#' params
 #'
-#' This is an internal helper function to be used after refuge parameters
-#' are set by the [setRefuge()] function.It calculates the proportion of fish 
+#' This function is designed to be used after refuge parameters are set by the
+#'  [setRefuge()] function. It calculates the proportion of fish 
 #' that are in predation refuge for the density-independent sigmoidal and 
 #' binned methods. For the competitive method, it finds the indices of fish
-#' within the prescribed size bins.
+#' within the prescribed size bins. These values are used by [reefVulnerable()]
+#' to set the vulnerability to predation at each time step.
 #' 
 #' For all methods, this function calculates the starting and ending body
 #' lengths which have access to refuge k. These are calculated with the `a`
@@ -749,7 +750,7 @@ setRefuge <- function(params, method, method_params = NULL,
 #' @param ... Unused
 #'
 #' @return A mizer params object with updated refuge profiles
-#' @concept refuge
+#' @concept refugeParams
 #' @export
 getRefuge <- function(params, ...) {
     
@@ -929,7 +930,7 @@ getRefuge <- function(params, ...) {
     return(params)
 }
 
-#' Change the refuge parameters for a model after steady state
+#' Change the refuge parameters for a model
 #'
 #' This is a wrapper function for the [setRefuge()] and [getRefuge()] 
 #' functions that allows users to easily change refuge parameters on an
@@ -938,7 +939,7 @@ getRefuge <- function(params, ...) {
 #' 
 #' @inheritSection setRefuge Setting the refuge profile
 #' 
-#' @param params a mizer params object
+#' @param params a mizer object
 #' 
 #' @param new_method    The new method to be used for setting the refuge 
 #'                      profile. Options are "sigmoidal", "binned", 
@@ -962,8 +963,8 @@ getRefuge <- function(params, ...) {
 #'                          
 #' @param ... Unused
 #'
-#' @return A mizer params object with updated refuge profiles
-#' @concept refuge
+#' @return A mizer object with updated refuge profiles
+#' @concept refugeParams
 #' @export
 newRefuge <- function(params,
                       # Fully changing method
@@ -981,7 +982,7 @@ newRefuge <- function(params,
             stop("Error: At least one input must be provided.")
         }
     
-    # object check ----
+      # object check ----  
         # Check if given mizerParams object is valid
         assert_that(is(params, "MizerParams"))
         
