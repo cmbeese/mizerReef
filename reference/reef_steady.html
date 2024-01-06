@@ -65,15 +65,24 @@ mizer's default projectToSteady function.</p>
 <dd><p>A MizerParams object</p></dd>
 
 
+<dt>distance_func</dt>
+<dd><p>A function that will be called after every t_per
+years with both the previous and the new state and that
+should return a number that in some sense measures the
+distance between the states. By default this uses the
+function distanceSSLogN() that you can use as a model
+for your own distance function.</p></dd>
+
+
 <dt>t_max</dt>
 <dd><p>The maximum number of years to run the simulation. Default is 100.</p></dd>
 
 
 <dt>t_per</dt>
 <dd><p>The simulation is broken up into shorter runs of <code>t_per</code> years,
-after each of which we check for convergence. Default value is 1.5. This
-should be chosen as an odd multiple of the timestep <code>dt</code> in order to be
-able to detect period 2 cycles.</p></dd>
+after each of which we check for convergence. Default value is
+1.5. This should be chosen as an odd multiple of the timestep
+<code>dt</code> in order to be able to detect period 2 cycles.</p></dd>
 
 
 <dt>dt</dt>
@@ -82,13 +91,15 @@ able to detect period 2 cycles.</p></dd>
 
 <dt>tol</dt>
 <dd><p>The simulation stops when the relative change in the egg
-production RDI over <code>t_per</code> years is less than <code>tol</code> for every species.</p></dd>
+production RDI over <code>t_per</code> years is less than <code>tol</code> for every
+species.</p></dd>
 
 
 <dt>return_sim</dt>
-<dd><p>If TRUE, the function returns the MizerSim object holding
-the result of the simulation run. If FALSE (default) the function returns
-a MizerParams object with the "initial" slots set to the steady state.</p></dd>
+<dd><p>If TRUE, the function returns the MizerSim object
+holding the result of the simulation run. If FALSE
+(default) the function returns a MizerParams object
+with the "initial" slots set to the steady state.</p></dd>
 
 
 <dt>preserve</dt>
