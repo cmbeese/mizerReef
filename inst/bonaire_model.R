@@ -27,23 +27,7 @@ library(assertthat)
     bonaire_refuge  <- bonaire_refuge
     method <- c("sigmoidal", "noncomplex")
     
-# Current steady state attempt:
-    # # Remove feeding level for all groups
-    #     bonaire_species$satiation <- rep(FALSE)
-    # # Try increasing rho
-    #     scale_rho_a <- 2
-    #     scale_rho_d <- 1
-    # # Try setting a reasonable invertebrate biomass - is it absolutely
-    # # necessary for me to have data for this?
-        bonaire_species$biomass_observed[bonaire_species$species == 'inverts'] <- 20
-
-# Other things tried:
-    # # Try widening predation kernels
-        # bonaire_species$sigma <- rep(2)
-    # # Reduce the proportion of fish that protected
-        # bonaire_refuge$prop_protect <- 0.2
-    # # Let predators feed equally from all spectra
-        # bonaire_int[1,] <- rep(1)
+# Steady state attempts in "inst/record_of_attempts"
 
 # Base mizer to look at differences with unstructured resources
 # params <- newMultispeciesParams(species_params = bonaire_species,
@@ -73,19 +57,6 @@ bonaire_model <- calibrateBiomass(bonaire_model)
 # The problem comes in this step when I try to match biomasses
 bonaire_model <- matchBiomasses(bonaire_model)
 bonaire_model <- reef_steady(bonaire_model)
-
-# Scaling up rho_detritus by 2, 4, 5, 10 - model not converging
-# Simulation run did not converge after 1.5 years. Value returned by the 
-# distance function was: NA
-# Warning messages:
-#     1: In projectToSteady(params, distance_func = distanceMaxRelRDI, 
-#                           t_per = t_per, : inverts are going extinct.
-#       2: In tune_algae_detritus(params) : Detrital production is not high 
-#                                           enough to support this abundance of
-#                                           detritivores. I will increase 
-#                                           external input to meet the 
-#                                           consumption rate.
-
 
 # Steady state iteration -------------------------------------------------------
 # Doesn't currently work - errors due to inverts going extinct
@@ -140,7 +111,7 @@ bonaire_model <- tuneParams(bonaire_model)
     # Params object
     save(bonaire_model,   file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_model.rda")
 
-# CSV Files
+    # CSV Files
     save(bonaire_species, file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_species.rda")
     save(bonaire_int,     file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_int.rda")
     save(bonaire_refuge,  file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_refuge.rda")

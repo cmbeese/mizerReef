@@ -6,6 +6,7 @@
 \usage{
 reef_steady(
   params,
+  distance_func = distanceSSLogN,
   t_max = 100,
   t_per = 1.5,
   dt = 0.1,
