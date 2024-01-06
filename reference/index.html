@@ -24,13 +24,7 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/sizespectrum/mizerReef/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul></div>
+      <ul class="navbar-nav"></ul></div>
 
     
   </div>
@@ -43,7 +37,7 @@
     <div class="section level2">
       <h2 id="setting-up-a-mizerreef-model">Setting up a mizerReef model<a class="anchor" aria-label="anchor" href="#setting-up-a-mizerreef-model"></a></h2>
       
-      
+      <p class="section-desc"></p><p>These functions are for setting up a new mizerReef model and finding a steady state for the dynamical system.</p>
 
       
     </div><div id="" class="section level2">
@@ -64,7 +58,13 @@
       </dl></div><div class="section level2">
       <h2 id="predation-refuge">Predation Refuge<a class="anchor" aria-label="anchor" href="#predation-refuge"></a></h2>
       
+      <p class="section-desc"></p><p>These functions set up the mediation of predation with refuge.</p>
+
       
+    </div><div class="section level2">
+      
+      <h3 id="setting-the-refuge-parameters">Setting the refuge parameters<a class="anchor" aria-label="anchor" href="#setting-the-refuge-parameters"></a></h3>
+      <p class="section-desc"></p><p>These functions allow users to set or change the refuge profile.</p>
 
       
     </div><div id="" class="section level2">
@@ -76,18 +76,34 @@
           
           <code><a href="getRefuge.html">getRefuge()</a></code> 
         </dt>
-        <dd>Defines refuge length bins by functional group, sets proportion of fish
-in refuge</dd>
-      </dl><dl><dt>
-          
-          <code><a href="getVulnerable.html">getVulnerable()</a></code> 
-        </dt>
-        <dd>Get vulnerability level</dd>
+        <dd>Finds the refuge length bins by functional group and stores them
+params</dd>
       </dl><dl><dt>
           
           <code><a href="newRefuge.html">newRefuge()</a></code> 
         </dt>
-        <dd>Change the refuge parameters for a model after steady state</dd>
+        <dd>Change the refuge parameters for a model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="setRefuge.html">setRefuge()</a></code> 
+        </dt>
+        <dd>Set the refuge profile parameters</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="new-rate-functions">New Rate Functions<a class="anchor" aria-label="anchor" href="#new-rate-functions"></a></h3>
+      <p class="section-desc"></p><p>These functions supplement or replace mizer’s default rate functions so that refuge impacts simulations.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="getVulnerable.html">getVulnerable()</a></code> 
+        </dt>
+        <dd>Get vulnerability level at in time range t</dd>
       </dl><dl><dt>
           
           <code><a href="reefEncounter.html">reefEncounter()</a></code> 
@@ -109,14 +125,36 @@ in refuge</dd>
         </dt>
         <dd>Find the proportion of fish vulnerable to being encountered by predators
 at each time step</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="plotting-the-refuge-profile">Plotting the refuge profile<a class="anchor" aria-label="anchor" href="#plotting-the-refuge-profile"></a></h3>
+      <p class="section-desc"></p><p>These functions allow users visualize the refuge profile for different functional groups in terms of their body length.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="plotRefuge.html">plotRefuge()</a></code> <code><a href="plotRefuge.html">plotlyRefuge()</a></code> 
+        </dt>
+        <dd>Plot the refuge profile, species by size</dd>
       </dl><dl><dt>
           
-          <code><a href="setRefuge.html">setRefuge()</a></code> 
+          <code><a href="plotVulnerable.html">plotVulnerable()</a></code> <code><a href="plotVulnerable.html">plotlyVulnerable()</a></code> 
         </dt>
-        <dd>Set the refuge profile parameters</dd>
+        <dd>Plot the vulnerability to predation of species by size</dd>
       </dl></div><div class="section level2">
       <h2 id="unstructured-resources">Unstructured Resources<a class="anchor" aria-label="anchor" href="#unstructured-resources"></a></h2>
       
+      <p class="section-desc"></p><p>These functions set up the production and consumption dynamics for the algae and detritus resources and provide some plotting abilities to assess these dynamics.</p>
+
+      
+    </div><div class="section level2">
+      
+      <h3 id="algae">Algae<a class="anchor" aria-label="anchor" href="#algae"></a></h3>
       
 
       
@@ -147,10 +185,36 @@ at each time step</dd>
         <dd>Expected algae lifetime</dd>
       </dl><dl><dt>
           
-          <code><a href="constant_dynamics.html">constant_dynamics()</a></code> 
+          <code><a href="getAlgaeConsumption.html">getAlgaeConsumption()</a></code> 
         </dt>
-        <dd>Hold resource dynamics constant</dd>
+        <dd>Get algae consumption rates</dd>
       </dl><dl><dt>
+          
+          <code><a href="getAlgaeProduction.html">getAlgaeProduction()</a></code> 
+        </dt>
+        <dd>Algae production rate</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plotAlgaeConsumption.html">plotAlgaeConsumption()</a></code> 
+        </dt>
+        <dd>Plot algae consumption rates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rescale_algae.html">rescale_algae()</a></code> 
+        </dt>
+        <dd>Rescale algae biomass without changing anything else</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="detritus">Detritus<a class="anchor" aria-label="anchor" href="#detritus"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="detritus_biomass.html">detritus_biomass()</a></code> 
         </dt>
@@ -172,21 +236,6 @@ at each time step</dd>
         <dd>Expected detritus lifetime</dd>
       </dl><dl><dt>
           
-          <code><a href="encounter_contribution.html">encounter_contribution()</a></code> 
-        </dt>
-        <dd>Contribution of unstructured components to the encounter rate</dd>
-      </dl><dl><dt>
-          
-          <code><a href="getAlgaeConsumption.html">getAlgaeConsumption()</a></code> 
-        </dt>
-        <dd>Get algae consumption rates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="getAlgaeProduction.html">getAlgaeProduction()</a></code> 
-        </dt>
-        <dd>Algae production rate</dd>
-      </dl><dl><dt>
-          
           <code><a href="getDetritusConsumption.html">getDetritusConsumption()</a></code> 
         </dt>
         <dd>Get detritus consumption rates</dd>
@@ -202,19 +251,40 @@ at each time step</dd>
         <dd>Plot detritus consumption rates by species</dd>
       </dl><dl><dt>
           
-          <code><a href="rescaleComponents.html">rescaleComponents()</a></code> 
+          <code><a href="plotDetritusProduction.html">plotDetritusProduction()</a></code> 
         </dt>
-        <dd>Rescale algae and detritus biomass without changing anything else</dd>
-      </dl><dl><dt>
-          
-          <code><a href="rescale_algae.html">rescale_algae()</a></code> 
-        </dt>
-        <dd>Rescale algae biomass without changing anything else</dd>
+        <dd>Plot detritus production rates from each source</dd>
       </dl><dl><dt>
           
           <code><a href="rescale_detritus.html">rescale_detritus()</a></code> 
         </dt>
         <dd>Rescale detritus biomass without changing anything else</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="other-components">Other Components<a class="anchor" aria-label="anchor" href="#other-components"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="constant_dynamics.html">constant_dynamics()</a></code> 
+        </dt>
+        <dd>Hold resource dynamics constant</dd>
+      </dl><dl><dt>
+          
+          <code><a href="encounter_contribution.html">encounter_contribution()</a></code> 
+        </dt>
+        <dd>Contribution of unstructured components to the encounter rate</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rescaleComponents.html">rescaleComponents()</a></code> 
+        </dt>
+        <dd>Rescale algae and detritus biomass without changing anything else</dd>
       </dl><dl><dt>
           
           <code><a href="scaleModel.html">scaleModel()</a></code> 
@@ -227,13 +297,13 @@ at each time step</dd>
         <dd>Checks unstructured resource parameters and interaction matrix</dd>
       </dl><dl><dt>
           
-          <code><a href="tune_algae_detritus.html">tune_algae_detritus()</a></code> 
+          <code><a href="tuneUR.html">tuneUR()</a></code> 
         </dt>
-        <dd>Tune algae and detritus to steady state</dd>
+        <dd>Tune unstructured resources (algae and detritus) to steady state</dd>
       </dl></div><div class="section level2">
       <h2 id="external-mortality">External Mortality<a class="anchor" aria-label="anchor" href="#external-mortality"></a></h2>
       
-      
+      <p class="section-desc"></p><p>These functions add size-dependent senescence mortality to mizerReef models.</p>
 
       
     </div><div id="" class="section level2">
@@ -245,7 +315,7 @@ at each time step</dd>
           
           <code><a href="getSenMort.html">getSenMort()</a></code> 
         </dt>
-        <dd>Get senescence mortality</dd>
+        <dd>Get the size specific senescence mortality rate</dd>
       </dl><dl><dt>
           
           <code><a href="reefFeedingLevel.html">reefFeedingLevel()</a></code> 
@@ -267,7 +337,7 @@ at each time step</dd>
         </dt>
         <dd>Set the parameters for external mortality</dd>
       </dl></div><div class="section level2">
-      <h2 id="plotting-functions">Plotting Functions<a class="anchor" aria-label="anchor" href="#plotting-functions"></a></h2>
+      <h2 id="summary-functions">Summary Functions<a class="anchor" aria-label="anchor" href="#summary-functions"></a></h2>
       
       
 
@@ -279,9 +349,33 @@ at each time step</dd>
 
       <dl><dt>
           
-          <code><a href="plotAlgaeConsumption.html">plotAlgaeConsumption()</a></code> 
+          <code><a href="getProductivity.html">getProductivity()</a></code> 
         </dt>
-        <dd>Plot algae consumption rates</dd>
+        <dd>Calculate fisheries productivity for each functional group above a chosen
+minimum fishing size</dd>
+      </dl></div><div class="section level2">
+      <h2 id="summary-plots">Summary Plots<a class="anchor" aria-label="anchor" href="#summary-plots"></a></h2>
+      
+      <p class="section-desc"></p><p>These functions plot some summary statistics and allow for the comparison of results between different models.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="plot2Productivity.html">plot2Productivity()</a></code> <code><a href="plot2Productivity.html">plotly2Productivity()</a></code> 
+        </dt>
+        <dd>Plot the fisheries productivity of two models or two different size ranges
+in the same plot</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot2TotalBiomass.html">plot2TotalBiomass()</a></code> <code><a href="plot2TotalBiomass.html">plotly2TotalBiomass()</a></code> 
+        </dt>
+        <dd>Plot the total biomass of two models or of two different size ranges in
+the same plot</dd>
       </dl><dl><dt>
           
           <code><a href="plotBiomass.html">plotBiomass()</a></code> <code><a href="plotBiomass.html">plotlyBiomass()</a></code> 
@@ -290,24 +384,26 @@ at each time step</dd>
 time</dd>
       </dl><dl><dt>
           
-          <code><a href="plotDetritusProduction.html">plotDetritusProduction()</a></code> 
-        </dt>
-        <dd>Plot detritus production rates from each source</dd>
-      </dl><dl><dt>
-          
           <code><a href="plotProductivity.html">plotProductivity()</a></code> <code><a href="plotProductivity.html">plotlyProductivity()</a></code> 
         </dt>
-        <dd>Plot the productivity of each species</dd>
+        <dd>Plot the total productivity for each functional group</dd>
       </dl><dl><dt>
           
-          <code><a href="plotRefuge.html">plotRefuge()</a></code> <code><a href="plotRefuge.html">plotlyRefuge()</a></code> 
+          <code><a href="plotProductivityRelative.html">plotProductivityRelative()</a></code> <code><a href="plotProductivityRelative.html">plotlyProductivityRelative()</a></code> 
         </dt>
-        <dd>Plot the refuge profile, species by size</dd>
+        <dd>Plot the relative difference between the potential fisheries productivity
+rates of two models or two different size ranges in the same plot</dd>
       </dl><dl><dt>
           
-          <code><a href="plotVulnerable.html">plotVulnerable()</a></code> <code><a href="plotVulnerable.html">plotlyVulnerable()</a></code> 
+          <code><a href="plotTotalBiomass.html">plotTotalBiomass()</a></code> <code><a href="plotTotalBiomass.html">plotlyTotalBiomass()</a></code> 
         </dt>
-        <dd>Plot the vulnerability to predation of species by size</dd>
+        <dd>Plot the total fishable biomass for each functional group at steady state</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plotTotalBiomassRelative.html">plotTotalBiomassRelative()</a></code> <code><a href="plotTotalBiomassRelative.html">plotlyTotalBiomassRelative()</a></code> 
+        </dt>
+        <dd>Plot the relative difference in between the total fishable biomasses of each
+each functional group at steady state</dd>
       </dl></div><div class="section level2">
       <h2 id="helper-functions">Helper Functions<a class="anchor" aria-label="anchor" href="#helper-functions"></a></h2>
       
@@ -330,26 +426,9 @@ time</dd>
         </dt>
         <dd>Remove some species from the model</dd>
       </dl></div><div class="section level2">
-      <h2 id="summary-functions">Summary Functions<a class="anchor" aria-label="anchor" href="#summary-functions"></a></h2>
-      
-      
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="getProductivity.html">getProductivity()</a></code> 
-        </dt>
-        <dd>Calculate fisheries productivity for each functional group above a chosen
-minimum fishing size</dd>
-      </dl></div><div class="section level2">
       <h2 id="example-parameters">Example Parameters<a class="anchor" aria-label="anchor" href="#example-parameters"></a></h2>
       
-      
+      <p class="section-desc"></p><p>These files hold example parameters and mizer params object to explore a model set up to emulate the coral reefs of Bonaire.</p>
 
       
     </div><div id="" class="section level2">
@@ -366,7 +445,7 @@ minimum fishing size</dd>
           
           <code><a href="bonaire_refuge.html">bonaire_refuge</a></code> 
         </dt>
-        <dd>refuge paramters for thesis, chapter 3 vignettes</dd>
+        <dd>refuge parameters for thesis, chapter 3 vignettes</dd>
       </dl><dl><dt>
           
           <code><a href="bonaire_species.html">bonaire_species</a></code> 

@@ -26,13 +26,7 @@ mizer's default projectToSteady function."><!-- mathjax --><script src="https://
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/sizespectrum/mizerReef/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul></div>
+      <ul class="navbar-nav"></ul></div>
 
     
   </div>
@@ -40,7 +34,7 @@ mizer's default projectToSteady function."><!-- mathjax --><script src="https://
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Project a mizerReef model to steady state</h1>
-      <small class="dont-index">Source: <a href="https://github.com/sizespectrum/mizerReef/blob/HEAD/R/reef-steady.R" class="external-link"><code>R/reef-steady.R</code></a></small>
+      
       <div class="d-none name"><code>reef_steady.Rd</code></div>
     </div>
 
@@ -59,7 +53,8 @@ mizer's default projectToSteady function.</p>
 <span>  tol <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> <span class="va">dt</span>,</span>
 <span>  return_sim <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  preserve <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"reproduction_level"</span>, <span class="st">"erepro"</span>, <span class="st">"R_max"</span><span class="op">)</span>,</span>
-<span>  progress_bar <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  progress_bar <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -106,6 +101,14 @@ of the <code>reproduction_level</code>.</p></dd>
 <dt>progress_bar</dt>
 <dd><p>A shiny progress object to implement a progress bar in a
 shiny app. Default FALSE.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Arguments passed on to <code><a href="tuneUR.html">tuneUR</a></code></p><dl><dt><code></code></dt>
+<dd></dd>
+
+  
+</dl></dd>
 
 </dl></div>
     <div class="section level2">

@@ -91,6 +91,12 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/newRefuge.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/plot2Productivity.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/plotAlgaeConsumption.html</loc>
   </url>
   <url>
@@ -106,7 +112,16 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/plotProductivity.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/plotProductivityRelative.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/plotRefuge.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/plotVulnerable.html</loc>
@@ -160,6 +175,6 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/setURParams.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/tune_algae_detritus.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/tuneUR.html</loc>
   </url>
 </urlset>
