@@ -6,12 +6,13 @@
 #' mizer's default projectToSteady function.
 #' 
 #' @param params A \linkS4class{MizerParams} object
-#' @distance_func   A function that will be called after every t_per years with 
-#'                  both the previous and the new state and that should return 
-#'                  a number that in some sense measures the distance between 
-#'                  the states. By default this uses the function 
-#'                  distanceSSLogN() that you can use as a model for your own 
-#'                  distance function.
+#' 
+#' @param distance_func A function that will be called after every t_per 
+#'                      years with both the previous and the new state and that 
+#'                      should return a number that in some sense measures the 
+#'                      distance between the states. By default this uses the 
+#'                      function distanceSSLogN() that you can use as a model 
+#'                      for your own distance function.
 #'                  
 #' @param t_max The maximum number of years to run the simulation. Default is 100.
 #' 

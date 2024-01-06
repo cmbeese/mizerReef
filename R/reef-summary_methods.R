@@ -55,38 +55,41 @@
 #' @family summary functions
 #' @concept summary
 getProductivity <- function(object,
-                            min_fishing_l = 7,
+                            min_fishing_l = NULL, 
                             max_fishing_l = NULL,...) {
     
     if (is(object, "MizerSim")) {
-        stop('This functionality is not set up yet you dumbass.')
+        stop('This functionality is not set up yet.')
     }
 
     if (is(object, "MizerParams")) {
         params <- object
         
-        if(is.null(max_fishing_l)){
-            max_fishing_l <- max(params@species_params$l_max)
-        }
+        if(is.null(min_fishing_l)){ min_fishing_l <- 7 }
+        if(is.null(max_fishing_l)){ max_fishing_l <- max(params@species_params$l_max) }
         
+        # why isnt this working?
         size_range <- mizer::get_size_range_array(params, 
                                                   min_l = min_fishing_l, 
-                                                  max_l = max_fishing_l)
+                                                  max_l = max_fishing_l, ...)
 
         # pr <- mizer::getEGrowth(params)
         pr <- mizer::getEReproAndGrowth(params)
+        prod <- (pr * params@initial_n * size_range) %*% (params@w * params@dw)
+        # This seems like growth times biomass?
         # Alice's old code:
         # prod_pred <- colSums(10^x[ref:end]*GG.u[ref:end,]*U[ref:end,]*dx)
-        # 10^x[ref:end] is weight of all fish over 5 
-        # growth of predators GG.u[ref:end,]
-        # abundance of predators U[ref:end,]
+        # 10^x[ref:end] is weights of all fish over 7 cm in length
+        # growth of predators over 7 cm in length GG.u[ref:end,]
+        # abundance of predators over 7 cm in length U[ref:end,]
+        # dx is width of the size bins
         # So for each species prod <- colSums(w*g*n*dw)
         
         # if(total == FALSE) {return(pr)}
         # if(total == TRUE){
         # Not sure which one it's supposed to be
         # prod <- (pr * params@w) %*% params@dw
-        prod <- pr  %*% (params@w * params@dw)
+        # prod <- pr  %*% (params@w * params@dw)
         return(prod[, , drop = TRUE])
         #}
     }

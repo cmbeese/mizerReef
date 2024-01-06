@@ -72,7 +72,7 @@ by model is returned as well as another column called \code{rel_diff}
 that gives the relative difference between the two values.
 }
 \description{
-This function creates a barplot with the relative difference in potential
+This function creates a barplot with the percent change in potential
 fisheries productivity between either: (1) two different mizerParams objects
 (2) two different size ranges. If comparing two mizerParams objects, they
 must have the same species groups.

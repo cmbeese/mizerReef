@@ -265,10 +265,12 @@ plotProductivity <- function(object,
     # plot ----
     p <- ggplot(plot_dat, aes(x = Species, y = value,
                               group = Legend, fill = Legend))
+    
     p + geom_bar(stat = "identity", position = "dodge") +
         scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names)
+                          labels = group_names) +
+        labs(fill = "Functional Group")
     
 }
 
@@ -347,16 +349,18 @@ plot2Productivity <- function(object1, object2,
     
     # get data frames with plotProductivity ----
     sf1 <- plotProductivity(object = object1, 
-                            min_fishing_l1 = min_fishing_l1,
-                            max_fishing_l1 = max_fishing_l1,
+                            min_fishing_l = min_fishing_l1,
+                            max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
         sf1$Model <- name1
     sf2 <- plotProductivity(object = object2, 
-                            min_fishing_l2 = min_fishing_l2,
-                            max_fishing_l2 = max_fishing_l2,
+                            min_fishing_l = min_fishing_l2,
+                            max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
         sf2$Model <- name2
     sf <- rbind(sf1, sf2)
+    
+    sf$Model <- factor(sf$Model, levels = c(name1, name2))
     
     # Return data frame if requested
     if(return_data == TRUE){return(sf)}
@@ -378,10 +382,13 @@ plot2Productivity <- function(object1, object2,
     # plot ----
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     
-    p <- ggplot(sf, aes(x = Species, y = value, 
-                        group = Model, alpha = Model,
-                        fill = Legend))
-    p + geom_bar(stat = "identity", position = "dodge", color = "black") +
+    p <- ggplot(sf, aes(x = Species, y = value,
+                        fill = Legend, group = Model,
+                        alpha = Model))
+    
+    p + geom_bar(stat = "identity", 
+                 position = "dodge", 
+                 color = "black") +
         scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
@@ -404,7 +411,7 @@ plotly2Productivity <- function(object,
 #' Plot the relative difference between the potential fisheries productivity 
 #' rates of two models or two different size ranges in the same plot
 #' 
-#' This function creates a barplot with the relative difference in potential
+#' This function creates a barplot with the percent change in potential
 #' fisheries productivity between either: (1) two different mizerParams objects
 #' (2) two different size ranges. If comparing two mizerParams objects, they
 #' must have the same species groups. 
@@ -473,17 +480,17 @@ plotProductivityRelative <- function(object1, object2,
     
     # get data frames with plotProductivity ----
     sf1 <- plotProductivity(object = object1, 
-                            min_fishing_l1 = min_fishing_l1,
-                            max_fishing_l1 = max_fishing_l1,
+                            min_fishing_l = min_fishing_l1,
+                            max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
     sf2 <- plotProductivity(object = object2, 
-                            min_fishing_l2 = min_fishing_l2,
-                            max_fishing_l2 = max_fishing_l2,
+                            min_fishing_l = min_fishing_l2,
+                            max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
     
     # Calculate relative difference
     sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-            dplyr::mutate(rel_diff = (value.y - value.x) / (value.x + value.y))
+            dplyr::mutate(rel_diff = 100*((value.y - value.x) / (value.y)))
     
     # return data if requested ----
     if(return_data == TRUE){return(sf)}
@@ -508,8 +515,9 @@ plotProductivityRelative <- function(object1, object2,
     
     p <- ggplot(sf, aes(x = Species, y = rel_diff,
                         fill = Legend))
+    
     p + geom_bar(stat = "identity", position = "dodge", color = "black") +
-        scale_y_continuous(name = "Relative Difference") +
+        scale_y_continuous(name = "% Change in Productivity") +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
         labs(fill = "Functional Groups") + 
@@ -623,6 +631,7 @@ plotTotalBiomass <- function(object,
     # plot ----
     p <- ggplot(plot_dat, aes(x = Species, y = value,
                               group = Legend, fill = Legend))
+    
     p + geom_bar(stat = "identity", position = "dodge") +
         scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
@@ -673,17 +682,19 @@ plot2TotalBiomass <- function(object1, object2,
     
     # get data frames with plotTotalBiomass ----
     sf1 <- plotTotalBiomass(object = object1, 
-                            min_fishing_l1 = min_fishing_l1,
-                            max_fishing_l1 = max_fishing_l1,
+                            min_fishing_l = min_fishing_l1,
+                            max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
         sf1$Model <- name1
     sf2 <- plotTotalBiomass(object = object2, 
-                            min_fishing_l2 = min_fishing_l2,
-                            max_fishing_l2 = max_fishing_l2,
+                            min_fishing_l = min_fishing_l2,
+                            max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
         sf2$Model <- name2
         
     sf <- rbind(sf1, sf2)
+    
+    sf$Model <- factor(sf$Model, levels = c(name1, name2))
     
     # Return data frame if requested
     if(return_data == TRUE){return(sf)}
@@ -708,6 +719,7 @@ plot2TotalBiomass <- function(object1, object2,
     p <- ggplot(sf, aes(x = Species, y = value, 
                         group = Model, alpha = Model,
                         fill = Legend))
+    
     p + geom_bar(stat = "identity", position = "dodge", color = "black") +
         scale_y_continuous(name = expression("Biomass (g/m^2)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
@@ -772,17 +784,17 @@ plotTotalBiomassRelative <- function(object1, object2,
     
     # get data frames with plotTotalBiomass ----
     sf1 <- plotTotalBiomass(object = object1, 
-                            min_fishing_l1 = min_fishing_l1,
-                            max_fishing_l1 = max_fishing_l1,
+                            min_fishing_l = min_fishing_l1,
+                            max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
     sf2 <- plotTotalBiomass(object = object2, 
-                            min_fishing_l2 = min_fishing_l2,
-                            max_fishing_l2 = max_fishing_l2,
+                            min_fishing_l = min_fishing_l2,
+                            max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
     
     # Calculate relative difference
     sf <- dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-          dplyr::mutate(rel_diff = (value.y - value.x) / (value.x + value.y))
+          dplyr::mutate(rel_diff =  100*((value.y - value.x) / (value.y)))
     
     # Return data frame if requested
     if(return_data == TRUE){return(sf)}
@@ -804,11 +816,10 @@ plotTotalBiomassRelative <- function(object1, object2,
     # plot ----
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     
-    p <- ggplot(sf, aes(x = Species, y = rel_diff, fill = Legend,
-                        ))
+    p <- ggplot(sf, aes(x = Species, y = rel_diff, fill = Legend))
     
     p + geom_bar(stat = "identity", position = "dodge", color = "black") +
-        scale_y_continuous(name = "Relative Difference") +
+        scale_y_continuous(name = "% Change in Total Biomass") +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
         labs(fill = "Functional Groups") + 

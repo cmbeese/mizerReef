@@ -5,7 +5,7 @@
 \title{Calculate fisheries productivity for each functional group above a chosen
 minimum fishing size}
 \usage{
-getProductivity(object, min_fishing_l = 7, max_fishing_l = NULL, ...)
+getProductivity(object, min_fishing_l = NULL, max_fishing_l = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \code{MizerParams} or \code{MizerSim}. If given a
