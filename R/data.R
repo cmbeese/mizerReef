@@ -11,6 +11,12 @@
 #' @source PhD Thesis
 "bonaire_model"
 
+#' MizerParams object for thesis, chapter 3 vignettes
+#'
+#' @format A MizerParams object
+#' @source PhD Thesis
+"bonaire_model2"
+
 #' species_params for thesis, chapter 3 vignettes
 #'
 #' @format A MizerParams object

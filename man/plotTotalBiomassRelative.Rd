@@ -9,6 +9,7 @@ each functional group at steady state}
 plotTotalBiomassRelative(
   object1,
   object2,
+  diff_method,
   min_fishing_l1 = NULL,
   max_fishing_l1 = NULL,
   min_fishing_l2 = NULL,
@@ -23,6 +24,12 @@ plotlyTotalBiomassRelative(object, species = NULL, ...)
 \item{object1}{First MizerParams or MizerSim object.}
 
 \item{object2}{Second MizerParams or MizerSim object.}
+
+\item{diff_method}{The method to calculate the relative change between
+models. If \code{percent.change}, the percent change is
+calculated relative to the value from object 1 with
+formula 100*(new-old)/old. If \code{rel.diff} the relative
+difference is returned given by (new - old)/(old + new).}
 
 \item{min_fishing_l1}{Optional.  The minimum length (cm) of fished
 individuals for model 2. Defaults to 7cm.

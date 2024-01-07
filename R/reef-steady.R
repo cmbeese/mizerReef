@@ -7,12 +7,12 @@
 #' 
 #' @param params A \linkS4class{MizerParams} object
 #' 
-#' @param distance_func A function that will be called after every t_per 
-#'                      years with both the previous and the new state and that 
-#'                      should return a number that in some sense measures the 
-#'                      distance between the states. By default this uses the 
-#'                      function distanceSSLogN() that you can use as a model 
-#'                      for your own distance function.
+#' @param d_func    Optional. A function that will be called after every t_per
+#'                  years with both the previous and the new state and that 
+#'                  should return a number that in some sense measures the
+#'                  distance between the states. By default this uses the 
+#'                  function distanceSSLogN() that you can use as a model 
+#'                  for your own distance function.
 #'                  
 #' @param t_max The maximum number of years to run the simulation. Default is 100.
 #' 
@@ -46,7 +46,7 @@
 #' @return An object of type \linkS4class{MizerParams}
 #' @concept setup
 #' @export
-reef_steady <- function(params, distance_func = distanceSSLogN,
+reef_steady <- function(params, d_func = NULL,
                         t_max = 100, t_per = 1.5, dt = 0.1,
                         tol = 0.1 * dt, return_sim = FALSE,
                         preserve = c("reproduction_level", "erepro", "R_max"),
@@ -72,13 +72,12 @@ reef_steady <- function(params, distance_func = distanceSSLogN,
     for (res in names(params@other_dynamics)) {
         params@other_dynamics[[res]] <- "constant_dynamics"
     }
+    
+    if(is.null(d_func)){d_func = distanceSSLogN}
 
-    object <- mizer::projectToSteady(params,
-                                     distance_func = distance_func,
-                                     t_per = t_per,
-                                     t_max = t_max,
-                                     dt = dt,
-                                     tol = tol,
+    object <- mizer::projectToSteady(params, distance_func = d_func,
+                                     t_per = t_per, t_max = t_max,
+                                     dt = dt, tol = tol,
                                      return_sim = return_sim,
                                      progress_bar = progress_bar)
 

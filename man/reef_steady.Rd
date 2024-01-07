@@ -6,7 +6,7 @@
 \usage{
 reef_steady(
   params,
-  distance_func = distanceSSLogN,
+  d_func = NULL,
   t_max = 100,
   t_per = 1.5,
   dt = 0.1,
@@ -20,7 +20,7 @@ reef_steady(
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}
 
-\item{distance_func}{A function that will be called after every t_per
+\item{d_func}{Optional. A function that will be called after every t_per
 years with both the previous and the new state and that
 should return a number that in some sense measures the
 distance between the states. By default this uses the

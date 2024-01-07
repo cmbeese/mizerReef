@@ -18,8 +18,7 @@ library(assertthat)
 
     # Create some tester refuge scenarios
     method <- c("sigmoidal", "noncomplex")
-    bonaire_refuge <- data.frame(L_refuge = 20, prop_protect = 0.4)
-    # bonaire_species$linecolour <- c("#8E0408","#578979","#D89958")
+    bonaire_refuge <- data.frame(L_refuge = 15, prop_protect = 0.2)
 
 # When we can we use saved .rda files
     bonaire_species <- bonaire_species
@@ -45,18 +44,21 @@ bonaire_model <- newReefParams(species_params = bonaire_species,
                                method = method[1],
                                method_params = bonaire_refuge)
         
-bonaire_model@linecolour["predators"] <-"#8E0408"
-bonaire_model@linecolour["inverts"] <- "#D89958"
-bonaire_model@linecolour["herbivores"] <- "#578979"
+# bonaire_model@linecolour["predators"] <-"#8E0408"
+# bonaire_model@linecolour["inverts"] <- "#D89958"
+# bonaire_model@linecolour["herbivores"] <- "#578979"
 
 ## Project to steady state
-bonaire_model <- reef_steady(bonaire_model)
+bonaire_model <- reef_steady(bonaire_model) 
 bonaire_model <- calibrateBiomass(bonaire_model)
-    # The mizerParams object that goes up to this step is currently saved as 
-    # bonaire_model.rda
-# The problem comes in this step when I try to match biomasses
 bonaire_model <- matchBiomasses(bonaire_model)
 bonaire_model <- reef_steady(bonaire_model)
+bonaire_model <- reef_steady(bonaire_model)
+bonaire_model <- reef_steady(bonaire_model)
+bonaire_model <- reef_steady(bonaire_model)
+bonaire_model <- reef_steady(bonaire_model)
+
+bonaire_model <- setBevertonHolt(bonaire_model, erepro = 0.0001)
 
 # Steady state iteration -------------------------------------------------------
 # Doesn't currently work - errors due to inverts going extinct
