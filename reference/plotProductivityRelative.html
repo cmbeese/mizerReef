@@ -57,6 +57,7 @@ must have the same species groups.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotProductivityRelative</span><span class="op">(</span></span>
 <span>  <span class="va">object1</span>,</span>
 <span>  <span class="va">object2</span>,</span>
+<span>  <span class="va">diff_method</span>,</span>
 <span>  min_fishing_l1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_fishing_l1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_fishing_l2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -76,6 +77,14 @@ must have the same species groups.</p>
 
 <dt>object2</dt>
 <dd><p>Second MizerParams or MizerSim object.</p></dd>
+
+
+<dt>diff_method</dt>
+<dd><p>The method to calculate the relative change between
+models. If <code>percent.change</code>, the percent change is
+calculated relative to the value from object 1 with
+formula 100*(new-old)/old. If <code>rel.diff</code> the relative
+difference is returned given by (new - old)/(old + new).</p></dd>
 
 
 <dt>min_fishing_l1</dt>
