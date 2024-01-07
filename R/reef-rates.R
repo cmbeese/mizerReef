@@ -31,7 +31,7 @@
 #' @export
 #' @concept refugeRates
 #' @family rate functions
-getVulnerable <- function(params, n, n_pp, n_other,
+getVulnerable <- function(object, n, n_pp, n_other,
                           time_range, drop = TRUE, ...) {
     
     if (is(object, "MizerParams")) {

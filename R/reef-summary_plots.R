@@ -333,7 +333,7 @@ plotlyProductivity <- function(object,
 #'                      data used for the plot is returned instead of the plot 
 #'                      itself. Default value is FALSE.
 #'                      
-#' @inheritDotParams plotProductivity -object
+#' @inheritDotParams plotProductivity 
 #'
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
 #'          frame with the the productivity for each functional group
@@ -471,7 +471,7 @@ plotly2Productivity <- function(object,
 #'                      data used for the plot is returned instead of the plot 
 #'                      itself. Default value is FALSE.
 #'                      
-#' @inheritDotParams plotProductivity -object
+#' @inheritDotParams plotProductivity
 #' 
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
 #'          frame with the the productivity for each functional group
@@ -679,7 +679,7 @@ plotlyTotalBiomass <- function(object,
 #' 
 #' @inheritParams plot2Productivity
 #' 
-#' @inheritDotParams plotTotalBiomass -object
+#' @inheritDotParams plotTotalBiomass
 #' 
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
 #'          frame with the the total steady state biomass for each functional 
@@ -782,7 +782,7 @@ plotly2TotalBiomass <- function(object,
 #' 
 #' @inheritParams plotProductivityRelative
 #' 
-#' @inheritDotParams plotTotalBiomass -object
+#' @inheritDotParams plotTotalBiomass
 #' 
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
 #'          frame with the the total steady state biomass for each functional 

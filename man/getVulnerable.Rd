@@ -4,10 +4,10 @@
 \alias{getVulnerable}
 \title{Get vulnerability level at in time range t}
 \usage{
-getVulnerable(params, n, n_pp, n_other, time_range, drop = TRUE, ...)
+getVulnerable(object, n, n_pp, n_other, time_range, drop = TRUE, ...)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{object}{A \code{MizerParams} object or a \code{MizerSim} object}
 
 \item{n}{A matrix of species abundances (species x size).}
 
@@ -24,8 +24,6 @@ The time_range can be character or numeric.}
 from the returned array.}
 
 \item{...}{Unused}
-
-\item{object}{A \code{MizerParams} object or a \code{MizerSim} object}
 }
 \value{
 If a \code{MizerParams} object is passed in, the function returns a two

@@ -55,6 +55,7 @@ itself. Default value is FALSE.}
 \item{...}{
   Arguments passed on to \code{\link[=plotProductivity]{plotProductivity}}
   \describe{
+    \item{\code{object}}{An object of class \linkS4class{MizerParams}}
     \item{\code{start_time}}{The first time to be plotted. Default is the beginning
 of the time series.}
     \item{\code{end_time}}{The last time to be plotted. Default is the end of the time

@@ -56,7 +56,7 @@ bonaire_model <- reef_steady(bonaire_model)
 bonaire_model <- reef_steady(bonaire_model)
 bonaire_model <- reef_steady(bonaire_model)
 bonaire_model <- reef_steady(bonaire_model)
-bonaire_model <- reef_steady(bonaire_model)
+bonaire_model2 <- reef_steady(bonaire_model)
 
 bonaire_model <- setBevertonHolt(bonaire_model, erepro = 0.0001)
 
@@ -112,6 +112,9 @@ bonaire_model <- tuneParams(bonaire_model)
 
     # Params object
     save(bonaire_model,   file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_model.rda")
+
+    save(bonaire_model2,   file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_model2.rda")
+
 
     # CSV Files
     save(bonaire_species, file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_species.rda")

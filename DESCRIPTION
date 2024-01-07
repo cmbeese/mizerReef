@@ -36,6 +36,7 @@ Imports:
     dplyr,
     splus2R,
     stats,
+    plyr,
     lifecycle
 Suggests: 
     knitr,

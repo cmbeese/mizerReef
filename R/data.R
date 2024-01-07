@@ -1,17 +1,17 @@
-#' MizerParams object object for thesis, chapter 4 Caribbean model
-#' with 10 functional groups
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-#' cbn_params"
+# MizerParams object object for thesis, chapter 4 Caribbean model
+# with 10 functional groups
+#
+# @format A MizerParams object
+# @source PhD Thesis
+# cbn_params"
 
-#' MizerParams object for thesis, chapter 3 vignettes
+#' MizerParams object for thesis
 #'
 #' @format A MizerParams object
 #' @source PhD Thesis
 "bonaire_model"
 
-#' MizerParams object for thesis, chapter 3 vignettes
+#' MizerParams object 2 for thesis, chapter 3 vignettes
 #'
 #' @format A MizerParams object
 #' @source PhD Thesis
