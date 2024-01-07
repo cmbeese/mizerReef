@@ -90,7 +90,7 @@ tuneUR <- function(params,...) {
 #' @return a mizer model object with scaled parameters
 #' @concept Uresources
 #' @export
-scaleModel <- function(params, factor) {
+reef_scaleModel <- function(params, factor) {
 
     # Algae
     params@other_params[["algae"]]$rho <-
@@ -106,10 +106,35 @@ scaleModel <- function(params, factor) {
     params@other_params$detritus$external <-
         params@other_params$detritus$external * factor
 
-    # Rest of mizer
-    mizer::scaleModel(params, factor)
+    # now comes the code of mizer's standard scaleModel()
+    params <- validParams(params)
+    assert_that(is.number(factor), factor > 0)
+    params@cc_pp <- params@cc_pp * factor
+    params@resource_params$kappa <- params@resource_params$kappa * 
+        factor
+    if ("r_max" %in% names(params@species_params)) {
+        params@species_params$R_max <- params@species_params$r_max
+        params@species_params$r_max <- NULL
+        message("The 'r_max' column has been renamed to 'R_max'.")
+    }
+    if ("R_max" %in% names(params@species_params)) {
+        params@species_params$R_max <- params@species_params$R_max * 
+            factor
+    }
+    params@search_vol <- params@search_vol/factor
+    if ("gamma" %in% names(params@species_params)) {
+        params@species_params$gamma <- params@species_params$gamma/factor
+    }
+    initial_n_other <- params@initial_n_other
+    for (res in names(initial_n_other)) {
+        initial_n_other[[res]] <- initial_n_other[[res]] * factor
+    }
+    initialN(params) <- params@initial_n * factor
+    initialNResource(params) <- params@initial_n_pp * factor
+    initialNOther(params) <- initial_n_other
+    params@sc <- params@sc * factor
+    return(params)
 }
-
 
 #' Hold resource dynamics constant
 #' 

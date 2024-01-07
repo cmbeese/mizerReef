@@ -24,6 +24,10 @@ bonaire_model <- newReefParams(species_params = bonaire_species,
                                # method = method[2])
                                method = method[1],
                                method_params = bonaire_refuge)
+# We need to specify linecolours for detritus and algae, for them to be included
+# in diet plots
+bonaire_model@linecolour["detritus"] <-"brown"
+bonaire_model@linecolour["algae"] <- "darkseagreen"
 
 # Project to steady state ------------------------------------------------------
 # Changed default distance function back to distanceSSLogN, but trying both to
@@ -37,10 +41,15 @@ bonaire_model <- newReefParams(species_params = bonaire_species,
         reef_steady() |> reef_steady() |> reef_steady() |> 
         reef_steady() |> reef_steady()
     
-    # But then errors after calibrating and matching biomasses
+    # We need to tell mizer to use `reef_scaleModel()` so that also the
+    # consumption parameters are rescaled correctly by `calibrateBiomass()`
+    customFunction("scaleModel", reef_scaleModel)
     attempt_1 <- calibrateBiomass(attempt_1)
     attempt_1 <- matchBiomasses(attempt_1)
     attempt_1 <- reef_steady(attempt_1)
+    # Convergence is achieved in 12 years but the predators and inverts aren't
+    # doing well enough yet, needing an reproductive efficiency greater than 1.
+
     
     # Simulation run did not converge after 99 years. 
     # Value returned by the distance function was: 689.726402638765
