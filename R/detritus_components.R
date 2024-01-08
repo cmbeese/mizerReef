@@ -249,7 +249,7 @@ getDetritusProduction <- function(params, n = params@initial_n,
     # Return vector
     c(feces    = sum(feces),
       decomp   = (prop_decomp*ex_mort) + sen_mort,
-      external = params@other_params$detritus$d.external
+      external = params@other_params$detritus$external
     )
 }
 

@@ -34,10 +34,11 @@ newReefParams <- function(# Original mizer parameters
                             a_bar = NULL, b_bar = NULL,
                             w_settle = NULL, max_protect = NULL, tau = NULL,
                           # Parameters for unstructured resources
-                            UR_interaction, exp_alg = NULL, exp_det = NULL,
-                            algae_growth = NULL, 
+                            UR_interaction, 
+                            exp_alg = NULL, exp_det = NULL,
                             scale_rho_a = NULL, scale_rho_d = NULL,
-                            prop_decomp = NULL, d.external = NULL,
+                            initial_algae_growth = NULL, 
+                            prop_decomp = NULL, initial_d_external = NULL,
                           # Parameters for external mortality
                             ext_mort_params = NULL, ...) {
     
@@ -67,11 +68,11 @@ newReefParams <- function(# Original mizer parameters
                           UR_interaction = UR_interaction,
                           exp_alg = exp_alg,
                           exp_det = exp_det,
-                          algae_growth = algae_growth,
                           scale_rho_a = scale_rho_a,
                           scale_rho_d = scale_rho_d,
+                          initial_algae_growth = initial_algae_growth,
                           prop_decomp = prop_decomp,
-                          d.external = d.external)
+                          initial_d_external = initial_d_external)
     
     ### External mortality ----
     params <- setExtMortParams(params = params,
@@ -125,7 +126,7 @@ newReefParams <- function(# Original mizer parameters
         dynamics_fun = "algae_dynamics",
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_alg,
-                                algae_growth = params@other_params$algae_growth))
+                                growth = params@other_params$initial_algae_growth))
     
     ### Detritus component - Add in detritus ----
     params <- setComponent(
@@ -134,7 +135,7 @@ newReefParams <- function(# Original mizer parameters
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_det,
                                 prop_decomp = params@other_params$prop_decomp,
-                                d.external  = params@other_params$d.external))
+                                external  = params@other_params$initial_d_external))
 
     # External mortality - Weight dependent ----
         ext_mort_params <- params@other_params[['ext_mort_params']]
@@ -160,9 +161,6 @@ newReefParams <- function(# Original mizer parameters
         params <- setRateFunction(params, "PredMort", "reefPredMort")
         # Add in senescence mortality
         params <- setRateFunction(params, "Mort", "reefMort")
-        
-        # Change scale model function
-        params <- customFunction("scaleModel", reefScaleModel)
     
     # Return object ----    
     return(params)

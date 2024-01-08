@@ -224,7 +224,7 @@ plotAlgaeConsumption <- function(params) {
 #' @concept algae
 #' @export
 getAlgaeProduction <- function(params) {
-    return(params@other_params$algae$algae_growth)
+    return(params@other_params$algae$growth)
 }
 
 

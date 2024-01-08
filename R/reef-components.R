@@ -64,7 +64,7 @@ tuneUR <- function(params,...) {
                 to support this abundance of herbivores. I will increase algae
                 growth to meet the consumption rate.")
     }
-    params@other_params$algae$algae_growth <- aout
+    params@other_params$algae$growth <- aout
 
     # detritus
     params@other_params$detritus$external <- 0

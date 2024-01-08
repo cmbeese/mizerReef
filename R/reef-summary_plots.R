@@ -354,12 +354,12 @@ plot2Productivity <- function(object1, object2,
                               return_data = FALSE, ...){
     
     # get data frames with plotProductivity ----
-    sf1 <- plotProductivity(object = object1, 
+    sf1 <- plotProductivity(object1, 
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
         sf1$Model <- name1
-    sf2 <- plotProductivity(object = object2, 
+    sf2 <- plotProductivity(object2, 
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
@@ -492,11 +492,11 @@ plotProductivityRelative <- function(object1, object2, diff_method,
                                      return_data = FALSE, ...){
     
     # get data frames with plotProductivity ----
-    sf1 <- plotProductivity(object = object1, 
+    sf1 <- plotProductivity(object1, 
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
-    sf2 <- plotProductivity(object = object2, 
+    sf2 <- plotProductivity(object2, 
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
@@ -624,7 +624,7 @@ plotTotalBiomass <- function(object,
     }
     
     ## get productivity ----
-    biom <- mizer::getBiomass(object = params, 
+    biom <- mizer::getBiomass(params, 
                               min_l = min_fishing_l,
                               max_l = max_fishing_l)
     
@@ -702,12 +702,12 @@ plot2TotalBiomass <- function(object1, object2,
                               return_data = FALSE, ...){
     
     # get data frames with plotTotalBiomass ----
-    sf1 <- plotTotalBiomass(object = object1, 
+    sf1 <- plotTotalBiomass(object1, 
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
         sf1$Model <- name1
-    sf2 <- plotTotalBiomass(object = object2, 
+    sf2 <- plotTotalBiomass(object2, 
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
@@ -804,11 +804,11 @@ plotTotalBiomassRelative <- function(object1, object2, diff_method,
                                      return_data = FALSE, ...){
     
     # get data frames with plotTotalBiomass ----
-    sf1 <- plotTotalBiomass(object = object1, 
+    sf1 <- plotTotalBiomass(object1, 
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
-    sf2 <- plotTotalBiomass(object = object2, 
+    sf2 <- plotTotalBiomass(object2, 
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)

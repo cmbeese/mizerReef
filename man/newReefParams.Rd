@@ -24,11 +24,11 @@ newReefParams(
   UR_interaction,
   exp_alg = NULL,
   exp_det = NULL,
-  algae_growth = NULL,
   scale_rho_a = NULL,
   scale_rho_d = NULL,
+  initial_algae_growth = NULL,
   prop_decomp = NULL,
-  d.external = NULL,
+  initial_d_external = NULL,
   ext_mort_params = NULL,
   ...
 )
@@ -101,26 +101,28 @@ detritus. Defaults to the same value used for the
 scaling exponent of the maximum intake rate for
 fish consumers.}
 
-\item{algae_growth}{The initial growth rate of algae in grams/year/m^-2.
-This value is reset to match consumption in the
-\verb{[reefSteady()]}  function so that steady state
-abundances match given values.}
-
 \item{scale_rho_a}{A factor to multiply rho values by for algae
 encounter rate. Used in steady state tuning.}
 
 \item{scale_rho_d}{A factor to multiply rho values by for detritus
 encounter rate. Used in steady state tuning.}
 
+\item{initial_algae_growth}{The initial growth rate of algae in
+grams/year/m^-2. This value is reset to match
+consumption in the \verb{[reefSteady()]}  function
+so that steady state abundances match given
+values.}
+
 \item{prop_decomp}{The proportion of waste material that decomposes to
 become part of the detritus pool.}
 
-\item{d.external}{The rate at which detritus biomass sinks from the
-pelagic zone and becomes part of the detritus pool
-in grams per year. This value is reset to make up any
-differences in consumption and production in the
-\verb{[reefSteady()]} function so that steady state
-abundances match observed values.}
+\item{initial_d_external}{The rate at which detritus biomass sinks from
+the pelagic zone and becomes part of the
+detritus pool in grams per year. This value is
+reset to make up any differences in consumption
+and production in the \verb{[reefSteady()]} function
+so that steady state abundances match observed
+values.}
 
 \item{ext_mort_params}{Named list containing desired mortality parameters}
 
