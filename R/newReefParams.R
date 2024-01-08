@@ -160,6 +160,9 @@ newReefParams <- function(# Original mizer parameters
         params <- setRateFunction(params, "PredMort", "reefPredMort")
         # Add in senescence mortality
         params <- setRateFunction(params, "Mort", "reefMort")
+        
+        # Change scale model function
+        params <- customFunction("scaleModel", reefScaleModel)
     
     # Return object ----    
     return(params)

@@ -90,7 +90,7 @@ tuneUR <- function(params,...) {
 #' @return a mizer model object with scaled parameters
 #' @concept Uresources
 #' @export
-reef_scaleModel <- function(params, factor) {
+reefScaleModel <- function(params, factor) {
 
     # Algae
     params@other_params[["algae"]]$rho <-
