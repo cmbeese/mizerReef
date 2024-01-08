@@ -28,6 +28,9 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/bonaire_model.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/bonaire_model2.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/bonaire_refuge.html</loc>
   </url>
   <url>
@@ -142,6 +145,9 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/reefRates.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/reefScaleModel.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/reefSenMort.html</loc>
   </url>
   <url>
@@ -161,9 +167,6 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/rescale_detritus.html</loc>
-  </url>
-  <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/scaleModel.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/setExtMortParams.html</loc>

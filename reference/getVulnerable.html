@@ -45,13 +45,13 @@ predation refuge and thus vulnerable to being encountered by predators.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getVulnerable</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">time_range</span>, drop <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getVulnerable</span><span class="op">(</span><span class="va">object</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">time_range</span>, drop <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>params</dt>
-<dd><p>A MizerParams object</p></dd>
+    <dl><dt>object</dt>
+<dd><p>A <code>MizerParams</code> object or a <code>MizerSim</code> object</p></dd>
 
 
 <dt>n</dt>
@@ -80,10 +80,6 @@ from the returned array.</p></dd>
 
 <dt>...</dt>
 <dd><p>Unused</p></dd>
-
-
-<dt>object</dt>
-<dd><p>A <code>MizerParams</code> object or a <code>MizerSim</code> object</p></dd>
 
 </dl></div>
     <div class="section level2">

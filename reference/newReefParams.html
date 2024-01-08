@@ -65,11 +65,11 @@ resource components, senescence mortality, and predation refuge.</p>
 <span>  <span class="va">UR_interaction</span>,</span>
 <span>  exp_alg <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  exp_det <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  algae_growth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_rho_a <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_rho_d <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  initial_algae_growth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prop_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  d.external <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  initial_d_external <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ext_mort_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -181,13 +181,6 @@ scaling exponent of the maximum intake rate for
 fish consumers.</p></dd>
 
 
-<dt>algae_growth</dt>
-<dd><p>The initial growth rate of algae in grams/year/m^-2.
-This value is reset to match consumption in the
-<code>[reefSteady()]</code>  function so that steady state
-abundances match given values.</p></dd>
-
-
 <dt>scale_rho_a</dt>
 <dd><p>A factor to multiply rho values by for algae
 encounter rate. Used in steady state tuning.</p></dd>
@@ -198,18 +191,27 @@ encounter rate. Used in steady state tuning.</p></dd>
 encounter rate. Used in steady state tuning.</p></dd>
 
 
+<dt>initial_algae_growth</dt>
+<dd><p>The initial growth rate of algae in
+grams/year/m^-2. This value is reset to match
+consumption in the <code>[reefSteady()]</code>  function
+so that steady state abundances match given
+values.</p></dd>
+
+
 <dt>prop_decomp</dt>
 <dd><p>The proportion of waste material that decomposes to
 become part of the detritus pool.</p></dd>
 
 
-<dt>d.external</dt>
-<dd><p>The rate at which detritus biomass sinks from the
-pelagic zone and becomes part of the detritus pool
-in grams per year. This value is reset to make up any
-differences in consumption and production in the
-<code>[reefSteady()]</code> function so that steady state
-abundances match observed values.</p></dd>
+<dt>initial_d_external</dt>
+<dd><p>The rate at which detritus biomass sinks from
+the pelagic zone and becomes part of the
+detritus pool in grams per year. This value is
+reset to make up any differences in consumption
+and production in the <code>[reefSteady()]</code> function
+so that steady state abundances match observed
+values.</p></dd>
 
 
 <dt>ext_mort_params</dt>
