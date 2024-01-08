@@ -1,0 +1,796 @@
+---
+title: "c3 vignettes"
+#format: latex
+echo: FALSE
+format:
+    pdf:
+        toc: false
+        toc-depth: 1
+        number-sections: false
+        number-depth: 2
+    docx:
+        number-sections: true
+        highlight-style: github 
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, error = FALSE,
+                      echo = FALSE,
+                      fig.align = 'center', fig.height = 6, fig.width = 8)
+```
+
+```{r packages, include = FALSE}
+#### Setup - loading packages and functions ------------------------------------
+# Load in relevant packages
+library(mizer)
+library(mizerExperimental)
+library(assertthat)
+library(mizerReef)
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(knitr)
+# Load model
+params <- bonaire_model
+# Set catchability of inverts to 0
+gear_params(params)["inverts, knife_edge_gear", "catchability"] <- 0
+# Store species parameter dataframe
+sp <- params@species_params
+sp$linecolour <- c("#8E0408","#578979","#D89958")
+```
+
+```{r paramstable}
+#| label: tbl-params
+#| tbl-cap: Species parameters
+sp %>%
+    filter(!is.na(biomass_observed)) %>%
+    select(biomass_observed, biomass_cutoff,
+           l_max, #l_mat, 
+           age_mat, a, b, beta) %>%
+    kable(col.names = c("Biomass (g/m^2)", "Cutoff Size (g)",
+                        "Maximum Length (cm)", #"Maturation Length (cm)", 
+                        "Maturation Age (yr)", 
+                        "Length to Weight: a", "Length to Weight: b",
+                        "Predator-Prey Mass Ratio (PPMR)"))
+```
+
+# 1. Changing the refuge profile
+
+## 1.1 Comparing a non-complex reef to a reef with refuge
+```{r vig01, include = FALSE}
+l_ref <- 30 
+p_ref <- 0.3
+```
+
+The presence of predation refuge should have some impact on the size spectra. The steady state above was calibrated without any refuge. As in @Rogers2014, this example explores the impact of implementing a sigmoidal refuge profile. The maximum length of fish with access to refuge was set to `r paste(l_ref,"cm")` and with the maximum proportion of fish protected from predators at `r paste(100*p_ref,"%")`. @fig-vig01spectra shows how the size spectra change when predation refuge is added to the simulation.
+
+```{r vig01spectra, include = FALSE}
+# Spectra comparison and relative difference in spectra
+# set new length for model and re run to steady state
+new_mp <- data.frame(L_refuge = l_ref, prop_protect = p_ref)
+ref_model <- newRefuge(params, new_method = "sigmoidal", new_method_params = new_mp)
+ref_model <- reef_steady(ref_model)
+ref_model <- reef_steady(ref_model)
+# ref_model <- calibrateBiomass(ref_model)
+# ref_model <- matchBiomasses(ref_model)
+# # ref_model <- matchGrowth(ref_model)
+# ref_model <- reef_steady(ref_model)
+# ref_model <- reef_steady(ref_model)
+
+# Get weights of L_refuge for each
+l1 <- params@other_params$refuge_lengths
+l2 <- ref_model@other_params$refuge_lengths
+
+# Convert to weights
+w1 <- sp$a * l1$L_refuge.i ^ sp$b
+w2 <- sp$a * l2$L_refuge.i ^ sp$b
+
+# Set colors for weight lines
+w_ref <- list(old = "gray", new = "black")
+    
+all11 <-  plotSpectra2(params, ref_model,
+                       name1 = "No refuge",
+                       name2 = "sigmoidal",
+                       power = 2) + 
+    geom_vline(xintercept = w1, #linetype = "twodash",
+               linewidth = 0.5, color = w_ref$old) +
+    geom_vline(xintercept = w2, #linetype = "twodash",
+               linewidth = 0.5, color = w_ref$new) + 
+    labs(color = "Functional Group", 
+         linetype = "L.refuge", tag = "A.") 
+                
+rel11 <- plotSpectraRelative(params, ref_model,
+                             name1 = "No refuge", 
+                             name2 = "sigmoidal",
+                             power = 2) + 
+    geom_vline(xintercept = w1, #linetype = "twodash",
+               linewidth = 0.5, color = w_ref$old) +
+    geom_vline(xintercept = w2, #linetype = "twodash",
+               linewidth = 0.5, color = w_ref$new) + 
+    labs(color = "Functional Group", tag = "B.") 
+
+comp11 <- ggarrange(all11, rel11, 
+                    ncol = 2,
+                    common.legend = TRUE)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig11spectra.png",
+       plot = comp11, 
+       width = 20, 
+       height = 9, 
+       units = "cm", 
+       bg = "white")
+```
+
+```{r vig01fig}
+#| label: fig-vig01spectra
+#| fig-cap: !expr paste("Plot (A) shows the steady state spectra when refuge is
+#|          introduced (",p_ref,"% protected up to",l_ref,"cm, dotted lines) 
+#|          compared to a flat reef with no refuge (solid lines). Plot 
+#|          (B) gives the relative difference between these spectra by fish 
+#|          body size.") 
+
+print(comp11)
+```
+
+\newpage
+The total biomass and potential fisheries productivity also change when refuge
+is made available. See @fig-vig01summary.
+```{r vig01sum, include = FALSE}
+
+# Fisheries productivity and biomass comparison, L = 20 and L = 40
+all_biom11 <- plot2TotalBiomass(params, ref_model,
+                                name1 = "No refuge", 
+                                name2 = "sigmoidal") +
+              labs(tag = "A.")
+
+print(all_biom11)
+
+rel_biom11 <- plotTotalBiomassRelative(params, ref_model, 
+                                       diff_method = "percent_change") +
+              labs(tag = "B.")
+
+all_prod11 <- plot2Productivity(params, ref_model,
+                                name1 = "No refuge", 
+                                name2 = "sigmoidal") +
+              labs(tag = "C.")
+
+print(all_prod11)
+
+rel_prod11 <- plotProductivityRelative(params, ref_model, 
+                                       diff_method = "percent_change") + 
+              labs(tag = "D.")
+
+sum11 <- ggarrange(all_biom11, rel_biom11, all_prod11, rel_prod11,
+                   ncol = 2, nrow = 2,
+                   common.legend = TRUE)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig11summary.png",
+       plot = sum11, 
+       width = 20, 
+       height = 9, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+```{r vig01sumfig}
+#| label: fig-vig01summary
+#| 
+#| fig-cap: !expr paste("The steady state values (left) and per cent change 
+#|          (right) in total biomass (top) and potential fisheries productivity 
+#|          (bottom) when a sigmoidal refuge profile is introduced to mediate 
+#|          predation. The faded reefs had to refuge while bright reefs had 
+#|          ",p_ref,"% of all fish protected up to",l_ref,"cm.") 
+
+print(sum11)
+```
+
+\newpage
+
+## 1.2 Changing the maximum size of fish with access to refuge
+```{r vig11params, include = FALSE}
+new_l <- 0.5*l_ref
+```
+
+In this example we look at the consequences of changing $L_{refuge}$, the body length at which refuge availability rapidly decreases for prey. The steady state above was calibrated with a sigmoidal refuge profile. The maximum refuge length was set to `r paste(l_ref,"cm")`. @fig-vig11spectra shows how the 
+size spectra change when $L_{refuge}$ is changed to `r paste(new_l,"cm")`. The vertical lines show the new and old maximum refuge lengths in terms of their corresponding weights. Since all species use the same shape parameters in this model, the refuge weight is the same for all functional groups.
+
+```{r vig11spectra, include = FALSE}
+# Spectra comparison and relative difference in spectra, L = 20 and L = 40 
+# set new length for model and re run to steady state
+new_l_model <- newRefuge(ref_model, new_L_refuge = new_l)
+new_l_model <- reef_steady(new_l_model)
+new_l_model <- reef_steady(new_l_model)
+# new_l_model <- calibrateBiomass(new_l_model)
+# new_l_model <- matchBiomasses(new_l_model)
+# # new_l_model <- matchGrowth(new_l_model)
+# new_l_model <- reef_steady(new_l_model)
+# new_l_model <- reef_steady(new_l_model)
+
+# Get weights of L_refuge for each
+l1 <- ref_model@other_params$refuge_lengths
+l2 <- new_l_model@other_params$refuge_lengths
+
+# Convert to weights
+w1 <- sp$a * l1$L_refuge.i ^ sp$b
+w2 <- sp$a * l2$L_refuge.i ^ sp$b
+
+# Set colors for weight lines
+w_ref <- list(old = "gray", new = "black")
+    
+all11 <-  plotSpectra2(ref_model, new_l_model,
+                       name1 = paste(l_ref,"cm"), 
+                       name2 = paste(new_l,"cm"),
+                       power = 2) + 
+    geom_vline(xintercept = w1, #linetype = "twodash",
+               linewidth = 0.5, color = w_ref$old) +
+    geom_vline(xintercept = w2, #linetype = "twodash",
+               linewidth = 0.5, color = w_ref$new) + 
+    labs(color = "Functional Group", 
+         linetype = "L.refuge", tag = "A.") 
+                
+rel11 <- plotSpectraRelative(ref_model, new_l_model, 
+                             name1 = paste(l_ref,"cm"), 
+                             name2 = paste(new_l,"cm"),
+                             power = 2) + 
+    geom_vline(xintercept = w1, #linetype = "twodash",
+               linewidth = 0.5, color = w_ref$old) +
+    geom_vline(xintercept = w2, #linetype = "twodash",
+               linewidth = 0.5, color = w_ref$new) + 
+    labs(color = "Functional Group", tag = "B.") 
+
+comp11 <- ggarrange(all11, rel11, 
+                    ncol = 2,
+                    common.legend = TRUE)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig11spectra.png",
+       plot = comp11, 
+       width = 20, 
+       height = 9, 
+       units = "cm", 
+       bg = "white")
+```
+
+```{r vig11fig}
+#| label: fig-vig11spectra
+#| fig-cap: !expr paste("Plot (A) shows the steady state spectra whe the 
+#|          maximum length of fish protected by refuge is changed 
+#|          from",l_ref,"cm (solid lines) to",new_l,"cm (dotted lines). Plot 
+#|          (B) gives the relative difference between these spectra by fish 
+#|          body size.") 
+
+print(comp11)
+```
+
+We can see that the expected non-linearity in the size spectra shifts slightly towards larger prey with the increase of the refuge length 
+(@fig-vig11spectra A). This is to be expected, as now larger fish are being protected from predation. 
+
+\newpage
+The total biomass and potential fisheries productivity for each group also 
+change as we change the minimum refuge size. See @fig-vig11summary.
+```{r vig11sum, include = FALSE}
+
+# Fisheries productivity and biomass comparison, L = 20 and L = 40
+all_biom11 <- plot2TotalBiomass(ref_model, new_l_model,
+                                name1 = paste(l_ref,"cm"), 
+                                name2 = paste(new_l,"cm")) +
+              labs(tag = "A.")
+
+print(all_biom11)
+
+rel_biom11 <- plotTotalBiomassRelative(ref_model, new_l_model, 
+                                       diff_method = "percent_change") +
+              labs(tag = "B.")
+
+all_prod11 <- plot2Productivity(ref_model, new_l_model,
+                                name1 = paste(l_ref,"cm"),
+                                name2 = paste(new_l,"cm")) +
+              labs(tag = "C.")
+
+print(all_prod11)
+
+rel_prod11 <- plotProductivityRelative(ref_model, new_l_model, 
+                                       diff_method = "percent_change") + 
+              labs(tag = "D.")
+
+sum11 <- ggarrange(all_biom11, rel_biom11, all_prod11, rel_prod11,
+                   ncol = 2, nrow = 2,
+                   common.legend = TRUE)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig11summary.png",
+       plot = sum11, 
+       width = 20, 
+       height = 9, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+```{r vig11sumfig}
+#| label: fig-vig11summary
+#| fig-cap: !expr paste("The steady state values (left) and % change (right) in
+#|          total biomass (top) and potential fisheries productivity (bottom) 
+#|          when the maximum length of fish protected by refuge is changed 
+#|          from",l_ref,"cm (faded) to",new_l,"cm (bright).") 
+
+print(sum11)
+```
+
+\newpage
+## 1.3 Doubling the proportion of refuge
+```{r vig12, include = FALSE}
+# Spectra comparison and relative difference in spectra, p = 20% and p = 40%
+# set new length for model and re run to steady state
+p_ref <- ref_model@other_params$method_params[["prop_protect"]]
+new_p <- 2*p_ref
+
+# make new model
+new_p_model <- newRefuge(ref_model, new_prop_protect = new_p)
+new_p_model <- reef_steady(new_p_model)
+new_p_model <- reef_steady(new_p_model)
+# new_p_model <- calibrateBiomass(new_p_model)
+# new_p_model <- matchBiomasses(new_p_model)
+# # new_p_model <- matchGrowth(new_p_model)
+# new_p_model <- reef_steady(new_p_model)
+# new_p_model <- reef_steady(new_p_model)
+
+# plots
+all_spectra12 <-  plotSpectra2(ref_model, new_p_model, 
+                               name1 = paste(p_ref*100,"%"), 
+                               name2 = paste(new_p*100,"%"),
+                               power = 2) +
+    labs(color = "Functional Group", 
+         linetype = "prop_protect", tag = "A.") 
+                
+rel_spectra12 <- plotSpectraRelative(ref_model, new_p_model,
+                                     name1 = paste(100*p_ref,"%"), 
+                                     name2 = paste(100*new_p,"%"),
+                                     power = 2) +
+    labs(color = "Functional Group", 
+         linetype = "prop_protect", tag = "B.") 
+
+comp_spectra12 <- ggarrange(all_spectra12, rel_spectra12, ncol = 2,
+                          common.legend = TRUE)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig12spectra.png",
+       plot = comp_spectra12, 
+       width = 20, 
+       height = 9, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+Now we look at the consequences of changing `prop_protect`, the maximum 
+proportion of prey protected by refuge. The steady state above was calibrated 
+with `prop_protect` set to `r paste(100*p_ref,"%")`. @fig-vig12spectra 
+shows how the size spectra change when `prop_protect` is 
+changed to `r paste(100*new_p,"%")`.
+```{r vig12fig}
+#| label:  fig-vig12spectra
+#| fig-cap: !expr paste("Plot (A) shows the steady state spectra 
+#|          when the maximum proportion of fish protected is changed from 
+#|          ",100*p_ref,"% (solid lines) to",100*new_p,"% (dotted lines). Plot 
+#|          (B) gives the relative difference between these spectra by fish 
+#|          body size.") 
+
+
+print(comp_spectra12)
+```
+
+\newpage
+The total biomass and potential fisheries productivity change in response
+to changing the maximum proportion of prey that are protected from predators. 
+See @fig-vig12summary.
+```{r vig 12sum, include = FALSE}
+# Fisheries productivity and biomass comparison, p = 20% and p = 40%
+
+all_biom12 <- plot2TotalBiomass(object1 = ref_model, 
+                                object2 = new_p_model,
+                                name1 = paste(100*p_ref,"%"),
+                                name2 = paste(100*new_p,"%")) +
+                labs(tag = "A.")
+    
+rel_biom12 <- plotTotalBiomassRelative(object1 = ref_model, 
+                                       object2 = new_p_model,
+                                       diff_method = "percent_change") +
+                labs(tag = "B.")
+
+all_prod12 <- plot2Productivity(ref_model, new_p_model,
+                                name1 = paste(p_ref,"cm"),
+                                name2 = paste(new_p,"cm")) +
+                labs(tag = "C.")             
+
+rel_prod12 <- plotProductivityRelative(object1 = ref_model, 
+                                       object2 = new_p_model,
+                                       diff_method = "percent_change") + 
+                labs(tag = "D.")
+
+comp_all12 <- ggarrange(all_biom12, rel_biom12, all_prod12, rel_prod12, 
+                        ncol = 2, nrow = 2,
+                        common.legend = TRUE)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig12summary.png",
+       plot = comp_all12, 
+       width = 20, 
+       height = 9, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+```{r vig12sumfig}
+#| label: fig-vig12summary
+#| fig-cap: !expr paste("The steady state values (left) and % change (right) 
+#|          in total biomass (top) and fisheries productivity (bottom) when 
+#|          the maximum proportion of fish protected by refuge is changed 
+#|          from",100*p_ref,"% (faded) to",100*new_p,"% (bright).")
+#|          
+print(comp_all12)
+```
+
+\newpage
+
+## 1.4 Sensitivity of productivity to the size range fished
+```{r vig13, include = FALSE}
+old_min_l <- 7
+old_max_l <- max(params@species_params$l_max)
+new_min_l <- 30
+```
+
+However, it's important to note that in all of these examples, the potential fisheries productivity is sensitive to the minimum fishing size parameter. The above plots all show the potential fisheries productivity when fishing in the 
+size range `r paste(old_min_l,"cm to",old_max_l,"cm")`. @fig-vig13 explores the
+differences in productivity for all three of the above models when the minimum
+fishing size is increased to `r paste(new_min_l,"cm")`.
+```{r vig13plots, include = FALSE}
+
+range_change <- paste("Original minimum harvest size",old_min_l,"cm \n 
+                      New minimum harvest size",new_min_l,"cm")
+
+og_tag    <- paste("Non-complex\n
+                   No refuge")
+ref_tag   <- paste("Max size protected",l_ref,"cm\n 
+                    Max proportion protected",100*p_ref,"%")
+new_l_tag <- paste("Max size protected",new_l,"cm\n
+                    Max proportion protected",100*p_ref,"%")
+new_p_tag <- paste("Max size protected",l_ref,"cm\n
+                    Max proportion protected",100*new_p,"%")
+
+l0 <- plotProductivityRelative(params, params, 
+                               diff_method = "rel_diff",
+                               min_fishing_l1 = old_min_l,
+                               min_fishing_l2 = new_min_l) +
+    labs(tag = "A.", x = og_tag) +
+    theme(axis.title.x = element_text(size = 10, color = "navyblue",
+                                      hjust = 1, vjust = 1, lineheight = 0.5,
+                                      face = "bold.italic"))
+
+l1 <- plotProductivityRelative(ref_model, ref_model, 
+                               diff_method = "rel_diff",
+                               min_fishing_l1 = old_min_l,
+                               min_fishing_l2 = new_min_l) +
+    labs(tag = "B.", x = ref_tag) +
+    theme(axis.title.x = element_text(size = 10, color = "navyblue",
+                                      hjust = 1, vjust = 1, lineheight = 0.5,
+                                      face = "bold.italic"))
+
+    
+l2 <- plotProductivityRelative(new_l_model, new_l_model, 
+                               diff_method = "rel_diff",
+                               min_fishing_l1 = old_min_l,
+                               min_fishing_l2 = new_min_l) +
+    labs(tag = "C.", x = new_l_tag) +
+    theme(axis.title.x = element_text(size = 10, color = "navyblue",
+                                      hjust = 1, vjust = 1, lineheight = 0.5,
+                                      face = "bold.italic"))
+
+l3 <- plotProductivityRelative(new_p_model, new_p_model, 
+                               diff_method = "rel_diff",
+                               min_fishing_l1 = old_min_l,
+                               min_fishing_l2 = new_min_l) +
+    labs(tag = "D.", x = new_p_tag) +
+    theme(axis.title.x = element_text(size = 10, color = "navyblue",
+                                      hjust = 1, vjust = 1, lineheight = 0.5,
+                                      face = "bold.italic"))
+
+l_sen <- ggarrange(l0, l1, l2, l3, 
+                   ncol = 2, nrow =3,
+                   legend = "bottom",common.legend = TRUE) +
+        theme(plot.title.position = 'plot')
+
+l_sen <- annotate_figure(l_sen, top = text_grob(
+    paste("Original minimum harvest size",old_min_l,"cm, new minimum harvest size",new_min_l,"cm"),
+    color = "navyblue", face = "bold", size = 10))
+
+print(l_sen)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig13.png",
+       plot = l_sen, 
+       width = 20, 
+       height = 20, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+```{r vig13fig}
+#| label: fig-vig13
+#| fig-cap: The relative difference in fisheries productivity for all models 
+#|          when different size ranges are fished.
+
+
+print(l_sen)
+```
+
+\newpage
+# 2. Simulating fishing mortality
+Here we examine how fishing mortality impacts our system. Many coral reef fisheries have limited regulation and takes are typically under-reported (Newton et al. 2007). For this general example, we use knife-edge selectivity function which defines a minimum fishing size above which selectivity is 1 for 
+all functional groups and sizes. This minimum fishing size defaults to 5\% of
+the maximum length for the species. We set all fish functional groups equally catch-able while the catchability of invertebrates is set to 0. The relevant 
+gear parameters are given in @tbl-fishing. 
+
+```{r fishtable}
+#| label: tbl-fishing
+#| tbl-cap: Selectivity parameters and catchability
+params@gear_params %>%
+    filter(catchability > 0) %>%
+    select(species, knife_edge_size, catchability) %>%
+    kable(row.names = FALSE,
+          col.names = c("Functional Group", "Minimum fishing size [g]", 
+                        "Catchability [1/year]"))
+
+```
+
+## 2.1 Doubling the fishing effort
+```{r vig21, include = FALSE}
+e1 <- 0.3
+e2 <- 2*e1
+time <- 30
+```
+
+MizerReef determines the fishing mortality for each fishing gear by setting the effort invested into fishing with that gear. The effort value for each gear is multiplied by the catchability and the selectivity. 
+
+@fig-vig21 shows the impact of doubling the fishing effort on all functional groups on both a non complex reef with no refuge and the first sigmoidal reef modeled above. All simulations were projected for `r paste(time)` years. The first simulations have a fishing effort of `r paste(e1)` while the double effort sim was run with fishing effort `r paste(e2)`.
+
+```{r vig21plots, include = FALSE}
+sim <- project(params, effort = e1, t_max = time)
+sim_double_effort <- project(params, effort = e2, t_max = time)
+
+refsim <- project(ref_model, effort = e1, t_max = time)
+refsim_double_effort <- project(ref_model, effort = e2, t_max = time)
+
+p1 <- plotSpectra2(sim, sim_double_effort, power = 2) +
+        labs(tag = "A.")
+
+p2 <- plotSpectraRelative(sim, sim_double_effort, power = 2) +
+        labs(tag = "B.")
+
+p3 <- plotBiomassRelative(sim_double_effort) + 
+        labs(tag = "C.")
+
+p4 <- plotSpectra2(refsim, refsim_double_effort, power = 2) +
+        labs(tag = "D.")
+
+p5 <- plotSpectraRelative(refsim, refsim_double_effort, power = 2) +
+        labs(tag = "E.")
+
+p6 <- plotBiomassRelative(refsim_double_effort) + 
+        labs(tag = "F.")
+
+
+p <- ggarrange(p1, p2, p3, p4, p5, p6, 
+               common.legend = TRUE, 
+               ncol = 3, nrow = 2)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig21.png",
+       plot = p, 
+       width = 18, 
+       height = 27, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+```{r vig21fig}
+#| label: fig-vig21
+#| fig-cap: !expr paste("The top row gives the results of simulations for a 
+#|          non-complex reef with no refuges. The bottom row gives the results 
+#|          for a sigmoidal refuge profile protect a maximum of",p_ref,"of
+#|          fish up to",l_ref,"cm in length. Plots A & D shows the resulting 
+#|          spectra after projecting for",time,"years with low effort 
+#|          (solid lines) and doubled effort (dotted lines). Plots B,C,E, and F 
+#|          give the relative difference in size spectra (B & E) and 
+#|          biomass (C & F) when the fishing effort is doubled from",e1," to 
+#|          ",e2,".")
+#|          
+print(p)
+```
+
+\newpage
+
+## 2.2 Restricting fishing on herbivores
+Now we explore how these outcomes might change if fishers only harvested 
+from the predator guild. @fig-vig22 shows the impact of setting the catchability
+of herbivores to 0 so that only fish from the predator spectrum are taken.
+```{r vig22, include = FALSE}
+# Make a copy of the model in a new variable
+params_no_herbs <- params
+ref_no_herbs <- ref_model
+# Change the catchability of herbivores to 0
+gear_params(params_no_herbs)["herbivores, knife_edge_gear", "catchability"] <- 0
+gear_params(ref_no_herbs)["herbivores, knife_edge_gear", "catchability"] <- 0
+# Project
+sim_no_herbs <- project(params_no_herbs, t_max = time)
+ref_no_herbs <- project(ref_no_herbs, t_max = time)
+
+h1 <- plotSpectra2(sim, sim_no_herbs, power = 2) +
+        labs(tag = "A.")
+
+h2 <- plotSpectraRelative(sim, sim_no_herbs, power = 2) +
+        labs(tag = "B.")
+
+h3 <- plotBiomassRelative(sim_no_herbs) + 
+        labs(tag = "C.")
+
+h4 <- plotSpectra2(refsim, ref_no_herbs, power = 2) +
+        labs(tag = "D.")
+
+h5 <- plotSpectraRelative(refsim, ref_no_herbs, power = 2) +
+        labs(tag = "E.")
+
+h6 <- plotBiomassRelative(ref_no_herbs) + 
+        labs(tag = "F.")
+
+
+h <- ggarrange(h1, h2, h3, h4, h5, h6, 
+               common.legend = TRUE, 
+               ncol = 3, nrow = 2)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig21.png",
+       plot = h, 
+       width = 18, 
+       height = 27, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+```{r vig22fig}
+#| label: fig-vig22
+#| fig-cap: !expr paste("The top row gives the results of simulations for a 
+#|          non-complex reef with no refuges. The bottom row gives the results 
+#|          for a sigmoidal refuge profile protect a maximum of ",p_ref," of
+#|          fish up to",l_ref," cm in length. Plots A & D shows the resulting 
+#|          spectra after projecting for ",time," years with no fishing on
+#|          herbivores. Plots B,C,E, and F give the relative difference in size 
+#|          spectra (B & E) and biomass (C & F) when the catchability of
+#|          herbivores is set to zero.")
+#|          
+
+print(h)
+```
+
+\newpage
+# 3. Changing the production of unstructured resources
+```{r vig3, include = FALSE}
+old_A_prod <- params@other_params$algae$growth
+new_A_prod <- 2*old_A_prod
+```
+
+## 3.1 Doubling the production of algae
+There is often a boom in algal resources following mass coral mortality due to bleaching or disturbance, and this can result in an explosion of herbivore populations. @fig-vig31 investigate model predictions when we increase the availability of the algal resource. At steady state, the Bonaire model produces
+`r paste(old_A_prod)` grams of algal biomass per square meter per year.
+```{r vig31, include = FALSE}
+# 3.1 Doubling the production of algae
+# project old sim
+sim <- project(params, t_max = 30)
+# set new algae growth rate
+new_alg <- params
+new_alg@other_params$algae$algae_growth  <- new_A_prod
+sim_double_algae <- project(new_alg, t_max = 30)
+
+# Plots
+a1 <- plotBiomassRelative(sim_double_algae) + 
+        labs(tag = "B.")
+
+a2 <- plotSpectra2(sim, sim_double_algae, power = 2,
+                   name1 = paste(old_A_prod,"g/m^2/year"), 
+                   name2 = paste(new_A_prod,"g/m^2/year")) +
+        labs(tag = "A.")
+
+a3 <- plotSpectraRelative(sim, sim_double_algae, power = 2) +
+        labs(tag = "C.")
+
+a4 <- ggarrange(a2, a1, a3, common.legend = TRUE, ncol = 3)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig31.png",
+       plot = a4, 
+       width = 27, 
+       height = 9, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+```{r vig31fig}
+#| label: fig-vig31
+#| fig-cap: Plot (A) shows the steady state spectra for the original algae
+#|          production (solid lines) and when algae production is doubled 
+#|          (dotted lines). The other panels give the relative difference in 
+#|          (B) biomass and (C) size spectra when algae production is doubled.
+
+print(a4)
+```
+
+\newpage
+## 3.2 Doubling the external production of detritus
+```{r vig32, include = FALSE}
+old_D_ext <- getDetritusProduction(params)[['external']]
+new_D_ext <- 2*old_D_ext
+```
+
+Detritus is produced by many different sources on coral reefs and we may be
+underestimating the production. @fig-vig32 looks at the consequences of
+increasing the production of detritus. At steady state, external sources 
+produce `r paste(old_D_ext)` grams of detritus per square meter per year.
+```{r vig32plots}
+# project old sim
+sim <- project(params, t_max = 30)
+# set new external detritus input
+new_det <- params
+new_det@other_params$detritus$external <- new_D_ext
+# project
+sim_double_det <- project(new_det, t_max = 30)
+
+# Plots
+d1 <- plotBiomassRelative(sim_double_det) + 
+        labs(tag = "B.")
+
+d2 <- plotSpectra2(sim, sim_double_det, power = 2,
+                   name1 = paste(old_D_ext,"g/m^2/year"), 
+                   name2 = paste(new_D_ext,"g/m^2/year")) +
+        labs(tag = "A.")
+
+d3 <- plotSpectraRelative(sim, sim_double_det, power = 2) +
+        labs(tag = "C.")
+
+d4 <- ggarrange(d2, d1, d3, common.legend = TRUE, ncol = 3)
+
+# PNG2
+ggsave("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes/figures/vig32.png",
+       plot = p4, 
+       width = 27, 
+       height = 9, 
+       units = "cm", 
+       bg = "white")
+
+```
+
+```{r vig32fig}
+#| label: fig-vig32
+#| fig-cap: Plot (A) shows the steady state spectra for the original algae
+#|          production (solid lines) and when external detrital input is 
+#|          doubled (dotted lines). The other panels give the relative 
+#|          difference in (B) biomass and (C) size spectra when external
+#|          detritus production is doubled.
+
+print(d4)
+```
+
+
+
+
+
