@@ -105,9 +105,11 @@ newReefParams <- function(# Original mizer parameters
         rho_alg[is.na(rho_alg)] <- 0
         rho_det[is.na(rho_det)] <- 0
         
-        # Store new rho values in species_params data frame
+        # Pull scaling values
         scale_rho_a <- params@other_params$scale_rho_a
         scale_rho_d <- params@other_params$scale_rho_d
+        
+        # Store new rho values in species_params data frame
         params@species_params$rho_algae    <- scale_rho_a*rho_alg
         params@species_params$rho_detritus <- scale_rho_d*rho_det
     
@@ -132,7 +134,7 @@ newReefParams <- function(# Original mizer parameters
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_det,
                                 prop_decomp = params@other_params$prop_decomp,
-                                d.external = params@other_params$d.external))
+                                d.external  = params@other_params$d.external))
 
     # External mortality - Weight dependent ----
         ext_mort_params <- params@other_params[['ext_mort_params']]

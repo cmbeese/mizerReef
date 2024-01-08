@@ -40,20 +40,22 @@
 #' @param scale_rho_d   A factor to multiply rho values by for detritus
 #'                      encounter rate. Used in steady state tuning.
 #' 
-#' @param algae_growth  The initial growth rate of algae in grams/year/m^-2.
-#'                      This value is reset to match consumption in the 
-#'                      `[reefSteady()]`  function so that steady state 
-#'                      abundances match given values.
+#' @param initial_algae_growth  The initial growth rate of algae in 
+#'                              grams/year/m^-2. This value is reset to match
+#'                              consumption in the `[reefSteady()]`  function 
+#'                              so that steady state abundances match given 
+#'                              values.
 #'                      
 #' @param prop_decomp   The proportion of waste material that decomposes to
 #'                      become part of the detritus pool.
 #'                      
-#' @param d.external    The rate at which detritus biomass sinks from the 
-#'                      pelagic zone and becomes part of the detritus pool 
-#'                      in grams per year. This value is reset to make up any 
-#'                      differences in consumption and production in the 
-#'                      `[reefSteady()]` function so that steady state 
-#'                      abundances match observed values.
+#' @param initial_d_external    The rate at which detritus biomass sinks from 
+#'                              the pelagic zone and becomes part of the 
+#'                              detritus pool in grams per year. This value is 
+#'                              reset to make up any differences in consumption 
+#'                              and production in the `[reefSteady()]` function 
+#'                              so that steady state abundances match observed 
+#'                              values.
 #'
 #' @return `setUResourceParams`: MizerParams object with updated unstructured
 #'  resource parameters
@@ -66,8 +68,8 @@ setURParams <- function(params,
                         exp_alg = NULL, exp_det = NULL,
                         scale_rho_a = NULL, scale_rho_d = NULL,
                         # Resource Production
-                        algae_growth = NULL, 
-                        prop_decomp = NULL, d.external = NULL) {
+                        initial_algae_growth = NULL, 
+                        prop_decomp = NULL, initial_d_external = NULL) {
     
     # object check ----
         # Check if mizerParams is valid
@@ -176,44 +178,44 @@ setURParams <- function(params,
             if (scale_rho_d < 0){
                 stop("scale_rho_d must be non-negative.")
             }
-            params@other_params$scale_rho_d <- scale_rho_d 
+            params@other_params$detritus$scale_rho_d <- scale_rho_d 
         }
         
         ## Production ----
         # Set default algae growth rate
-        if(is.null(algae_growth)){ params@other_params$algae_growth <- 2e3
+        if(is.null(initial_algae_growth)){ params@other_params$initial_initial_algae_growth <- 2e3
         } else {
-            if (!is.numeric(algae_growth)){
-                stop("algae_growth should be a numerical value.")
+            if (!is.numeric(initial_algae_growth)){
+                stop("initial_algae_growth should be a numerical value.")
             }
-            if (algae_growth <0){
-                stop("algae_growth must be non-negative.")
+            if (initial_algae_growth <0){
+                stop("initial_algae_growth must be non-negative.")
             }
-            params@other_params$algae_growth <- algae_growth 
+            params@other_params$algae$initial_algae_growth <- initial_algae_growth 
         }
     
         # Set default proportion of waste that becomes part of the detritus pool
-        if(is.null(prop_decomp)){ params@other_params$prop_decomp <- 0.2
+        if(is.null(prop_decomp)){ params@other_params$prop_decomp <- 0.8
         } else {
             if (!is.numeric(prop_decomp)){
-                stop("algae_growth should be a numerical value.")
+                stop("initial_algae_growth should be a numerical value.")
             }
             if (prop_decomp < 0 || prop_decomp > 1){
-                stop("algae_growth must be a proportion between 0 and 1.")
+                stop("initial_algae_growth must be a proportion between 0 and 1.")
             }
-            params@other_params$prop_decomp <- prop_decomp
+            params@other_params$detritus$prop_decomp <- prop_decomp
         }
     
         # Set default external detritus
-        if(is.null(d.external)){ params@other_params$d.external <- 0.1
+        if(is.null(initial_d_external)){ params@other_params$initial_d_external <- 1
         } else { 
-            if (!is.numeric(d.external)){
-                stop("d.external should be a numerical value.")
+            if (!is.numeric(initial_d_external)){
+                stop("initial_d_external should be a numerical value.")
             }
-            if (d.external < 0){
-                stop("d.external must be non-negative.")
+            if (initial_d_external < 0){
+                stop("initial_d_external must be non-negative.")
             }
-            params@other_params$d.external <- d.external 
+            params@other_params$detritus$initial_d_external <- initial_d_external 
         }
     
         # Note time sim was modified
@@ -994,6 +996,9 @@ newRefuge <- function(params,
         # Check if the user provided one of the available refuge profile methods
         m_opt <- c('sigmoidal','binned','competitive','noncomplex')
         if(is.null(new_method)) {
+            warning("Since you did not provide a new method for determinging 
+                    the refuge profile, I will use the one currently stored in 
+                    params@other_params$refuge_params$method.")
             # If user did not provide a method, use old one
             new_method <- refuge_params$method
         # If user did provide a method, check that it's one of the options

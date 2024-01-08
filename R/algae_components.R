@@ -13,6 +13,57 @@ algae_biomass <- function(params) {
     params@initial_n_other$algae
 }
 
+# #' Algae dynamics with carrying capacity
+# #'
+# #' Calculates the algae biomass at the next time step from the current
+# #' algae biomass
+# #'
+# #' The time evolution of the algae biomass \eqn{B} is described by
+# #'
+# #'  \deqn{ \frac{dB}{dt} = P_A\left( 1 - \frac{B}{\Kappa} \right) - c_A \, B_A }{
+# #'                 dB/dt = P_A * (1 - B_A/\Kappa) - c_a * B_A}
+# #'
+# #' where \eqn{\Kappa} is the system's carrying capacity for algae in grams, 
+# #' \eqn{c_A} is the mass-specific rate of consumption calculated with 
+# #' `algae_consumption()` and \eqn{P_A} is the rate at which algae 
+# #' grows, calculated with `getAlgaeProduction()`.
+# #'
+# #' The dynamical equation is solved analytically to
+# #'       
+# #'   \deqn{ B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)} 
+# #'                        - \frac{\Kappa \, P_A}{P_A+\Kappa \, c_A} 
+# #'                        e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)} }{
+# #'         B_A(t + dt) = B_A(t) exp^(-dt/K * (P_A+ k*C_A))
+# #'                        (-k*P_A) / (P_A + K*c_A) * e^(-dt/k * (P_A + k*C_A) }
+# #'                        
+# #' @param params A [MizerParams] object
+# #' @param n A matrix of current species abundances (species x size)
+# #' @param n_other Other dynamic components.
+# #' @param rates A list of rates as returned by [getRates()]
+# #' @param dt Time step size
+# #' @param ... Unused
+# #'
+# #' @return A single number giving the algae biomass at next time step
+# #' @seealso [detritus_dynamics()], [algae_consumption()], 
+# #'          [getAlgaeConsumption()], [getAlgaeProduction()]
+# #' @concept algae
+# #' @export
+# algae_dynamics2 <- function(params, n, n_other, rates, dt, ...) {
+#     
+#     consumption <- algae_consumption(params, n, rates)
+#     production <- sum(getAlgaeProduction(params))
+#     k <- params@other_params$algae$carry
+#     
+#     # If consumption is non-zero, return analytic solution
+#     if (consumption) {
+#         et <- exp(-dt/k * (production + k * consumption))
+#         frac <- (k*production) / (production + k * consumption)
+#         return(n_other$algae * et - frac * et)
+#     }
+#     return(n_other$algae + production * dt)
+# }
+
+
 #' Algae dynamics
 #'
 #' Calculates the algae biomass at the next time step from the current
