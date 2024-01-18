@@ -11,7 +11,10 @@
 #' @inheritParams setURParams
 #' @inheritParams setExtMortParams
 #' @inheritParams setRefuge
-#' @param species_params A functional group parameter data frame
+#' @param group_params  A functional group parameter data frame containing at
+#'                      least the name of each functional group, their
+#'                      observed abundances, and the cut-off size for 
+#'                      observations in grams.
 #' @param interaction The group specific interaction matrix, \eqn{\theta_{ij}}
 #' @param min_w_pp Minimum size of plankton in grams
 #' @param w_pp_cutoff Maximum size of plankton in grams
@@ -24,7 +27,7 @@
 #' @concept setup
 #' @return An object of type \linkS4class{MizerParams}
 newReefParams <- function(# Original mizer parameters
-                            species_params, interaction = NULL, 
+                            group_params, interaction = NULL, 
                             crit_feed = NULL,
                             min_w_pp = NA, w_pp_cutoff = 1.0, n = 3/4,
                           # Parameters for setting up refuge
@@ -43,11 +46,15 @@ newReefParams <- function(# Original mizer parameters
                             ext_mort_params = NULL, ...) {
     
     ## Initialize model with newMultispeciesParams ----
-    params <- newMultispeciesParams(species_params = species_params,
+    params <- newMultispeciesParams(species_params = group_params,
                                     interaction = interaction,
                                     min_w_pp = min_w_pp,
                                     w_pp_cutoff = w_pp_cutoff,
                                     n = n, p = n, ...)
+    
+    # Change resource color
+    params@linecolour["Resource"] <- "lightseagreen"
+    params@linecolour["Fishing"] <- "blue"
     
     # Add parameters ----
     ### Refuge ----

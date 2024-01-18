@@ -601,13 +601,21 @@ plotTotalBiomass <- function(object,
     # object checks ----
     if (is(object, "MizerSim")) {
         ## sim values ----
-        params <- object@params
-        warning('This functionality is not set up yet.')
-    }
-    if (is(object, "MizerParams")) {
+            # get total biomass at last timestep
+        end_time  <- max(as.numeric(dimnames(object@n)$time))
+        
+        biom <- mizer::getBiomass(object, 
+                                  min_l = min_fishing_l,
+                                  max_l = max_fishing_l)
+        
+        biom <- biom[end_time, ,drop = TRUE]
+    } else if (is(object, "MizerParams")) {
         ## params ----
         params <- object
-    } else {
+        biom <- mizer::getBiomass(params, 
+                                  min_l = min_fishing_l,
+                                  max_l = max_fishing_l)
+    } else if (all(is(object, "MizerSim"), is(object, "MizerParams"))){
         stop('object should be a mizerParams or mizerSim object.')
     }
     

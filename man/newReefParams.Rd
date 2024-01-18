@@ -5,7 +5,7 @@
 \title{Set up parameters for a mizerReef model}
 \usage{
 newReefParams(
-  species_params,
+  group_params,
   interaction = NULL,
   crit_feed = NULL,
   min_w_pp = NA,
@@ -34,7 +34,10 @@ newReefParams(
 )
 }
 \arguments{
-\item{species_params}{A functional group parameter data frame}
+\item{group_params}{A functional group parameter data frame containing at
+least the name of each functional group, their
+observed abundances, and the cut-off size for
+observations in grams.}
 
 \item{interaction}{The group specific interaction matrix, \eqn{\theta_{ij}}}
 

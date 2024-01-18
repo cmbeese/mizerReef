@@ -129,6 +129,10 @@ setURParams <- function(params,
         }
     }
         
+    # set colors ---- 
+        params@linecolour["detritus"] <- "chocolate4"
+        params@linecolour["algae"]    <- "palegreen"
+        
     # other parameters ----
         
         ## Encounter rates rho and exp ----
