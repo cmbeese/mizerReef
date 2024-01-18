@@ -40,6 +40,6 @@ rate:
 }
 
 \seealso{
-\code{\link[=getAlgaeProduction]{getAlgaeProduction()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getDetritusConsumption]{getDetritusConsumption()}}
+\code{\link[=getAlgalProduction]{getAlgalProduction()}}, \code{\link[=algal_dynamics]{algal_dynamics()}}, \code{\link[=getDetritusConsumption]{getDetritusConsumption()}}
 }
 \concept{detritus}

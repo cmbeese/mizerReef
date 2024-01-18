@@ -2,7 +2,7 @@
 
 #' Project a mizerReef model to steady state
 #' 
-#' This function tune detritus and algae parameters after running
+#' This function tunes the detritus and algae parameters after running
 #' mizer's default projectToSteady function.
 #' 
 #' @param params A \linkS4class{MizerParams} object

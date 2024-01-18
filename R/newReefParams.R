@@ -130,7 +130,7 @@ newReefParams <- function(# Original mizer parameters
     ### Algae Component - Add in algae ----
     params <- setComponent(
         params, "algae", initial_value = 1,
-        dynamics_fun = "algae_dynamics",
+        dynamics_fun = "algal_dynamics",
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_alg,
                                 growth = params@other_params$initial_algae_growth))

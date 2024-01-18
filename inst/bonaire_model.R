@@ -6,49 +6,38 @@ library(mizer)
 library(mizerExperimental)
 library(mizerReef)
 library(assertthat)
+library(here)
 
 #### Parameters ----------------------------------------------------------------
 
-# When new parameters need to be loaded 
-    setwd("C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/c3_files/vignettes")
-
     # Load species parameter data
-    bonaire_species <- read.csv("bonaire_species.csv")
-    bonaire_int     <- read.csv("bonaire_int.csv",  row.names = 1)
-
+    bonaire_species <- read.csv(here("inst/bonaire_species.csv"))
+    bonaire_int     <- read.csv(here("inst/bonaire_int.csv"),  row.names = 1)
+    bonaire_refuge  <- load("inst/bonaire_refuge.rda")
+    
     # Create some tester refuge scenarios
-    method <- c("sigmoidal", "noncomplex")
-    bonaire_refuge <- data.frame(L_refuge = 15, prop_protect = 0.2)
+    # method <- c("noncomplex", "sigmoidal", "competitive")
+    # bonaire_refuge <- data.frame(L_refuge = 15, prop_protect = 0.2)
 
 # When we can we use saved .rda files
     # bonaire_species <- bonaire_species
     # bonaire_int     <- bonaire_int
     # bonaire_refuge  <- bonaire_refuge
-    # method <- c("sigmoidal", "noncomplex")
-    
-# Steady state attempts in "inst/record_of_attempts"
-
-# Base mizer to look at differences with unstructured resources
-# params <- newMultispeciesParams(species_params = bonaire_species,
-#                                 interaction = bonaire_int,
-#                                 min_w_pp = NA,
-#                                 w_pp_cutoff = 1.0,
-#                                 n = 3/4, p = 3/4)
 
 ## Set model -------------------------------------------------------------------
-bonaire_model <- newReefParams(species_params = bonaire_species,
-                               interaction = bonaire_int,
-                               method = method[2])
-                               # scale_rho_a = scale_rho_a,
-                               # scale_rho_d = scale_rho_d,
-                               # method = method[1],
-                               # method_params = bonaire_refuge)
-        
-bonaire_model@linecolour["predators"] <-"#8E0408"
-bonaire_model@linecolour["inverts"] <- "#D89958"
-bonaire_model@linecolour["herbivores"] <- "#578979"
-bonaire_model@linecolour["detritus"] <-"burlywood4"
-bonaire_model@linecolour["algae"] <- "darkolivegreen4"
+# bonaire_model <- newReefParams(species_params = bonaire_species,
+#                                interaction = bonaire_int,
+#                                method = method[2])
+#                                # scale_rho_a = scale_rho_a,
+#                                # scale_rho_d = scale_rho_d,
+#                                # method = method[1],
+#                                # method_params = bonaire_refuge)
+#         
+# bonaire_model@linecolour["predators"] <-"#8E0408"
+# bonaire_model@linecolour["inverts"] <- "#D89958"
+# bonaire_model@linecolour["herbivores"] <- "#578979"
+# bonaire_model@linecolour["detritus"] <-"burlywood4"
+# bonaire_model@linecolour["algae"] <- "darkolivegreen4"
 
 ## Project to steady state
 bonaire_model <- bonaire_model |>
@@ -114,9 +103,9 @@ bonaire_model <- tuneParams(bonaire_model)
     # save(bonaire_model2,   file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_model2.rda")
 
     # CSV Files
-    save(bonaire_species, file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_species.rda")
-    save(bonaire_int,     file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_int.rda")
-    save(bonaire_refuge,  file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/345_mizerReef/mizerReef/data/bonaire_refuge.rda")
+    save(bonaire_species, file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/3_mizerReef/mizerReef/data/bonaire_species.rda")
+    save(bonaire_int,     file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/3_mizerReef/mizerReef/data//bonaire_int.rda")
+    save(bonaire_refuge,  file = "C:/Users/DELL/OneDrive - Victoria University of Wellington - STAFF/Thesis/3_mizerReef/mizerReef/data/bonaire_refuge.rda")
 
 # Build website ----------------------------------------------------------------
 pkgdown::build_site()

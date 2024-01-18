@@ -3,7 +3,7 @@
 #' @section Adding unstructured resources:
 #'
 #'      mizerReef supports two resource spectra that are not size- structured.
-#'      Algae is consumed by herbivorous fish, while detritus is consumed by
+#'      Algae are consumed by herbivorous fish, while detritus is consumed by
 #'      herbivorous fish and benthic invertebrates. This function sets the 
 #'      interaction matrix for these resources as well as any default
 #'      parameters necessary to structure them.
@@ -19,7 +19,7 @@
 #'      
 #' @inheritSection getDetritusConsumption Detritus consumption
 #' @inheritSection getDetritusProduction Detritus production
-#' @inheritSection algae_consumption Algae consumption
+#' @inheritSection algal_consumption Algal consumption
 #'
 #' @param params MizerParams object
 #' @param UR_interaction Interaction matrix for unstructured resources
@@ -514,8 +514,9 @@ setRefuge <- function(params, method, method_params = NULL,
         }
         if (anyNA(params@species_params[["a"]]) ||
             anyNA(params@species_params[["b"]])) {
-            stop("There must be no NAs in the species_params 
-                 columns 'a' and 'b'.")
+            warning("There are NAs in the species_params 
+                    columns 'a' and 'b'. You must provide mass parameters 
+                    for these species.")
         }
     
     # Find number of species for checks

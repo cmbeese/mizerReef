@@ -47,7 +47,7 @@ detritus_biomass <- function(params) {
 #' @param ... Unused
 #'
 #' @return A vector giving the detritus spectrum at the next time step.
-#' @seealso [algae_dynamics()], [detritus_consumption()], 
+#' @seealso [algal_dynamics()], [detritus_consumption()], 
 #'          [getDetritusConsumption()], [getDetritusProduction()]
 #' @concept detritus
 #' @export
@@ -124,7 +124,7 @@ detritus_consumption <- function(params,
 #' 
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores
-#' @seealso [getAlgaeProduction()], [algae_dynamics()], [getDetritusConsumption()]
+#' @seealso [getAlgalProduction()], [algal_dynamics()], [getDetritusConsumption()]
 #' 
 #' @concept detritus
 #' @export

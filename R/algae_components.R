@@ -1,4 +1,4 @@
-#' Algae Biomass
+#' Algal Biomass
 #'
 #' The algae resource pool represents a combination of algal turf mats,
 #' macroalgae, and the epilithic algal matrix (not including detritus).
@@ -6,77 +6,77 @@
 #' feed on algae regardless of their body size.
 #'
 #' @param params MizerParams
-#' @return The algae biomass in grams
+#' @return The algal biomass in grams
 #' @concept algae
 #' @export
-algae_biomass <- function(params) {
+algal_biomass <- function(params) {
     params@initial_n_other$algae
 }
 
-# #' Algae dynamics with carrying capacity
-# #'
-# #' Calculates the algae biomass at the next time step from the current
-# #' algae biomass
-# #'
-# #' The time evolution of the algae biomass \eqn{B} is described by
-# #'
-# #'  \deqn{ \frac{dB}{dt} = P_A\left( 1 - \frac{B}{\Kappa} \right) - c_A \, B_A }{
-# #'                 dB/dt = P_A * (1 - B_A/\Kappa) - c_a * B_A}
-# #'
-# #' where \eqn{\Kappa} is the system's carrying capacity for algae in grams, 
-# #' \eqn{c_A} is the mass-specific rate of consumption calculated with 
-# #' `algae_consumption()` and \eqn{P_A} is the rate at which algae 
-# #' grows, calculated with `getAlgaeProduction()`.
-# #'
-# #' The dynamical equation is solved analytically to
-# #'       
-# #'   \deqn{ B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)} 
-# #'                        - \frac{\Kappa \, P_A}{P_A+\Kappa \, c_A} 
-# #'                        e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)} }{
-# #'         B_A(t + dt) = B_A(t) exp^(-dt/K * (P_A+ k*C_A))
-# #'                        (-k*P_A) / (P_A + K*c_A) * e^(-dt/k * (P_A + k*C_A) }
-# #'                        
-# #' @param params A [MizerParams] object
-# #' @param n A matrix of current species abundances (species x size)
-# #' @param n_other Other dynamic components.
-# #' @param rates A list of rates as returned by [getRates()]
-# #' @param dt Time step size
-# #' @param ... Unused
-# #'
-# #' @return A single number giving the algae biomass at next time step
-# #' @seealso [detritus_dynamics()], [algae_consumption()], 
-# #'          [getAlgaeConsumption()], [getAlgaeProduction()]
-# #' @concept algae
-# #' @export
-# algae_dynamics2 <- function(params, n, n_other, rates, dt, ...) {
-#     
-#     consumption <- algae_consumption(params, n, rates)
-#     production <- sum(getAlgaeProduction(params))
-#     k <- params@other_params$algae$carry
-#     
-#     # If consumption is non-zero, return analytic solution
-#     if (consumption) {
-#         et <- exp(-dt/k * (production + k * consumption))
-#         frac <- (k*production) / (production + k * consumption)
-#         return(n_other$algae * et - frac * et)
-#     }
-#     return(n_other$algae + production * dt)
-# }
+#' Algal dynamics with carrying capacity
+#'
+#' Calculates the algal biomass at the next time step from the current
+#' algae biomass
+#'
+#' The time evolution of the algal biomass \eqn{B} is described by
+#'
+#'  \deqn{ \frac{dB}{dt} = P_A\left( 1 - \frac{B}{\Kappa} \right) - c_A \, B_A }{
+#'                 dB/dt = P_A * (1 - B_A/ \Kappa) - c_a * B_A}
+#'
+#' where \eqn{\Kappa} is the system's carrying capacity for algae in grams,
+#' \eqn{c_A} is the mass-specific rate of consumption calculated with
+#' `algal_consumption()` and \eqn{P_A} is the rate at which algae
+#' grows, calculated with `getAlgalProduction()`.
+#'
+#' The dynamical equation is solved analytically to
+#'
+#'   \deqn{ B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)}
+#'                        - \frac{\Kappa \, P_A}{P_A+\Kappa \, c_A}
+#'                        e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)} }{
+#'         B_A(t + dt) = B_A(t) exp^(-dt/K * (P_A+ k*C_A))
+#'                        (-k*P_A) / (P_A + K*c_A) * e^(-dt/k * (P_A + k*C_A) }
+#'
+#' @param params A [MizerParams] object
+#' @param n A matrix of current species abundances (species x size)
+#' @param n_other Other dynamic components.
+#' @param rates A list of rates as returned by [getRates()]
+#' @param dt Time step size
+#' @param ... Unused
+#'
+#' @return A single number giving the algae biomass at next time step
+#' @seealso [detritus_dynamics()], [algal_consumption()],
+#'          [getAlgalConsumption()], [getAlgalProduction()]
+#' @concept algae
+#' @export
+algal_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
+
+    consumption <- algal_consumption(params, n, rates)
+    production <- sum(getAlgalProduction(params))
+    k <- params@other_params$algae$carry
+
+    # If consumption is non-zero, return analytic solution
+    if (consumption) {
+        et <- exp(-dt/k * (production + k * consumption))
+        frac <- (k*production) / (production + k * consumption)
+        return(n_other$algae * et - frac * et)
+    }
+    return(n_other$algae + production * dt)
+}
 
 
 #' Algae dynamics
 #'
-#' Calculates the algae biomass at the next time step from the current
+#' Calculates the algal biomass at the next time step from the current
 #' algae biomass
 #'
-#' The time evolution of the algae biomass \eqn{B} is described by
+#' The time evolution of the algal biomass \eqn{B} is described by
 #'
 #' \deqn{dB/dt = \tt{production} - \tt{consumption} \cdot B}{
 #'       dB/dt = production - consumption * B}
 #'
 #' where  `consumption` is the mass-specific rate of consumption calculated
-#' with `algae_consumption()` and `production` is the rate at which algae 
-#' grows, calculated with `getAlgaeProduction()`.
+#' with `algal_consumption()` and `production` is the rate at which algae 
+#' grows, calculated with `getAlgalProduction()`.
 #'
 #' The dynamical equation is solved analytically to
 #'
@@ -96,15 +96,15 @@ algae_biomass <- function(params) {
 #' @param dt Time step size
 #' @param ... Unused
 #'
-#' @return A single number giving the algae biomass at next time step
-#' @seealso [detritus_dynamics()], [algae_consumption()], 
-#'          [getAlgaeConsumption()], [getAlgaeProduction()]
+#' @return A single number giving the algal biomass at next time step
+#' @seealso [detritus_dynamics()], [algal_consumption()], 
+#'          [getAlgalConsumption()], [getAlgalProduction()]
 #' @concept algae
 #' @export
-algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
+algal_dynamics <- function(params, n, n_other, rates, dt, ...) {
 
-    consumption <- algae_consumption(params, n, rates)
-    production <- sum(getAlgaeProduction(params))
+    consumption <- algal_consumption(params, n, rates)
+    production <- sum(getAlgalProduction(params))
 
     # If consumption is non-zero, return analytic solution
     if (consumption) {
@@ -114,16 +114,16 @@ algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
     return(n_other$algae + production * dt)
 }
 
-#' Mass-specific algae consumption rate
+#' Mass-specific algal consumption rate
 #'
-#' This mass-specific consumption rate is used in `algae_dynamics()` to
-#' calculate the algae biomass at the next time step. To get the
-#' non-mass-specific consumption rate, use `getAlgaeConsumption()`.
+#' This mass-specific consumption rate is used in `algal_dynamics()` to
+#' calculate the algal biomass at the next time step. To get the
+#' non-mass-specific consumption rate, use `getAlgalConsumption()`.
 #' 
 #' The rho parameter for herbivorous fish groups is stored in
 #' `other_params(params)$algae$rho`
 #'
-#' @section Algae consumption:
+#' @section Algal consumption:
 #' 
 #'  The rate at which herbivorous consumer groups encounter algal 
 #'  biomass \eqn{E_{i.A}(w)} is controlled by the parameter 
@@ -135,7 +135,7 @@ algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #'          
 #'  The mass specific consumption rate then accounts for the preference of 
 #'  functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the 
-#'  mass-specific algae consumption rate:
+#'  mass-specific algal consumption rate:
 #'  
 #'  \deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
 #'        c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}
@@ -147,7 +147,7 @@ algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #' @return The mass-specific consumption rate of algae in grams per year.
 #' @concept algae
 #' @export
-algae_consumption <- function(params,
+algal_consumption <- function(params,
                               n = params@initial_n,
                               rates = getRates(params)) {
 
@@ -161,19 +161,19 @@ algae_consumption <- function(params,
     # sum((params@other_params$algae$rho * n) %*% params@dw)
 }
 
-#' Get algae consumption rates
+#' Get algal consumption rates
 #'
 #' This function returns a named vector with one component for each species
 #' giving the rate in grams/year at which that species consumes algae
 #' 
-#' @inheritSection algae_consumption Algae consumption
+#' @inheritSection algal_consumption Algal consumption
 #'
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores
-#' @seealso [getAlgaeProduction()], [algae_dynamics()], [getAlgaeConsumption()]
+#' @seealso [getAlgalProduction()], [algal_dynamics()], [getAlgalConsumption()]
 #' @concept algae
 #' @export
-getAlgaeConsumption <- function(params) {
+getAlgalConsumption <- function(params) {
 
     # With feeding level
     feeding_level <- getFeedingLevel(params)
@@ -192,14 +192,14 @@ getAlgaeConsumption <- function(params) {
     return(consumption)
 }
 
-#' Plot algae consumption rates
+#' Plot algal consumption rates
 #'
 #' @param params MizerParams
 #' @return A pie chart.
 #' @concept algae
 #' @export
-plotAlgaeConsumption <- function(params) {
-    consumption <- getAlgaeConsumption(params)
+plotAlgalConsumption <- function(params) {
+    consumption <- getAlgalConsumption(params)
     total <- sum(consumption)
     consumption <- consumption[consumption > total/100]
     df <- data.frame(Consumer = names(consumption),
@@ -207,28 +207,28 @@ plotAlgaeConsumption <- function(params) {
     ggplot(df, aes(x = "", y = Rate, fill = Consumer)) +
         geom_bar(stat = "identity", width = 1) +
         coord_polar("y", start = 0) +
-        labs(title = "Algae consumption rate [g/year]",
+        labs(title = "Algal consumption rate [g/year]",
              x = "", y = "")
 }
 
-#' Algae production rate
+#' Algal production rate
 #'
-#' This is the rate in grams/year/m^-2 at which the system produces algae
+#' This is the rate in grams/year/m^-2 at which the system produces algal
 #' biomass. The rate is set so that production and consumption are equal for
 #' chosen steady state abundances.
 #'
 #' @param params MizerParams
 #'
 #' @return The annual growth rate of algae per square meter
-#' @seealso [getAlgaeConsumption()], [algae_dynamics()], [getAlgaeProduction()]
+#' @seealso [getAlgalConsumption()], [algal_dynamics()], [getAlgalProduction()]
 #' @concept algae
 #' @export
-getAlgaeProduction <- function(params) {
+getAlgalProduction <- function(params) {
     return(params@other_params$algae$growth)
 }
 
 
-# Probably not a useful function at the moment since algae production 
+# Probably not a useful function at the moment since algal production 
 # is constant (for now)
 # #' Plot algae production rates
 # #'
@@ -246,35 +246,35 @@ getAlgaeProduction <- function(params) {
 #          x = "", y = "")
 # }
 
-
-#' Expected algae lifetime
-#'
-#' The expected algae lifetime is defined as the inverse of the
-#' mass-specific algae consumption rate.
-#'
-#' @param params A MizerParams object
-#' @return The number giving the expected lifetime in years.
-#' @concept algae
-#' @export
-algae_lifetime <- function(params) {
-    1 / algae_consumption(params,
-                          n = params@initial_n,
-                          rates = getRates(params))
-}
-
-#' @rdname algae_lifetime
-#' @param params A MizerParams object
-#' @param value A number with the new value for the expected lifetime in years
-#'
-#' Assigning a new value to the algae lifetime rescales the algae
-#' abundance while keeping the total consumption of algae the same (by
-#' adjusting the interaction strength of species with algae).
-#' 
-#' @concept algae
-#' @export
-`algae_lifetime<-` <- function(params, value) {
-    rescale_algae(params, value / algae_lifetime(params))
-}
+# Not used
+# #' Expected algae lifetime
+# #'
+# #' The expected algae lifetime is defined as the inverse of the
+# #' mass-specific algae consumption rate.
+# #'
+# #' @param params A MizerParams object
+# #' @return The number giving the expected lifetime in years.
+# #' @concept algae
+# #' @export
+# algae_lifetime <- function(params) {
+#     1 / algal_consumption(params,
+#                           n = params@initial_n,
+#                           rates = getRates(params))
+# }
+# 
+# #' @rdname algae_lifetime
+# #' @param params A MizerParams object
+# #' @param value A number with the new value for the expected lifetime in years
+# #'
+# #' Assigning a new value to the algae lifetime rescales the algae
+# #' abundance while keeping the total consumption of algae the same (by
+# #' adjusting the interaction strength of species with algae).
+# #' 
+# #' @concept algae
+# #' @export
+# `algae_lifetime<-` <- function(params, value) {
+#     rescale_algae(params, value / algae_lifetime(params))
+# }
 
 #' Rescale algae biomass without changing anything else
 #'

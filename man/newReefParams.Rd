@@ -142,7 +142,7 @@ resource components, senescence mortality, and predation refuge.
 
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{ mizerReef supports two resource spectra that are not size- structured.
- Algae is consumed by herbivorous fish, while detritus is consumed by
+ Algae are consumed by herbivorous fish, while detritus is consumed by
  herbivorous fish and benthic invertebrates. This function sets the 
  interaction matrix for these resources as well as any default
  parameters necessary to structure them.

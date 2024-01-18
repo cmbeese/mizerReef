@@ -57,8 +57,8 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 tuneUR <- function(params,...) {
 
     # algae
-    ain  <- getAlgaeProduction(params) / params@initial_n_other$algae
-    aout <- algae_consumption(params)
+    ain  <- getAlgalProduction(params) / params@initial_n_other$algae
+    aout <- algal_consumption(params)
     if (ain < aout) {
         warning("The value for algae growth provided does not produce enough
                 to support this abundance of herbivores. I will increase algae
@@ -80,7 +80,7 @@ tuneUR <- function(params,...) {
     params
 }
 
-#' Scale Model Parameters
+#' Scale model parameters
 #'
 #' This function scales various model parameters by a given factor.
 #'
@@ -90,7 +90,7 @@ tuneUR <- function(params,...) {
 #' @return a mizer model object with scaled parameters
 #' @concept Uresources
 #' @export
-reefScaleModel <- function(params, factor) {
+scaleReefModel <- function(params, factor) {
 
     # Algae
     params@other_params[["algae"]]$rho <-
@@ -135,6 +135,53 @@ reefScaleModel <- function(params, factor) {
     params@sc <- params@sc * factor
     return(params)
 }
+
+#' Calibrate the scale of a mizerReef model to match total observed biomass
+#' 
+#' This function replaces mizer's calibrateBiomass function to include 
+#' unstructured resources. Given a Mizer Params object, it returns an updated 
+#' MizerParams object which is rescaled with [scaleReefModel()] so that the 
+#' total biomass in the model agrees with the total observed biomass.
+#' 
+#' Biomass observations usually only include individuals above a certain size.
+#' This size should be specified in a biomass_cutoff column of the species
+#' parameter data frame. If this is missing, it is assumed that all sizes are
+#' included in the observed biomass, i.e., it includes larval biomass.
+#' 
+#' After using this function the total biomass in the model will match the
+#' total biomass, summed over all species. However the biomasses of the
+#' individual species will not match observations yet, with some species
+#' having biomasses that are too high and others too low. So after this
+#' function use the mizer function matchReefBiomasses() to match the 
+#' biomasses for each group. 
+#' 
+#' @param params A MizerParams object
+#' @return A MizerParams object
+#' @concept Uresources
+#' @export
+calibrateReefBiomass <- function(params) {
+    if ((!("biomass_observed" %in% names(params@species_params))) ||
+        all(is.na(params@species_params$biomass_observed))) {
+        return(params)
+    }
+    no_sp <- nrow(params@species_params)
+    cutoff <- params@species_params$biomass_cutoff
+    # When no cutoff known, set it to 0
+    if (is.null(cutoff)) cutoff <- rep(0, no_sp)
+    cutoff[is.na(cutoff)] <- 0
+    observed <- params@species_params$biomass_observed
+    observed_total <- sum(observed, na.rm = TRUE)
+    sp_observed <- which(!is.na(observed))
+    model_total <- 0
+    for (sp_idx in sp_observed) {
+        model_total <- 
+            model_total + 
+            sum((params@initial_n[sp_idx, ] * params@w * params@dw)
+                [params@w >= cutoff[[sp_idx]]])
+    }
+    scaleReefModel(params, factor = observed_total / model_total)
+}
+
 
 #' Hold resource dynamics constant
 #' 

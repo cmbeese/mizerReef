@@ -66,7 +66,7 @@ Checks unstructured resource parameters and interaction matrix
 
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{ mizerReef supports two resource spectra that are not size- structured.
- Algae is consumed by herbivorous fish, while detritus is consumed by
+ Algae are consumed by herbivorous fish, while detritus is consumed by
  herbivorous fish and benthic invertebrates. This function sets the 
  interaction matrix for these resources as well as any default
  parameters necessary to structure them.
@@ -143,7 +143,7 @@ independent of any other model component. It is set so that production
 and consumption are equal for the chosen steady state abundances.
 }
 
-\section{Algae consumption}{
+\section{Algal consumption}{
 
 
 The rate at which herbivorous consumer groups encounter algal
@@ -156,7 +156,7 @@ an allometric exponent \eqn{m_{alg}} which is taken from empirical data.
 
 The mass specific consumption rate then accounts for the preference of
 functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the
-mass-specific algae consumption rate:
+mass-specific algal consumption rate:
 
 \deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
        c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}

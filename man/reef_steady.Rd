@@ -64,7 +64,7 @@ shiny app. Default FALSE.}
 An object of type \linkS4class{MizerParams}
 }
 \description{
-This function tune detritus and algae parameters after running
+This function tunes the detritus and algae parameters after running
 mizer's default projectToSteady function.
 }
 \concept{setup}
