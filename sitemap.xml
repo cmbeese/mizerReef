@@ -10,16 +10,16 @@
     <loc>https://cmbeese.github.io/mizerReef/index.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/algae_biomass.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algal_biomass.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/algae_consumption.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algal_consumption.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/algae_dynamics.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algal_dynamics.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/algae_lifetime.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algal_dynamics_cc.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/bonaire_int.html</loc>
@@ -35,6 +35,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/bonaire_species.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/calibrateReefBiomass.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/constant_dynamics.html</loc>
@@ -58,10 +61,10 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/encounter_contribution.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/getAlgaeConsumption.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/getAlgalConsumption.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/getAlgaeProduction.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/getAlgalProduction.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/getDetritusConsumption.html</loc>
@@ -100,7 +103,7 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/plotAlgaeConsumption.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/plotAlgalConsumption.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/plotBiomass.html</loc>
@@ -145,9 +148,6 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/reefRates.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/reefScaleModel.html</loc>
-  </url>
-  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/reefSenMort.html</loc>
   </url>
   <url>
@@ -167,6 +167,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/rescale_detritus.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/scaleReefModel.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/setExtMortParams.html</loc>
