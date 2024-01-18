@@ -46,7 +46,7 @@ resource components, senescence mortality, and predation refuge.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">newReefParams</span><span class="op">(</span></span>
-<span>  <span class="va">species_params</span>,</span>
+<span>  <span class="va">group_params</span>,</span>
 <span>  interaction <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  crit_feed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_w_pp <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -77,8 +77,11 @@ resource components, senescence mortality, and predation refuge.</p>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>species_params</dt>
-<dd><p>A functional group parameter data frame</p></dd>
+    <dl><dt>group_params</dt>
+<dd><p>A functional group parameter data frame containing at
+least the name of each functional group, their
+observed abundances, and the cut-off size for
+observations in grams.</p></dd>
 
 
 <dt>interaction</dt>
