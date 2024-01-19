@@ -97,7 +97,7 @@ scaleReefModel <- function(params, factor) {
         params@other_params[["algae"]]$rho / factor
     params@species_params$rho_algae <-
         params@species_params$rho_algae / factor
-    params@other_params$algae$growth <- 
+    params@other_params$algae$growth <-
         params@other_params$algae$growth * factor
 
     # Detritus
@@ -107,6 +107,17 @@ scaleReefModel <- function(params, factor) {
         params@species_params$rho_detritus / factor
     params@other_params$detritus$external <-
         params@other_params$detritus$external * factor
+    
+    # Vulnerability
+    if (!is.null(params@other_params$refuge_params$max_protect)) {
+        params@other_params$refuge_params$max_protect <-
+            params@other_params$refuge_params$max_protect * factor
+    }
+    if (!is.null(params@other_params$method_params$refuge_density)) {
+        params@other_params$method_params$refuge_density <-
+            params@other_params$method_params$refuge_density * factor
+    }
+    
 
     # now comes the code of mizer's standard scaleModel()
     params <- validParams(params)
