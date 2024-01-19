@@ -3,7 +3,7 @@
 \docType{data}
 \name{bonaire_species}
 \alias{bonaire_species}
-\title{species_params for thesis, chapter 3 vignettes}
+\title{MizerParams object for thesis}
 \format{
 A MizerParams object
 }
@@ -14,6 +14,9 @@ PhD Thesis
 bonaire_species
 }
 \description{
+MizerParams object 2 for thesis, chapter 3 vignettes
+}
+\details{
 species_params for thesis, chapter 3 vignettes
 }
 \keyword{datasets}

@@ -97,6 +97,8 @@ scaleReefModel <- function(params, factor) {
         params@other_params[["algae"]]$rho / factor
     params@species_params$rho_algae <-
         params@species_params$rho_algae / factor
+    params@other_params$algae$growth <- 
+        params@other_params$algae$growth * factor
 
     # Detritus
     params@other_params[["detritus"]]$rho <-
@@ -110,16 +112,14 @@ scaleReefModel <- function(params, factor) {
     params <- validParams(params)
     assert_that(is.number(factor), factor > 0)
     params@cc_pp <- params@cc_pp * factor
-    params@resource_params$kappa <- params@resource_params$kappa * 
-        factor
+    params@resource_params$kappa <- params@resource_params$kappa * factor
     if ("r_max" %in% names(params@species_params)) {
         params@species_params$R_max <- params@species_params$r_max
         params@species_params$r_max <- NULL
         message("The 'r_max' column has been renamed to 'R_max'.")
     }
     if ("R_max" %in% names(params@species_params)) {
-        params@species_params$R_max <- params@species_params$R_max * 
-            factor
+        params@species_params$R_max <- params@species_params$R_max * factor
     }
     params@search_vol <- params@search_vol/factor
     if ("gamma" %in% names(params@species_params)) {

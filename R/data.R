@@ -7,15 +7,15 @@
 
 #' MizerParams object for thesis
 #'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"bonaire_model"
+# #' @format A MizerParams object
+# #' @source PhD Thesis
+#"bonaire_model"
 
 #' MizerParams object 2 for thesis, chapter 3 vignettes
 #'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"bonaire_model2"
+# #' @format A MizerParams object
+# #' @source PhD Thesis
+# "bonaire_model2"
 
 #' species_params for thesis, chapter 3 vignettes
 #'

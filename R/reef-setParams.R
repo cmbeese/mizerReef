@@ -514,9 +514,9 @@ setRefuge <- function(params, method, method_params = NULL,
         }
         if (anyNA(params@species_params[["a"]]) ||
             anyNA(params@species_params[["b"]])) {
-            warning("There are NAs in the species_params 
-                    columns 'a' and 'b'. You must provide mass parameters 
-                    for these species.")
+            message("There are NAs in the species_params 
+                    columns 'a' and 'b'. You must provide these parameters 
+                    for these species if you want them to use refuge.")
         }
     
     # Find number of species for checks

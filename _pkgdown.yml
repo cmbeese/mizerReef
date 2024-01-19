@@ -1,8 +1,13 @@
 url: https://cmbeese.github.io/mizerReef/
 template:
   bootstrap: 5
+  # bslib:
+  #   primary: "#188CA2"
+  #   secondary: "#65BCBC"
+  #   primary-text-emphasis: "#65BCBC"
   bootswatch: cerulean
 navbar:
+  #bg: primary
   structure:
     left:
     - home
@@ -73,5 +78,4 @@ reference:
     - bonaire_int
     - bonaire_refuge
     - bonaire_species
-    - bonaire_model
-    - bonaire_model2
+
