@@ -205,3 +205,83 @@ calibrateReefBiomass <- function(params) {
 constant_dynamics <- function(params, n_other, component, ...) {
     n_other[[component]]
 }
+
+#' Match observed growth rates
+#' 
+#' This does the same as `mizer::matchGrowth()` but in addition also rescales
+#' the consumption rates of algae and detritus.
+#' 
+#' @param params A MizerParams object
+#' @param species The species to be affected. Optional. By default all species
+#'   for which growth information is available will be affected. A vector of
+#'   species names, or a numeric vector with the species indices, or a logical
+#'   vector indicating for each species whether it is to be affected (TRUE) or
+#'   not.
+#' @param keep A string determining which quantity is to be kept constant. The
+#'   choices are "egg" which keeps the egg density constant, "biomass" which 
+#'   keeps the total biomass of the species constant and "number" which keeps
+#'   the total number of individuals constant.
+#' @return A modified MizerParams object with rescaled rates and rescaled 
+#'   species parameters `gamma`,`h`, `ks` and `k`.
+#' @concept Uresources
+#' @export
+matchReefGrowth <- function(params, species = NULL,
+                            keep = c("egg", "biomass", "number")) {
+    
+    assert_that(is(params, "MizerParams"))
+    sel <- valid_species_arg(params, species = species, 
+                             return.logical = TRUE)
+    sp <- params@species_params
+    keep <- match.arg(keep)
+    
+    biomass <- getBiomass(params)
+    number <- getN(params)
+    
+    sp <- set_species_param_default(sp, "age_mat", NA)
+    # If age at maturity is not specified, calculate it from von Bertalanffy
+    if (all(c("k_vb", "w_inf") %in% names(sp))) {
+        sp <- set_species_param_default(sp, "age_mat", age_mat_vB(params))
+    }
+    
+    # Don't affect species where no age at maturity is available
+    sel <- sel & !is.na(sp$age_mat)
+    
+    factor <- age_mat(params)[sel] / sp$age_mat[sel]
+    
+    params@search_vol[sel, ] <- params@search_vol[sel, ] * factor
+    params@intake_max[sel, ] <- params@intake_max[sel, ] * factor
+    params@metab[sel, ] <- params@metab[sel, ] * factor
+    params@species_params$gamma[sel] <- sp$gamma[sel] * factor
+    params@species_params[sel, "h"] <- sp[sel, "h"] * factor
+    if ("ks" %in% names(sp)) {
+        params@species_params$ks[sel] <- sp$ks[sel] * factor
+    }
+    if ("k" %in% names(sp)) {
+        params@species_params[sel, "k"] <- sp[sel, "k"] * factor
+    }
+    
+    # rescale consumption of algae and detritus
+    
+    params@other_params$algae$rho[sel, ] <- 
+        params@other_params$algae$rho[sel, ] * factor
+    params@species_params$rho_algae[sel] <-
+        params@species_params$rho_algae[sel] * factor
+    
+    params@other_params$detritus$rho[sel, ] <- 
+        params@other_params$detritus$rho[sel, ] * factor
+    params@species_params$rho_detritus[sel] <-
+        params@species_params$rho_detritus[sel] * factor
+    
+    params <- steadySingleSpecies(params, species = sel)
+    
+    if (keep == "biomass") {
+        factor <- biomass / getBiomass(params)
+        params@initial_n <- params@initial_n * factor
+    }
+    if (keep == "number") {
+        factor <- number / getN(params)
+        params@initial_n <- params@initial_n * factor
+    }
+    
+    setBevertonHolt(params)
+}

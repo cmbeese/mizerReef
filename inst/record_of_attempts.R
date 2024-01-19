@@ -41,7 +41,7 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     data.frame(age_mat_model, age_mat_observed)
     
     # Match growth rates
-    attempt_1 <- matchGrowth(attempt_1)
+    attempt_1 <- matchReefGrowth(attempt_1)
     
     # Growth - still way off
     age_mat_model = age_mat(attempt_1)
@@ -50,9 +50,9 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     
     # Iteration
     attempt_1 <- attempt_1 |>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()
     # Predators and inverts need reproductive efficiency greater than 1
     
     # Look at spectra - look crazy!
@@ -62,7 +62,7 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     attempt_1 <- scaleDownBackground(attempt_1, factor = 1/2)
     
     # Find steady again
-    attempt_1 <- attempt_1 |> matchGrowth() |> reef_steady()
+    attempt_1 <- attempt_1 |> matchReefGrowth() |> reef_steady()
     
     # Maturation age for herbivores still very low
     age_mat_model = age_mat(attempt_1)
@@ -73,7 +73,7 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     attempt_1 <- scaleDownBackground(attempt_1, factor = 1/2)
     
     # Find steady again
-    attempt_1 <- attempt_1 |> matchGrowth() |> reef_steady()
+    attempt_1 <- attempt_1 |> matchReefGrowth() |> reef_steady()
     
     # Reproduction
     attempt_1 <- setBevertonHolt(attempt_1, erepro = 0.0001)
@@ -107,7 +107,7 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     data.frame(age_mat_model, age_mat_observed)
     
     # Match growth rates
-    attempt_2 <- matchGrowth(attempt_2)
+    attempt_2 <- matchReefGrowth(attempt_2)
     attempt_2 <- reef_steady(attempt_2)
     
     # Growth - age mat for preds goes way up here?
@@ -117,9 +117,9 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     
     # Iteration
     attempt_2 <- attempt_2 |>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()
     
     # Fails on third line 
     # Simulation run did not converge after 99 years. Value returned by the 
@@ -148,7 +148,7 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     data.frame(age_mat_model, age_mat_observed)
     
     # Match growth rates
-    attempt_3 <- matchGrowth(attempt_3)
+    attempt_3 <- matchReefGrowth(attempt_3)
     attempt_3 <- reef_steady(attempt_3)
     
     # Growth - age mat still low for herbs
@@ -158,9 +158,9 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     
     # Iteration
     attempt_3 <- attempt_3 |>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()
     
     # Simulation run did not converge after 99 years. Value returned by the 
     # distance function was: 239.302546379538
@@ -186,14 +186,14 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     attempt_4 <- reef_steady(attempt_4)
     
     # Detritus keeps needing to be scaled up?
-    attempt_4 <- matchGrowth(attempt_4)
+    attempt_4 <- matchReefGrowth(attempt_4)
     attempt_4 <- reef_steady(attempt_4)
     
     # Iteration
     attempt_4 <- attempt_4 |>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()
     
     # Simulation run did not converge after 99 years. Value returned by the 
     # distance function was: 239.302546379538
@@ -219,14 +219,14 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     attempt_5 <- reef_steady(attempt_5)
     
     # Detritus keeps needing to be scaled up?
-    attempt_5 <- matchGrowth(attempt_5)
+    attempt_5 <- matchReefGrowth(attempt_5)
     attempt_5 <- reef_steady(attempt_5)
     
     # Iteration
     attempt_5 <- attempt_5 |>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()
     
     # Simulation run did not converge after 99 years. Value returned by the 
     # distance function was: 239.302546379538
@@ -254,14 +254,14 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     attempt_6 <- reef_steady(attempt_6)
     
     # Growth
-    attempt_6 <- matchGrowth(attempt_6)
+    attempt_6 <- matchReefGrowth(attempt_6)
     attempt_6 <- reef_steady(attempt_6)
     
     
     attempt_6 <- attempt_6 |>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()
     
     # Simulation run did not converge after 99 years. Value returned by the 
     # distance function was: 239.302546379538
@@ -305,7 +305,7 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     attempt_8 <- reef_steady(attempt_8)
     
     # Growth
-    attempt_8 <- matchGrowth(attempt_8)
+    attempt_8 <- matchReefGrowth(attempt_8)
     attempt_8 <- reef_steady(attempt_8)
     
     # Growth - age mat still low for herbs
@@ -315,9 +315,9 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     
     # Iteration
     attempt_8 <- attempt_8 |>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()
     
     # Simulation run did not converge after 99 years. Value returned by the 
     # distance function was: 239.302546379538
@@ -342,7 +342,7 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     attempt_9 <- reef_steady(attempt_9)
     
     # Growth
-    attempt_9 <- matchGrowth(attempt_9)
+    attempt_9 <- matchReefGrowth(attempt_9)
     attempt_9 <- reef_steady(attempt_9)
     
     # Growth - age mat still low for herbs
@@ -352,9 +352,9 @@ bonaire_model <- newReefParams(group_params = bonaire_species,
     
     # Iteration
     attempt_9 <- attempt_9 |>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()|>
-        calibrateReefBiomass()|> matchBiomasses()|> matchGrowth()|> reef_steady()
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> reef_steady()
     
     # Error in if (any(growth[idx] == 0)) { : 
     #         missing value where TRUE/FALSE needed
