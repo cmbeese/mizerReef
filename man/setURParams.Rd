@@ -12,6 +12,7 @@ setURParams(
   scale_rho_a = NULL,
   scale_rho_d = NULL,
   initial_algae_growth = NULL,
+  algae_capacity = NULL,
   prop_decomp = NULL,
   initial_d_external = NULL
 )
@@ -43,6 +44,9 @@ grams/year/m^-2. This value is reset to match
 consumption in the \verb{[reefSteady()]}  function
 so that steady state abundances match given
 values.}
+
+\item{algae_capacity}{The carrying capacity of the system for algal
+biomass in grams per year.}
 
 \item{prop_decomp}{The proportion of waste material that decomposes to
 become part of the detritus pool.}
