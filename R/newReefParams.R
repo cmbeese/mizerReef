@@ -133,6 +133,7 @@ newReefParams <- function(# Original mizer parameters
         dynamics_fun = "algal_dynamics",
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_alg,
+                                capacity = params@other_params$algae_capacity,
                                 growth = params@other_params$initial_algae_growth))
     
     ### Detritus component - Add in detritus ----

@@ -60,8 +60,8 @@ tuneUR <- function(params,...) {
     ain  <- getAlgalProduction(params) / params@initial_n_other$algae
     aout <- algal_consumption(params)
     if (ain < aout) {
-        warning("The value for algae growth provided does not produce enough
-                to support this abundance of herbivores. I will increase algae
+        warning("The value for algal growth provided does not produce enough
+                to support this abundance of herbivores. I will increase algal
                 growth to meet the consumption rate.")
     }
     params@other_params$algae$growth <- aout
@@ -109,14 +109,14 @@ scaleReefModel <- function(params, factor) {
         params@other_params$detritus$external * factor
     
     # Vulnerability
-    if (!is.null(params@other_params$refuge_params$max_protect)) {
-        params@other_params$refuge_params$max_protect <-
-            params@other_params$refuge_params$max_protect * factor
-    }
-    if (!is.null(params@other_params$method_params$refuge_density)) {
-        params@other_params$method_params$refuge_density <-
-            params@other_params$method_params$refuge_density * factor
-    }
+    # if (!is.null(params@other_params$refuge_params$max_protect)) {
+    #     params@other_params$refuge_params$max_protect <-
+    #         params@other_params$refuge_params$max_protect * factor
+    # }
+    # if (!is.null(params@other_params$method_params$refuge_density)) {
+    #     params@other_params$method_params$refuge_density <-
+    #         params@other_params$method_params$refuge_density * factor
+    # }
     
 
     # now comes the code of mizer's standard scaleModel()
