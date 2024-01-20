@@ -20,21 +20,22 @@ algal_biomass <- function(params) {
 #'
 #' The time evolution of the algal biomass \eqn{B} is described by
 #'
-#'  \deqn{ \frac{dB}{dt} = P_A\left( 1 - \frac{B}{\Kappa} \right) - c_A \, B_A }{
-#'                 dB/dt = P_A * (1 - B_A/ \Kappa) - c_a * B_A}
+#'  \deqn{ \frac{dB_A}{dt} = P_A\left( 1 - 
+#'                          \frac{B_A}{K} \right) - c_A \, B_A }{
+#'                 dB/dt = P_A * (1 - B_A/ K) - c_a * B_A}
 #'
-#' where \eqn{\Kappa} is the system's carrying capacity for algae in grams,
+#' where \eqn{K} is the system's carrying capacity for algae in grams/ year,
 #' \eqn{c_A} is the mass-specific rate of consumption calculated with
 #' `algal_consumption()` and \eqn{P_A} is the rate at which algae
 #' grows, calculated with `getAlgalProduction()`.
 #'
 #' The dynamical equation is solved analytically to
 #'
-#'   \deqn{ B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)}
-#'                        - \frac{\Kappa \, P_A}{P_A+\Kappa \, c_A}
-#'                        e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)} }{
-#'         B_A(t + dt) = B_A(t) exp^(-dt/K * (P_A+ k*C_A))
-#'                        (-k*P_A) / (P_A + K*c_A) * e^(-dt/k * (P_A + k*C_A) }
+#'   \deqn{ B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{K}(P_A+ K \, C_A)}
+#'                        - \frac{K \, P_A}{P_A+ K \, c_A}
+#'                        e^{-\frac{dt}{K}(P_A+ K \, C_A)} }{
+#'         B_A(t + dt) = B_A(t) exp^(-dt/K * (P_A+ K*C_A))
+#'                        (-K*P_A) / (P_A + K*c_A) * e^(-dt/K * (P_A + K*C_A) }
 #'
 #' @param params A [MizerParams] object
 #' @param n A matrix of current species abundances (species x size)
@@ -52,7 +53,7 @@ algal_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 
     consumption <- algal_consumption(params, n, rates)
     production <- sum(getAlgalProduction(params))
-    k <- params@other_params$algae$carry
+    k <- params@other_params$algae$capacity
 
     # If consumption is non-zero, return analytic solution
     if (consumption) {
@@ -182,7 +183,8 @@ getAlgalConsumption <- function(params) {
                         (1 - feeding_level)) %*% params@dw
 
     # Without feeding levels
-    # consumption <- (params@other_params$algae$rho * params@initial_n) %*% params@dw
+    # consumption <- 
+    # (params@other_params$algae$rho * params@initial_n) %*% params@dw
 
     # Fix names
     names(consumption) <- params@species_params$species
