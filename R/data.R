@@ -5,17 +5,11 @@
 # @source PhD Thesis
 # cbn_params"
 
-#' MizerParams object for thesis
+#' MizerParams object for thesis, chapter 3 vignettes
 #'
-# #' @format A MizerParams object
-# #' @source PhD Thesis
-#"bonaire_model"
-
-#' MizerParams object 2 for thesis, chapter 3 vignettes
-#'
-# #' @format A MizerParams object
-# #' @source PhD Thesis
-# "bonaire_model2"
+#' @format A MizerParams object
+#' @source PhD Thesis
+"bonaire_model"
 
 #' species_params for thesis, chapter 3 vignettes
 #'
