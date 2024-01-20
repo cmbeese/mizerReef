@@ -73,19 +73,11 @@ plotVulnerable <- function(object,
     sel_sp <- which(!is.na(species))
     refuge <- refuge[sel_sp, , drop = FALSE]
     
-    # Convert length bins in to weight bins for each functional group
-    group_length_bins <- matrix(0, nrow = length(species), ncol = length(params@w))
-    for (i in 1:length(species)) {
-        group_length_bins[i,] <- (params@w / sp$a[i])^(1 / sp$b[i])
-    }
-    group_length_bins <- group_length_bins[sel_sp, , drop = FALSE]
-    
     # Set x axis limit for plots
     x_limit = max(sp$l_max)
     
     ## data frame from selected species -----
     plot_dat <- data.frame(w = rep(params@w, each = length(species)),
-                           l = c(group_length_bins),
                            value = c(refuge),
                            Species = species)
     
@@ -112,24 +104,25 @@ plotVulnerable <- function(object,
     
     # plot ----
     ## faceting ----
-    p <- ggplot(plot_dat, aes(group = Species)) +
-        facet_wrap(~ Species, scales = "free_x") +
-        theme(strip.text.x = element_text(size = 6))
+    p <- ggplot(plot_dat, aes(group = Species))
+    #    facet_wrap(~ Species, scales = "free_x") +
+    #    theme(strip.text.x = element_text(size = 6))
     #   strip.background = element_blank(),
     #   strip.text.x =element_blank())
     
     ## labels and scales ----
-    p + geom_line(aes(x = l, y = value,
+    p + geom_line(aes(x = w, y = value,
                       colour = Legend, linetype = Legend,
                       linewidth = Legend)) +
         labs(colour = 'Functional Group', linetype = 'Functional Group',
              linewidth = 'Functional Group') +
-        scale_x_continuous(name = "Total Length [cm]",
-                           limits = c(0,x_limit)) +
-        # scale_x_continuous(name = "Log Size [g]", trans = "log10",
-        #                    breaks = c(10^-2, 10^0, 10^2, 10^4),
-        #                    labels = c(-2, 0, 2, 4)) +
-        scale_y_continuous(name = "Proportion Protected", limits = c(0, 1)) +
+        # scale_x_continuous(name = "Total Length [cm]",
+        #                    limits = c(0,x_limit)) +
+        scale_x_continuous(name = "Log Size [g]", trans = "log10") +#,
+                           #breaks = c(10^-2, 10^0, 10^2, 10^4),
+                           #labels = c(-2, 0, 2, 4)) +
+        scale_y_continuous(name = "Proportion Protected", 
+                           limits = c(0, 1)) +
         scale_colour_manual(values = params@linecolour[legend_levels],
                             labels = group_names) +
         scale_linetype_manual(values = params@linetype[legend_levels],
