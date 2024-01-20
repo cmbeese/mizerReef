@@ -170,7 +170,7 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
         refuge <- params@other_params$refuge
         vulnerable <- 1 - refuge
         
-        # Competitive method -------------------------------------------------------
+    # Competitive method -------------------------------------------------------
     } else if (refuge_params$method == "competitive") {
         
         # Initialize empty list to hold number of competitors for each bin

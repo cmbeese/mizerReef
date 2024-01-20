@@ -45,6 +45,9 @@
 #'                              consumption in the `[reefSteady()]`  function 
 #'                              so that steady state abundances match given 
 #'                              values.
+#'                              
+#' @param algae_capacity    The carrying capacity of the system for algal
+#'                          biomass in grams per year.
 #'                      
 #' @param prop_decomp   The proportion of waste material that decomposes to
 #'                      become part of the detritus pool.
@@ -69,6 +72,7 @@ setURParams <- function(params,
                         scale_rho_a = NULL, scale_rho_d = NULL,
                         # Resource Production
                         initial_algae_growth = NULL, 
+                        algae_capacity = NULL,
                         prop_decomp = NULL, initial_d_external = NULL) {
     
     # object check ----
@@ -130,8 +134,8 @@ setURParams <- function(params,
     }
         
     # set colors ---- 
-        params@linecolour["detritus"] <- "chocolate4"
-        params@linecolour["algae"]    <- "palegreen"
+        params@linecolour["detritus"] <- "plum4"
+        params@linecolour["algae"]    <- "olivedrab3"
         
     # other parameters ----
         
@@ -182,7 +186,7 @@ setURParams <- function(params,
             if (scale_rho_d < 0){
                 stop("scale_rho_d must be non-negative.")
             }
-            params@other_params$detritus$scale_rho_d <- scale_rho_d 
+            params@other_params$scale_rho_d <- scale_rho_d 
         }
         
         ## Production ----
@@ -196,7 +200,20 @@ setURParams <- function(params,
             if (initial_algae_growth <0){
                 stop("initial_algae_growth must be non-negative.")
             }
-            params@other_params$algae$initial_algae_growth <- initial_algae_growth 
+            params@other_params$initial_algae_growth <- initial_algae_growth 
+        }
+        
+        # Set default algae carrying capacity
+        if(is.null(algae_capacity)){ 
+            params@other_params$algae_capacity <- 2e3
+        } else {
+            if (!is.numeric(algae_capacity)){
+                stop("algae_capacity should be a numerical value.")
+            }
+            if (algae_capacity < 0){
+                stop("algae_capacity must be non-negative.")
+            }
+            params@other_params$algae_capacity <- algae_capacity 
         }
     
         # Set default proportion of waste that becomes part of the detritus pool
@@ -208,11 +225,12 @@ setURParams <- function(params,
             if (prop_decomp < 0 || prop_decomp > 1){
                 stop("initial_algae_growth must be a proportion between 0 and 1.")
             }
-            params@other_params$detritus$prop_decomp <- prop_decomp
+            params@other_params$prop_decomp <- prop_decomp
         }
     
         # Set default external detritus
-        if(is.null(initial_d_external)){ params@other_params$initial_d_external <- 1
+        if(is.null(initial_d_external)){ 
+            params@other_params$initial_d_external <- 1
         } else { 
             if (!is.numeric(initial_d_external)){
                 stop("initial_d_external should be a numerical value.")
@@ -220,7 +238,7 @@ setURParams <- function(params,
             if (initial_d_external < 0){
                 stop("initial_d_external must be non-negative.")
             }
-            params@other_params$detritus$initial_d_external <- initial_d_external 
+            params@other_params$initial_d_external <- initial_d_external 
         }
     
         # Note time sim was modified
