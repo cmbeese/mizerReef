@@ -1,4 +1,4 @@
 ﻿species,l_max,w_mat,age_mat,biomass_observed,biomass_cutoff,k_vb,a,b,beta,sigma,refuge_user,bad_pred,interaction_resource,interaction_algae,interaction_detritus,satiation,linecolour
 predators,50,100,4,107,3.125,0.4,0.025,3,100,1,TRUE,TRUE,1,0,0,FALSE,#8E0408
 herbivores,50,100,4,34,3.125,0.6,0.025,3,100,1,TRUE,FALSE,1,1,0,FALSE,#578979
-inverts,20,0.01,0.2,NA,NA,NA,NA,NA,100,1,FALSE,FALSE,1,0,1,TRUE,#D89958
+inverts,30,0.01,0.2,NA,NA,NA,NA,NA,100,1,FALSE,FALSE,1,0,1,TRUE,#D89958
