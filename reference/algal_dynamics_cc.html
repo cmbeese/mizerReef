@@ -83,15 +83,16 @@ algae biomass</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The time evolution of the algal biomass \(B\) is described by</p>
-<p>$$ \frac{dB}{dt} = P_A\left( 1 - \frac{B}{\Kappa} \right) - c_A \, B_A $$</p>
-<p>where \(\Kappa\) is the system's carrying capacity for algae in grams,
+<p>$$ \frac{dB_A}{dt} = P_A\left( 1 - 
+                         \frac{B_A}{K} \right) - c_A \, B_A $$</p>
+<p>where \(K\) is the system's carrying capacity for algae in grams/ year,
 \(c_A\) is the mass-specific rate of consumption calculated with
 <code><a href="algal_consumption.html">algal_consumption()</a></code> and \(P_A\) is the rate at which algae
 grows, calculated with <code><a href="getAlgalProduction.html">getAlgalProduction()</a></code>.</p>
 <p>The dynamical equation is solved analytically to</p>
-<p>$$ B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)}
-                       - \frac{\Kappa \, P_A}{P_A+\Kappa \, c_A}
-                       e^{-\frac{dt}{\Kappa}(P_A+\Kappa \, C_A)} $$</p>
+<p>$$ B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{K}(P_A+ K \, C_A)}
+                       - \frac{K \, P_A}{P_A+ K \, c_A}
+                       e^{-\frac{dt}{K}(P_A+ K \, C_A)} $$</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

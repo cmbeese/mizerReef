@@ -50,6 +50,7 @@
 <span>  scale_rho_a <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_rho_d <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  initial_algae_growth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  algae_capacity <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prop_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  initial_d_external <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -95,6 +96,11 @@ grams/year/m^-2. This value is reset to match
 consumption in the <code>[reefSteady()]</code>  function
 so that steady state abundances match given
 values.</p></dd>
+
+
+<dt>algae_capacity</dt>
+<dd><p>The carrying capacity of the system for algal
+biomass in grams per year.</p></dd>
 
 
 <dt>prop_decomp</dt>
