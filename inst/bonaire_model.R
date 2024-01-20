@@ -103,18 +103,18 @@ library(here)
         calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> 
         reef_steady()
 
-    params <- reef_steady(params)
+    bonaire_model <- reef_steady(params)
 # Plots ------------------------------------------------------------------------
-plotBiomassVsSpecies(params)
-plotRefuge(params)
-plotSpectra(params, power = 1, total = TRUE)
-plotDiet(params)  
+plotBiomassVsSpecies(bonaire_model)
+plotRefuge(bonaire_model)
+plotSpectra(bonaire_model, power = 1, total = TRUE)
+plotDiet(bonaire_model)  
 
 # I am happy with these parameters!
 # Save object ------------------------------------------------------------------
 
     # Params object
-    save(params,   file = "data/bonaire_model.rda")
+    save(bonaire_model,   file = "data/bonaire_model.rda")
 
     # CSV Files
     save(bonaire_species, file = "data/bonaire_species.rda")
