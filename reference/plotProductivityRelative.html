@@ -58,6 +58,7 @@ must have the same species groups.</p>
 <span>  <span class="va">object1</span>,</span>
 <span>  <span class="va">object2</span>,</span>
 <span>  <span class="va">diff_method</span>,</span>
+<span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_fishing_l1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_fishing_l1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_fishing_l2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -66,7 +67,7 @@ must have the same species groups.</p>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">plotlyProductivityRelative</span><span class="op">(</span><span class="va">object</span>, species <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">plotlyProductivityRelative</span><span class="op">(</span><span class="va">object1</span>, <span class="va">object2</span>, <span class="va">diff_method</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -85,6 +86,14 @@ models. If <code>percent.change</code>, the percent change is
 calculated relative to the value from object 1 with
 formula 100*(new-old)/old. If <code>rel.diff</code> the relative
 difference is returned given by (new - old)/(old + new).</p></dd>
+
+
+<dt>species</dt>
+<dd><p>The groups to be selected. Optional. By default all target
+groups are selected. A vector of groups names, or a numeric
+vector with the groups indices, or a logical vector
+indicating for each group whether it is to be selected
+(TRUE) or not.</p></dd>
 
 
 <dt>min_fishing_l1</dt>
@@ -142,21 +151,13 @@ productivity estimates. Defaults to max length.</p></dd>
   
 </dl></dd>
 
-
-<dt>species</dt>
-<dd><p>The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
-indicating for each group whether it is to be selected
-(TRUE) or not.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
 <p>A ggplot2 object, unless <code>return_data = TRUE</code>, in which case a data
-frame with the the productivity for each functional group
+frame with the the productivity for each Species Group
 by model is returned as well as another column called <code>rel_diff</code></p>
 
 
@@ -184,6 +185,7 @@ and <code>max_fishing_l1</code> arguments for the first size range and  the
 <code><a href="plotBiomass.html">plotBiomass</a>()</code>,
 <code><a href="plotProductivity.html">plotProductivity</a>()</code>,
 <code><a href="plotRefuge.html">plotRefuge</a>()</code>,
+<code><a href="plotSpectraRelative.html">plotSpectraRelative</a>()</code>,
 <code><a href="plotTotalBiomassRelative.html">plotTotalBiomassRelative</a>()</code>,
 <code><a href="plotTotalBiomass.html">plotTotalBiomass</a>()</code>,
 <code><a href="plotVulnerable.html">plotVulnerable</a>()</code></p></div>
