@@ -102,40 +102,23 @@ plotBiomass <- function(sim, species = NULL,
         stop("start_time must be less than end_time")
     }
     
-    # Algae ----
-    ba <- unlist(sim@n_other$algae)
-    dim(ba) <- dim(sim@n_other$algae)
-    dimnames(ba) <- dimnames(sim@n_other$algae)
-    times <- as.numeric(dimnames(ba)[[1]])
-    ba <- ba[(times >= start_time) & (times <= end_time), , drop = FALSE]
-    ba <- melt(ba)
-    
+    # other components
+    bc <- unlist(sim@n_other)
+    dim(bc) <- dim(sim@n_other)
+    dimnames(bc) <- dimnames(sim@n_other)
+    times <- as.numeric(dimnames(bc)[[1]])
+    bc <- bc[(times >= start_time) & (times <= end_time), , drop = FALSE]
+    bc <- melt(bc)
     # Implement ylim and a minimal cutoff and bring columns in desired order
     min_value <- 1e-20
-    ba <- ba[ba$value >= min_value &
-                 (is.na(ylim[1]) | ba$value >= ylim[1]) &
-                 (is.na(ylim[2]) | ba$value <= ylim[2]), c(1, 3, 2)]
-    names(ba) <- c("Year", "Biomass", "Species")
-    ba$Legend <- ba$Species
-    
-    # Detritus ----
-    bd <- unlist(sim@n_other$detritus)
-    dim(bd) <- dim(sim@n_other$detritus)
-    dimnames(bd) <- dimnames(sim@n_other$detritus)
-    times <- as.numeric(dimnames(bd)[[1]])
-    bd <- bd[(times >= start_time) & (times <= end_time), , drop = FALSE]
-    bd <- melt(bd)
-    
-    # Implement ylim and a minimal cutoff and bring columns in desired order
-    min_value <- 1e-20
-    bd <- bd[bd$value >= min_value &
-                 (is.na(ylim[1]) | bd$value >= ylim[1]) &
-                 (is.na(ylim[2]) | bd$value <= ylim[2]), c(1, 3, 2)]
-    names(bd) <- c("Year", "Biomass", "Species")
-    bd$Legend <- bd$Species
+    bc <- bc[bc$value >= min_value &
+                 (is.na(ylim[1]) | bc$value >= ylim[1]) &
+                 (is.na(ylim[2]) | bc$value <= ylim[2]), c(1, 3, 2)]
+    names(bc) <- c("Year", "Biomass", "Species")
+    bc$Legend <- bc$Species
     
     # Return data ----
-    plot_dat <- rbind(df, ba, bd)
+    plot_dat <- rbind(df, bc)
     if (return_data) return(plot_dat)
     
     p <- mizer::plotDataFrame(plot_dat, params, 
@@ -146,7 +129,7 @@ plotBiomass <- function(sim, species = NULL,
                 labs(colour    = "Functional\nGroup", 
                      linetype  = "Functional\nGroup",
                      linewidth = "Functional\nGroup",)
-        
+    p
 }
 
 
