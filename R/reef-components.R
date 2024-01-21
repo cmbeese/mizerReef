@@ -57,23 +57,15 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 tuneUR <- function(params,...) {
 
     # algae
-    ain  <- getAlgalProduction(params) / params@initial_n_other$algae
-    aout <- algal_consumption(params)
-    if (ain < aout) {
-        warning("The value for algal growth provided does not produce enough
-                to support this abundance of herbivores. I will increase algal
-                growth to meet the consumption rate.")
-    }
+    aout <- sum(getAlgalConsumption(params))
     params@other_params$algae$growth <- aout
 
     # detritus
     params@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(params))
-    dout <- detritus_consumption(params)
-    if (din < dout) {
-        warning("Detrital production is not high enough to support this 
-                abundance of detritivores. I will increase external
-                input to meet the consumption rate.")
+    dout <- sum(getDetritusConsumption(params))
+    if (din > dout) {
+        warning("Balancing detritus production with consumption requires a negative external influx.")
     }
     params@other_params$detritus$external <- dout - din
 
