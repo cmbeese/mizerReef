@@ -4,12 +4,13 @@
 \alias{plotTotalBiomassRelative}
 \alias{plotlyTotalBiomassRelative}
 \title{Plot the relative difference in between the total fishable biomasses of each
-each functional group at steady state}
+each Species Group at steady state}
 \usage{
 plotTotalBiomassRelative(
   object1,
   object2,
   diff_method,
+  species = NULL,
   min_fishing_l1 = NULL,
   max_fishing_l1 = NULL,
   min_fishing_l2 = NULL,
@@ -18,7 +19,7 @@ plotTotalBiomassRelative(
   ...
 )
 
-plotlyTotalBiomassRelative(object, species = NULL, ...)
+plotlyTotalBiomassRelative(object1, object2, diff_method, ...)
 }
 \arguments{
 \item{object1}{First MizerParams or MizerSim object.}
@@ -30,6 +31,12 @@ models. If \code{percent.change}, the percent change is
 calculated relative to the value from object 1 with
 formula 100*(new-old)/old. If \code{rel.diff} the relative
 difference is returned given by (new - old)/(old + new).}
+
+\item{species}{The groups to be selected. Optional. By default all target
+groups are selected. A vector of groups names, or a numeric
+vector with the groups indices, or a logical vector
+indicating for each group whether it is to be selected
+(TRUE) or not.}
 
 \item{min_fishing_l1}{Optional.  The minimum length (cm) of fished
 individuals for model 2. Defaults to 7cm.
@@ -62,12 +69,6 @@ biomass estimates. Defaults to 7 cm.}
 maximum length (cm) of fished individuals for
 biomass estimates. Defaults to max length.}
   }}
-
-\item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
-indicating for each group whether it is to be selected
-(TRUE) or not.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
@@ -78,7 +79,7 @@ values.
 }
 \description{
 This functions creates a barplot with the relative change in biomass of
-each functional group within a size range between either (1) two different
+each Species Group within a size range between either (1) two different
 mizerParams objects (two models) or (2) two different size ranges.
 }
 \details{
@@ -105,6 +106,7 @@ Other plotting functions:
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}
 }

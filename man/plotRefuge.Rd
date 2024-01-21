@@ -43,6 +43,7 @@ Other plotting functions:
 \code{\link{plotBiomass}()},
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
+\code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}

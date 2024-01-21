@@ -3,7 +3,7 @@
 \name{plotProductivity}
 \alias{plotProductivity}
 \alias{plotlyProductivity}
-\title{Plot the total productivity for each functional group}
+\title{Plot the total productivity for each Species Group}
 \usage{
 plotProductivity(
   object,
@@ -49,7 +49,7 @@ series.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
-frame with the the productivity for each functional group
+frame with the the productivity for each Species Group
 is returned.
 }
 \description{
@@ -67,6 +67,7 @@ Other plotting functions:
 \code{\link{plotBiomass}()},
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}

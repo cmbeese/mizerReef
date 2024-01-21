@@ -68,7 +68,6 @@ getProductivity <- function(object,
         if(is.null(min_fishing_l)){ min_fishing_l <- 7 }
         if(is.null(max_fishing_l)){ max_fishing_l <- max(params@species_params$l_max) }
         
-        # why isnt this working?
         size_range <- mizer::get_size_range_array(params, 
                                                   min_l = min_fishing_l, 
                                                   max_l = max_fishing_l, ...)

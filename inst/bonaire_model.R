@@ -111,7 +111,7 @@ library(here)
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.38)
+    params <- setBevertonHolt(params, erepro = 0.39)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
     rep <- getReproductionLevel(params)

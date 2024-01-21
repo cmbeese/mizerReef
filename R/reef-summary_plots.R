@@ -10,10 +10,10 @@ utils::globalVariables(c("Species", "value", "Model", "Legend",
                          # variables used by ggplot for detritus and algae
                          "Rate", "Source", "Consumer"))
 
-#' Plot the biomass of functional groups and unstructured components through
+#' Plot the biomass of Species Groups and unstructured components through
 #' time
 #'
-#' After running a projection, the biomass of each functional group and each
+#' After running a projection, the biomass of each Species Group and each
 #' unstructured component can be plotted against time. The biomass is
 #' calculated within user defined size limits (min_w, max_w, min_l, max_l, see
 #' [get_size_range_array()]).
@@ -71,6 +71,7 @@ plotBiomass <- function(sim, species = NULL,
                         highlight = NULL, return_data = FALSE,
                         ...) {
     
+    params <- sim@params
     # If there are no unstructured components then call the mizer function
     if (is.null(getComponent(params, "algae"))) {
         if (is.null(getComponent(params, "detritus"))) {
@@ -92,7 +93,6 @@ plotBiomass <- function(sim, species = NULL,
                              highlight = highlight,
                              return_data = TRUE, ...)
     
-    params <- sim@params
     species <- valid_species_arg(sim, species)
     if (missing(start_time)) start_time <-
         as.numeric(dimnames(sim@n)[[1]][1])
@@ -164,10 +164,94 @@ plotlyBiomass <- function(sim,
                           ...) {
     argg <- c(as.list(environment()), list(...))
     ggplotly(do.call("plotBiomass", argg),
-             tooltip = c("Functional Group", "Year", "Biomass"))
+             tooltip = c("Species Group", "Year", "Biomass"))
 }
 
-#' Plot the total productivity for each functional group
+#' Plot the relative difference or percent change between two spectra
+#' 
+#' This plots a measure of the relative difference between the steady state 
+#' spectra of two mizer objects. The user can choose how this difference is 
+#' calculated. Let the spectra of the two objects be represented as 
+#' \eqn{N_1(w)} and \eqn{N_2(w)}.
+#' 
+#' If `diff_method` is given as `percent_change`, this function plots the
+#' percent change, given by \deqn{ 100*(N_2(w) - N_1(w)) / (N_1(w)).}
+#' 
+#' If `diff_method` is given as `rel_diff` the difference is calculated 
+#' relative to their average, so \deqn{2 (N_2(w) - N_1(w)) / (N_2(w) + N_1(w)).}
+#' 
+#' The individual spectra are calculated by the [plotSpectra()] function which
+#' is passed all additional arguments you supply. So you can for example
+#' determine a size range over which to average the simulation results via the
+#' `time_range` argument. See [plotSpectra()] for more options.
+#' 
+#' Note that it does not matter whether the relative difference is calculated
+#' for the number density or the biomass density or the biomass density in log
+#' weight because the factors of \eqn{w} by which the densities differ cancels 
+#' out in the relative difference.
+#' 
+#' @param object1 An object of class MizerSim or MizerParams
+#' @param object2 An object of class MizerSim or MizerParams
+#' @param diff_method   The method to calculate the relative change between 
+#'                      models. If `percent.change`, the percent change is 
+#'                      calculated relative to the value from object 1 with 
+#'                      formula 100*(new-old)/old. If `rel.diff` the relative 
+#'                      difference is returned given by (new - old)/(old + new).
+#' @param ... Parameters passed to `plotSpectra()`
+#' @concept sumplots
+#' @family plotting functions
+#' @return A ggplot2 object
+#' @export
+plotSpectraRelative <- function(object1, object2, diff_method, ...) {
+    
+    
+    sf1 <- mizer::plotSpectra(object1, return_data = TRUE, ...)
+    sf2 <- mizer::plotSpectra(object2, return_data = TRUE, ...)
+    
+    # Calculate relative difference
+    if (diff_method == "percent_change"){
+        sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
+                mutate(rel_diff = 100*((value.y - value.x) / value.x))
+        yLabel <- "% Change in Biomass"
+    } else if (diff_method == "rel_diff"){
+        sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
+                mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+        yLabel <- "Relative Difference in Biomass"
+    } else {
+        stop("diff_method should be either 'percent_change' or 'rel_diff'.")
+    }
+    
+    sf <- dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
+        dplyr::mutate(rel_diff = (value.y - value.x) / (value.x + value.y))
+    
+    if (is(object1, "MizerSim")) {
+        params <- object1@params
+    } else {
+        params <- object1
+    }
+    legend_levels <- intersect(names(params@linecolour),
+                               unique(sf$Legend))
+    linecolours <- params@linecolour[legend_levels]
+    
+    ggplot(sf,
+           aes(x = w, y = rel_diff, colour = Legend)) +
+        geom_line() +
+        labs(x = "Weight [g]", y = "Relative difference") +
+        scale_x_log10() +
+        scale_color_manual(values = linecolours) +
+        geom_hline(yintercept = 0, linetype = 1,
+                   colour = "dark grey", linewidth = 0.75)
+}
+
+#' @rdname plotSpectraRelative
+#' @export
+plotlySpectraRelative <- function(object1, object2, diff_method,...) {
+    ggplotly(plotSpectraRelative(object1, object2, diff_method,...),
+             tooltip = c("Legend", "w", "rel_diff"))
+}
+
+
+#' Plot the total productivity for each Species Group
 #'
 #' When called with a \linkS4class{MizerParams} object the steady state 
 #' productivity is plotted. When called with a \linkS4class{MizerSim} 
@@ -201,7 +285,7 @@ plotlyBiomass <- function(sim,
 #' @param ... unused
 #'
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
-#'          frame with the the productivity for each functional group
+#'          frame with the the productivity for each Species Group
 #'          is returned. 
 #'
 #' @import ggplot2
@@ -276,7 +360,7 @@ plotProductivity <- function(object,
         scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
-        labs(fill = "Functional Group", x = "Functional Group")
+        labs(fill = "Species Group", x = "Species Group")
     
 }
 
@@ -336,7 +420,7 @@ plotlyProductivity <- function(object,
 #' @inheritDotParams plotProductivity 
 #'
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
-#'          frame with the the productivity for each functional group
+#'          frame with the the productivity for each Species Group
 #'          by model is returned. 
 #'
 #' @import ggplot2
@@ -347,7 +431,7 @@ plotlyProductivity <- function(object,
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
 #'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
-plot2Productivity <- function(object1, object2, 
+plot2Productivity <- function(object1, object2, species = NULL,
                               name1 = "First", name2 = "Second",
                               min_fishing_l1 = NULL, max_fishing_l1 = NULL,
                               min_fishing_l2 = NULL, max_fishing_l2 = NULL,
@@ -399,7 +483,7 @@ plot2Productivity <- function(object1, object2,
         scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
-        labs(fill = "Functional Group", x = "Functional Group") + 
+        labs(fill = "Species Group", x = "Species Group") + 
         scale_alpha_manual(values = c(0.5,1),
                            labels = c(name1, name2))
     
@@ -407,8 +491,7 @@ plot2Productivity <- function(object1, object2,
 
 #' @rdname plot2Productivity
 #' @export
-plotly2Productivity <- function(object,
-                                species = NULL,...) {
+plotly2Productivity <- function(object1, object2,...) {
     
     argg <- as.list(environment())
     ggplotly(do.call("plot2Productivity", argg),
@@ -474,7 +557,7 @@ plotly2Productivity <- function(object,
 #' @inheritDotParams plotProductivity
 #' 
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
-#'          frame with the the productivity for each functional group
+#'          frame with the the productivity for each Species Group
 #'          by model is returned as well as another column called `rel_diff`
 #'          that gives the relative difference between the two values. 
 #'
@@ -486,9 +569,12 @@ plotly2Productivity <- function(object,
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
 #'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
-plotProductivityRelative <- function(object1, object2, diff_method,
-                                     min_fishing_l1 = NULL, max_fishing_l1 = NULL,
-                                     min_fishing_l2 = NULL, max_fishing_l2 = NULL,
+plotProductivityRelative <- function(object1, object2, diff_method, 
+                                     species = NULL,
+                                     min_fishing_l1 = NULL, 
+                                     max_fishing_l1 = NULL,
+                                     min_fishing_l2 = NULL, 
+                                     max_fishing_l2 = NULL,
                                      return_data = FALSE, ...){
     
     # get data frames with plotProductivity ----
@@ -503,12 +589,12 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     
     # Calculate relative difference
     if (diff_method == "percent_change"){
-        sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                dplyr::mutate(rel_diff = 100*((value.y - value.x) / value.y))
+        sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |> 
+                mutate(rel_diff = 100*((value.y - value.x) / value.x))
         yLabel <- "% Change in Productivity"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                dplyr::mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+                mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
         yLabel <- "Relative Difference in Productivity"
     } else {
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
@@ -541,24 +627,24 @@ plotProductivityRelative <- function(object1, object2, diff_method,
         scale_y_continuous(name = yLabel) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
-        labs(fill = "Functional Group", x = "Functional Group") +
+        labs(fill = "Species Group", x = "Species Group") +
         geom_hline(yintercept = 0, linetype = 1,
                    colour = "dark grey", linewidth = 0.75)
 }
 
 #' @rdname plotProductivityRelative
 #' @export
-plotlyProductivityRelative <- function(object,
-                                       species = NULL,...) {
+plotlyProductivityRelative <- function(object1, object2, 
+                                       diff_method,...) {
     
     argg <- as.list(environment())
     ggplotly(do.call("plotProductivityRelative", argg),
              tooltip = c("Species", "value"))
 }
 
-#' Plot the total fishable biomass for each functional group at steady state
+#' Plot the total fishable biomass for each Species Group at steady state
 #' 
-#' This functions creates a barplot with the biomass of each functional group
+#' This functions creates a barplot with the biomass of each Species Group
 #' within a size range. Usually used in conjunction with [plotProductivity()] 
 #' to check for decoupling.  
 #'
@@ -664,14 +750,13 @@ plotTotalBiomass <- function(object,
         scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
-        labs(fill = "Functional Group", x = "Functional Group")
+        labs(fill = "Species Group", x = "Species Group")
     
 }
 
 #' @rdname plotTotalBiomass
 #' @export
-plotlyTotalBiomass <- function(object,
-                               species = NULL,...) {
+plotlyTotalBiomass <- function(object,...) {
     
     argg <- as.list(environment())
     ggplotly(do.call("plotTotalBiomass", argg),
@@ -703,7 +788,7 @@ plotlyTotalBiomass <- function(object,
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
 #'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
-plot2TotalBiomass <- function(object1, object2, 
+plot2TotalBiomass <- function(object1, object2, species = NULL,
                               name1 = "First", name2 = "Second",
                               min_fishing_l1 = NULL, max_fishing_l1 = NULL,
                               min_fishing_l2 = NULL, max_fishing_l2 = NULL,
@@ -756,12 +841,12 @@ plot2TotalBiomass <- function(object1, object2,
                           labels = group_names) +
         scale_alpha_manual(values = c(0.5,1),
                            labels = c(name1, name2)) +
-        labs(fill = "Functional Group", x = "Functional Group") 
+        labs(fill = "Species Group", x = "Species Group") 
 }
 
 #' @rdname plot2TotalBiomass
 #' @export
-plotly2TotalBiomass <- function(object,
+plotly2TotalBiomass <- function(object1, object2,
                                 species = NULL,...) {
     
     argg <- as.list(environment())
@@ -770,10 +855,10 @@ plotly2TotalBiomass <- function(object,
 }
 
 #' Plot the relative difference in between the total fishable biomasses of each
-#' each functional group at steady state
+#' each Species Group at steady state
 #' 
 #' This functions creates a barplot with the relative change in biomass of 
-#' each functional group within a size range between either (1) two different 
+#' each Species Group within a size range between either (1) two different 
 #' mizerParams objects (two models) or (2) two different size ranges.
 #' 
 #' This function is usually used in conjunction with 
@@ -806,9 +891,13 @@ plotly2TotalBiomass <- function(object,
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
 #'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
-plotTotalBiomassRelative <- function(object1, object2, diff_method,
-                                     min_fishing_l1 = NULL, max_fishing_l1 = NULL,
-                                     min_fishing_l2 = NULL, max_fishing_l2 = NULL,
+plotTotalBiomassRelative <- function(object1, object2, 
+                                     diff_method,
+                                     species = NULL,
+                                     min_fishing_l1 = NULL, 
+                                     max_fishing_l1 = NULL,
+                                     min_fishing_l2 = NULL, 
+                                     max_fishing_l2 = NULL,
                                      return_data = FALSE, ...){
     
     # get data frames with plotTotalBiomass ----
@@ -824,11 +913,11 @@ plotTotalBiomassRelative <- function(object1, object2, diff_method,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                dplyr::mutate(rel_diff = 100*((value.y - value.x) / value.y))
+                mutate(rel_diff = 100*((value.y - value.x) / value.x))
             yLabel <- "% Change in Total Biomass"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                dplyr::mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+                mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
             yLabel <- "Relative Difference in Total Biomass"
     } else {
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
@@ -861,7 +950,7 @@ plotTotalBiomassRelative <- function(object1, object2, diff_method,
         scale_y_continuous(name = yLabel) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
-        labs(fill = "Functional Group", x = "Functional Group") + 
+        labs(fill = "Species Group", x = "Species Group") + 
         geom_hline(yintercept = 0, linetype = 1,
                    colour = "dark grey", linewidth = 0.75)
     
@@ -869,8 +958,8 @@ plotTotalBiomassRelative <- function(object1, object2, diff_method,
 
 #' @rdname plotTotalBiomassRelative
 #' @export
-plotlyTotalBiomassRelative <- function(object,
-                                       species = NULL,...) {
+plotlyTotalBiomassRelative <- function(object1, object2,
+                                       diff_method,...) {
     
     argg <- as.list(environment())
     ggplotly(do.call("TotalBiomassRelative", argg),

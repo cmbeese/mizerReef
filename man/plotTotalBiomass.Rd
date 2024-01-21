@@ -3,7 +3,7 @@
 \name{plotTotalBiomass}
 \alias{plotTotalBiomass}
 \alias{plotlyTotalBiomass}
-\title{Plot the total fishable biomass for each functional group at steady state}
+\title{Plot the total fishable biomass for each Species Group at steady state}
 \usage{
 plotTotalBiomass(
   object,
@@ -14,7 +14,7 @@ plotTotalBiomass(
   ...
 )
 
-plotlyTotalBiomass(object, species = NULL, ...)
+plotlyTotalBiomass(object, ...)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerParams}}
@@ -43,7 +43,7 @@ itself. Default value is FALSE.}
 A ggplot2 object
 }
 \description{
-This functions creates a barplot with the biomass of each functional group
+This functions creates a barplot with the biomass of each Species Group
 within a size range. Usually used in conjunction with \code{\link[=plotProductivity]{plotProductivity()}}
 to check for decoupling.
 }
@@ -58,6 +58,7 @@ Other plotting functions:
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotVulnerable}()}
 }

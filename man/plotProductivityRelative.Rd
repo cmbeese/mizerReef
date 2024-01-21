@@ -10,6 +10,7 @@ plotProductivityRelative(
   object1,
   object2,
   diff_method,
+  species = NULL,
   min_fishing_l1 = NULL,
   max_fishing_l1 = NULL,
   min_fishing_l2 = NULL,
@@ -18,7 +19,7 @@ plotProductivityRelative(
   ...
 )
 
-plotlyProductivityRelative(object, species = NULL, ...)
+plotlyProductivityRelative(object1, object2, diff_method, ...)
 }
 \arguments{
 \item{object1}{First MizerParams or MizerSim object.}
@@ -30,6 +31,12 @@ models. If \code{percent.change}, the percent change is
 calculated relative to the value from object 1 with
 formula 100*(new-old)/old. If \code{rel.diff} the relative
 difference is returned given by (new - old)/(old + new).}
+
+\item{species}{The groups to be selected. Optional. By default all target
+groups are selected. A vector of groups names, or a numeric
+vector with the groups indices, or a logical vector
+indicating for each group whether it is to be selected
+(TRUE) or not.}
 
 \item{min_fishing_l1}{Optional.  The minimum length (cm) of fished
 individuals for model 2. Defaults to 7cm.
@@ -66,16 +73,10 @@ productivity estimates. Defaults to 7 cm.}
 maximum length (cm) of fished individuals for
 productivity estimates. Defaults to max length.}
   }}
-
-\item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
-indicating for each group whether it is to be selected
-(TRUE) or not.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
-frame with the the productivity for each functional group
+frame with the the productivity for each Species Group
 by model is returned as well as another column called \code{rel_diff}
 that gives the relative difference between the two values.
 }
@@ -108,6 +109,7 @@ Other plotting functions:
 \code{\link{plotBiomass}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}

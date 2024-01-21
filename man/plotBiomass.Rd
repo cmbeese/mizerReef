@@ -3,7 +3,7 @@
 \name{plotBiomass}
 \alias{plotBiomass}
 \alias{plotlyBiomass}
-\title{Plot the biomass of functional groups and unstructured components through
+\title{Plot the biomass of Species Groups and unstructured components through
 time}
 \usage{
 plotBiomass(
@@ -86,7 +86,7 @@ frame with the four variables 'Year', 'Biomass', 'Species',
 'Legend' is returned.
 }
 \description{
-After running a projection, the biomass of each functional group and each
+After running a projection, the biomass of each Species Group and each
 unstructured component can be plotted against time. The biomass is
 calculated within user defined size limits (min_w, max_w, min_l, max_l, see
 \code{\link[=get_size_range_array]{get_size_range_array()}}).
@@ -101,6 +101,7 @@ Other plotting functions:
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}

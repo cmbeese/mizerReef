@@ -57,6 +57,7 @@ Other plotting functions:
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()}
 }

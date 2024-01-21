@@ -9,6 +9,7 @@ in the same plot}
 plot2Productivity(
   object1,
   object2,
+  species = NULL,
   name1 = "First",
   name2 = "Second",
   min_fishing_l1 = NULL,
@@ -19,12 +20,18 @@ plot2Productivity(
   ...
 )
 
-plotly2Productivity(object, species = NULL, ...)
+plotly2Productivity(object1, object2, ...)
 }
 \arguments{
 \item{object1}{First MizerParams or MizerSim object.}
 
 \item{object2}{Second MizerParams or MizerSim object.}
+
+\item{species}{The groups to be selected. Optional. By default all target
+groups are selected. A vector of groups names, or a numeric
+vector with the groups indices, or a logical vector
+indicating for each group whether it is to be selected
+(TRUE) or not.}
 
 \item{name1}{An optional string with the name for the first model, to be
 used in the legend. Set to "First" by default.}
@@ -67,16 +74,10 @@ productivity estimates. Defaults to 7 cm.}
 maximum length (cm) of fished individuals for
 productivity estimates. Defaults to max length.}
   }}
-
-\item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
-indicating for each group whether it is to be selected
-(TRUE) or not.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
-frame with the the productivity for each functional group
+frame with the the productivity for each Species Group
 by model is returned.
 }
 \description{
@@ -93,6 +94,7 @@ Other plotting functions:
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}
