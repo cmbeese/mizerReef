@@ -240,7 +240,8 @@ matchReefGrowth <- function(params, species = NULL,
     sp <- set_species_param_default(sp, "age_mat", NA)
     # If age at maturity is not specified, calculate it from von Bertalanffy
     if (all(c("k_vb", "w_inf") %in% names(sp))) {
-        sp <- set_species_param_default(sp, "age_mat", age_mat_vB(params))
+        age_mat_vB <- age_mat_vB(params)
+        sp <- mizer::set_species_param_default(sp, "age_mat", age_mat_vB)
     }
     
     # Don't affect species where no age at maturity is available
