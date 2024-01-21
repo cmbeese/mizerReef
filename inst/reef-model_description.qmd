@@ -282,7 +282,7 @@ have not yet settled to the reef substrate and are too small to utilize
 refuge to avoid predation. The default value for this minimum weight is
 0.1 grams. All individuals below this size are assumed to be vulnerable
 to predators. To ensure some food is always available, the maximum value
-of $R_j(w_p)$ is set to $R_{max}$, which defaults to 98%.
+of $R_j(w_p)$ is set to \textt{max_protect}, which defaults to 98%.
 
 Refuge can be suppressed for functional groups which are not expected to
 utilize biogenic structures for protection (e.g. schooling species) with
@@ -307,14 +307,14 @@ Here $W_{refuge}$ defines the weight at which refuges transition from
 being widely available to becoming unavailable.
 
 $r$ defines the maximum proportion of fish with access to predation
-refuge and is always less than or equal to $R_{max}$.
+refuge and is always less than or equal to \textt{max_protect}.
 
 $\alpha$ controls the rate at which the availability of refuge decreases
 with increasing body size. A smaller $\alpha$ results in a more gradual
 decrease in refuge availability, while the default value of 100 results
 in a steeper decline.
 
-This sigmoid takes on values between $0$ and $R_{max}$. $W_{refuge}$
+This sigmoid takes on values between $0$ and \textt{max_protect}. $W_{refuge}$
 marks the body weight at which refuge becomes scarcer for prey.
 
 ##### Binned

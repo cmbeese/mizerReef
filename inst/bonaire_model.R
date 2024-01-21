@@ -27,12 +27,8 @@ library(here)
                             method = "competitive",
                             method_params = bonaire_refuge)
     
-    # Fix gammas - this will be internal but not for this model
-    params@species_params$gamma <- c(6.4,0.2,0.2)
-    
-## Project to steady state -----------------------------------------------------
-    params <- params |>
-        reef_steady() |> reef_steady() 
+## Project to first steady state -----------------------------------------------
+    params <- reef_steady(params)
 
 ## Calibrate biomasses and growth ----------------------------------------------
     
@@ -49,6 +45,31 @@ library(here)
     age_mat_observed = bonaire_species$age_mat
     age_mat_model = age_mat(params)
     data.frame(age_mat_model, age_mat_observed)
+    # These are already quite close 
+    
+    # Check biomass match - still way off
+    plotBiomassVsSpecies(params)
+    
+## Tune home range -------------------------------------------------------------
+    
+    # Check current search volume
+    current_vol <- getSearchVolume(params)
+    g <- params@species_params$gamma
+    g[1] <- 1
+    # By Nash 2014, gamma for predators should be at least 1 for predators and
+    # at least 0.004 for herbivores
+    # Looks okay for herbs but should be higher for preds
+    
+    # Implement new search rate
+    params@species_params$gamma <- g
+    gp <- 1
+    q <- 0.75
+    pred_search <- gp*(params@w^q)
+    herb_search <- current_vol["herbivores",]
+    inv_search  <- current_vol["inverts",]
+    new_vol <- rbind(pred_search, herb_search, inv_search)
+    rownames(new_vol) <- c("predators","herbivores","inverts")
+    params <- setSearchVolume(params, search_vol = new_vol)
     
 ## Steady state iteration ------------------------------------------------------
     
@@ -59,12 +80,18 @@ library(here)
         calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> 
         reef_steady()|>
         calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> 
+        reef_steady()|>
+        calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> 
         reef_steady()
+    
+    # Much better
+    plotBiomassVsSpecies(params)
     
     # Check match with observed age at maturity
     age_mat_observed = bonaire_species$age_mat
     age_mat_model = age_mat(params)
     data.frame(age_mat_model, age_mat_observed)
+    # Closer than needed
     
 ## Check resulting spectra and tune resources ----------------------------------
     
@@ -81,18 +108,29 @@ library(here)
     
 # Tune reproduction ------------------------------------------------------------
     # We do not have yield or catch data - can't tune size distribution
-    # Using resilience to fishing following Ken Andersen 2016 procedure
-    # Start by setting erepro same for all species
-    params <- setBevertonHolt(params, erepro = 0.25)
+    # First attempt to set very low to see what the minimum values are
+    params <- setBevertonHolt(params, erepro = 0.0001)
+    # Now set setting erepro same for all species, as low as possible
+    params <- setBevertonHolt(params, erepro = 0.38)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
-    getReproductionLevel(params)
-    # These look good
+    rep <- getReproductionLevel(params)
+    # These are low for predators and herbivores, and strangely high for 
+    # inverts. A reproduction level closer to one means reproduction rate is 
+    # almost totally independent of the investment into reproduction
+    # Reproduction should be density independent on reefs
     
     # Check comparison of density dependent & independent reduction
     getRDI(params) / getRDD(params)
     # Reproduction is density independent for inverts, density dependent for 
-    # preds and herbs
+    # preds and herbs - but possible too much - RDI is only slightly higher
+    
+    # Let's increase reproduction level to 0.5 for predators and herbivores
+    # so that 
+    rep_level <- c(0.5, 0.5, rep[3])
+    names(rep_level) <- c("predators","herbivores","inverts")
+    params <- setBevertonHolt(params,
+                              reproduction_level = rep_level)
     
     # Iterate to get back to steady state
     params <- params |>
@@ -102,8 +140,18 @@ library(here)
         reef_steady()|>
         calibrateReefBiomass()|> matchBiomasses()|> matchReefGrowth()|> 
         reef_steady()
-
+    
+    # Check new reproduction - these look better
+    rep <- getReproductionLevel(params)
+    getRDI(params) / getRDD(params)
+    
+    # Check new spectra
+    plotSpectra(params, total = TRUE, power = 1)
+    plotSpectra(params, total = TRUE, power = 2)
+    
+    # Save!
     bonaire_model <- reef_steady(params)
+    
 # Plots ------------------------------------------------------------------------
 plotBiomassVsSpecies(bonaire_model)
 plotRefuge(bonaire_model)
@@ -120,4 +168,4 @@ plotDiet(bonaire_model)
     save(bonaire_species, file = "data/bonaire_species.rda")
     save(bonaire_int,     file = "data/bonaire_int.rda")
     save(bonaire_refuge,  file = "data/bonaire_refuge.rda")
-
+    
