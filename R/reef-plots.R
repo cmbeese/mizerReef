@@ -2,7 +2,7 @@ library(ggplot2)
 library(plotly)
 library(dplyr)
 
-#' Plot the vulnerability to predation of species by size
+#' Plot the vulnerability to predation of species by weight
 #'
 #' When called with a \linkS4class{MizerParams} object the initial 
 #' vulnerability is plotted. The complement of refuge.
@@ -62,7 +62,6 @@ plotVulnerable <- function(object,
     
     # Calculate proportion of fish in refuge
     vul <- getVulnerable(params)
-    refuge <- (1-vul)
     
     ## species selector ----
     sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
@@ -71,22 +70,22 @@ plotVulnerable <- function(object,
     species <- gsub('inverts',NA,species)
     species <- species[!is.na(species)]
     sel_sp <- which(!is.na(species))
-    refuge <- refuge[sel_sp, , drop = FALSE]
+    vul <- vul[sel_sp, , drop = FALSE]
     
     # Set x axis limit for plots
     x_limit = max(sp$l_max)
     
     ## data frame from selected species -----
     plot_dat <- data.frame(w = rep(params@w, each = length(species)),
-                           value = c(refuge),
+                           value = c(vul),
                            Species = species)
     
     if (!all.sizes) {
         # Remove vulnerability for sizes outside a species' size range
         for (sp in species) {
             plot_dat$value[plot_dat$Species == sp &
-                               (plot_dat$w < params@species_params[sp, "w_min"] |
-                                    plot_dat$w > params@species_params[sp, "w_max"])] <- NA
+                            (plot_dat$w < params@species_params[sp, "w_min"] |
+                            plot_dat$w > params@species_params[sp, "w_max"])] <- NA
         }
         
         plot_dat <- plot_dat[complete.cases(plot_dat), ]
@@ -114,14 +113,14 @@ plotVulnerable <- function(object,
     p + geom_line(aes(x = w, y = value,
                       colour = Legend, linetype = Legend,
                       linewidth = Legend)) +
-        labs(colour = 'Functional Group', linetype = 'Functional Group',
-             linewidth = 'Functional Group') +
+        labs(colour = 'Species', linetype = 'Species',
+             linewidth = 'Species') +
         # scale_x_continuous(name = "Total Length [cm]",
         #                    limits = c(0,x_limit)) +
         scale_x_continuous(name = "Log Size [g]", trans = "log10") +#,
                            #breaks = c(10^-2, 10^0, 10^2, 10^4),
                            #labels = c(-2, 0, 2, 4)) +
-        scale_y_continuous(name = "Proportion Protected", 
+        scale_y_continuous(name = "Proportion Vulnerable", 
                            limits = c(0, 1)) +
         scale_colour_manual(values = params@linecolour[legend_levels],
                             labels = group_names) +
@@ -145,7 +144,7 @@ plotlyVulnerable <- function(object,
 }
 
 
-#' Plot the refuge profile, species by size
+#' Plot the refuge profile, species by length
 #'
 #' When called with a \linkS4class{MizerParams} object the initial 
 #' refuge profile is plotted. The complement of vulnerability.
@@ -265,8 +264,8 @@ plotRefuge <- function(object,
         p + geom_line(aes(x = l, y = value,
                           colour = Legend, linetype = Legend,
                           linewidth = Legend)) +
-            labs(colour = 'Functional Group', linetype = 'Functional Group',
-                 linewidth = 'Functional Group') +
+            labs(colour = 'Species', linetype = 'Species',
+                 linewidth = 'Species') +
             scale_x_continuous(name = "Total Length (cm)",
                                limits = c(0,x_limit)) +
             # scale_x_continuous(name = "Log Size [g]", trans = "log10",

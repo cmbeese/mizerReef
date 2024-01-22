@@ -84,14 +84,11 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
 detritus_consumption <- function(params,
                                  n = params@initial_n,
                                  rates = getRates(params)) {
-    # With feeding level
-    feeding_level <- rates$feeding_level
-    feeding_level[is.na(feeding_level)] <- 0
-    sum((params@other_params$detritus$rho * n * (1 - feeding_level))
-        %*% params@dw)
-
-    # Without feeding level
-    #sum((params@other_params$detritus$rho * n ) %*% params@dw)
+    
+    sum((params@other_params$detritus$rho * n * 
+             (1 - rates$feeding_level)) %*% params@dw)
+        #params@other_params$detritus$external_consumption
+    
 }
 
 
@@ -135,10 +132,8 @@ getDetritusConsumption <- function(params) {
     consumption <- (params@other_params$detritus$rho * params@initial_n *
                         (1 - feeding_level)) %*% params@dw
 
-    # Without feeding level
-    # consumption <- (params@other_params$detritus$rho * params@initial_n) %*% params@dw
-
     names(consumption) <- params@species_params$species
+    
     # Convert from mass specific rate to total rates
     consumption <- consumption * params@initial_n_other$detritus
 
@@ -233,10 +228,6 @@ getDetritusProduction <- function(params, n = params@initial_n,
     consumption <- sweep((1 - rates$feeding_level) * rates$encounter * n, 2,
                          params@dw, "*", check.margin = FALSE)
 
-    # Without feeding level
-    # consumption <- sweep(rates$encounter * n, 2,
-    #                      params@dw, "*", check.margin = FALSE)
-
     feces <- sweep(consumption, 1, (1 - params@species_params$alpha), "*",
                    check.margin = FALSE)
 
@@ -244,11 +235,12 @@ getDetritusProduction <- function(params, n = params@initial_n,
     ex_mort <- sum((params@mu_b * n) %*% (params@w * params@dw))
     sen_mort <- getSenMort(params)
     sen_mort <- sum((sen_mort * n) %*% (params@w * params@dw))
-    prop_decomp <- params@other_params$detritus$prop_decomp
+    sen_decomp <- params@other_params$detritus$sen_decomp
+    ext_decomp <- params@other_params$detritus$ext_decomp
 
     # Return vector
     c(feces    = sum(feces),
-      decomp   = (prop_decomp*ex_mort) + sen_mort,
+      decomp   = (ext_decomp*ex_mort) + (sen_decomp*sen_mort),
       external = params@other_params$detritus$external
     )
 }

@@ -103,33 +103,30 @@ plotBiomass <- function(sim, species = NULL,
     }
     
     # other components
-    bc <- unlist(sim@n_other)
-    dim(bc) <- dim(sim@n_other)
-    dimnames(bc) <- dimnames(sim@n_other)
-    times <- as.numeric(dimnames(bc)[[1]])
-    bc <- bc[(times >= start_time) & (times <= end_time), , drop = FALSE]
-    bc <- melt(bc)
+    bu <- unlist(sim@n_other)
+    dim(bu) <- dim(sim@n_other)
+    dimnames(bu) <- dimnames(sim@n_other)
+    times <- as.numeric(dimnames(bu)[[1]])
+    bu <- bu[(times >= start_time) & (times <= end_time), , drop = FALSE]
+    bu <- melt(bu)
     # Implement ylim and a minimal cutoff and bring columns in desired order
     min_value <- 1e-20
-    bc <- bc[bc$value >= min_value &
-                 (is.na(ylim[1]) | bc$value >= ylim[1]) &
-                 (is.na(ylim[2]) | bc$value <= ylim[2]), c(1, 3, 2)]
-    names(bc) <- c("Year", "Biomass", "Species")
-    bc$Legend <- bc$Species
+    bu <- bu[bu$value >= min_value &
+                 (is.na(ylim[1]) | bu$value >= ylim[1]) &
+                 (is.na(ylim[2]) | bu$value <= ylim[2]), c(1, 3, 2)]
+    names(bu) <- c("Year", "Biomass", "Species")
+    bu$Legend <- bu$Species
     
     # Return data ----
-    plot_dat <- rbind(df, bc)
+    plot_dat <- rbind(df, bu)
     if (return_data) return(plot_dat)
     
-    p <- mizer::plotDataFrame(plot_dat, params, 
-                         xlab = "Year", ylab = "Biomass [g]",
-                         ytrans = "log10",
-                         y_ticks = y_ticks, highlight = highlight,
-                         legend_var = "Legend") + 
-                labs(colour    = "Functional\nGroup", 
-                     linetype  = "Functional\nGroup",
-                     linewidth = "Functional\nGroup",)
-    p
+    p <- mizer::plotDataFrame(plot_dat, params,
+                              xlab = "Year", ylab = "Biomass [g]",
+                              ytrans = "log10", y_ticks = y_ticks, 
+                              highlight = highlight,
+                              legend_var = "Legend")
+        
 }
 
 
@@ -147,7 +144,7 @@ plotlyBiomass <- function(sim,
                           ...) {
     argg <- c(as.list(environment()), list(...))
     ggplotly(do.call("plotBiomass", argg),
-             tooltip = c("Species Group", "Year", "Biomass"))
+             tooltip = c("Species", "Year", "Biomass"))
 }
 
 #' Plot the relative difference or percent change between two spectra

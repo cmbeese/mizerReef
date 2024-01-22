@@ -10,7 +10,8 @@ newReefParams(
   crit_feed = NULL,
   min_w_pp = NA,
   w_pp_cutoff = 1,
-  n = 3/4,
+  n = 0.75,
+  p = n,
   method,
   method_params,
   refuge_user = NULL,
@@ -22,12 +23,9 @@ newReefParams(
   max_protect = NULL,
   tau = NULL,
   UR_interaction,
-  exp_alg = NULL,
-  exp_det = NULL,
-  scale_rho_a = NULL,
-  scale_rho_d = NULL,
   initial_algae_growth = NULL,
-  prop_decomp = NULL,
+  sen_decomp = NULL,
+  ext_decomp = NULL,
   initial_d_external = NULL,
   ext_mort_params = NULL,
   ...
@@ -96,28 +94,19 @@ actually use it. Defaults to 1.}
 
 Optional parameters:}
 
-\item{exp_alg}{The allometric exponent for the consumption rate of
-algae. Defaults to 0.86.}
-
-\item{exp_det}{The allometric exponent for the consumption rate of
-detritus. Defaults to the same value used for the
-scaling exponent of the maximum intake rate for
-fish consumers.}
-
-\item{scale_rho_a}{A factor to multiply rho values by for algae
-encounter rate. Used in steady state tuning.}
-
-\item{scale_rho_d}{A factor to multiply rho values by for detritus
-encounter rate. Used in steady state tuning.}
-
 \item{initial_algae_growth}{The initial growth rate of algae in
 grams/year/m^-2. This value is reset to match
 consumption in the \verb{[reefSteady()]}  function
 so that steady state abundances match given
 values.}
 
-\item{prop_decomp}{The proportion of waste material that decomposes to
-become part of the detritus pool.}
+\item{sen_decomp}{The proportion of decomposing mass from senescence
+mortality that decomposes to become part of the
+detritus pool. Defaults to 0.8.}
+
+\item{ext_decomp}{The proportion of decomposing mass from external
+mortality that decomposes to  become part of the
+detritus pool. Defaults to 0.2.}
 
 \item{initial_d_external}{The rate at which detritus biomass sinks from
 the pelagic zone and becomes part of the

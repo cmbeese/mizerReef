@@ -65,7 +65,9 @@ tuneUR <- function(params,...) {
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
-        warning("Balancing detritus production with consumption requires a negative external influx.")
+        warning("Fecal matter and decomposition are producing more 
+        detritus than detritivores consume. To achieve a steady state,
+        the influx of external detritus is negative.")
     }
     params@other_params$detritus$external <- dout - din
 
@@ -110,7 +112,6 @@ scaleReefModel <- function(params, factor) {
     #         params@other_params$method_params$refuge_density * factor
     # }
     
-
     # now comes the code of mizer's standard scaleModel()
     params <- validParams(params)
     assert_that(is.number(factor), factor > 0)

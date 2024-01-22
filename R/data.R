@@ -28,3 +28,9 @@
 #' @format A MizerParams object
 #' @source PhD Thesis
 "bonaire_refuge"
+
+#' refuge parameters for tuning the steady state
+#'
+#' @format A MizerParams object
+#' @source PhD Thesis
+"tuning_profile"

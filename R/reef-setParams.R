@@ -25,21 +25,7 @@
 #' @param UR_interaction Interaction matrix for unstructured resources
 #'  (species x resource)
 #'
-#' Optional parameters:
-#' @param exp_alg       The allometric exponent for the consumption rate of
-#'                      algae. Defaults to 0.86.
-#' 
-#' @param exp_det       The allometric exponent for the consumption rate of
-#'                      detritus. Defaults to the same value used for the 
-#'                      scaling exponent of the maximum intake rate for 
-#'                      fish consumers.
-#' 
-#' @param scale_rho_a   A factor to multiply rho values by for algae
-#'                      encounter rate. Used in steady state tuning.
-#' 
-#' @param scale_rho_d   A factor to multiply rho values by for detritus
-#'                      encounter rate. Used in steady state tuning.
-#' 
+#' Optional parameters: 
 #' @param initial_algae_growth  The initial growth rate of algae in 
 #'                              grams/year/m^-2. This value is reset to match
 #'                              consumption in the `[reefSteady()]`  function 
@@ -49,8 +35,13 @@
 #' @param algae_capacity    The carrying capacity of the system for algal
 #'                          biomass in grams per year.
 #'                      
-#' @param prop_decomp   The proportion of waste material that decomposes to
-#'                      become part of the detritus pool.
+#' @param sen_decomp    The proportion of decomposing mass from senescence
+#'                      mortality that decomposes to become part of the 
+#'                      detritus pool. Defaults to 0.8.
+#'                      
+#' @param ext_decomp    The proportion of decomposing mass from external
+#'                      mortality that decomposes to  become part of the 
+#'                      detritus pool. Defaults to 0.2.
 #'                      
 #' @param initial_d_external    The rate at which detritus biomass sinks from 
 #'                              the pelagic zone and becomes part of the 
@@ -67,13 +58,11 @@
 setURParams <- function(params,
                         # Preference for resource
                         UR_interaction = NULL, 
-                        # Encounter rate
-                        exp_alg = NULL, exp_det = NULL,
-                        scale_rho_a = NULL, scale_rho_d = NULL,
                         # Resource Production
                         initial_algae_growth = NULL, 
                         algae_capacity = NULL,
-                        prop_decomp = NULL, initial_d_external = NULL) {
+                        sen_decomp = NULL, ext_decomp = NULL, 
+                        initial_d_external = NULL) {
     
     # object check ----
         # Check if mizerParams is valid
@@ -133,61 +122,13 @@ setURParams <- function(params,
         }
     }
         
-    # set colors ---- 
+    # set plotting aesthetics ---- 
         params@linecolour["detritus"] <- "plum4"
         params@linecolour["algae"]    <- "olivedrab3"
+        params@linetype["detritus"] <- "solid"
+        params@linetype["algae"]    <- "solid"
         
     # other parameters ----
-        
-        ## Encounter rates rho and exp ----
-        # Set default exp_alg
-        if(is.null(exp_alg)){ params@other_params$exp_alg <- 0.86
-        } else {
-            if (!is.numeric(exp_alg)){
-                stop("exp_alg should be a numerical value.")
-            }
-            if (exp_alg < 0){
-                stop("exp_alg must be non-negative.")
-            }
-            params@other_params$exp_alg <- exp_alg 
-        }
-        
-        # Set default exp_det
-        if(is.null(exp_det)){ params@other_params$exp_det <- 0.75
-        } else {
-            if (!is.numeric(exp_det)){
-                stop("exp_det should be a numerical value.")
-            }
-            if (exp_det < 0){
-                stop("exp_det must be non-negative.")
-            }
-            params@other_params$exp_det <- exp_det 
-        }
-        
-        
-        # Set default scale_rho_a
-        if(is.null(scale_rho_a)){ params@other_params$scale_rho_a <- 1
-        } else {
-            if (!is.numeric(scale_rho_a)){
-                stop("scale_rho_a should be a numerical value.")
-            }
-            if (scale_rho_a < 0){
-                stop("scale_rho_a must be non-negative.")
-            }
-            params@other_params$scale_rho_a <- scale_rho_a 
-        }
-        
-        # Set default scale_rho_d
-        if(is.null(scale_rho_d)){ params@other_params$scale_rho_d <- 1
-        } else {
-            if (!is.numeric(scale_rho_d)){
-                stop("scale_rho_d should be a numerical value.")
-            }
-            if (scale_rho_d < 0){
-                stop("scale_rho_d must be non-negative.")
-            }
-            params@other_params$scale_rho_d <- scale_rho_d 
-        }
         
         ## Production ----
         # Set default algae growth rate
@@ -216,16 +157,30 @@ setURParams <- function(params,
             params@other_params$algae_capacity <- algae_capacity 
         }
     
-        # Set default proportion of waste that becomes part of the detritus pool
-        if(is.null(prop_decomp)){ params@other_params$prop_decomp <- 0.8
+        # Set default proportion of senescence mortality that becomes part of 
+        # the detritus pool
+        if(is.null(sen_decomp)){ params@other_params$sen_decomp <- 0.8
         } else {
-            if (!is.numeric(prop_decomp)){
-                stop("initial_algae_growth should be a numerical value.")
+            if (!is.numeric(sen_decomp)){
+                stop("sen_decomp should be a numerical value.")
             }
-            if (prop_decomp < 0 || prop_decomp > 1){
-                stop("initial_algae_growth must be a proportion between 0 and 1.")
+            if (sen_decomp < 0 || sen_decomp > 1){
+                stop("sen_decomp must be a proportion between 0 and 1.")
             }
-            params@other_params$prop_decomp <- prop_decomp
+            params@other_params$sen_decomp <- sen_decomp
+        }
+        
+        # Set default proportion of external mortality that becomes part of 
+        # the detritus poo
+        if(is.null(ext_decomp)){ params@other_params$ext_decomp <- 0.8
+        } else {
+            if (!is.numeric(ext_decomp)){
+                stop("ext_decomp should be a numerical value.")
+            }
+            if (ext_decomp < 0 || ext_decomp > 1){
+                stop("ext_decomp must be a proportion between 0 and 1.")
+            }
+            params@other_params$ext_decomp <- ext_decomp
         }
     
         # Set default external detritus
@@ -515,12 +470,13 @@ setExtMortParams <- function(params,
 #' @export
 setRefuge <- function(params, method, method_params = NULL,
                       # Parameters specific to each group
-                      refuge_user = NULL, bad_pred = NULL, satiation = NULL,
+                      refuge_user = NULL, bad_pred = NULL, 
+                      satiation = NULL,
                       # Parameters used by all methods
                       a_bar = NULL, b_bar = NULL,
                       w_settle = NULL, max_protect = NULL, tau = NULL,...) {
 
-    # object check ----
+    # object check 
         # Check if given mizerParams object is valid
         assert_that(is(params, "MizerParams"))
     
@@ -540,7 +496,7 @@ setRefuge <- function(params, method, method_params = NULL,
     # Find number of species for checks
     no_sp = nrow(params@species_params)
     
-    # species_params checks ----
+    # species_params checks
         # Check that refuge_user is logical and the right length
         if(!('refuge_user' %in% colnames(params@species_params))){
             if(is.null(refuge_user)){
@@ -593,7 +549,7 @@ setRefuge <- function(params, method, method_params = NULL,
 
         # Minimum weight of fish protected by refuges at measured scale
         if(is.null(w_settle)){
-            w_settle <- 0.01
+            w_settle <- 0.1
         } else {
             if(!is.numeric(w_settle)) {
                 stop("w_settle should be numeric.")
@@ -695,7 +651,7 @@ setRefuge <- function(params, method, method_params = NULL,
             if (is.null(method_params$slope)){ method_params$slope <- 100 } 
         }
 
-        ## Binned method ----
+        # Binned method ----
         if (refuge_params$method == "binned") {
             if(!("start_L" %in% cnames)) {
                 stop("The binned method parameters dataframe needs a column called
@@ -718,7 +674,7 @@ setRefuge <- function(params, method, method_params = NULL,
             }
         }
 
-        ## Competitive method ----
+        # Competitive method ----
         if (refuge_params$method == "competitive") {
             if(!("start_L" %in% cnames)) {
                 stop("The competitive method parameters dataframe needs a 
@@ -744,7 +700,7 @@ setRefuge <- function(params, method, method_params = NULL,
     }
     
     
-    # Store in params object ----
+    # Store in params object --
     params@other_params[['refuge_params']] <- as.data.frame(refuge_params)
 
     params@other_params[['method_params']] <- as.data.frame(method_params)

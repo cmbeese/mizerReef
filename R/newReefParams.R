@@ -29,19 +29,20 @@
 newReefParams <- function(# Original mizer parameters
                             group_params, interaction = NULL, 
                             crit_feed = NULL,
-                            min_w_pp = NA, w_pp_cutoff = 1.0, n = 3/4,
+                            min_w_pp = NA, w_pp_cutoff = 1, 
+                            n = 0.75, p = n,
                           # Parameters for setting up refuge
                             method, method_params, 
                             refuge_user = NULL, bad_pred = NULL, 
                             satiation = NULL,
                             a_bar = NULL, b_bar = NULL,
-                            w_settle = NULL, max_protect = NULL, tau = NULL,
+                            w_settle = NULL, max_protect = NULL, 
+                            tau = NULL,
                           # Parameters for unstructured resources
                             UR_interaction, 
-                            exp_alg = NULL, exp_det = NULL,
-                            scale_rho_a = NULL, scale_rho_d = NULL,
                             initial_algae_growth = NULL, 
-                            prop_decomp = NULL, initial_d_external = NULL,
+                            sen_decomp = NULL, ext_decomp = NULL, 
+                            initial_d_external = NULL,
                           # Parameters for external mortality
                             ext_mort_params = NULL, ...) {
     
@@ -69,16 +70,12 @@ newReefParams <- function(# Original mizer parameters
     
     params <- getRefuge(params,...)
     
-    if(is.null(exp_det)){exp_det <- n}
     ### Unstructured resources ----
     params <- setURParams(params = params,
                           UR_interaction = UR_interaction,
-                          exp_alg = exp_alg,
-                          exp_det = exp_det,
-                          scale_rho_a = scale_rho_a,
-                          scale_rho_d = scale_rho_d,
                           initial_algae_growth = initial_algae_growth,
-                          prop_decomp = prop_decomp,
+                          sen_decomp = sen_decomp, 
+                          ext_decomp = ext_decomp, 
                           initial_d_external = initial_d_external)
     
     ### External mortality ----
@@ -113,19 +110,13 @@ newReefParams <- function(# Original mizer parameters
         rho_alg[is.na(rho_alg)] <- 0
         rho_det[is.na(rho_det)] <- 0
         
-        # Pull scaling values
-        scale_rho_a <- params@other_params$scale_rho_a
-        scale_rho_d <- params@other_params$scale_rho_d
-        
         # Store new rho values in species_params data frame
-        params@species_params$rho_algae    <- scale_rho_a*rho_alg
-        params@species_params$rho_detritus <- scale_rho_d*rho_det
+        params@species_params$rho_algae    <- rho_alg
+        params@species_params$rho_detritus <- rho_det
     
         # Calculate rho * w^n for use in algae and detritus dynamic functions
-        exp_alg <- params@other_params$exp_alg
-        exp_det <- params@other_params$exp_det
-        rho_alg <- outer(params@species_params$rho_algae, params@w ^ exp_alg)
-        rho_det <- outer(params@species_params$rho_detritus, params@w ^ exp_det)
+        rho_alg <- outer(params@species_params$rho_algae, params@w ^ 0.86)
+        rho_det <- outer(params@species_params$rho_detritus, params@w ^ n)
     
     ### Algae Component - Add in algae ----
     params <- setComponent(
@@ -142,7 +133,8 @@ newReefParams <- function(# Original mizer parameters
         dynamics_fun = "detritus_dynamics",
         encounter_fun = "encounter_contribution",
         component_params = list(rho = rho_det,
-                                prop_decomp = params@other_params$prop_decomp,
+                                sen_decomp = params@other_params$sen_decomp,
+                                ext_decomp = params@other_params$ext_decomp,
                                 external  = params@other_params$initial_d_external))
 
     # External mortality - Weight dependent ----

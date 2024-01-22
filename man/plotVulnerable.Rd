@@ -3,7 +3,7 @@
 \name{plotVulnerable}
 \alias{plotVulnerable}
 \alias{plotlyVulnerable}
-\title{Plot the vulnerability to predation of species by size}
+\title{Plot the vulnerability to predation of species by weight}
 \usage{
 plotVulnerable(
   object,

@@ -3,7 +3,7 @@
 \name{plotRefuge}
 \alias{plotRefuge}
 \alias{plotlyRefuge}
-\title{Plot the refuge profile, species by size}
+\title{Plot the refuge profile, species by length}
 \usage{
 plotRefuge(object, species = NULL, all.sizes = FALSE, return_data = FALSE, ...)
 

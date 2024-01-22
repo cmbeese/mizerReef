@@ -152,14 +152,10 @@ algal_consumption <- function(params,
                               n = params@initial_n,
                               rates = getRates(params)) {
 
-    # With feeding level
     feeding_level <- rates$feeding_level
     feeding_level[is.na(feeding_level)] <- 0
     sum((params@other_params$algae$rho * n * (1 - feeding_level))
         %*% params@dw)
-
-    # # Without feeding level
-    # sum((params@other_params$algae$rho * n) %*% params@dw)
 }
 
 #' Get algal consumption rates
@@ -181,11 +177,6 @@ getAlgalConsumption <- function(params) {
     feeding_level[is.na(feeding_level)] <- 0
     consumption <- (params@other_params$algae$rho * params@initial_n *
                         (1 - feeding_level)) %*% params@dw
-
-    # Without feeding levels
-    # consumption <- 
-    # (params@other_params$algae$rho * params@initial_n) %*% params@dw
-
     # Fix names
     names(consumption) <- params@species_params$species
     # Convert from mass specific rate to total rates
