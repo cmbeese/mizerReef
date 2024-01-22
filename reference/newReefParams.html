@@ -51,7 +51,8 @@ resource components, senescence mortality, and predation refuge.</p>
 <span>  crit_feed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_w_pp <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  w_pp_cutoff <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">3</span><span class="op">/</span><span class="fl">4</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">0.75</span>,</span>
+<span>  p <span class="op">=</span> <span class="va">n</span>,</span>
 <span>  <span class="va">method</span>,</span>
 <span>  <span class="va">method_params</span>,</span>
 <span>  refuge_user <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -63,12 +64,9 @@ resource components, senescence mortality, and predation refuge.</p>
 <span>  max_protect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tau <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">UR_interaction</span>,</span>
-<span>  exp_alg <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  exp_det <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  scale_rho_a <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  scale_rho_d <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  initial_algae_growth <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  prop_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sen_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ext_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  initial_d_external <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ext_mort_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -172,28 +170,6 @@ actually use it. Defaults to 1.</p></dd>
 <p>Optional parameters:</p></dd>
 
 
-<dt>exp_alg</dt>
-<dd><p>The allometric exponent for the consumption rate of
-algae. Defaults to 0.86.</p></dd>
-
-
-<dt>exp_det</dt>
-<dd><p>The allometric exponent for the consumption rate of
-detritus. Defaults to the same value used for the
-scaling exponent of the maximum intake rate for
-fish consumers.</p></dd>
-
-
-<dt>scale_rho_a</dt>
-<dd><p>A factor to multiply rho values by for algae
-encounter rate. Used in steady state tuning.</p></dd>
-
-
-<dt>scale_rho_d</dt>
-<dd><p>A factor to multiply rho values by for detritus
-encounter rate. Used in steady state tuning.</p></dd>
-
-
 <dt>initial_algae_growth</dt>
 <dd><p>The initial growth rate of algae in
 grams/year/m^-2. This value is reset to match
@@ -202,9 +178,16 @@ so that steady state abundances match given
 values.</p></dd>
 
 
-<dt>prop_decomp</dt>
-<dd><p>The proportion of waste material that decomposes to
-become part of the detritus pool.</p></dd>
+<dt>sen_decomp</dt>
+<dd><p>The proportion of decomposing mass from senescence
+mortality that decomposes to become part of the
+detritus pool. Defaults to 0.8.</p></dd>
+
+
+<dt>ext_decomp</dt>
+<dd><p>The proportion of decomposing mass from external
+mortality that decomposes to  become part of the
+detritus pool. Defaults to 0.2.</p></dd>
 
 
 <dt>initial_d_external</dt>

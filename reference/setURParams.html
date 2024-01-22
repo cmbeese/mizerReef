@@ -45,13 +45,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">setURParams</span><span class="op">(</span></span>
 <span>  <span class="va">params</span>,</span>
 <span>  UR_interaction <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  exp_alg <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  exp_det <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  scale_rho_a <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  scale_rho_d <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  initial_algae_growth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  algae_capacity <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  prop_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sen_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ext_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  initial_d_external <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -68,28 +65,6 @@
 <p>Optional parameters:</p></dd>
 
 
-<dt>exp_alg</dt>
-<dd><p>The allometric exponent for the consumption rate of
-algae. Defaults to 0.86.</p></dd>
-
-
-<dt>exp_det</dt>
-<dd><p>The allometric exponent for the consumption rate of
-detritus. Defaults to the same value used for the
-scaling exponent of the maximum intake rate for
-fish consumers.</p></dd>
-
-
-<dt>scale_rho_a</dt>
-<dd><p>A factor to multiply rho values by for algae
-encounter rate. Used in steady state tuning.</p></dd>
-
-
-<dt>scale_rho_d</dt>
-<dd><p>A factor to multiply rho values by for detritus
-encounter rate. Used in steady state tuning.</p></dd>
-
-
 <dt>initial_algae_growth</dt>
 <dd><p>The initial growth rate of algae in
 grams/year/m^-2. This value is reset to match
@@ -103,9 +78,16 @@ values.</p></dd>
 biomass in grams per year.</p></dd>
 
 
-<dt>prop_decomp</dt>
-<dd><p>The proportion of waste material that decomposes to
-become part of the detritus pool.</p></dd>
+<dt>sen_decomp</dt>
+<dd><p>The proportion of decomposing mass from senescence
+mortality that decomposes to become part of the
+detritus pool. Defaults to 0.8.</p></dd>
+
+
+<dt>ext_decomp</dt>
+<dd><p>The proportion of decomposing mass from external
+mortality that decomposes to  become part of the
+detritus pool. Defaults to 0.2.</p></dd>
 
 
 <dt>initial_d_external</dt>
