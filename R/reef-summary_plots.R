@@ -668,6 +668,7 @@ plotTotalBiomass <- function(object,
     if (is(object, "MizerSim")) {
         ## sim values ----
             # get total biomass at last timestep
+        params <- object@params
         end_time  <- max(as.numeric(dimnames(object@n)$time))
         
         biom <- mizer::getBiomass(object, 
