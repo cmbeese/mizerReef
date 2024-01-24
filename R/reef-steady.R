@@ -45,12 +45,13 @@
 #' 
 #' @return An object of type \linkS4class{MizerParams}
 #' @concept setup
+#' @include reef-components.R
 #' @export
-reef_steady <- function(params, d_func = NULL,
-                        t_max = 100, t_per = 1.5, dt = 0.1,
-                        tol = 0.1 * dt, return_sim = FALSE,
-                        preserve = c("reproduction_level", "erepro", "R_max"),
-                        progress_bar = TRUE,...) {
+reefSteady <- function(params, d_func = NULL,
+                       t_max = 100, t_per = 1.5, dt = 0.1,
+                       tol = 0.1 * dt, return_sim = FALSE,
+                       preserve = c("reproduction_level", "erepro", "R_max"),
+                       progress_bar = TRUE,...) {
 
     # Check if params are valid
     params <- mizer::validParams(params)
@@ -120,5 +121,5 @@ reef_steady <- function(params, d_func = NULL,
     }
 }
 
-environment(reef_steady) <- asNamespace("mizer")
-utils::assignInNamespace("steady", reef_steady, ns = "mizer")
+environment(reefSteady) <- asNamespace("mizer")
+utils::assignInNamespace("steady", reefSteady, ns = "mizer")

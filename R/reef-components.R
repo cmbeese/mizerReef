@@ -53,7 +53,6 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' @concept Uresources
 #' 
 #' @export
-#' 
 tuneUR <- function(params,...) {
 
     # algae

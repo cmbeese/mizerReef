@@ -917,7 +917,7 @@ getRefuge <- function(params, ...) {
 #' This is a wrapper function for the [setRefuge()] and [getRefuge()] 
 #' functions that allows users to easily change refuge parameters on an
 #' existing mizer model. This will take it out of steady state, and users
-#' should run [reef_steady()] after this function to return to steady state. 
+#' should run [reefSteady()] after this function to return to steady state. 
 #' 
 #' @inheritSection setRefuge Setting the refuge profile
 #' 

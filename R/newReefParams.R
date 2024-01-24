@@ -30,7 +30,7 @@ newReefParams <- function(# Original mizer parameters
                             group_params, interaction = NULL, 
                             crit_feed = NULL,
                             min_w_pp = NA, w_pp_cutoff = 1, 
-                            n = 0.75, p = n,
+                            n = 0.75,
                           # Parameters for setting up refuge
                             method, method_params, 
                             refuge_user = NULL, bad_pred = NULL, 

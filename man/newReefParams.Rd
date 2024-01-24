@@ -11,7 +11,6 @@ newReefParams(
   min_w_pp = NA,
   w_pp_cutoff = 1,
   n = 0.75,
-  p = n,
   method,
   method_params,
   refuge_user = NULL,

@@ -30,18 +30,18 @@ tuning_profile  <- tuning_profile
                             method_params = tuning_profile)
 
 ## Project to first steady state -----------------------------------------------
-    params <- reef_steady(params)
+    params <- reefSteady(params)
 
 ## Calibrate biomasses and growth ----------------------------------------------
 
     # Match observed species group biomasses
     params <- calibrateReefBiomass(params)
     params <- matchBiomasses(params)
-    params <- reef_steady(params)
+    params <- reefSteady(params)
     
     # Match observed growth rates
     params <- matchReefGrowth(params)
-    params <- reef_steady(params)
+    params <- reefSteady(params)
     
     # Check for match with age at maturity
     age_mat_observed = bonaire_species$age_mat
@@ -55,11 +55,11 @@ tuning_profile  <- tuning_profile
     # Iterate to refine biomass
     params <- params |>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
-        reef_steady()|>
+        reefSteady()|>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
-        reef_steady()|>
+        reefSteady()|>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
-        reef_steady()
+        reefSteady()
     
     plotBiomassVsSpecies(params) # spot on
 
@@ -76,10 +76,10 @@ tuning_profile  <- tuning_profile
     
     # Match biomasses again
     params <- params |>
-        matchBiomasses()|> reef_steady()|> 
-        matchBiomasses()|> reef_steady()|>
-        matchBiomasses()|> reef_steady()|>
-        matchBiomasses()|> reef_steady() 
+        matchBiomasses()|> reefSteady()|> 
+        matchBiomasses()|> reefSteady()|>
+        matchBiomasses()|> reefSteady()|>
+        matchBiomasses()|> reefSteady() 
     
     # Make sure new refuge is in place
     plotVulnerable(params)
@@ -132,9 +132,9 @@ tuning_profile  <- tuning_profile
     
     # Iterate to get back to steady state
     params <- params |>
-        reef_steady()|>
-        reef_steady()|>
-        reef_steady()
+        reefSteady()|>
+        reefSteady()|>
+        reefSteady()
     
     # Check new reproduction - these look better
     rep <- getReproductionLevel(params)
@@ -145,7 +145,7 @@ tuning_profile  <- tuning_profile
     plotSpectra(params, total = TRUE, power = 2)
 
     # Save!
-    bonaire_model <- reef_steady(params)
+    bonaire_model <- reefSteady(params)
     
     # Meh
 

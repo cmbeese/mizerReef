@@ -46,7 +46,7 @@ A mizer object with updated refuge profiles
 This is a wrapper function for the \code{\link[=setRefuge]{setRefuge()}} and \code{\link[=getRefuge]{getRefuge()}}
 functions that allows users to easily change refuge parameters on an
 existing mizer model. This will take it out of steady state, and users
-should run \code{\link[=reef_steady]{reef_steady()}} after this function to return to steady state.
+should run \code{\link[=reefSteady]{reefSteady()}} after this function to return to steady state.
 }
 \section{Setting the refuge profile}{
 
