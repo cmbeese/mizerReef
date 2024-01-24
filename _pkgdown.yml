@@ -9,11 +9,8 @@ template:
 navbar:
   #bg: primary
   structure:
-    left:
-    - home
-    - reference
-    - articles
-    right: github
+    left: [home, reference, articles]
+    right: [github]
 home:
   sidebar:
     structure:
