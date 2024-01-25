@@ -76,5 +76,10 @@ reference:
     - bonaire_refuge
     - bonaire_species
     - bonaire_model
+    - karpata_int
+    - karpata_refuge
+    - karpata_species
+    - karpata_model
+    - aquarius_refuge
     - tuning_profile
 
