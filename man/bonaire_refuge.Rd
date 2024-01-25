@@ -3,9 +3,9 @@
 \docType{data}
 \name{bonaire_refuge}
 \alias{bonaire_refuge}
-\title{refuge parameters for thesis, chapter 3 vignettes}
+\title{refuge parameters for for a simple, generic Caribbean reef}
 \format{
-A MizerParams object
+datafram
 }
 \source{
 PhD Thesis
@@ -14,6 +14,9 @@ PhD Thesis
 bonaire_refuge
 }
 \description{
-refuge parameters for thesis, chapter 3 vignettes
+Includes predators, herbivores, and invertebrates.
+}
+\details{
+PhD Thesis chapter 3 vignettes
 }
 \keyword{datasets}

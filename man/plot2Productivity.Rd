@@ -91,12 +91,12 @@ object the steady state productivities are plotted.
 Other plotting functions: 
 \code{\link{plot2TotalBiomass}()},
 \code{\link{plotBiomass}()},
-\code{\link{plotProductivityRelative}()},
 \code{\link{plotProductivity}()},
+\code{\link{plotProductivityRelative}()},
 \code{\link{plotRefuge}()},
 \code{\link{plotSpectraRelative}()},
-\code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()},
+\code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}

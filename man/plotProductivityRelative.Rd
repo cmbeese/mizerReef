@@ -110,8 +110,8 @@ Other plotting functions:
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
 \code{\link{plotSpectraRelative}()},
-\code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotTotalBiomass}()},
+\code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}

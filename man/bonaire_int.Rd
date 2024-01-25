@@ -3,9 +3,9 @@
 \docType{data}
 \name{bonaire_int}
 \alias{bonaire_int}
-\title{interaction matrix for thesis, chapter 3 vignettes}
+\title{interaction matrix for for a simple, generic Caribbean reef}
 \format{
-A MizerParams object
+dataframe
 }
 \source{
 PhD Thesis
@@ -14,6 +14,9 @@ PhD Thesis
 bonaire_int
 }
 \description{
-interaction matrix for thesis, chapter 3 vignettes
+Includes predators, herbivores, and invertebrates.
+}
+\details{
+PhD Thesis chapter 3 vignettes
 }
 \keyword{datasets}

@@ -3,9 +3,9 @@
 \docType{data}
 \name{tuning_profile}
 \alias{tuning_profile}
-\title{refuge parameters for tuning the steady state}
+\title{Constant refuge profile}
 \format{
-A MizerParams object
+dataframe
 }
 \source{
 PhD Thesis
@@ -14,6 +14,20 @@ PhD Thesis
 tuning_profile
 }
 \description{
-refuge parameters for tuning the steady state
+This is a 2-dimensional array containing start and end lengths for size bins
+and prop_protect equal to 10\% for all bins.
+}
+\details{
+These refuge parameters are intended for tuning the steady state when
+using the density-dependent competitive method. The tuning profile provides
+a constant proportion of refuges to all fish up to 50 cm in length.
+
+When creating a model using the competitive method, you should run
+\code{\link[=newReefParams]{newReefParams()}} with the "binned" method and thing tuning profile.
+
+After species biomasses and growth rates have been calibrated to match
+empirical observations, use the \code{\link[=newRefuge]{newRefuge()}} function to implement your
+competitive refuge parameters. After using \code{\link[=newRefuge]{newRefuge()}}, make sure to run
+\code{\link[=reefSteady]{reefSteady()}} again to regain the steady state.
 }
 \keyword{datasets}

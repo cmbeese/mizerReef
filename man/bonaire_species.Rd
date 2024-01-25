@@ -3,9 +3,9 @@
 \docType{data}
 \name{bonaire_species}
 \alias{bonaire_species}
-\title{species_params for thesis, chapter 3 vignettes}
+\title{species_params for a simple, generic Caribbean reef}
 \format{
-A MizerParams object
+dataframe
 }
 \source{
 PhD Thesis
@@ -14,6 +14,9 @@ PhD Thesis
 bonaire_species
 }
 \description{
-species_params for thesis, chapter 3 vignettes
+Includes predators, herbivores, and invertebrates.
+}
+\details{
+PhD Thesis chapter 3 vignettes
 }
 \keyword{datasets}
