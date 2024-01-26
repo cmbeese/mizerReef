@@ -23,7 +23,6 @@ tuning_profile  <- tuning_profile
 # With these parameters, invertebrates consume plankton and detritus,
 #   with the proportion of detritus increasing with size
 
-
 ## Set model -------------------------------------------------------------------
 params <- newReefParams(group_params = karpata_species,
                         interaction = karpata_int,
@@ -31,7 +30,11 @@ params <- newReefParams(group_params = karpata_species,
                         method_params = tuning_profile)
 
 ## Project to first steady state -----------------------------------------------
-params <- reefSteady(params)
+params <- params |>
+    reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+    reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
+
+# Converges on 7th attempt
 
 ## Calibrate biomasses and growth ----------------------------------------------
 
@@ -39,6 +42,8 @@ params <- reefSteady(params)
 params <- calibrateReefBiomass(params)
 params <- matchBiomasses(params)
 params <- reefSteady(params)
+params <- params |>
+    reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
 
 # Match observed growth rates
 params <- matchReefGrowth(params)
