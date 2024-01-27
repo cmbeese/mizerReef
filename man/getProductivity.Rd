@@ -5,7 +5,13 @@
 \title{Calculate fisheries productivity for each functional group above a chosen
 minimum fishing size}
 \usage{
-getProductivity(object, min_fishing_l = NULL, max_fishing_l = NULL, ...)
+getProductivity(
+  object,
+  include_repro = FALSE,
+  min_fishing_l = NULL,
+  max_fishing_l = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{An object of class \code{MizerParams} or \code{MizerSim}. If given a
@@ -13,6 +19,10 @@ getProductivity(object, min_fishing_l = NULL, max_fishing_l = NULL, ...)
 final time of a simulation to calculate productivity. If
 given a \linkS4class{MizerParams} object, uses the initial
 growth rates.}
+
+\item{include_repro}{A boolean value that indicates whether to include
+energy for reproduction in productivity estimates.
+Defaults to false.}
 
 \item{min_fishing_l}{The minimum length (cm) of fished individuals for
 productivity estimates. Defaults to 7 cm.}

@@ -33,10 +33,9 @@
 #'                  given a \linkS4class{MizerParams} object, uses the initial 
 #'                  growth rates.
 #'                  
-#@param total A boolean value that indicates whether the user wants the
-#             mass specific productivity for each functional group (species
-#             by size) or the total productivity for each functional group.
-#             Default value is true.
+#' @param include_repro A boolean value that indicates whether to include
+#'                      energy for reproduction in productivity estimates.
+#'                      Defaults to false.
 #'              
 #' @param min_fishing_l The minimum length (cm) of fished individuals for
 #'                      productivity estimates. Defaults to 7 cm.
@@ -55,6 +54,7 @@
 #' @family summary functions
 #' @concept summary
 getProductivity <- function(object,
+                            include_repro = FALSE,
                             min_fishing_l = NULL, 
                             max_fishing_l = NULL,...) {
     
@@ -71,9 +71,10 @@ getProductivity <- function(object,
         size_range <- mizer::get_size_range_array(params, 
                                                   min_l = min_fishing_l, 
                                                   max_l = max_fishing_l, ...)
-
-        # pr <- mizer::getEGrowth(params)
-        pr <- mizer::getEReproAndGrowth(params)
+        
+        if (include_repro == FALSE){ pr <- mizer::getEGrowth(params) }
+        if (include_repro == TRUE) { pr <- mizer::getEReproAndGrowth(params) }
+        
         prod <- (pr * params@initial_n * size_range) %*% (params@w * params@dw)
         # This seems like growth times biomass?
         # Alice's old code:
