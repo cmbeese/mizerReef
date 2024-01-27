@@ -84,7 +84,7 @@ parameters.)</p></dd>
 
 <dt>pred_rate</dt>
 <dd><p>A two dimensional array (predator species x predator size)
-with the feeding level.</p></dd>
+with the predation rate</p></dd>
 
 
 <dt>vulnerable</dt>
@@ -100,15 +100,14 @@ that are not protected from predation by refuge</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A two dimensional array (prey species x prey size) with the predation
-mortality</p>
+<p>A two dimensional array (prey species x prey size) with the
+predation mortality</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>$$\mu_{p.i}(w_p) = \sum_j {\tt pred\_rate}_j(w_p)\, V_{ji}(w_p)\, \theta_{ji}.$$</p>
-<p>You would not usually call this
-function directly but instead use <code>getPredMort()</code>, which then calls this
-function unless an alternative function has been registered, see below.</p>
+<p>You would not usually call this function directly but instead
+use <code>getPredMort()</code>, which then calls this function.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
