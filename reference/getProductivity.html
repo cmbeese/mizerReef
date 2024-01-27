@@ -48,7 +48,13 @@ minimum fishing size</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getProductivity</span><span class="op">(</span><span class="va">object</span>, min_fishing_l <span class="op">=</span> <span class="cn">NULL</span>, max_fishing_l <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getProductivity</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  include_repro <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  min_fishing_l <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  max_fishing_l <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -59,6 +65,12 @@ MizerSim object, uses the growth rates at the
 final time of a simulation to calculate productivity. If
 given a MizerParams object, uses the initial
 growth rates.</p></dd>
+
+
+<dt>include_repro</dt>
+<dd><p>A boolean value that indicates whether to include
+energy for reproduction in productivity estimates.
+Defaults to false.</p></dd>
 
 
 <dt>min_fishing_l</dt>
