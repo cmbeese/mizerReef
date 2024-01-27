@@ -76,10 +76,12 @@ tuning_profile  <- tuning_profile
     
     # Match biomasses again
     params <- params |>
-        matchBiomasses()|> reefSteady()|> 
-        matchBiomasses()|> reefSteady()|>
-        matchBiomasses()|> reefSteady()|>
-        matchBiomasses()|> reefSteady() 
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()
     
     # Make sure new refuge is in place
     plotVulnerable(params)
@@ -109,7 +111,7 @@ tuning_profile  <- tuning_profile
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.04)
+    params <- setBevertonHolt(params, erepro = 0.065)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
     rep <- getReproductionLevel(params)
@@ -125,7 +127,7 @@ tuning_profile  <- tuning_profile
     
     # Let's increase reproduction level to 0.5 for predators and herbivores
     # so that 
-    rep_level <- c(0.5, rep[2], rep[3])
+    rep_level <- c(0.5, 0.5, rep[3])
     names(rep_level) <- c("predators","herbivores","inverts")
     params <- setBevertonHolt(params,
                               reproduction_level = rep_level)

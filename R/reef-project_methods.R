@@ -155,9 +155,11 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
     max_protect <- refuge_params$max_protect
     tau         <- refuge_params$tau
     
-    # Pull no of spcies and size bins
+    # Pull no of species and size bins
     no_w <- length(params@w)
     no_sp <- dim(params@interaction)[1]
+    # Pull indices of size bins less than w_settle
+    
     
     # Store which functional groups use refuge
     refuge_user <- params@species_params$refuge_user
@@ -209,6 +211,7 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
             vulnerable = 1 - (refuge_user*refuge)
         }
     }
+    
     return(vulnerable)
 }
 
@@ -454,7 +457,7 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 #'                  with the encounter rate.
 #'
 #' @return A two dimensional array (predator species x predator size) with the
-#'   feeding level.
+#'          feeding level.
 #'   
 #' @family mizer rate functions
 #' @concept extmort
@@ -483,18 +486,17 @@ reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,
 #' \deqn{\mu_{p.i}(w_p) = \sum_j {\tt pred\_rate}_j(w_p)\, V_{ji}(w_p)\, \theta_{ji}.}{
 #'   \mu_{p.i}(w_p) = \sum_j pred_rate_j(w_p) V_{ji}(w_p) \theta_{ji}.}
 #'   
-#' You would not usually call this
-#' function directly but instead use [getPredMort()], which then calls this
-#' function unless an alternative function has been registered, see below.
+#' You would not usually call this function directly but instead 
+#' use [getPredMort()], which then calls this function.
 #' 
 #' @inheritParams reefRates
 #' @param vulnerable Array (species x size) with the proportion of individuals 
 #'                   that are not protected from predation by refuge
 #' @param pred_rate A two dimensional array (predator species x predator size)
-#'   with the feeding level.
+#'                  with the predation rate
 #'
-#' @return A two dimensional array (prey species x prey size) with the predation
-#'   mortality
+#' @return A two dimensional array (prey species x prey size) with the 
+#'          predation mortality
 #' @family mizer rate functions
 #' @concept refugeRates
 #' @export
@@ -502,10 +504,20 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
                          vulnerable = reefVulnerable(params, n, n_pp,
                                                      n_other, t), ...) {
     
-    # Find indices of fish that have grown out of the resource spectrum
-    idx_sp <- (length(params@w_full) - 
-                   length(params@w) + 1):length(params@w_full)
+    # Number of species, number of bins in resource spectrum and full
+    # size spectrum
     no_sp <- nrow(params@species_params)
+    no_w <- length(params@w)
+    no_w_full <- length(params@w_full)
+    
+    # Find number of size bins in resource spectra smaller than smallest fish
+    p <- no_w_full - no_w  
+    
+    # Add columns for entire model size range to vulnerability matrix
+    larval_vul <- matrix(1, nrow = no_sp, ncol = p)
+
+    # Add larval vulnerability to vulnerability matrix
+    vul_pp <- cbind(larval_vul, vulnerable)
     
     # Find indices of predator species whose foraging is hindered by refuge
     bad_pred  <- which(params@species_params$bad_pred == TRUE)
@@ -513,24 +525,32 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     
     # Create list of vulnerabilities for each predator
     vul <- vector("list", no_sp)
-    vul[bad_pred] <- list(vulnerable)
-    vul[good_pred] <- list(matrix(1, nrow = no_sp, ncol = length(idx_sp)))
+    vul[bad_pred] <- list(vul_pp)
+    vul[good_pred] <- list(matrix(1, nrow = no_sp, ncol = ncol(vul_pp)))
     
     # Loop through predator species to calculate predation mortality on
     # each prey species & size by all predators
-    pm <- matrix(0, no_sp, length(idx_sp))
+    pm <- matrix(0, no_sp, length(params@w_full))
+    
     for (i in 1:no_sp){
-        # Vulnerability rate of all prey (species by size) to predator i
+        # Vulnerability rate of all prey, including resource
+        # (species by size) to predator i
         v <- vul[[i]]
         # Predation rate of predator species i on all prey (by size)
-        pr_i <- pred_rate[i, idx_sp]
-        # vul*pr_i predation mortality on prey (species by size) by predator i 
-        # pm + add to predation mortality from other predators
+        pr_i <- pred_rate[i,]
+        pr_i <- matrix(rep(pr_i, each = nrow(v)), 
+                       nrow = nrow(v), ncol = ncol(v))
+        # vul*pr_i predation mortality on prey (species by size) by 
+        # predator i 
         pm <- pm + v*pr_i
     }
     
+    # Get index of species that have grown out of the resource spectrum
+    idx_sp <- (length(params@w_full) - 
+                   length(params@w) + 1):length(params@w_full)
+    
     # Account for interaction of species
-    pred_mort <- base::t(params@interaction) %*% pm
+    pred_mort <- base::t(params@interaction) %*% pm[, idx_sp, drop = FALSE]
     
     return(pred_mort)
 }
@@ -556,17 +576,17 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 #'      Users can change all constants with the `setSenMortParams()` function.
 #'
 #' @param params A MizerParams object
-#' @param n A matrix of species abundances (species x size).
-#' @param n_pp A vector of the resource abundance by size
-#' @param n_other A list of abundances for other dynamical components of the
-#'   ecosystem
-#' @param t The time for which to do the calculation (Not used by standard
-#'   mizer rate functions but useful for extensions with time-dependent
-#'   parameters.)
+#' @param n     A matrix of species abundances (species x size).
+#' @param n_pp  A vector of the resource abundance by size
+#' @param n_other   A list of abundances for other dynamical components of the
+#'                  ecosystem
+#' @param t     The time for which to do the calculation (Not used by standard
+#'              mizer rate functions but useful for extensions with 
+#'              time-dependent parameters.)
 #' @param ... Unused
 #'
-#' @return A named two dimensional array (species x size) with the senescence
-#'   mortality rates.
+#' @return  A named two dimensional array (species x size) with the senescence
+#'          mortality rates.
 #' @concept extmort
 #' @export
 reefSenMort <- function(params, n, n_pp, n_other, t = 0, ...) {

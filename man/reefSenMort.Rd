@@ -17,8 +17,8 @@ reefSenMort(params, n, n_pp, n_other, t = 0, ...)
 ecosystem}
 
 \item{t}{The time for which to do the calculation (Not used by standard
-mizer rate functions but useful for extensions with time-dependent
-parameters.)}
+mizer rate functions but useful for extensions with
+time-dependent parameters.)}
 
 \item{...}{Unused}
 }

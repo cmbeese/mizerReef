@@ -42,8 +42,6 @@ params <- params |>
 params <- calibrateReefBiomass(params)
 params <- matchBiomasses(params)
 params <- reefSteady(params)
-params <- params |>
-    reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
 
 # Match observed growth rates
 params <- matchReefGrowth(params)

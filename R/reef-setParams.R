@@ -828,7 +828,7 @@ getRefuge <- function(params, ...) {
             start_w[start_w < w_settle] <- w_settle
             
             # Gives indices of fish in size range to protect
-            bin.id[[k]] <- which(params@w >= start_w & params@w <= end_w)
+            bin.id[[k]] <- which(w >= start_w & w <= end_w)
             
             # Refuge
             ref[bin.id[[k]]] = method_params$prop_protect[k]

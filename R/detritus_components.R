@@ -56,7 +56,7 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
     consumption <- detritus_consumption(params, n, rates)
     production <- sum(getDetritusProduction(params, n, rates))
 
-    if (consumption) {
+    if (consumption > 0) {
         et <- exp(-consumption * dt)
         return(n_other$detritus * et + production / consumption  * (1 - et))
     }
@@ -87,7 +87,6 @@ detritus_consumption <- function(params,
     
     sum((params@other_params$detritus$rho * n * 
              (1 - rates$feeding_level)) %*% params@dw)
-        #params@other_params$detritus$external_consumption
     
 }
 

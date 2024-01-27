@@ -56,7 +56,7 @@ algal_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     k <- params@other_params$algae$capacity
 
     # If consumption is non-zero, return analytic solution
-    if (consumption) {
+    if (consumption > 0) {
         et <- exp(-dt/k * (production + k * consumption))
         frac <- (k*production) / (production + k * consumption)
         return(n_other$algae * et - frac * et)
