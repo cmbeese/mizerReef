@@ -290,8 +290,8 @@ tuning_profile  <- tuning_profile
     # Try with 10 plus biomasses instead of 5 plus - has drastically smaller
     # biomass for pred_plank, no farming damselfish
     # increase beta for planktivores?
-    karpata_species$interaction_algae[karpata_species$interaction_algae == 0.5] <- 1
-    karpata_species$interaction_algae[karpata_species$interaction_detritus == 0.5] <- 1
+    karpata_10plus$interaction_algae[karpata_species$interaction_algae == 0.5] <- 1
+    karpata_10plus$interaction_algae[karpata_species$interaction_detritus == 0.5] <- 1
     karpata_10plus$beta[karpata_10plus$species == "pred_plank"] <- 1000
     karpata_10plus$sigma[karpata_10plus$species == "pred_grab"] <- 2
     
@@ -312,19 +312,65 @@ tuning_profile  <- tuning_profile
     plotBiomassVsSpecies(params)
     
     # Match biomass species by species, starting with ones that are closest
-    params <- matchBiomasses(params)
+    #params <- matchBiomasses(params)
+    #params <- reefSteady(params)
+    
+    # Error in mizer::setBevertonHolt(params, 
+    #                     reproduction_level = old_reproduction_level) : 
+    #     Some species have no reproduction.
+    
+    # Match biomass species by species, starting with ones that are closest
+    params <- matchBiomasses(params, species = "parrotfish")
     params <- reefSteady(params)
-    # HUGE distance function
+    
+    # Plot species vs biomass to see which ones are furthest away
+    plotBiomassVsSpecies(params)
+    
+    params <- matchBiomasses(params, species = "herbs")
     params <- params |>
         reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+        reefSteady() |> reefSteady() 
+    
+    plotBiomassVsSpecies(params)
+    
+    params <- matchBiomasses(params, species = "pred_plank")
+    params <- params |>
         reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
-        
+        reefSteady() |> reefSteady() |> reefSteady() 
+    
     # Error in mizer::setBevertonHolt(params, 
     #                         reproduction_level = old_reproduction_level) : 
     #     Some species have no reproduction.
+    
+    params <- matchBiomasses(params, species = "pred_inv")
+    params <- params |>
+        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+        reefSteady() |> reefSteady() |> reefSteady()
+    
+    plotBiomassVsSpecies(params)
+    
+    params <- matchBiomasses(params, species = "pred_eng")
+    params <- reefSteady(params)
+    
+    plotBiomassVsSpecies(params)
+    
+    params <- matchBiomasses(params, species = "pred_grab")
+    params <- params |>
+        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+        reefSteady() |> reefSteady() |> reefSteady()
+    
+    plotBiomassVsSpecies(params)
+    
+    params <- params |>
+        matchReefGrowth() |> matchReefGrowth() |> matchReefGrowth() |>
+        matchReefGrowth() |> matchReefGrowth()
+    
+    params <- params |>
+        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+        reefSteady() |> reefSteady() |> reefSteady()
+    
+    
+    
     
     
     
