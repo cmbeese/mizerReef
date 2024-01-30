@@ -107,3 +107,75 @@ getSenMort <- function(params, n = initialN(params),
     sen_mort
 }
 
+
+#' Get energy rate available for growth through time
+#'
+#' Calculates the energy rate \eqn{g_i(w)} (grams/year) available by 
+#' species and size for growth after metabolism, movement and 
+#' reproduction have been accounted for.
+#' 
+#' @inheritParams reefRates
+#'   
+#' @return If a `MizerParams` object is passed in, the function returns a two
+#'   dimensional array (predator species x predator size) based on the
+#'   abundances also passed in.
+#'   If a `MizerSim` object is passed in, the function returns a three
+#'   dimensional array (time step x predator species x predator size) with the
+#'   energy for growth calculated at every time step in the simulation.
+#'   If \code{drop = TRUE} then the dimension of length 1 will be removed from
+#'   the returned array.
+#' @export
+#' @family rate functions
+getEGrowthTime <- function(params, n, n_pp, n_other,
+                           time_range,
+                           drop = FALSE, ...) {
+    
+    if (is(object, "MizerParams")) {
+        params <- validParams(params)
+        f <- get(params@rates_funcs$EGrowth)
+        
+        # Get any missing arguments
+        if (missing(time_range)) time_range <- 0
+        t <- min(time_range)
+        if (missing(n)) n <- params@initial_n
+        if (missing(n_pp)) n_pp <- params@initial_n_pp
+        if (missing(n_other)) n_other <- params@initial_n_other
+        
+        # Calculate growth
+        g <- f(params, n = n, n_pp = n_pp, n_other = n_other, t = t, 
+               e_repro = getERepro(params, n = n, n_pp = n_pp, 
+                                   n_other = n_other, t = t), 
+               e = getEReproAndGrowth(params, n = n, n_pp = n_pp, 
+                                      n_other = n_other, t = t))
+        dimnames(g) <- dimnames(params@metab)
+        
+        return(g)
+        
+    } else { 
+
+        sim <- object
+        if (missing(time_range)) {
+            time_range <- dimnames(sim@n)$time
+        }
+        time_elements <- mizer::get_time_elements(sim, time_range)
+        grow_time <- plyr::aaply(which(time_elements), 1, function(x) {
+            # Necessary as we only want single time step but may only have 1
+            # species which makes using drop impossible
+            n <- array(sim@n[x, , ], dim = dim(sim@n)[2:3])
+            dimnames(n) <- dimnames(sim@n)[2:3]
+            n_other <- sim@n_other[x, ]
+            names(n_other) <- dimnames(sim@n_other)$component
+            t <- as.numeric(dimnames(sim@n)$time[[x]])
+            grow <- getEGrowthTime(sim@params, n = n,
+                                   n_pp = sim@n_pp[x, ],
+                                   n_other = n_other,
+                                   time_range = t)
+            return(grow)
+        }, .drop = FALSE)
+    
+    # Before we drop dimensions we want to set the time dimname
+    names(dimnames(grow_time))[[1]] <- "time"
+    grow_time <- grow_time[, , , drop = drop]
+    return(grow_time)
+    }
+}

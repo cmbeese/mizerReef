@@ -59,7 +59,18 @@ getProductivity <- function(object,
                             max_fishing_l = NULL,...) {
     
     if (is(object, "MizerSim")) {
-        stop('This functionality is not set up yet.')
+        sim <- object
+        size_range <- mizer::get_size_range_array(sim@params, 
+                                                  min_l = min_fishing_l, 
+                                                  max_l = max_fishing_l,...)
+        
+        abundances <- apply(sweep(sweep(sim@n, c(2, 3), size_range, "*"), 3,
+                            sim@params@dw, "*"), c(1, 2), sum)
+        
+        
+        if (include_repro == FALSE){ pr <- getEGrowthTime(sim) }
+        if (include_repro == TRUE) { 
+            stop('This functionality is not set up yet.')}
     }
 
     if (is(object, "MizerParams")) {
@@ -75,7 +86,8 @@ getProductivity <- function(object,
         if (include_repro == FALSE){ pr <- mizer::getEGrowth(params) }
         if (include_repro == TRUE) { pr <- mizer::getEReproAndGrowth(params) }
         
-        prod <- (pr * params@initial_n * size_range) %*% (params@w * params@dw)
+        prod <- (pr * params@initial_n * size_range) %*% params@dw[, , drop = TRUE]
+        
         # This seems like growth times biomass?
         # Alice's old code:
         # prod_pred <- colSums(10^x[ref:end]*GG.u[ref:end,]*U[ref:end,]*dx)

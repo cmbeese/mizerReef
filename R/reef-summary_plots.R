@@ -220,7 +220,7 @@ plotSpectraRelative <- function(object1, object2, diff_method, ...) {
         scale_x_log10() +
         scale_color_manual(values = linecolours) +
         geom_hline(yintercept = 0, linetype = 1,
-                   colour = "dark grey", linewidth = 0.75)
+                   colour = "dark grey", linewidth = 1)
 }
 
 #' @rdname plotSpectraRelative
@@ -244,6 +244,13 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #'                  numeric vector with the species indices, or a logical 
 #'                  vector indicating for each species whether it is to be 
 #'                  selected (TRUE) or not.
+#'                  
+#' @param total A boolean value that determines whether the total productivity
+#'              from all species is plotted as well. Default is FALSE.
+#'              
+#' @param ylim  A numeric vector of length two providing lower and upper limits
+#'              for the y axis. Use NA to refer to the existing minimum or 
+#'              maximum. Any values below 1e-20 are always cut off.
 #'                  
 #' @param start_time    The first time to be plotted. Default is the beginning 
 #'                      of the time series.
@@ -274,46 +281,92 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #' @concept sumplots
 #' @family plotting functions
 #' 
-#' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
-#'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
+#' @seealso [plotBiomass()], [plot2TotalBiomass()], 
+#'          [plotTotalBiomassRelative()], [plotProductivity()],
+#'          [plot2Productivity()], [plotProductivityRelative()]
 plotProductivity <- function(object,
-                             species = NULL,
-                             return_data = FALSE,
+                             species = NULL, ylim = c(NA, NA),
+                             total = FALSE,  return_data = FALSE,
                              min_fishing_l = NULL, max_fishing_l = NULL,
                              start_time = NULL, end_time = NULL,...) {
     
     if (is(object, "MizerSim")) {
         # sim values ----
-        params <- object@params
-        warning('This functionality is not set up yet.')
-    }
-    if (is(object, "MizerParams")) {
+        sim <- object
+        assert_that(is(sim, "MizerSim"),
+                    is.flag(return_data))
+        params <- sim@params
+        
+        species <- mizer::valid_species_arg(sim, species, 
+                                            error_on_empty = TRUE)
+        
+        if (missing(start_time)) start_time <- 
+            as.numeric(dimnames(sim@n)[[1]][1])
+        if (missing(end_time)) end_time <- 
+            as.numeric(dimnames(sim@n)[[1]][dim(sim@n)[1]])
+        if (start_time >= end_time) {
+            stop("start_time must be less than end_time")
+        }
+        
+        p <- getProductivity(sim, ...)
+        # Select time range
+        p <- p[(as.numeric(dimnames(p)[[1]]) >= start_time) &
+               (as.numeric(dimnames(p)[[1]]) <= end_time), , drop = FALSE]
+        
+        # Include total
+        if (total) {
+            p <- cbind(p, Total = rowSums(p))
+        }
+        
+        p <- reshape2::melt(p)
+        
+        # Implement ylim and a minimal cutoff and bring columns in 
+        # desired order
+        min_value <- 1e-20
+        p <- p[p$value >= min_value &
+                     (is.na(ylim[1]) | p$value >= ylim[1]) &
+                     (is.na(ylim[2]) | p$value <= ylim[2]), c(1, 3, 2)]
+        names(p) <- c("Year", "Biomass", "Species")
+        
+        # Select species
+        plot_dat <- p[p$Species %in% c("Total", species), ]
+        plot_dat$Legend <- plot_dat$Species
+        
+        if (return_data) return(plot_dat) 
+        
+        mizer::plotDataFrame(plot_dat, params, xlab = "Year", 
+                             ylab = "Productivity [g/m^2/year]",
+                             ytrans = "log10",
+                             y_ticks = y_ticks, highlight = highlight,
+                             legend_var = "Legend")
+        
+    } else if (is(object, "MizerParams")) {
         # params ----
         params <- object
     } else {
         stop('object should be a mizerParams or mizerSim object.')
     }
     
-    # create plot_dat ----
+    ### create plot_dat ----
     
-    ## values from object ----
+    ### values from object ----
     params <- object
     sp <- params@species_params
     no_sp <- dim(params@interaction)[1]
     
-    ## group names ----
+    ### group names ----
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
     } else {
         group_names <- params@species_params$group_names
     }
     
-    ## get productivity ----
+    ### get productivity ----
     prod <- getProductivity(params, 
                             min_fishing_l = min_fishing_l,
                             max_fishing_l = max_fishing_l)
     
-    ## species selector ----
+    ### species selector ----
     sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
                                 error_on_empty = TRUE)
     species <- dimnames(params@initial_n)$sp[sel_sp]
@@ -322,14 +375,14 @@ plotProductivity <- function(object,
     sel_sp <- which(!is.na(species))
     prod <- prod[sel_sp, drop = FALSE]
     
-    ## data frame from selected species ----
+    ### data frame from selected species ----
     plot_dat <- data.frame(value = prod, Species = species)
     
-    ## colors ----
+    ### colors ----
     legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
     plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
     
-    ## return data if requested ----
+    ### return data if requested ----
     if (return_data) return(plot_dat)
     
     # plot ----
@@ -341,8 +394,8 @@ plotProductivity <- function(object,
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
         labs(fill = "Species Group", x = "Species Group")
-    
 }
+
 
 #' @rdname plotProductivity
 #' @export
@@ -609,7 +662,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
                           labels = group_names) +
         labs(fill = "Species Group", x = "Species Group") +
         geom_hline(yintercept = 0, linetype = 1,
-                   colour = "dark grey", linewidth = 0.75)
+                   colour = "dark grey", linewidth = 0.9)
 }
 
 #' @rdname plotProductivityRelative
@@ -933,7 +986,7 @@ plotTotalBiomassRelative <- function(object1, object2,
                           labels = group_names) +
         labs(fill = "Species Group", x = "Species Group") + 
         geom_hline(yintercept = 0, linetype = 1,
-                   colour = "dark grey", linewidth = 0.75)
+                   colour = "dark grey", linewidth = 0.9)
     
 }
 

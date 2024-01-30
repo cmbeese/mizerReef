@@ -8,6 +8,8 @@
 plotProductivity(
   object,
   species = NULL,
+  ylim = c(NA, NA),
+  total = FALSE,
   return_data = FALSE,
   min_fishing_l = NULL,
   max_fishing_l = NULL,
@@ -26,6 +28,13 @@ species are selected. A vector of species names, or a
 numeric vector with the species indices, or a logical
 vector indicating for each species whether it is to be
 selected (TRUE) or not.}
+
+\item{ylim}{A numeric vector of length two providing lower and upper limits
+for the y axis. Use NA to refer to the existing minimum or
+maximum. Any values below 1e-20 are always cut off.}
+
+\item{total}{A boolean value that determines whether the total productivity
+from all species is plotted as well. Default is FALSE.}
 
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot
@@ -58,8 +67,9 @@ productivity is plotted. When called with a \linkS4class{MizerSim}
 object the productivity is plotted.
 }
 \seealso{
-\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}}, \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
-\code{\link[=plotProductivity]{plotProductivity()}}, \code{\link[=plot2Productivity]{plot2Productivity()}}, \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
+\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}}, \code{\link[=plotProductivity]{plotProductivity()}},
+\code{\link[=plot2Productivity]{plot2Productivity()}}, \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
 
 Other plotting functions: 
 \code{\link{plot2Productivity}()},
