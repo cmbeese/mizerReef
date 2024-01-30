@@ -100,7 +100,9 @@ reefSteady <- function(params, d_func = NULL,
     rates <- mizer::getRates(params)
     
     # algae and detritus ----
-    params <- tuneUR(params = params, ...)
+    cc <- params@other_params$carry_capacity
+    if (cc == TRUE)  { params <- tuneUR_cc(params = params, ...) }
+    if (cc == FALSE) { params <- tuneUR(params = params, ...) }
 
     if (preserve == "reproduction_level") {
         params <- mizer::setBevertonHolt(params,

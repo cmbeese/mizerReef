@@ -31,6 +31,10 @@
 #'                              so that steady state abundances match given 
 #'                              values.
 #'                              
+#' @param carry_capacity A boolean value that indicates whether the user wants
+#'                      to implement a carrying capacity for unstructured 
+#'                      resources. Default is FALSE
+#'                              
 #' @param algae_capacity    The carrying capacity of the system for algae
 #'                          biomass in grams per year.
 #'                          
@@ -61,7 +65,8 @@ setURParams <- function(params,
                         # Preference for resource
                         UR_interaction = NULL, 
                         # Resource Production
-                        initial_algae_growth = NULL, 
+                        initial_algae_growth = NULL,
+                        carry_capacity = FALSE,
                         algae_capacity = NULL,
                         detritus_capacity = NULL,
                         sen_decomp = NULL, ext_decomp = NULL, 
@@ -73,6 +78,10 @@ setURParams <- function(params,
 
         # Find number of species for checks
         no_sp = nrow(params@species_params)
+        
+        # Check if user wants to use carrying capacity
+        assert_that(is.flag(carry_capacity))
+        params@other_params$carry_capacity = carry_capacity
         
     # interaction ----
     # Check if user included in species params

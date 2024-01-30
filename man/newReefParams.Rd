@@ -22,7 +22,10 @@ newReefParams(
   max_protect = NULL,
   tau = NULL,
   UR_interaction,
+  carry_capacity = FALSE,
   initial_algae_growth = NULL,
+  algae_capacity = NULL,
+  detritus_capacity = NULL,
   sen_decomp = NULL,
   ext_decomp = NULL,
   initial_d_external = NULL,
@@ -91,11 +94,21 @@ actually use it. Defaults to 1.}
 \item{UR_interaction}{Interaction matrix for unstructured resources
 (species x resource)}
 
+\item{carry_capacity}{A boolean value that indicates whether the user wants
+to implement a carrying capacity for unstructured
+resources.}
+
 \item{initial_algae_growth}{The initial growth rate of algae in
 grams/m^2/year. This value is reset to match
 consumption in the \code{\link[=reefSteady]{reefSteady()}}  function
 so that steady state abundances match given
 values.}
+
+\item{algae_capacity}{The carrying capacity of the system for algae
+biomass in grams per year.}
+
+\item{detritus_capacity}{The carrying capacity of the system for
+detritus biomass in grams per year.}
 
 \item{sen_decomp}{The proportion of decomposing mass from senescence
 mortality that decomposes to become part of the

@@ -16,6 +16,9 @@
 #'                      observed abundances, and the cut-off size for 
 #'                      observations in grams.
 #' @param interaction The group specific interaction matrix, \eqn{\theta_{ij}}
+#' @param carry_capacity A boolean value that indicates whether the user wants
+#'                      to implement a carrying capacity for unstructured 
+#'                      resources.
 #' @param min_w_pp Minimum size of plankton in grams
 #' @param w_pp_cutoff Maximum size of plankton in grams
 #' @param n Growth exponent (also used as metabolic exponent p)
@@ -39,8 +42,11 @@ newReefParams <- function(# Original mizer parameters
                             w_settle = NULL, max_protect = NULL, 
                             tau = NULL,
                           # Parameters for unstructured resources
-                            UR_interaction, 
+                            UR_interaction,
+                            carry_capacity = FALSE,
                             initial_algae_growth = NULL, 
+                            algae_capacity = NULL,
+                            detritus_capacity = NULL,
                             sen_decomp = NULL, ext_decomp = NULL, 
                             initial_d_external = NULL,
                           # Parameters for external mortality
@@ -74,6 +80,9 @@ newReefParams <- function(# Original mizer parameters
     params <- setURParams(params = params,
                           UR_interaction = UR_interaction,
                           initial_algae_growth = initial_algae_growth,
+                          carry_capacity = carry_capacity,
+                          algae_capacity = algae_capacity,
+                          detritus_capacity = detritus_capacity,
                           sen_decomp = sen_decomp, 
                           ext_decomp = ext_decomp, 
                           initial_d_external = initial_d_external)
@@ -118,24 +127,47 @@ newReefParams <- function(# Original mizer parameters
         rho_alg <- outer(params@species_params$rho_algae, params@w ^ 0.86)
         rho_det <- outer(params@species_params$rho_detritus, params@w ^ n)
     
-    ### Algae Component - Add in algae ----
-    params <- setComponent(
-        params, "algae", initial_value = 1,
-        dynamics_fun = "algal_dynamics",
-        encounter_fun = "encounter_contribution",
-        component_params = list(rho = rho_alg,
-                                capacity = params@other_params$algae_capacity,
-                                growth = params@other_params$initial_algae_growth))
-    
-    ### Detritus component - Add in detritus ----
-    params <- setComponent(
-        params, "detritus", initial_value = 1,
-        dynamics_fun = "detritus_dynamics",
-        encounter_fun = "encounter_contribution",
-        component_params = list(rho = rho_det,
-                                sen_decomp = params@other_params$sen_decomp,
-                                ext_decomp = params@other_params$ext_decomp,
-                                external  = params@other_params$initial_d_external))
+    if (carry_capacity == FALSE){
+        ### Algae Component - Add in algae ----
+        params <- setComponent(
+            params, "algae", initial_value = 1,
+            dynamics_fun = "algae_dynamics",
+            encounter_fun = "encounter_contribution",
+            component_params = list(rho = rho_alg,
+                                    capacity = params@other_params$algae_capacity,
+                                    growth = params@other_params$initial_algae_growth))
+        
+        ### Detritus component - Add in detritus ----
+        params <- setComponent(
+            params, "detritus", initial_value = 1,
+            dynamics_fun = "detritus_dynamics",
+            encounter_fun = "encounter_contribution",
+            component_params = list(rho = rho_det,
+                                    sen_decomp = params@other_params$sen_decomp,
+                                    ext_decomp = params@other_params$ext_decomp,
+                                    capacity = params@other_params$detritus_capacity,
+                                    external  = params@other_params$initial_d_external))
+    } else if (carry_capacity == TRUE){
+        ### Algae Component - Add in algae ----
+        params <- setComponent(
+            params, "algae", initial_value = 1,
+            dynamics_fun = "algae_dynamics_cc",
+            encounter_fun = "encounter_contribution",
+            component_params = list(rho = rho_alg,
+                                    capacity = params@other_params$algae_capacity,
+                                    growth = params@other_params$initial_algae_growth))
+        
+        ### Detritus component - Add in detritus ----
+        params <- setComponent(
+            params, "detritus", initial_value = 1,
+            dynamics_fun = "detritus_dynamics_cc",
+            encounter_fun = "encounter_contribution",
+            component_params = list(rho = rho_det,
+                                    sen_decomp = params@other_params$sen_decomp,
+                                    ext_decomp = params@other_params$ext_decomp,
+                                    capacity = params@other_params$detritus_capacity,
+                                    external  = params@other_params$initial_d_external))
+    }
 
     # External mortality - Weight dependent ----
         ext_mort_params <- params@other_params[['ext_mort_params']]

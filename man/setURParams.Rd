@@ -8,6 +8,7 @@ setURParams(
   params,
   UR_interaction = NULL,
   initial_algae_growth = NULL,
+  carry_capacity = FALSE,
   algae_capacity = NULL,
   detritus_capacity = NULL,
   sen_decomp = NULL,
@@ -26,6 +27,10 @@ grams/m^2/year. This value is reset to match
 consumption in the \code{\link[=reefSteady]{reefSteady()}}  function
 so that steady state abundances match given
 values.}
+
+\item{carry_capacity}{A boolean value that indicates whether the user wants
+to implement a carrying capacity for unstructured
+resources. Default is FALSE}
 
 \item{algae_capacity}{The carrying capacity of the system for algae
 biomass in grams per year.}
