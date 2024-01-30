@@ -125,7 +125,7 @@ getSenMort <- function(params, n = initialN(params),
 #'   If \code{drop = TRUE} then the dimension of length 1 will be removed from
 #'   the returned array.
 #' @export
-#' @family rate functions
+#' @concept summary
 getEGrowthTime <- function(params, n, n_pp, n_other,
                            time_range,
                            drop = FALSE, ...) {

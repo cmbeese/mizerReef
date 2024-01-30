@@ -33,9 +33,4 @@ Calculates the energy rate \eqn{g_i(w)} (grams/year) available by
 species and size for growth after metabolism, movement and
 reproduction have been accounted for.
 }
-\seealso{
-Other rate functions: 
-\code{\link{getSenMort}()},
-\code{\link{getVulnerable}()}
-}
-\concept{rate functions}
+\concept{summary}

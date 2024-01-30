@@ -62,7 +62,7 @@ reference:
 - contents: has_concept("summary")
 - title: Summary Plots 
   desc:  >
-        These functions plot some summary statistics and allow for the 
+        These functions calculate and plot summary statistics and allow for the 
         comparison of results between different models. 
 - contents: has_concept("sumplots")
 - title: Helper Functions
