@@ -167,6 +167,7 @@ as a .csv file. The data can then be read into R using the command
 
 \seealso{
 Other rate functions: 
+\code{\link{getEGrowthTime}()},
 \code{\link{getSenMort}()}
 }
 \concept{rate functions}

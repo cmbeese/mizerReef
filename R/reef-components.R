@@ -40,6 +40,50 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
                   algae_factor)
 }
 
+#' Tune unstructured resources with carrying capacities 
+#' (algae and detritus) to steady state
+#'
+#' For models that use unstructured resources with carrying capacities,
+#' this functions sets the production rates of detritus and algae so
+#' that productions equals consumption at steady state.
+#' 
+#' The growth of rate of algae is set to \eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A} 
+#' grams per meter squared per year.
+#' 
+#' The external production of detritus is set to 
+#' \eqn{(c_D \cdot B_D)/(1-\frac{B_D}{K_D} - P_{D.f} - P_{D.d}} grams per meter
+#' squared per year.
+#'
+#' @param params A MizerParams object
+#' @param ... unused
+#' @return An updated MizerParams object
+#' @concept Uresources
+#' 
+#' @export
+tuneUR_cc <- function(params,...) {
+    
+    # algae
+    ba <- algae_biomass(params)
+    ka <- params@other_params$algae$capacity
+    aout <- sum(getAlgalConsumption(params))
+    params@other_params$algae$growth <- (aout*ba)/(1-ba/ka)
+    
+    # detritus
+    params@other_params$detritus$external <- 0
+    bd <- detritus_biomass(params)
+    kd <- params@other_params$detritus$capacity
+    din <- sum(getDetritusProduction(params))
+    dout <- sum(getDetritusConsumption(params))
+    if (din > dout) {
+        warning("Fecal matter and decomposition are producing more 
+        detritus than detritivores consume. To achieve a steady state,
+        the influx of external detritus is negative.")
+    }
+    params@other_params$detritus$external <- ((dout*bd)/(1-bd/kd)) - din
+    
+    params
+}
+
 #' Tune unstructured resources (algae and detritus) to steady state
 #'
 #' This first sets the rate of degradation of algae so that for the given

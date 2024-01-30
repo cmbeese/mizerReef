@@ -8,32 +8,34 @@
 #'      interaction matrix for these resources as well as any default
 #'      parameters necessary to structure them.
 #'
-#'      The resource interaction matrix \eqn{\theta_{ki} modifies the
+#'      The resource interaction matrix \eqn{\theta_{ki}} modifies the
 #'      interaction of each functional group \eqn{i} with each unstructured
 #'      resource \eqn{k} in the model. This can be used for example to allow 
 #'      for different diet preferences on each unstructured resource. 
 #'      
 #'      Note that interaction with size structured resources, such as
-#'      plankton, is still set with the `resource_interaction` column of
+#'      plankton, is still set with the resource_interaction column of
 #'      the species parameters dataframe.
 #'      
 #' @inheritSection getDetritusConsumption Detritus consumption
 #' @inheritSection getDetritusProduction Detritus production
-#' @inheritSection algal_consumption Algal consumption
+#' @inheritSection algae_consumption Algae consumption
 #'
 #' @param params MizerParams object
 #' @param UR_interaction Interaction matrix for unstructured resources
-#'  (species x resource)
+#'                       (species x resource)
 #'
-#' Optional parameters: 
 #' @param initial_algae_growth  The initial growth rate of algae in 
-#'                              grams/year/m^-2. This value is reset to match
-#'                              consumption in the `[reefSteady()]`  function 
+#'                              grams/m^2/year. This value is reset to match
+#'                              consumption in the [reefSteady()]  function 
 #'                              so that steady state abundances match given 
 #'                              values.
 #'                              
-#' @param algae_capacity    The carrying capacity of the system for algal
+#' @param algae_capacity    The carrying capacity of the system for algae
 #'                          biomass in grams per year.
+#'                          
+#' @param detritus_capacity The carrying capacity of the system for 
+#'                          detritus biomass in grams per year.          
 #'                      
 #' @param sen_decomp    The proportion of decomposing mass from senescence
 #'                      mortality that decomposes to become part of the 
@@ -47,12 +49,12 @@
 #'                              the pelagic zone and becomes part of the 
 #'                              detritus pool in grams per year. This value is 
 #'                              reset to make up any differences in consumption 
-#'                              and production in the `[reefSteady()]` function 
+#'                              and production in the [reefSteady()] function 
 #'                              so that steady state abundances match observed 
 #'                              values.
 #'
-#' @return `setUResourceParams`: MizerParams object with updated unstructured
-#'  resource parameters
+#' @return `setURParams` MizerParams object with updated unstructured
+#'                       resource parameters
 #' @concept Uresources 
 #' @export
 setURParams <- function(params,
@@ -61,6 +63,7 @@ setURParams <- function(params,
                         # Resource Production
                         initial_algae_growth = NULL, 
                         algae_capacity = NULL,
+                        detritus_capacity = NULL,
                         sen_decomp = NULL, ext_decomp = NULL, 
                         initial_d_external = NULL) {
     
@@ -194,6 +197,19 @@ setURParams <- function(params,
                 stop("initial_d_external must be non-negative.")
             }
             params@other_params$initial_d_external <- initial_d_external 
+        }
+        
+        # Set default detritus carrying capacity
+        if(is.null(detritus_capacity)){ 
+            params@other_params$detritus_capacity <- 2e3
+        } else {
+            if (!is.numeric(detritus_capacity)){
+                stop("detritus_capacity should be a numerical value.")
+            }
+            if (detritus_capacity < 0){
+                stop("detritus_capacity must be non-negative.")
+            }
+            params@other_params$detritus_capacity <- detritus_capacity 
         }
     
         # Note time sim was modified

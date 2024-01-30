@@ -9,6 +9,7 @@ setURParams(
   UR_interaction = NULL,
   initial_algae_growth = NULL,
   algae_capacity = NULL,
+  detritus_capacity = NULL,
   sen_decomp = NULL,
   ext_decomp = NULL,
   initial_d_external = NULL
@@ -18,18 +19,19 @@ setURParams(
 \item{params}{MizerParams object}
 
 \item{UR_interaction}{Interaction matrix for unstructured resources
-(species x resource)
-
-Optional parameters:}
+(species x resource)}
 
 \item{initial_algae_growth}{The initial growth rate of algae in
-grams/year/m^-2. This value is reset to match
-consumption in the \verb{[reefSteady()]}  function
+grams/m^2/year. This value is reset to match
+consumption in the \code{\link[=reefSteady]{reefSteady()}}  function
 so that steady state abundances match given
 values.}
 
-\item{algae_capacity}{The carrying capacity of the system for algal
+\item{algae_capacity}{The carrying capacity of the system for algae
 biomass in grams per year.}
+
+\item{detritus_capacity}{The carrying capacity of the system for
+detritus biomass in grams per year.}
 
 \item{sen_decomp}{The proportion of decomposing mass from senescence
 mortality that decomposes to become part of the
@@ -43,12 +45,12 @@ detritus pool. Defaults to 0.2.}
 the pelagic zone and becomes part of the
 detritus pool in grams per year. This value is
 reset to make up any differences in consumption
-and production in the \verb{[reefSteady()]} function
+and production in the \code{\link[=reefSteady]{reefSteady()}} function
 so that steady state abundances match observed
 values.}
 }
 \value{
-\code{setUResourceParams}: MizerParams object with updated unstructured
+\code{setURParams} MizerParams object with updated unstructured
 resource parameters
 }
 \description{
@@ -63,13 +65,13 @@ Checks unstructured resource parameters and interaction matrix
  interaction matrix for these resources as well as any default
  parameters necessary to structure them.
 
- The resource interaction matrix \eqn\{\\theta_\{ki\} modifies the
+ The resource interaction matrix \eqn{\theta_{ki}} modifies the
  interaction of each functional group \eqn{i} with each unstructured
  resource \eqn{k} in the model. This can be used for example to allow 
  for different diet preferences on each unstructured resource. 
  
  Note that interaction with size structured resources, such as
- plankton, is still set with the `resource_interaction` column of
+ plankton, is still set with the resource_interaction column of
  the species parameters dataframe.
 }\if{html}{\out{</div>}}
 }
@@ -135,10 +137,10 @@ independent of any other model component. It is set so that production
 and consumption are equal for the chosen steady state abundances.
 }
 
-\section{Algal consumption}{
+\section{Algae consumption}{
 
 
-The rate at which herbivorous consumer groups encounter algal
+The rate at which herbivorous consumer groups encounter algae
 biomass \eqn{E_{i.A}(w)} is controlled by the parameter
 \eqn{\rho_{A.i}}. It scales with the size of the consumer raised to
 an allometric exponent \eqn{m_{alg}} which is taken from empirical data.
@@ -148,7 +150,7 @@ an allometric exponent \eqn{m_{alg}} which is taken from empirical data.
 
 The mass specific consumption rate then accounts for the preference of
 functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the
-mass-specific algal consumption rate:
+mass-specific algae consumption rate:
 
 \deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
        c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}

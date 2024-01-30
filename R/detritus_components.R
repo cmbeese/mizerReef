@@ -13,6 +13,57 @@ detritus_biomass <- function(params) {
     params@initial_n_other$detritus
 }
 
+#' Detritus dynamics with carrying capacity
+#'
+#' Calculates the detritus biomass at the next time step from the current
+#' detritus biomass
+#'
+#' The time evolution of the detritus biomass \eqn{B} is described by
+#'
+#'  \deqn{ \frac{dB_D}{dt} = P_D\left( 1 - 
+#'                          \frac{B_D}{K_D} \right) - c_D \, B_D }{
+#'                 dB_D/dt = P_D * (1 - B_D/ K_D) - c_D * B_D}
+#'
+#' where \eqn{K_D} is the system's carrying capacity for detritus in grams/ year,
+#' \eqn{c_D} is the mass-specific rate of consumption calculated with
+#' `detritus_consumption()` and \eqn{P_D} is the rate at which detritus
+#' is produced calculated with `getDetritusProduction()`.
+#'
+#' The dynamical equation is solved analytically to
+#'
+#'   \deqn{B_D(t + dt) = B_D(t) \cdot e^{-\frac{dt}{K_D}(P_D+ K_D \, C_D)}
+#'                        - \frac{K_D \, P_D}{P_D + K \, c_D}
+#'                        e^{-\frac{dt}{K_D}(P_D + K_D \, c_D)} }{
+#'         B_D(t + dt) = B_D(t) exp^(-dt/K_D * (P_D+ K_D*c_D))
+#'                        (-K_D*P_D) / (P_D + K_D*c_D) * e^(-dt/K_D * 
+#'                        (P_D + K_D*c_D) }
+#'
+#' @param params A [MizerParams] object
+#' @param n A matrix of current species abundances (species x size)
+#' @param n_other Other dynamic components.
+#' @param rates A list of rates as returned by [getRates()]
+#' @param dt Time step size
+#' @param ... Unused
+#'
+#' @return A single number giving the detritus biomass at next time step
+#' @seealso [detritus_dynamics()], [detritus_consumption()],
+#'          [getDetritusConsumption()], [getDetritusProduction()]
+#' @concept detritus
+#' @export
+detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
+    
+    consumption <- detritus_consumption(params, n, rates)
+    production <- sum(getDetritusProduction(params))
+    kd <- params@other_params$detritus$capacity
+    
+    # If consumption is non-zero, return analytic solution
+    if (consumption > 0) {
+        et <- exp(-dt/kd * (production + kd * consumption))
+        frac <- (kd*production) / (production + kd * consumption)
+        return(n_other$detritus * et - frac * et)
+    }
+    return(n_other$detritus + production * dt)
+}
 
 #' Detritus dynamics
 #'
@@ -47,7 +98,7 @@ detritus_biomass <- function(params) {
 #' @param ... Unused
 #'
 #' @return A vector giving the detritus spectrum at the next time step.
-#' @seealso [algal_dynamics()], [detritus_consumption()], 
+#' @seealso [algae_dynamics()], [detritus_consumption()], 
 #'          [getDetritusConsumption()], [getDetritusProduction()]
 #' @concept detritus
 #' @export
@@ -120,7 +171,7 @@ detritus_consumption <- function(params,
 #' 
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores
-#' @seealso [getAlgalProduction()], [algal_dynamics()], [getDetritusConsumption()]
+#' @seealso [getAlgaeProduction()], [algae_dynamics()], [getDetritusConsumption()]
 #' 
 #' @concept detritus
 #' @export

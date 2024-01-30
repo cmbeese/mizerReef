@@ -89,13 +89,11 @@ grams.}
 actually use it. Defaults to 1.}
 
 \item{UR_interaction}{Interaction matrix for unstructured resources
-(species x resource)
-
-Optional parameters:}
+(species x resource)}
 
 \item{initial_algae_growth}{The initial growth rate of algae in
-grams/year/m^-2. This value is reset to match
-consumption in the \verb{[reefSteady()]}  function
+grams/m^2/year. This value is reset to match
+consumption in the \code{\link[=reefSteady]{reefSteady()}}  function
 so that steady state abundances match given
 values.}
 
@@ -111,7 +109,7 @@ detritus pool. Defaults to 0.2.}
 the pelagic zone and becomes part of the
 detritus pool in grams per year. This value is
 reset to make up any differences in consumption
-and production in the \verb{[reefSteady()]} function
+and production in the \code{\link[=reefSteady]{reefSteady()}} function
 so that steady state abundances match observed
 values.}
 
@@ -135,13 +133,13 @@ resource components, senescence mortality, and predation refuge.
  interaction matrix for these resources as well as any default
  parameters necessary to structure them.
 
- The resource interaction matrix \eqn\{\\theta_\{ki\} modifies the
+ The resource interaction matrix \eqn{\theta_{ki}} modifies the
  interaction of each functional group \eqn{i} with each unstructured
  resource \eqn{k} in the model. This can be used for example to allow 
  for different diet preferences on each unstructured resource. 
  
  Note that interaction with size structured resources, such as
- plankton, is still set with the `resource_interaction` column of
+ plankton, is still set with the resource_interaction column of
  the species parameters dataframe.
 }\if{html}{\out{</div>}}
 }
