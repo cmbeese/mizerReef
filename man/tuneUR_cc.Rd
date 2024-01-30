@@ -21,11 +21,11 @@ this functions sets the production rates of detritus and algae so
 that productions equals consumption at steady state.
 }
 \details{
-The growth of rate of algae is set to \eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A}}
+The growth of rate of algae is set to \eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A})}
 grams per meter squared per year.
 
 The external production of detritus is set to
-\eqn{(c_D \cdot B_D)/(1-\frac{B_D}{K_D} - P_{D.f} - P_{D.d}} grams per meter
+\eqn{(c_D \cdot B_D)/(1-\frac{B_D}{K_D}) - P_{D.f} - P_{D.d}} grams per meter
 squared per year.
 }
 \concept{Uresources}
