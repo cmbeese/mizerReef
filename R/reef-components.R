@@ -65,7 +65,7 @@ tuneUR_cc <- function(params,...) {
     # algae
     ba <- algae_biomass(params)
     ka <- params@other_params$algae$capacity
-    aout <- sum(getAlgalConsumption(params))
+    aout <- sum(getAlgaeConsumption(params))
     params@other_params$algae$growth <- (aout*ba)/(1-ba/ka)
     
     # detritus
@@ -100,7 +100,7 @@ tuneUR_cc <- function(params,...) {
 tuneUR <- function(params,...) {
 
     # algae
-    aout <- sum(getAlgalConsumption(params))
+    aout <- sum(getAlgaeConsumption(params))
     params@other_params$algae$growth <- aout
 
     # detritus

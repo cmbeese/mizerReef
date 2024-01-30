@@ -126,11 +126,12 @@ getSenMort <- function(params, n = initialN(params),
 #'   the returned array.
 #' @export
 #' @concept summary
-getEGrowthTime <- function(params, n, n_pp, n_other,
+getEGrowthTime <- function(object, n, n_pp, n_other,
                            time_range,
                            drop = FALSE, ...) {
     
     if (is(object, "MizerParams")) {
+        params <- object
         params <- validParams(params)
         f <- get(params@rates_funcs$EGrowth)
         
@@ -152,7 +153,6 @@ getEGrowthTime <- function(params, n, n_pp, n_other,
         return(g)
         
     } else { 
-
         sim <- object
         if (missing(time_range)) {
             time_range <- dimnames(sim@n)$time

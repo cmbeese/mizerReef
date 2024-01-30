@@ -53,7 +53,7 @@ algae_biomass <- function(params) {
 algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 
     consumption <- algae_consumption(params, n, rates)
-    production <- sum(getalgaeProduction(params))
+    production <- sum(getAlgaeProduction(params))
     ka <- params@other_params$algae$capacity
 
     # If consumption is non-zero, return analytic solution
@@ -78,7 +78,7 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 #'
 #' where  `consumption` is the mass-specific rate of consumption calculated
 #' with `algae_consumption()` and `production` is the rate at which algae 
-#' grows, calculated with `getalgaeProduction()`.
+#' grows, calculated with `getAlgaeProduction()`.
 #'
 #' The dynamical equation is solved analytically to
 #'
@@ -106,7 +106,7 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 
     consumption <- algae_consumption(params, n, rates)
-    production <- sum(getalgaeProduction(params))
+    production  <- sum(getAlgaeProduction(params))
 
     # If consumption is non-zero, return analytic solution
     if (consumption) {
@@ -120,7 +120,7 @@ algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #'
 #' This mass-specific consumption rate is used in `algae_dynamics()` to
 #' calculate the algae biomass at the next time step. To get the
-#' non-mass-specific consumption rate, use `getalgaeConsumption()`.
+#' non-mass-specific consumption rate, use `getAlgaeConsumption()`.
 #' 
 #' The rho parameter for herbivorous fish groups is stored in
 #' `other_params(params)$algae$rho`
@@ -193,7 +193,7 @@ getAlgaeConsumption <- function(params) {
 #' @concept algae
 #' @export
 plotAlgaeConsumption <- function(params) {
-    consumption <- getalgaeConsumption(params)
+    consumption <- getAlgaeConsumption(params)
     total <- sum(consumption)
     consumption <- consumption[consumption > total/100]
     df <- data.frame(Consumer = names(consumption),
@@ -201,11 +201,11 @@ plotAlgaeConsumption <- function(params) {
     ggplot(df, aes(x = "", y = Rate, fill = Consumer)) +
         geom_bar(stat = "identity", width = 1) +
         coord_polar("y", start = 0) +
-        labs(title = "algae consumption rate [g/year]",
+        labs(title = "Algae consumption rate [g/year]",
              x = "", y = "")
 }
 
-#' algae production rate
+#' Algae production rate
 #'
 #' This is the rate in grams/year/m^-2 at which the system produces algae
 #' biomass. The rate is set so that production and consumption are equal for
@@ -214,7 +214,7 @@ plotAlgaeConsumption <- function(params) {
 #' @param params MizerParams
 #'
 #' @return The annual growth rate of algae per square meter
-#' @seealso [getalgaeConsumption()], [algae_dynamics()], [getalgaeProduction()]
+#' @seealso [getAlgaeConsumption()], [algae_dynamics()], [getAlgaeProduction()]
 #' @concept algae
 #' @export
 getAlgaeProduction <- function(params) {

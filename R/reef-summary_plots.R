@@ -245,6 +245,10 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #'                  vector indicating for each species whether it is to be 
 #'                  selected (TRUE) or not.
 #'                  
+#' @param end   A boolean value that indicated whether you want the end
+#'              productivity of a simulation (default, TRUE) or the
+#'              productivity through time. 
+#'                  
 #' @param total A boolean value that determines whether the total productivity
 #'              from all species is plotted as well. Default is FALSE.
 #'              
@@ -284,7 +288,7 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], 
 #'          [plotTotalBiomassRelative()], [plotProductivity()],
 #'          [plot2Productivity()], [plotProductivityRelative()]
-plotProductivity <- function(object,
+plotProductivity <- function(object, end  = TRUE,
                              species = NULL, ylim = c(NA, NA),
                              total = FALSE,  return_data = FALSE,
                              min_fishing_l = NULL, max_fishing_l = NULL,
@@ -295,6 +299,7 @@ plotProductivity <- function(object,
         sim <- object
         assert_that(is(sim, "MizerSim"),
                     is.flag(return_data))
+        
         params <- sim@params
         
         species <- mizer::valid_species_arg(sim, species, 
@@ -328,6 +333,8 @@ plotProductivity <- function(object,
                      (is.na(ylim[2]) | p$value <= ylim[2]), c(1, 3, 2)]
         names(p) <- c("Year", "Biomass", "Species")
         
+        if (end == TRUE) { p <- p[end_time, ,drop = TRUE] }
+        
         # Select species
         plot_dat <- p[p$Species %in% c("Total", species), ]
         plot_dat$Legend <- plot_dat$Species
@@ -340,60 +347,57 @@ plotProductivity <- function(object,
                              y_ticks = y_ticks, highlight = highlight,
                              legend_var = "Legend")
         
-    } else if (is(object, "MizerParams")) {
+    } else {
         # params ----
         params <- object
-    } else {
-        stop('object should be a mizerParams or mizerSim object.')
+        assert_that(is(params, "MizerParams"),
+                    is.flag(return_data))
+    
+        ### values from object ----
+        sp <- params@species_params
+        no_sp <- dim(params@interaction)[1]
+        
+        ### group names ----
+        if (is.null(params@species_params$group_names)){
+            group_names <- params@species_params$species
+        } else {
+            group_names <- params@species_params$group_names
+        }
+        
+        ### get productivity ----
+        prod <- getProductivity(params, 
+                                min_fishing_l = min_fishing_l,
+                                max_fishing_l = max_fishing_l)
+        
+        ### species selector ----
+        sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
+                                    error_on_empty = TRUE)
+        species <- dimnames(params@initial_n)$sp[sel_sp]
+        species <- gsub('inverts', NA, species)
+        species <- species[!is.na(species)]
+        sel_sp <- which(!is.na(species))
+        prod <- prod[sel_sp, drop = FALSE]
+        
+        ### data frame from selected species ----
+        plot_dat <- data.frame(value = prod, Species = species)
+        
+        ### colors ----
+        legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
+        plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
+        
+        ### return data if requested ----
+        if (return_data) return(plot_dat)
+        
+        # plot ----
+        p <- ggplot(plot_dat, aes(x = Species, y = value,
+                                  group = Legend, fill = Legend))
+        
+        p + geom_bar(stat = "identity", position = "dodge") +
+            scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
+            scale_fill_manual(values = params@linecolour[legend_levels],
+                              labels = group_names) +
+            labs(fill = "Species Group", x = "Species Group")
     }
-    
-    ### create plot_dat ----
-    
-    ### values from object ----
-    params <- object
-    sp <- params@species_params
-    no_sp <- dim(params@interaction)[1]
-    
-    ### group names ----
-    if (is.null(params@species_params$group_names)){
-        group_names <- params@species_params$species
-    } else {
-        group_names <- params@species_params$group_names
-    }
-    
-    ### get productivity ----
-    prod <- getProductivity(params, 
-                            min_fishing_l = min_fishing_l,
-                            max_fishing_l = max_fishing_l)
-    
-    ### species selector ----
-    sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
-                                error_on_empty = TRUE)
-    species <- dimnames(params@initial_n)$sp[sel_sp]
-    species <- gsub('inverts', NA, species)
-    species <- species[!is.na(species)]
-    sel_sp <- which(!is.na(species))
-    prod <- prod[sel_sp, drop = FALSE]
-    
-    ### data frame from selected species ----
-    plot_dat <- data.frame(value = prod, Species = species)
-    
-    ### colors ----
-    legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
-    plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
-    
-    ### return data if requested ----
-    if (return_data) return(plot_dat)
-    
-    # plot ----
-    p <- ggplot(plot_dat, aes(x = Species, y = value,
-                              group = Legend, fill = Legend))
-    
-    p + geom_bar(stat = "identity", position = "dodge") +
-        scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
-        scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names) +
-        labs(fill = "Species Group", x = "Species Group")
 }
 
 
@@ -472,11 +476,13 @@ plot2Productivity <- function(object1, object2, species = NULL,
     
     # get data frames with plotProductivity ----
     sf1 <- plotProductivity(object1, 
+                            drop = TRUE,
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
         sf1$Model <- name1
     sf2 <- plotProductivity(object2, 
+                            drop = TRUE,
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)

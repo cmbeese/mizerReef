@@ -58,23 +58,10 @@ getProductivity <- function(object,
                             min_fishing_l = NULL, 
                             max_fishing_l = NULL,...) {
     
-    if (is(object, "MizerSim")) {
-        sim <- object
-        size_range <- mizer::get_size_range_array(sim@params, 
-                                                  min_l = min_fishing_l, 
-                                                  max_l = max_fishing_l,...)
-        
-        abundances <- apply(sweep(sweep(sim@n, c(2, 3), size_range, "*"), 3,
-                            sim@params@dw, "*"), c(1, 2), sum)
-        
-        
-        if (include_repro == FALSE){ pr <- getEGrowthTime(sim) }
-        if (include_repro == TRUE) { 
-            stop('This functionality is not set up yet.')}
-    }
-
     if (is(object, "MizerParams")) {
+        
         params <- object
+        assert_that(is(params, "MizerParams"))
         
         if(is.null(min_fishing_l)){ min_fishing_l <- 7 }
         if(is.null(max_fishing_l)){ max_fishing_l <- max(params@species_params$l_max) }
@@ -86,7 +73,20 @@ getProductivity <- function(object,
         if (include_repro == FALSE){ pr <- mizer::getEGrowth(params) }
         if (include_repro == TRUE) { pr <- mizer::getEReproAndGrowth(params) }
         
-        prod <- (pr * params@initial_n * size_range) %*% params@dw[, , drop = TRUE]
+        prod <- ((pr * params@initial_n * size_range) %*% params@dw)[,, drop = TRUE]
+        
+        return(prod)
+    
+    } else {
+        
+        sim <- object
+        size_range <- mizer::get_size_range_array(sim@params, 
+                                                  min_l = min_fishing_l, 
+                                                  max_l = max_fishing_l,...)
+        
+        if (include_repro == FALSE){ prod <- getEGrowthTime(sim@params) }
+        if (include_repro == TRUE) { 
+            stop('This functionality is not set up yet.')}
         
         # This seems like growth times biomass?
         # Alice's old code:
@@ -97,9 +97,7 @@ getProductivity <- function(object,
         # dx is width of the size bins
         # So for each species prod <- colSums(w*g*n*dw)
         return(prod[, , drop = TRUE])
-        #}
     }
-    stop("'object' should be a MizerParams or a MizerSim object")
 }
 
 

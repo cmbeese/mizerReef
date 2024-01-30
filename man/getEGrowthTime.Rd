@@ -4,11 +4,9 @@
 \alias{getEGrowthTime}
 \title{Get energy rate available for growth through time}
 \usage{
-getEGrowthTime(params, n, n_pp, n_other, time_range, drop = FALSE, ...)
+getEGrowthTime(object, n, n_pp, n_other, time_range, drop = FALSE, ...)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
-
 \item{n}{A matrix of species abundances (species x size).}
 
 \item{n_pp}{A vector of the resource abundance by size}

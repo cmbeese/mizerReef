@@ -19,7 +19,7 @@ The mass-specific consumption rate of algae in grams per year.
 \description{
 This mass-specific consumption rate is used in \code{algae_dynamics()} to
 calculate the algae biomass at the next time step. To get the
-non-mass-specific consumption rate, use \code{getalgaeConsumption()}.
+non-mass-specific consumption rate, use \code{getAlgaeConsumption()}.
 }
 \details{
 The rho parameter for herbivorous fish groups is stored in

@@ -2,7 +2,7 @@
 % Please edit documentation in R/algae_components.R
 \name{getAlgaeProduction}
 \alias{getAlgaeProduction}
-\title{algae production rate}
+\title{Algae production rate}
 \usage{
 getAlgaeProduction(params)
 }
@@ -18,6 +18,6 @@ biomass. The rate is set so that production and consumption are equal for
 chosen steady state abundances.
 }
 \seealso{
-\code{\link[=getalgaeConsumption]{getalgaeConsumption()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getalgaeProduction]{getalgaeProduction()}}
+\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}
 }
 \concept{algae}

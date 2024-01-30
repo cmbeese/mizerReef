@@ -7,6 +7,7 @@
 \usage{
 plotProductivity(
   object,
+  end = TRUE,
   species = NULL,
   ylim = c(NA, NA),
   total = FALSE,
@@ -22,6 +23,10 @@ plotlyProductivity(object, species = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerParams}}
+
+\item{end}{A boolean value that indicated whether you want the end
+productivity of a simulation (default, TRUE) or the
+productivity through time.}
 
 \item{species}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a

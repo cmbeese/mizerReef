@@ -63,6 +63,9 @@ itself. Default value is FALSE.}
   Arguments passed on to \code{\link[=plotProductivity]{plotProductivity}}
   \describe{
     \item{\code{object}}{An object of class \linkS4class{MizerParams}}
+    \item{\code{end}}{A boolean value that indicated whether you want the end
+productivity of a simulation (default, TRUE) or the
+productivity through time.}
     \item{\code{total}}{A boolean value that determines whether the total productivity
 from all species is plotted as well. Default is FALSE.}
     \item{\code{ylim}}{A numeric vector of length two providing lower and upper limits

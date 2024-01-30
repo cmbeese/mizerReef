@@ -34,7 +34,7 @@ The time evolution of the algal biomass \eqn{B} is described by
 
 where  \code{consumption} is the mass-specific rate of consumption calculated
 with \code{algae_consumption()} and \code{production} is the rate at which algae
-grows, calculated with \code{getalgaeProduction()}.
+grows, calculated with \code{getAlgaeProduction()}.
 
 The dynamical equation is solved analytically to
 
