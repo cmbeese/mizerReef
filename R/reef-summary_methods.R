@@ -84,12 +84,6 @@ getProductivity <- function(object,
         # abundance of predators over 7 cm in length U[ref:end,]
         # dx is width of the size bins
         # So for each species prod <- colSums(w*g*n*dw)
-        
-        # if(total == FALSE) {return(pr)}
-        # if(total == TRUE){
-        # Not sure which one it's supposed to be
-        # prod <- (pr * params@w) %*% params@dw
-        # prod <- pr  %*% (params@w * params@dw)
         return(prod[, , drop = TRUE])
         #}
     }
