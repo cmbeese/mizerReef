@@ -50,6 +50,7 @@ object the productivity is plotted.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotProductivity</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
+<span>  end <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  total <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -68,6 +69,12 @@ object the productivity is plotted.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
 <dd><p>An object of class MizerParams</p></dd>
+
+
+<dt>end</dt>
+<dd><p>A boolean value that indicated whether you want the end
+productivity of a simulation (default, TRUE) or the
+productivity through time.</p></dd>
 
 
 <dt>species</dt>
