@@ -130,6 +130,15 @@ itself. Default value is FALSE.</p></dd>
 <dd><p>Arguments passed on to <code><a href="plotProductivity.html">plotProductivity</a></code></p><dl><dt><code>object</code></dt>
 <dd><p>An object of class MizerParams</p></dd>
 
+    <dt><code>total</code></dt>
+<dd><p>A boolean value that determines whether the total productivity
+from all species is plotted as well. Default is FALSE.</p></dd>
+
+    <dt><code>ylim</code></dt>
+<dd><p>A numeric vector of length two providing lower and upper limits
+for the y axis. Use NA to refer to the existing minimum or
+maximum. Any values below 1e-20 are always cut off.</p></dd>
+
     <dt><code>start_time</code></dt>
 <dd><p>The first time to be plotted. Default is the beginning
 of the time series.</p></dd>

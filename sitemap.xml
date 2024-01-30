@@ -10,16 +10,16 @@
     <loc>https://cmbeese.github.io/mizerReef/index.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/algal_biomass.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algae_biomass.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/algal_consumption.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algae_consumption.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/algal_dynamics.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algae_dynamics.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/algal_dynamics_cc.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algae_dynamics_cc.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/aquarius_refuge.html</loc>
@@ -52,6 +52,9 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/detritus_dynamics.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/detritus_dynamics_cc.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/detritus_lifetime.html</loc>
   </url>
   <url>
@@ -61,16 +64,19 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/encounter_contribution.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/getAlgalConsumption.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/getAlgaeConsumption.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/getAlgalProduction.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/getAlgaeProduction.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/getDetritusConsumption.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/getDetritusProduction.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/getEGrowthTime.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/getProductivity.html</loc>
@@ -118,7 +124,7 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/plotAlgalConsumption.html</loc>
+    <loc>https://cmbeese.github.io/mizerReef/reference/plotAlgaeConsumption.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/plotBiomass.html</loc>
@@ -200,6 +206,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/tuneUR.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/tuning_profile.html</loc>

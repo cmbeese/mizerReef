@@ -63,7 +63,10 @@ resource components, senescence mortality, and predation refuge.</p>
 <span>  max_protect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tau <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">UR_interaction</span>,</span>
+<span>  carry_capacity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  initial_algae_growth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  algae_capacity <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  detritus_capacity <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sen_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ext_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  initial_d_external <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -165,16 +168,31 @@ actually use it. Defaults to 1.</p></dd>
 
 <dt>UR_interaction</dt>
 <dd><p>Interaction matrix for unstructured resources
-(species x resource)</p>
-<p>Optional parameters:</p></dd>
+(species x resource)</p></dd>
+
+
+<dt>carry_capacity</dt>
+<dd><p>A boolean value that indicates whether the user wants
+to implement a carrying capacity for unstructured
+resources.</p></dd>
 
 
 <dt>initial_algae_growth</dt>
 <dd><p>The initial growth rate of algae in
-grams/year/m^-2. This value is reset to match
-consumption in the <code>[reefSteady()]</code>  function
+grams/m^2/year. This value is reset to match
+consumption in the <code><a href="reefSteady.html">reefSteady()</a></code>  function
 so that steady state abundances match given
 values.</p></dd>
+
+
+<dt>algae_capacity</dt>
+<dd><p>The carrying capacity of the system for algae
+biomass in grams per year.</p></dd>
+
+
+<dt>detritus_capacity</dt>
+<dd><p>The carrying capacity of the system for
+detritus biomass in grams per year.</p></dd>
 
 
 <dt>sen_decomp</dt>
@@ -194,7 +212,7 @@ detritus pool. Defaults to 0.2.</p></dd>
 the pelagic zone and becomes part of the
 detritus pool in grams per year. This value is
 reset to make up any differences in consumption
-and production in the <code>[reefSteady()]</code> function
+and production in the <code><a href="reefSteady.html">reefSteady()</a></code> function
 so that steady state abundances match observed
 values.</p></dd>
 
@@ -226,13 +244,13 @@ values.</p></dd>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> interaction matrix <span class="cf">for</span> these resources as well as any default</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> parameters necessary to structure them.</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> The resource interaction matrix \eqn{\theta_{ki} modifies the</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a> The resource interaction matrix \eqn{\theta_{ki}} modifies the</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a> interaction of each functional group \eqn{i} with each unstructured</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a> resource \eqn{k} <span class="cf">in</span> the model. This can be used <span class="cf">for</span> example to allow </span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a> <span class="cf">for</span> different diet preferences on each unstructured resource. </span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a> Note that interaction with size structured resources, such as</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a> plankton, is still set with the <span class="st">`</span><span class="at">resource_interaction</span><span class="st">`</span> column of</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a> plankton, is still set with the resource_interaction column of</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a> the species parameters dataframe.</span></code></pre><p></p></div>
     </div>
     <div class="section level2">

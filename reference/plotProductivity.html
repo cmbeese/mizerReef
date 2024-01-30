@@ -51,6 +51,8 @@ object the productivity is plotted.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotProductivity</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  total <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  min_fishing_l <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_fishing_l <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -74,6 +76,17 @@ species are selected. A vector of species names, or a
 numeric vector with the species indices, or a logical
 vector indicating for each species whether it is to be
 selected (TRUE) or not.</p></dd>
+
+
+<dt>ylim</dt>
+<dd><p>A numeric vector of length two providing lower and upper limits
+for the y axis. Use NA to refer to the existing minimum or
+maximum. Any values below 1e-20 are always cut off.</p></dd>
+
+
+<dt>total</dt>
+<dd><p>A boolean value that determines whether the total productivity
+from all species is plotted as well. Default is FALSE.</p></dd>
 
 
 <dt>return_data</dt>
@@ -118,8 +131,9 @@ is returned.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="plotBiomass.html">plotBiomass()</a></code>, <code><a href="plot2TotalBiomass.html">plot2TotalBiomass()</a></code>, <code><a href="plotTotalBiomassRelative.html">plotTotalBiomassRelative()</a></code>,
-<code>plotProductivity()</code>, <code><a href="plot2Productivity.html">plot2Productivity()</a></code>, <code><a href="plotProductivityRelative.html">plotProductivityRelative()</a></code></p>
+    <div class="dont-index"><p><code><a href="plotBiomass.html">plotBiomass()</a></code>, <code><a href="plot2TotalBiomass.html">plot2TotalBiomass()</a></code>,
+<code><a href="plotTotalBiomassRelative.html">plotTotalBiomassRelative()</a></code>, <code>plotProductivity()</code>,
+<code><a href="plot2Productivity.html">plot2Productivity()</a></code>, <code><a href="plotProductivityRelative.html">plotProductivityRelative()</a></code></p>
 <p>Other plotting functions: 
 <code><a href="plot2Productivity.html">plot2Productivity</a>()</code>,
 <code><a href="plot2TotalBiomass.html">plot2TotalBiomass</a>()</code>,
