@@ -147,6 +147,65 @@ plotlyBiomass <- function(sim,
              tooltip = c("Species", "Year", "Biomass"))
 }
 
+#' Show two size spectra in the same plot
+#' 
+#' @param object1 First MizerParams or MizerSim object.
+#' @param object2 Second MizerParams or MizerSim object.
+#' @param name1 An optional string with the name for the first model, to be used
+#'   in the legend. Set to "First" by default.
+#' @param name2 An optional string with the name for the second model, to be
+#'   used in the legend. Set to "Second" by default.
+#' @param power The abundance is plotted as the number density times the weight
+#'   raised to this power. The default power = 1 gives the biomass density,
+#'   whereas power = 2 gives the biomass density with respect to logarithmic
+#'   size bins.
+#' @param ... Parameters to pass to `plotSpectra()`
+#' @return A ggplot2 object
+#' @export
+#' @concept sumplots
+plotSpectra2 <- function(object1, object2, 
+                         name1 = "First", name2 = "Second",
+                         power = 1, ...) {
+    
+    if (is(object1, "MizerSim")) {
+        params <- object1@params
+    } else {
+        params <- object1
+    }
+    
+    sf1 <- plotSpectra(object1, 
+                       power = power, return_data = TRUE, ...)
+    sf1$Model <- name1
+    sf2 <- plotSpectra(object2, 
+                       power = power, return_data = TRUE, ...)
+    sf2$Model <- name2
+    sf <- rbind(sf1, sf2)
+    
+    # Adding this line ensures model 1 will always be model 1, 
+    # regardless of naming - that way they could be named with numbers
+    sf$Model <- factor(sf$Model, levels = c(name1, name2))
+    sf$Legend <- factor(sf$Legend, 
+                        levels = c(params@species_params$species, "Resource"))
+    
+    legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
+    linecolours <- params@linecolour[legend_levels]
+    
+    if (power %in% c(0, 1, 2)) {
+        y_label <- c("Number density [1/g]", "Biomass density", 
+                     "Biomass density [g]")[power + 1]
+    }
+    else {
+        y_label <- paste0("Number density * w^", power)
+    }
+    
+    ggplot(sf, aes(x = w, y = value, colour = Legend, linetype = Model)) +
+        geom_line(linewidth = 0.95) +
+        scale_x_log10("Weight [g]") +
+        scale_y_log10(y_label) + 
+        scale_colour_manual(values = linecolours)
+    
+}
+
 #' Plot the relative difference or percent change between two spectra
 #' 
 #' This plots a measure of the relative difference between the steady state 
@@ -182,41 +241,46 @@ plotlyBiomass <- function(sim,
 #' @family plotting functions
 #' @return A ggplot2 object
 #' @export
-plotSpectraRelative <- function(object1, object2, diff_method, ...) {
+plotSpectraRelative <- function(object1, object2,
+                                power,
+                                diff_method = "percent_change", ...) {
     
-    
-    sf1 <- mizer::plotSpectra(object1, return_data = TRUE, ...)
-    sf2 <- mizer::plotSpectra(object2, return_data = TRUE, ...)
+    sf1 <- mizer::plotSpectra(object1, power = power,
+                              return_data = TRUE, ...)
+    sf2 <- mizer::plotSpectra(object2, power = power,
+                              return_data = TRUE, ...)
     
     # Calculate relative difference
     if (diff_method == "percent_change"){
-        sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
+        sf <-   dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
                 mutate(rel_diff = 100*((value.y - value.x) / value.x))
         yLabel <- "% Change in Biomass"
     } else if (diff_method == "rel_diff"){
-        sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
+        sf <-   dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
                 mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
         yLabel <- "Relative Difference in Biomass"
     } else {
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
     }
     
-    sf <- dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
-        dplyr::mutate(rel_diff = (value.y - value.x) / (value.x + value.y))
-    
     if (is(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
     }
+    
+    # Ensures that and species stay in the order we expect regardless of
+    # naming
+    sf$Legend <- factor(sf$Legend, 
+                        levels = c(params@species_params$species, "Resource"))
+    
     legend_levels <- intersect(names(params@linecolour),
                                unique(sf$Legend))
     linecolours <- params@linecolour[legend_levels]
     
-    ggplot(sf,
-           aes(x = w, y = rel_diff, colour = Legend)) +
-        geom_line() +
-        labs(x = "Weight [g]", y = "Relative difference") +
+    ggplot(sf, aes(x = w, y = rel_diff, colour = Legend)) +
+        geom_line(linewidth = 0.95) +
+        labs(x = "Weight [g]", y = yLabel) +
         scale_x_log10() +
         scale_color_manual(values = linecolours) +
         geom_hline(yintercept = 0, linetype = 1,

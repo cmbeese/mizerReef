@@ -5,7 +5,13 @@
 \alias{plotlySpectraRelative}
 \title{Plot the relative difference or percent change between two spectra}
 \usage{
-plotSpectraRelative(object1, object2, diff_method, ...)
+plotSpectraRelative(
+  object1,
+  object2,
+  power,
+  diff_method = "percent_change",
+  ...
+)
 
 plotlySpectraRelative(object1, object2, diff_method, ...)
 }

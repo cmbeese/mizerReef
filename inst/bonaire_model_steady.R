@@ -22,6 +22,7 @@ tuning_profile  <- tuning_profile
 #   transition fully to algae by maturity 
 # With these parameters, invertebrates consume plankton and detritus,
 #   with the proportion of detritus increasing with size
+# Try original interaction params
 
 ## Set model -------------------------------------------------------------------
     params <- newReefParams(group_params = bonaire_species,
