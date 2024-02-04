@@ -21,11 +21,43 @@ this functions sets the production rates of detritus and algae so
 that productions equals consumption at steady state.
 }
 \details{
-The growth of rate of algae is set to \eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A})}
-grams per meter squared per year.
+With a carrying capacity, the time evolution of the algae biomass
+\eqn{B_A(t)} is described by
 
-The external production of detritus is set to
+\deqn{ \frac{dB_A}{dt} = P_A\left( 1 - 
+                         \frac{B_A}{K_A} \right) - c_A \, B_A }{
+                dB_A/dt = P_A * (1 - B_A/ K_A) - c_A * B_A}
+
+where \eqn{K_A} is the system's carrying capacity for algae in grams/ year,
+\eqn{c_A} is the mass-specific rate of consumption calculated with
+\code{algae_consumption()} and \eqn{P_A} is the rate at which algae
+grows, calculated with \code{getAlgaeProduction()}.
+
+In this tuning function, the growth of rate of algae is set to
+\eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A})} grams per meter squared per year
+so that consumption is equal to production for steady state.
+
+Similarly, the time evolution of the detritus biomass \eqn{B_D(t)} is
+described by
+
+\deqn{ \frac{dB_D}{dt} = P_D\left( 1 - 
+                         \frac{B_D}{K_D} \right) - c_D \, B_D }{
+                dB_D/dt = P_D * (1 - B_D/ K_D) - c_D * B_D}
+
+where \eqn{K_D} is the system's carrying capacity for detritus in grams/ year,
+\eqn{c_D} is the mass-specific rate of consumption calculated with
+\code{detritus_consumption()} and \eqn{P_D} is the rate at which detritus
+is produced calculated with \code{getDetritusProduction()}. Total detritus
+production is given with
+
+\deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
+       p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
+
+In this tuning function, the external production of detritus is set to
 \eqn{(c_D \cdot B_D)/(1-\frac{B_D}{K_D}) - P_{D.f} - P_{D.d}} grams per meter
-squared per year.
+squared per year so that production equals consumption at steady state.
+}
+\seealso{
+\code{\link[=reefSteady]{reefSteady()}}, \code{\link[=algae_dynamics_cc]{algae_dynamics_cc()}}, \code{\link[=detritus_dynamics_cc]{detritus_dynamics_cc()}}
 }
 \concept{Uresources}

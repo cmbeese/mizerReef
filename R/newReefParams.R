@@ -96,7 +96,7 @@ newReefParams <- function(# Original mizer parameters
     ### Calculate Rho ----
         # Determine the necessary detritus and algae encounter rates so that at
         # maximum size the group has feeding level f0
-        if(is.null(crit_feed)){ crit_feed <- 0.6 }
+        if(is.null(crit_feed)){ crit_feed <- 0.7 }
         f0 <- set_species_param_default(params@species_params, "f0", crit_feed)$f0
         
         # Get interaction of each species with detritus and algae
@@ -115,9 +115,9 @@ newReefParams <- function(# Original mizer parameters
         rho_alg <- pmax(0, f0 * params@species_params$h / (1 - f0) - E) * ia
         rho_det <- pmax(0, f0 * params@species_params$h / (1 - f0) - E) * id
         
-        # Set rho to 0 for predators with no max consumption rate
-        rho_alg[is.na(rho_alg)] <- 0
-        rho_det[is.na(rho_det)] <- 0
+        # # Set rho to 0 for predators with no max consumption rate
+        # rho_alg[is.na(rho_alg)] <- 0
+        # rho_det[is.na(rho_det)] <- 0
         
         # Store new rho values in species_params data frame
         params@species_params$rho_algae    <- rho_alg

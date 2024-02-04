@@ -18,13 +18,13 @@ algae_biomass <- function(params) {
 #' Calculates the algae biomass at the next time step from the current
 #' algae biomass
 #'
-#' The time evolution of the algae biomass \eqn{B} is described by
+#' The time evolution of the algae biomass \eqn{B_A(t)} is described by
 #'
 #'  \deqn{ \frac{dB_A}{dt} = P_A\left( 1 - 
 #'                          \frac{B_A}{K_A} \right) - c_A \, B_A }{
 #'                 dB_A/dt = P_A * (1 - B_A/ K_A) - c_A * B_A}
 #'
-#' where \eqn{K} is the system's carrying capacity for algae in grams/ year,
+#' where \eqn{K_A} is the system's carrying capacity for algae in grams/ year,
 #' \eqn{c_A} is the mass-specific rate of consumption calculated with
 #' `algae_consumption()` and \eqn{P_A} is the rate at which algae
 #' grows, calculated with `getAlgaeProduction()`.
@@ -32,11 +32,11 @@ algae_biomass <- function(params) {
 #' The dynamical equation is solved analytically to
 #'
 #'   \deqn{B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{K_A}(P_A+ K_A \, c_A)}
-#'                        - \frac{K_A \, P_A}{P_A+ K_A \, c_A}
-#'                        e^{-\frac{dt}{K_A}(P_A+ K_A \, c_A)} }{
-#'         B_A(t + dt) = B_A(t) exp^(-dt/K_A * (P_A+ K_A*c_A))
-#'                        (-K_A*P_A) / (P_A + K_A*c_A) * e^(-dt/K_A * 
-#'                        (P_A + K*c_A) }
+#'                        + \frac{K_A \, P_A}{P_A+ K_A \, c_A} \left(1-
+#'                        e^{-\frac{dt}{K_A}(P_A+ K_A \, c_A)}\right) }{
+#'         B_A(t + dt) = B_A(t) exp^(-dt/K_A * (P_A+ K_A*c_A)) +
+#'                        (K_A*P_A) / (P_A + K_A*c_A) *(1 - e^(-dt/K_A * 
+#'                        (P_A + K_A*c_A)) }
 #'
 #' @param params A [MizerParams] object
 #' @param n A matrix of current species abundances (species x size)
@@ -60,9 +60,12 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     if (consumption > 0) {
         et <- exp(-dt/ka * (production + ka * consumption))
         frac <- (ka*production) / (production + ka * consumption)
-        return(n_other$algae * et - frac * et)
+        fracet <- frac *(1- et)
+        return(n_other$algae * et + fracet)
+    } else {
+    et <- exp(-dt/ka * (production))
+    return(n_other$algae * et)
     }
-    return(n_other$algae + production * dt)
 }
 
 
@@ -73,20 +76,20 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 #'
 #' The time evolution of the algal biomass \eqn{B} is described by
 #'
-#' \deqn{dB/dt = \tt{production} - \tt{consumption} \cdot B}{
-#'       dB/dt = production - consumption * B}
+#' \deqn{dB_A/dt = P_A - c_A \cdot B_A}{
+#'       dB_A/dt = P_A - c_A * B_A}
 #'
-#' where  `consumption` is the mass-specific rate of consumption calculated
-#' with `algae_consumption()` and `production` is the rate at which algae 
+#' where  \eqn{c_A} is the mass-specific rate of consumption calculated
+#' with `algae_consumption()` and \eqn{P_A} is the rate at which algae 
 #' grows, calculated with `getAlgaeProduction()`.
 #'
 #' The dynamical equation is solved analytically to
 #'
-#' \deqn{B(t+dt) = B(t) e^{(-\tt{consumption} \cdot dt)}
-#'              +\frac{\tt{production}}{\tt{consumption}}
-#'              (1- e^{(-\tt{consumption} \cdot dt)}).}{
-#'       B(t+dt) = B(t) exp(-consumption * dt) 
-#'               + production/consumption * (1 - exp(-consumption * dt)).}
+#' \deqn{B_A(t+dt) = B_A(t) e^{(- c_A \cdot dt)}
+#'              +\frac{P_A}{c_A}
+#'              (1- e^{(-c_A \cdot dt)}).}{
+#'       B_A(t+dt) = B(t) exp(-c_A * dt) 
+#'               + p_A/c_A * (1 - exp(-c_A * dt)).}
 #'
 #' This avoids the stability problems that would arise if we used the Euler
 #' method to solve the equation numerically.

@@ -1,11 +1,11 @@
-﻿species,l_max,l_mat,w_mat,age_mat,k_vb,pred_kernel_type,beta,sigma,ppmr_min,ppmr_max,biomass_cutoff,biomass_observed,a,b,interaction_resource,interaction_detritus,interaction_algae,refuge_user,bad_pred,satiation,linecolour,rep_species,group_names,Resilience
-pred_eng,45,16,53.21080535,2,0.4,lognormal,100,2,NA,NA,12.62968984,5.51,0.011,3.06,1,0,0,TRUE,TRUE,FALSE,#d35569,Cephalopholis cruentatus,Engulfers,medium
-pred_grab,80,25,280.7686892,2,0.1,lognormal,200,1,NA,NA,17.80529807,27.6,0.0174,3.01,1,0,0,TRUE,TRUE,FALSE,#b95236,Lutjanus apodus,Grabbers,medium
-eels,100,50,313.2484204,3,0.19,lognormal,10,3,NA,NA,NA,NA,0.00098,3.24,1,0,0,TRUE,FALSE,FALSE,#d078ca,Gymnothorax miliaris,Eels,medium
-pred_crypt,8,3,0.316549383,NA,3,lognormal,50,2,NA,NA,NA,NA,0.01122,3.04,1,0.6,0,FALSE,FALSE,FALSE,#9b2f68,Gramma loreto,Cryptobenthic Predators,high
-pred_inv,45,17,78.26595742,NA,0.4,box,NA,NA,5,600,15.10710494,14.13,0.012,3.1,1,0,0,TRUE,TRUE,FALSE,#58449e,Mulloidichthys martinicus,Nocturnal Invertivores,medium
-pred_plank,20,6,2.869617544,1,0.3,lognormal,800,2,NA,NA,13.49042805,0.55,0.01259,3.03,1,0,0,TRUE,FALSE,FALSE,#678cde,Azurina multilineata,Planktivores,medium
-parrotfish,64,16,64.92994478,2,0.6,lognormal,500,1,NA,NA,15.48385467,30.56,0.0138,3.05,1,0.5,0.5,TRUE,FALSE,FALSE,#70c464,Sparisoma viride,Parrotfish,medium
-farm_damsel,13,4,1.253643092,1,0.3,lognormal,500,1,NA,NA,NA,NA,0.02042,2.97,1,0.5,0.5,TRUE,FALSE,FALSE,#aabc51,Stegastes planifrons,Farming damselfish,high
-herbs,39,17,109.5865971,2,0.4,lognormal,500,1,NA,NA,24.54493383,1.5,0.0257,2.95,1,0.5,0.5,TRUE,FALSE,FALSE,#54832f,Acanthurus coeruleus,Herbivores,medium
-inverts,30,NA,0.01,0.2,NA,lognormal,100,1,NA,NA,NA,NA,0.025,3,1,1,0,FALSE,FALSE,TRUE,#c7923f,Inverts,Invertebrates,high
+﻿species,l_max,l_mat,w_mat,age_mat,k_vb,beta,sigma,biomass_cutoff,biomass_observed,a,b,interaction_resource,interaction_detritus,interaction_algae,refuge_user,bad_pred,satiation,linecolour,rep_species,group_names,Resilience,old_groups,alpha
+pred_eng,45,16,50,2,0.4,90,2,12.62968984,5.51,0.011,3.06,1,0,0,TRUE,TRUE,FALSE,#d35569,Cephalopholis cruentatus,Engulfers,medium,Predators,NA
+pred_grab,80,20,140,2,0.1,100,2,17.80529807,27.6,0.0174,3.01,1,0,0,TRUE,TRUE,FALSE,#b95236,Lutjanus apodus,Grabbers,medium,Predators,NA
+eels,100,50,300,3,0.19,30,2,NA,NA,0.00098,3.24,1,0,0,TRUE,FALSE,FALSE,#d078ca,Gymnothorax miliaris,Eels,medium,Predators,NA
+pred_crypt,8,3,0.3,NA,3,50,1,NA,NA,0.01122,3.04,0.5,0.5,0,TRUE,FALSE,FALSE,#9b2f68,Gramma loreto,Cryptobenthic Predators,high,Predators,NA
+pred_inv,45,10,50,NA,0.4,10,1,15.10710494,14.13,0.012,3.1,1,0,0,TRUE,FALSE,FALSE,#58449e,Mulloidichthys martinicus,Nocturnal Invertivores,medium,Predators,NA
+pred_plank,20,6,2.5,1,0.3,1000,1,13.49042805,0.55,0.01259,3.03,1,0,0,TRUE,FALSE,FALSE,#678cde,Azurina multilineata,Planktivores,medium,Predators,NA
+parrotfish,64,16,63,2,0.6,20,2,15.48385467,30.56,0.0138,3.05,0.5,0.5,0.5,TRUE,FALSE,FALSE,#70c464,Sparisoma viride,Parrotfish,medium,Herbivores,0.8
+farm_damsel,13,4,1,1,0.3,20,2,NA,NA,0.02042,2.97,0.5,0.5,0.5,TRUE,FALSE,FALSE,#aabc51,Stegastes planifrons,Farming damselfish,high,Herbivores,0.8
+herbs,39,17,105,2,0.4,20,2,24.54493383,1.5,0.0257,2.95,0.5,0.5,0.5,TRUE,FALSE,FALSE,#54832f,Acanthurus coeruleus,Herbivores,medium,Herbivores,0.8
+inverts,25,NA,0.01,0.1,NA,30,2,NA,NA,0.025,3,0.3,1,0,FALSE,FALSE,TRUE,#c7923f,Inverts,Invertebrates,high,Inverts,0.8

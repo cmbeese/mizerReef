@@ -27,13 +27,13 @@ Calculates the algae biomass at the next time step from the current
 algae biomass
 }
 \details{
-The time evolution of the algae biomass \eqn{B} is described by
+The time evolution of the algae biomass \eqn{B_A(t)} is described by
 
 \deqn{ \frac{dB_A}{dt} = P_A\left( 1 - 
                          \frac{B_A}{K_A} \right) - c_A \, B_A }{
                 dB_A/dt = P_A * (1 - B_A/ K_A) - c_A * B_A}
 
-where \eqn{K} is the system's carrying capacity for algae in grams/ year,
+where \eqn{K_A} is the system's carrying capacity for algae in grams/ year,
 \eqn{c_A} is the mass-specific rate of consumption calculated with
 \code{algae_consumption()} and \eqn{P_A} is the rate at which algae
 grows, calculated with \code{getAlgaeProduction()}.
@@ -41,11 +41,11 @@ grows, calculated with \code{getAlgaeProduction()}.
 The dynamical equation is solved analytically to
 
 \deqn{B_A(t + dt) = B_A(t) \cdot e^{-\frac{dt}{K_A}(P_A+ K_A \, c_A)}
-                       - \frac{K_A \, P_A}{P_A+ K_A \, c_A}
-                       e^{-\frac{dt}{K_A}(P_A+ K_A \, c_A)} }{
-        B_A(t + dt) = B_A(t) exp^(-dt/K_A * (P_A+ K_A*c_A))
-                       (-K_A*P_A) / (P_A + K_A*c_A) * e^(-dt/K_A * 
-                       (P_A + K*c_A) }
+                       + \frac{K_A \, P_A}{P_A+ K_A \, c_A} \left(1-
+                       e^{-\frac{dt}{K_A}(P_A+ K_A \, c_A)}\right) }{
+        B_A(t + dt) = B_A(t) exp^(-dt/K_A * (P_A+ K_A*c_A)) +
+                       (K_A*P_A) / (P_A + K_A*c_A) *(1 - e^(-dt/K_A * 
+                       (P_A + K_A*c_A)) }
 }
 \seealso{
 \code{\link[=detritus_dynamics]{detritus_dynamics()}}, \code{\link[=algae_consumption]{algae_consumption()}},

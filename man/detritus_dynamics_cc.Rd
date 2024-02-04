@@ -40,12 +40,12 @@ is produced calculated with \code{getDetritusProduction()}.
 
 The dynamical equation is solved analytically to
 
-\deqn{B_D(t + dt) = B_D(t) \cdot e^{-\frac{dt}{K_D}(P_D+ K_D \, C_D)}
-                       - \frac{K_D \, P_D}{P_D + K \, c_D}
-                       e^{-\frac{dt}{K_D}(P_D + K_D \, c_D)} }{
-        B_D(t + dt) = B_D(t) exp^(-dt/K_D * (P_D+ K_D*c_D))
-                       (-K_D*P_D) / (P_D + K_D*c_D) * e^(-dt/K_D * 
-                       (P_D + K_D*c_D) }
+\deqn{B_D(t + dt) = B_D(t) \cdot e^{-\frac{dt}{K_D}(P_D+ K_D \, c_D)}
+                       + \frac{K_D \, P_D}{P_D+ K_D \, c_D} \left(1-
+                       e^{-\frac{dt}{K_D}(P_D+ K_D \, c_D)}\right) }{
+        B_D(t + dt) = B_D(t) exp^(-dt/K_D * (P_D+ K_D*c_D)) +
+                       (K_D*P_D) / (P_D + K_D*c_D) *(1 - e^(-dt/K_D * 
+                       (P_D + K_D*c_D)) }
 }
 \seealso{
 \code{\link[=detritus_dynamics]{detritus_dynamics()}}, \code{\link[=detritus_consumption]{detritus_consumption()}},

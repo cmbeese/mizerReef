@@ -31,12 +31,12 @@ detritus_biomass <- function(params) {
 #'
 #' The dynamical equation is solved analytically to
 #'
-#'   \deqn{B_D(t + dt) = B_D(t) \cdot e^{-\frac{dt}{K_D}(P_D+ K_D \, C_D)}
-#'                        - \frac{K_D \, P_D}{P_D + K \, c_D}
-#'                        e^{-\frac{dt}{K_D}(P_D + K_D \, c_D)} }{
-#'         B_D(t + dt) = B_D(t) exp^(-dt/K_D * (P_D+ K_D*c_D))
-#'                        (-K_D*P_D) / (P_D + K_D*c_D) * e^(-dt/K_D * 
-#'                        (P_D + K_D*c_D) }
+#'   \deqn{B_D(t + dt) = B_D(t) \cdot e^{-\frac{dt}{K_D}(P_D+ K_D \, c_D)}
+#'                        + \frac{K_D \, P_D}{P_D+ K_D \, c_D} \left(1-
+#'                        e^{-\frac{dt}{K_D}(P_D+ K_D \, c_D)}\right) }{
+#'         B_D(t + dt) = B_D(t) exp^(-dt/K_D * (P_D+ K_D*c_D)) +
+#'                        (K_D*P_D) / (P_D + K_D*c_D) *(1 - e^(-dt/K_D * 
+#'                        (P_D + K_D*c_D)) }
 #'
 #' @param params A [MizerParams] object
 #' @param n A matrix of current species abundances (species x size)
@@ -60,9 +60,12 @@ detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     if (consumption > 0) {
         et <- exp(-dt/kd * (production + kd * consumption))
         frac <- (kd*production) / (production + kd * consumption)
-        return(n_other$detritus * et - frac * et)
+        fracet <- frac *(1- et)
+        return(n_other$detritus * et + fracet)
+    } else {
+        et <- exp(-dt/kd * (production))
+        return(n_other$detritus * et)
     }
-    return(n_other$detritus + production * dt)
 }
 
 #' Detritus dynamics
@@ -72,20 +75,21 @@ detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 #'
 #' The time evolution of the detritus biomass \eqn{B} is described by
 #'
-#' \deqn{dB/dt = \tt{production} - \tt{consumption} \cdot B + \tt{external}}{
-#'       dB/dt = production - consumption * B + external}
+#' \deqn{dB_D/dt = P_D - c_D \cdot B_D }{
+#'       dB_D/dt = P_D - c_D * B_D }
 #'
-#' where `consumption` is the mass-specific rate of consumption, calculated 
-#' with `detritus_consumption()`and `production` is the rate at which the 
+#' where \eqn{c_D} is the mass-specific rate of consumption, calculated 
+#' with `detritus_consumption()`and \eqn{P_D} is the rate at which the 
 #' rest of the system produces detritus biomass, calculate with 
 #' `getDetritusProduction()`.
 #' 
 #' The dynamical equation is solved analytically to
-#' \deqn{B(t+dt) = B(t)\exp(-\tt{consumption} \cdot dt)
-#'               + \frac{\tt{production}}{\tt{consumption}}
-#'                 (1-\exp(-\tt{consumption} \cdot dt)).}{
-#'       B(t+dt) = B(t) exp(-consumption * dt) 
-#'               + production/consumption * (1 - exp(-consumption * dt)).}
+#' 
+#' \deqn{B_D(t+dt) = B(t)\exp(-c_D \cdot dt)
+#'               + \frac{P_D}{c_D}
+#'                 (1-\exp(-c_D \cdot dt)).}{
+#'       B_D(t+dt) = B(t) exp(-c_D * dt) 
+#'               + P_D/c_D * (1 - exp(-c_D * dt)).}
 #'
 #' This avoids the stability problems that would arise if we used the Euler
 #' method to solve the equation numerically.

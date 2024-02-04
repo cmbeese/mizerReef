@@ -29,20 +29,21 @@ current detritus biomass.
 \details{
 The time evolution of the detritus biomass \eqn{B} is described by
 
-\deqn{dB/dt = \tt{production} - \tt{consumption} \cdot B + \tt{external}}{
-      dB/dt = production - consumption * B + external}
+\deqn{dB_D/dt = P_D - c_D \cdot B_D }{
+      dB_D/dt = P_D - c_D * B_D }
 
-where \code{consumption} is the mass-specific rate of consumption, calculated
-with \code{detritus_consumption()}and \code{production} is the rate at which the
+where \eqn{c_D} is the mass-specific rate of consumption, calculated
+with \code{detritus_consumption()}and \eqn{P_D} is the rate at which the
 rest of the system produces detritus biomass, calculate with
 \code{getDetritusProduction()}.
 
 The dynamical equation is solved analytically to
-\deqn{B(t+dt) = B(t)\exp(-\tt{consumption} \cdot dt)
-              + \frac{\tt{production}}{\tt{consumption}}
-                (1-\exp(-\tt{consumption} \cdot dt)).}{
-      B(t+dt) = B(t) exp(-consumption * dt) 
-              + production/consumption * (1 - exp(-consumption * dt)).}
+
+\deqn{B_D(t+dt) = B(t)\exp(-c_D \cdot dt)
+              + \frac{P_D}{c_D}
+                (1-\exp(-c_D \cdot dt)).}{
+      B_D(t+dt) = B(t) exp(-c_D * dt) 
+              + P_D/c_D * (1 - exp(-c_D * dt)).}
 
 This avoids the stability problems that would arise if we used the Euler
 method to solve the equation numerically.

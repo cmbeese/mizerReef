@@ -136,7 +136,7 @@ setURParams <- function(params,
         
     # set plotting aesthetics ---- 
         params@linecolour["detritus"] <- "plum4"
-        params@linecolour["algae"]    <- "olivedrab3"
+        params@linecolour["algae"]    <- "darkseagreen3"
         params@linetype["detritus"] <- "solid"
         params@linetype["algae"]    <- "solid"
         

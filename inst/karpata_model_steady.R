@@ -13,7 +13,7 @@ library(here)
 ## Load parameters -------------------------------------------------------------
 
 # Load species parameter data
-karpata_species <- read.csv(here("inst/karpata_species.csv"))
+karpata_species <- read.csv(here("inst/karpata_10plus.csv"))
 karpata_int     <- read.csv(here("inst/cbn_interaction.csv"),  row.names = 1)
 karpata_refuge  <- karpata_refuge
 tuning_profile  <- tuning_profile

@@ -29,20 +29,20 @@ algae biomass
 \details{
 The time evolution of the algal biomass \eqn{B} is described by
 
-\deqn{dB/dt = \tt{production} - \tt{consumption} \cdot B}{
-      dB/dt = production - consumption * B}
+\deqn{dB_A/dt = P_A - c_A \cdot B_A}{
+      dB_A/dt = P_A - c_A * B_A}
 
-where  \code{consumption} is the mass-specific rate of consumption calculated
-with \code{algae_consumption()} and \code{production} is the rate at which algae
+where  \eqn{c_A} is the mass-specific rate of consumption calculated
+with \code{algae_consumption()} and \eqn{P_A} is the rate at which algae
 grows, calculated with \code{getAlgaeProduction()}.
 
 The dynamical equation is solved analytically to
 
-\deqn{B(t+dt) = B(t) e^{(-\tt{consumption} \cdot dt)}
-             +\frac{\tt{production}}{\tt{consumption}}
-             (1- e^{(-\tt{consumption} \cdot dt)}).}{
-      B(t+dt) = B(t) exp(-consumption * dt) 
-              + production/consumption * (1 - exp(-consumption * dt)).}
+\deqn{B_A(t+dt) = B_A(t) e^{(- c_A \cdot dt)}
+             +\frac{P_A}{c_A}
+             (1- e^{(-c_A \cdot dt)}).}{
+      B_A(t+dt) = B(t) exp(-c_A * dt) 
+              + p_A/c_A * (1 - exp(-c_A * dt)).}
 
 This avoids the stability problems that would arise if we used the Euler
 method to solve the equation numerically.

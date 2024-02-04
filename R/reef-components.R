@@ -47,18 +47,47 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' this functions sets the production rates of detritus and algae so
 #' that productions equals consumption at steady state.
 #' 
-#' The growth of rate of algae is set to \eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A})} 
-#' grams per meter squared per year.
+#' With a carrying capacity, the time evolution of the algae biomass 
+#' \eqn{B_A(t)} is described by
+#'
+#'  \deqn{ \frac{dB_A}{dt} = P_A\left( 1 - 
+#'                          \frac{B_A}{K_A} \right) - c_A \, B_A }{
+#'                 dB_A/dt = P_A * (1 - B_A/ K_A) - c_A * B_A}
 #' 
-#' The external production of detritus is set to 
+#' where \eqn{K_A} is the system's carrying capacity for algae in grams/ year,
+#' \eqn{c_A} is the mass-specific rate of consumption calculated with
+#' `algae_consumption()` and \eqn{P_A} is the rate at which algae
+#' grows, calculated with `getAlgaeProduction()`.
+#' 
+#' In this tuning function, the growth of rate of algae is set to 
+#' \eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A})} grams per meter squared per year
+#' so that consumption is equal to production for steady state.
+#' 
+#' Similarly, the time evolution of the detritus biomass \eqn{B_D(t)} is 
+#' described by
+#'
+#'  \deqn{ \frac{dB_D}{dt} = P_D\left( 1 - 
+#'                          \frac{B_D}{K_D} \right) - c_D \, B_D }{
+#'                 dB_D/dt = P_D * (1 - B_D/ K_D) - c_D * B_D}
+#'                 
+#' where \eqn{K_D} is the system's carrying capacity for detritus in grams/ year,
+#' \eqn{c_D} is the mass-specific rate of consumption calculated with
+#' `detritus_consumption()` and \eqn{P_D} is the rate at which detritus
+#' is produced calculated with `getDetritusProduction()`. Total detritus
+#' production is given with
+#' 
+#'  \deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
+#'        p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
+#' 
+#' In this tuning function, the external production of detritus is set to 
 #' \eqn{(c_D \cdot B_D)/(1-\frac{B_D}{K_D}) - P_{D.f} - P_{D.d}} grams per meter
-#' squared per year.
+#' squared per year so that production equals consumption at steady state. 
 #'
 #' @param params A MizerParams object
 #' @param ... unused
 #' @return An updated MizerParams object
 #' @concept Uresources
-#' 
+#' @seealso [reefSteady()], [algae_dynamics_cc()], [detritus_dynamics_cc()]
 #' @export
 tuneUR_cc <- function(params,...) {
     
@@ -95,7 +124,7 @@ tuneUR_cc <- function(params,...) {
 #' @param ... unused
 #' @return An updated MizerParams object
 #' @concept Uresources
-#' 
+#' @seealso [reefSteady()], [algae_dynamics()], [detritus_dynamics()]
 #' @export
 tuneUR <- function(params,...) {
 
@@ -115,6 +144,51 @@ tuneUR <- function(params,...) {
     params@other_params$detritus$external <- dout - din
 
     params
+}
+
+#' Scale reef abundances
+#'
+#' Multiplies the abundances of all or of selected species by given factors and
+#' then retunes the reproductive efficiency accordingly.
+#'
+#' @details
+#' Does not run the system to steady state. For that you should call
+#' [reefSteady()] explicitly afterwards.
+#'
+#' @param params A mizer params object
+#' @param factor The factor by which the abundance of each species is multiplied.
+#'   This can be specified in two ways:
+#'   \itemize{
+#'   \item A named numeric vector where the name indicates the species and the
+#'     value gives the factor for that species. Only the named species are
+#'     affected.
+#'   \item  A number that gives the factor for all foreground species.
+#'   }
+#'
+#' @return An object of type \linkS4class{MizerParams}
+#' @export
+scaleReefAbundance <- function(params, factor) {
+    params <- validParams(params)
+    assert_that(is.numeric(factor),
+                all(factor > 0))
+    is_foreground <- !is.na(params@A)
+    no_sp <- sum(is_foreground)
+    if (length(factor) == 1 && length(names(factor)) == 0) {
+        factor <- rep(factor, no_sp)
+        names(factor) <- params@species_params$species[is_foreground]
+    }
+    to_rescale <- names(factor)
+    wrong <- setdiff(to_rescale, params@species_params$species)
+    if (length(wrong) > 0) {
+        stop(paste(wrong, collapse = ", "),
+             " do not exist.")
+    }
+    assert_that(length(to_rescale) == length(factor))
+    
+    params@initial_n[to_rescale, ] <-
+        params@initial_n[to_rescale, ] * factor
+    
+    return(setBevertonHolt(params, reproduction_level = 4/5))
 }
 
 #' Scale model parameters
@@ -145,16 +219,6 @@ scaleReefModel <- function(params, factor) {
     params@other_params$detritus$external <-
         params@other_params$detritus$external * factor
     
-    # Vulnerability
-    # if (!is.null(params@other_params$refuge_params$max_protect)) {
-    #     params@other_params$refuge_params$max_protect <-
-    #         params@other_params$refuge_params$max_protect * factor
-    # }
-    # if (!is.null(params@other_params$method_params$refuge_density)) {
-    #     params@other_params$method_params$refuge_density <-
-    #         params@other_params$method_params$refuge_density * factor
-    # }
-    
     # now comes the code of mizer's standard scaleModel()
     params <- validParams(params)
     assert_that(is.number(factor), factor > 0)
@@ -182,6 +246,20 @@ scaleReefModel <- function(params, factor) {
     params@sc <- params@sc * factor
     return(params)
 }
+
+#' Scale background down by a factor
+#' 
+#' Replaces scale down background function
+#' 
+#' @param factor A number giving the factor by which the background abundance
+#'   will be reduced
+#' @export
+scaleReefBackground <- function(params, factor) {
+    scaleReefAbundance(params, factor = factor) %>%
+        scaleModel(factor = 1 / factor)
+}
+
+
 
 #' Calibrate the scale of a mizerReef model to match total observed biomass
 #' 

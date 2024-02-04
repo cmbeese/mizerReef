@@ -20,4 +20,7 @@ abundances, the algae is at steady state. It then sets the rate at which
 detritus flows in from external sources (e.g. the pelagic zone) so that for
 the given abundances the detritus is at steady state.
 }
+\seealso{
+\code{\link[=reefSteady]{reefSteady()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=detritus_dynamics]{detritus_dynamics()}}
+}
 \concept{Uresources}

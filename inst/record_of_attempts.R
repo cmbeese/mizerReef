@@ -5,6 +5,7 @@
 
 # THIS NO LONGER WORKS
 ## Setup - load packages -------------------------------------------------------
+library(ggplot2)
 library(mizer)
 library(mizerExperimental)
 library(mizerReef)
@@ -13,419 +14,139 @@ library(here)
 
 ## Load parameters -------------------------------------------------------------
 
+rm(params, karpata_10plus, karpata_int)
+
 # Load species parameter data
-karpata_species <- read.csv(here("inst/karpata_species.csv"))
+# karpata_species <- read.csv(here("inst/karpata_species.csv"))
 karpata_10plus  <- read.csv(here("inst/karpata_10plus.csv"))
 karpata_int     <- read.csv(here("inst/cbn_interaction.csv"),  row.names = 1)
 karpata_refuge  <- karpata_refuge
 tuning_profile  <- tuning_profile
 
 # Attempt 1 --------------------------------------------------------------------
-        ## Set model
+    # Remove growth parameters that mizer struggles to match
+    #karpata_10plus$age_mat  <- NULL
+    karpata_10plus$k_vb     <- NULL
+    karpata_10plus$l_mat    <- NULL
+    karpata_10plus$interaction_resource[karpata_10plus$species == "pred_inv"] <- 0.3
+    #karpata_10plus$beta[karpata_10plus$species == "pred_inv"] <- 30
+    karpata_10plus$sigma[karpata_10plus$species == "pred_eng"] <- 1.5
+
     params <- newReefParams(group_params = karpata_10plus,
                             interaction = karpata_int,
-                            method = "binned", w_pp_cutoff = 0.1,
+                            method = "binned", w_pp_cutoff = 0.9,
+                            crit_feed = 0.85,
                             method_params = tuning_profile)
+    
+    rdi <- rep(0.8, dim(karpata_int)[1])
+    
+    params <- setBevertonHolt(params, reproduction_level = rdi)
     
     ## Project to first steady state
     params <- params |>
         reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
+        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+        reefSteady() |> reefSteady() 
     # Converges on 7th attempt
     
     # Match biomasses
     params <- calibrateReefBiomass(params)
     params <- matchBiomasses(params)
-    params <- reefSteady(params)
+    params <- params |>
+        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+        reefSteady() |> reefSteady() 
     
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 17755.7361631237
-    # Error in mizer::setBevertonHolt(params, 
-    #                                 reproduction_level = old_reproduction_level) :
-    #     Some species have no reproduction.
+    plotBiomassVsSpecies(params)
+    # Spot on
     
-    
-# Attempt 2 --------------------------------------------------------------------
-    
-    ## Set model - new set of parameters
-    params <- newReefParams(group_params = karpata_10plus,
-                            interaction = karpata_int,
-                            method = "binned", 
-                            method_params = tuning_profile)
-    
-    ## Project to first steady state
+    # Now match growth
+    params <- matchReefGrowth(params)
     params <- params |>
         reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
         reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
     
-    # Match biomasses doesn't converge - try species by species
-    params <- calibrateReefBiomass(params)
     
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
+    plotSpectra(params, power = 2, total = TRUE)
+    plotFeedingLevel(params)
     
-    # Match biomass species by species, starting with ones that are closest
-    params <- matchBiomasses(params, species = "parrotfish")
-    params <- reefSteady(params)
-    
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "herbs")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_inv")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_eng")
-    params <- reefSteady(params)
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_grab")
-    params <- reefSteady(params)
-    
-    plotBiomassVsSpecies(params)
-    
-    # This is  where it gets unhappy
-    params <- matchBiomasses(params, species = "pred_plank")
-    
-    # Simulation run did not converge after 99 years. Value returned by 
-    # the distance function was: 183067.146045887
-    
+    # # Scale down background??
+    params <- scaleReefBackground(params, 2)
     
     params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |> 
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |> 
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    # Error in mizer::setBevertonHolt(params, 
-    #                             reproduction_level = old_reproduction_level) : 
-    #     Some species have no reproduction.
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady() |> reefSteady()
 
-    plotPredMort(params)
+    
+    # Check for match with age at maturity
+    age_mat_observed = karpata_species$age_mat
+    age_mat_model = age_mat(params)
+    data.frame(age_mat_model, age_mat_observed)
+    # Not great
+    
+    plotBiomassVsSpecies(params)
+    # Spot on
+    
+    params <- setBevertonHolt(params, erepro = 0.0001)
+    getReproductionLevel(params)
+    
+    params <- setBevertonHolt(params, erepro = 0.008)
+    getReproductionLevel(params)
+    
+    #params <- setBevertonHolt(params, species =  reproduction_level = rdi)
+    
+    params <- reefSteady(params)
+    
+    params <- params |>
+        reefSteady() |> reefSteady() |> reefSteady() |> 
+        reefSteady() |> reefSteady()
+    
+    getReproductionLevel(params)
+    
+    
     plotSpectra(params, power = 2)
-    plotDiet(params)
-    # Everything is eating planktivores. weird.
-    
-    rm(params)
-    
-# Attempt 3 --------------------------------------------------------------------
-    # Try with 10 plus biomasses instead of 5 plus - has drastically smaller
-    # biomass for pred_plank, no farming damselfish
-    # increase beta for planktivores?
-    karpata_10plus$beta[karpata_10plus$species == "pred_plank"] <- 1000
-    
-    ## Set model
-    params <- newReefParams(group_params = karpata_10plus,
-                            interaction = karpata_int,
-                            method = "binned", #w_pp_cutoff = 0.1,
-                            method_params = tuning_profile)
-    
-    ## Project to first steady state
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
-    
-    # Match biomasses doesn't converge - try species by species
-    params <- calibrateReefBiomass(params)
-    
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
-    
-    # Match biomass species by species, starting with ones that are closest
-    params <- matchBiomasses(params, species = "parrotfish")
-    params <- reefSteady(params)
-    
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "herbs")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_inv")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_eng")
-    params <- reefSteady(params)
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_grab")
-    params <- reefSteady(params)
-    
-    plotBiomassVsSpecies(params)
-    
-    # This is  where it gets unhappy
-    params <- matchBiomasses(params, species = "pred_plank")
-    params <- reefSteady(params)
-    
     plotPredMort(params)
-    plotSpectra(params, power = 2)
-    plotDiet(params)
-    # Looking slightly better, lets increase again 
-    rm(params)
+    plotFeedingLevel(params)
+    plotDiet(params) + scale_x_log10(limits = c(1, 10000))
+    plotDiet(karpata_model2)+ scale_x_log10(limits = c(1, 10000))
+    params <- tuneParams(params)
     
-# Attempt 4 --------------------------------------------------------------------
-    # Try with 10 plus biomasses instead of 5 plus - has drastically smaller
-    # biomass for pred_plank, no farming damselfish
-    # increase beta for planktivores?
-    karpata_10plus$beta[karpata_10plus$species == "pred_plank"] <- 8000
+    ## Now switch to competitive method --------------------------------------------
+    params <- newRefuge(params,
+                        new_method = "competitive",
+                        new_method_params = karpata_refuge)
     
-    ## Set model
-    params <- newReefParams(group_params = karpata_10plus,
-                            interaction = karpata_int,
-                            method = "binned", #w_pp_cutoff = 0.1,
-                            method_params = tuning_profile)
-    
+    # Match biomasses again
     params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
+        matchBiomasses()|> reefSteady()|> 
+        matchBiomasses()|> reefSteady()|>
+        matchBiomasses()|> reefSteady()|>
+        matchBiomasses()|> reefSteady()|> reefSteady()|>
+        reefSteady()|> reefSteady()|> reefSteady()|> reefSteady()
     
-    ## Calibrate biomasses
-    params <- calibrateReefBiomass(params)
+    # Make sure new refuge is in place
+    plotRefuge(params)
     
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
+    plotBiomassVsSpecies(params) # spot on
     
-    # Match biomass species by species, starting with ones that are closest
-    params <- matchBiomasses(params, species = "parrotfish")
-    params <- reefSteady(params)
-    
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "herbs")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_eng")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() 
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_grab")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_inv")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    plotBiomassVsSpecies(params)
-    
-    # This is  where it gets unhappy
-    params <- matchBiomasses(params, species = "pred_plank")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 506032.221535751
-    # Error in mizer::setBevertonHolt(params, 
-    #                                 reproduction_level = old_reproduction_level) : 
-    #     Some species have no reproduction.
-    
-    plotPredMort(params)
-    plotSpectra(params, power = 2)
-    plotDiet(params)
-    # Looking slightly better, lets increase again 
-    rm(params)
-    
-# Attempt 5 --------------------------------------------------------------------
-    # Reduce interactions with planktivores?
-    karpata_10plus$beta[karpata_10plus$species == "pred_plank"] <- 10000
-    karpata_int$pred_plank[karpata_int$pred_plank == 1] <- 0.5
-    
-    ## Set model
-    params <- newReefParams(group_params = karpata_10plus,
-                            interaction = karpata_int,
-                            method = "binned", #w_pp_cutoff = 0.1,
-                            method_params = tuning_profile)
-    
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
-    
-    ## Calibrate biomasses
-    params <- calibrateReefBiomass(params)
-    
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
-    
-    # Match biomass species by species, starting with ones that are closest
-    #params <- matchBiomasses(params)
-    #params <- reefSteady(params)
+    plotSpectra(params, power = 2, total = TRUE)
     
     
-    # Match biomass species by species, starting with ones that are closest
-    params <- matchBiomasses(params, species = "parrotfish")
-    params <- reefSteady(params)
+    # Save!
+    karpata_model <- reefSteady(params)
+    karpata_model2 <- reefSteady(params)
+    karpata_model3 <- reefSteady(params)
     
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
     
-    params <- matchBiomasses(params, species = "herbs")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() 
+    save(karpata_model,   file = "data/karpata_model.rda")
+    save(karpata_model2,   file = "data/karpata_model2.rda")
+    save(karpata_model3,   file = "data/karpata_model3.rda")
     
-    plotBiomassVsSpecies(params)
     
-    params <- matchBiomasses(params, species = "pred_plank")
-    params <- reefSteady(params)
     
-    params <- matchBiomasses(params, species = "pred_inv")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_eng")
-    params <- reefSteady(params)
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_grab")
-    params <- reefSteady(params) 
-    plotBiomassVsSpecies(params)
-    
-    # Now all together
-    params <- calibrateReefBiomass(params)
-    params <- matchBiomasses(params)
-    params <- reefSteady(params)
-    
-    # Now match growth
-    params <- matchReefGrowth(params)
-    
-    # With these parameter values the pred_grab does not have enough food 
-    # to cover its metabolic cost NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    
-    plotPredMort(params)
-    plotSpectra(params, power = 2)
-    plotDiet(params)
-    # Looking slightly better, lets increase again 
-    rm(params)
-    
-# Attempt 6 --------------------------------------------------------------------
-    # Reduce interactions with planktivores?
-    karpata_10plus$beta[karpata_10plus$species == "pred_plank"] <- 10000
-    karpata_int$pred_plank[karpata_int$pred_plank == 1] <- 0.5
-    
-    ## Set model
-    params <- newReefParams(group_params = karpata_10plus,
-                            interaction = karpata_int,
-                            method = "binned", w_pp_cutoff = 0.1,
-                            method_params = tuning_profile)
-    
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
-    
-    ## Calibrate biomasses
-    params <- calibrateReefBiomass(params)
-    
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
-    
-    # Match biomass species by species, starting with ones that are closest
-    # params <- matchBiomasses(params)
-    # params <- reefSteady(params)
-    # 
-    
-    # Match biomass species by species, starting with ones that are closest
-    params <- matchBiomasses(params, species = "parrotfish")
-    params <- reefSteady(params)
-    
-    # Plot species vs biomass to see which ones are furthest away
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "herbs")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() 
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_plank")
-    params <- reefSteady(params)
-    
-    params <- matchBiomasses(params, species = "pred_inv")
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady()
-    
-    # OSCILLATING!
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 6.84237482032618
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 1430.33280917617
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 2278.06090068667
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 8.08335509847775
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 1737.67642915773
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 1505.7909620901
-    # Simulation run did not converge after 99 years. Value returned by the 
-    # distance function was: 7043.75462585284
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_eng")
-    params <- reefSteady(params)
-    
-    plotBiomassVsSpecies(params)
-    
-    params <- matchBiomasses(params, species = "pred_grab")
-    params <- reefSteady(params) 
-    plotBiomassVsSpecies(params)
-    
-    # Now all together
-    params <- calibrateReefBiomass(params)
-    params <- matchBiomasses(params)
-    params <- reefSteady(params)
-    
-    # Now match growth
-    params <- matchReefGrowth(params)
-    
-    # With these parameter values the pred_grab does not have enough food 
-    # to cover its metabolic cost NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    
-    plotPredMort(params)
-    plotSpectra(params, power = 2)
-    plotDiet(params)
-    # Looking slightly better, lets increase again 
     rm(params)
     
     
