@@ -851,7 +851,7 @@ plotTotalBiomass <- function(object,
                               group = Legend, fill = Legend))
     
     p + geom_bar(stat = "identity", position = "dodge") +
-        scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
+        scale_y_continuous(name = expression("Total Biomass (g/m^2)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
         labs(fill = "Species Group", x = "Species Group")

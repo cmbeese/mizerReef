@@ -22,25 +22,38 @@ karpata_10plus  <- read.csv(here("inst/karpata_10plus.csv"))
 karpata_int     <- read.csv(here("inst/cbn_interaction.csv"),  row.names = 1)
 karpata_refuge  <- karpata_refuge
 tuning_profile  <- tuning_profile
+tuning_profile$prop_protect[1:4] <- 0.4
 
 # Attempt 1 --------------------------------------------------------------------
-    # Remove growth parameters that mizer struggles to match
-    #karpata_10plus$age_mat  <- NULL
     karpata_10plus$k_vb     <- NULL
     karpata_10plus$l_mat    <- NULL
-    karpata_10plus$interaction_resource[karpata_10plus$species == "pred_inv"] <- 0.3
-    #karpata_10plus$beta[karpata_10plus$species == "pred_inv"] <- 30
-    karpata_10plus$sigma[karpata_10plus$species == "pred_eng"] <- 1.5
-
+    # karpata_10plus$alpha <- NULL
+    # karpata_10plus$interaction_resource[karpata_10plus$species == "pred_inv"] <- 0.3
+    # karpata_10plus$beta[karpata_10plus$species == "pred_inv"] <- 30
+    # karpata_10plus$sigma[karpata_10plus$species == "pred_eng"] <- 1.5
+    # karpata_10plus$biomass_observed[karpata_10plus$species == "pred_inv"] <- NA
+    # karpata_10plus$biomass_cutoff[karpata_10plus$species == "pred_inv"] <- NA
+    # karpata_int$pred_inv[karpata_int$pred_inv == 1] <- 0.5
+    # karpata_int$pred_inv[karpata_int$pred_inv == 1] <- 0
+    
     params <- newReefParams(group_params = karpata_10plus,
                             interaction = karpata_int,
-                            method = "binned", w_pp_cutoff = 0.9,
+                            method = "binned", w_pp_cutoff = 1,
                             crit_feed = 0.85,
                             method_params = tuning_profile)
     
-    rdi <- rep(0.8, dim(karpata_int)[1])
+    # species_params(params)["pred_inv", "pred_kernel_type"] <- "box"
+    # species_params(params)["pred_inv", "ppmr_min"] <- 2
+    # species_params(params)["pred_inv", "beta"] <- 10
+    # species_params(params)["pred_eng", "sigma"] <- 2
+    # species_params(params)["pred_grab", "sigma"] <- 2
+    # species_params(params)["eels", "sigma"] <- 3
+    # species_params(params)["pred_grab", "beta"] <- 80
     
+    rdi <- rep(0.8, dim(karpata_int)[1])
+
     params <- setBevertonHolt(params, reproduction_level = rdi)
+    getReproductionLevel(params)
     
     ## Project to first steady state
     params <- params |>
@@ -52,6 +65,7 @@ tuning_profile  <- tuning_profile
     # Match biomasses
     params <- calibrateReefBiomass(params)
     params <- matchBiomasses(params)
+    
     params <- params |>
         reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
         reefSteady() |> reefSteady() 
@@ -61,6 +75,33 @@ tuning_profile  <- tuning_profile
     
     # Now match growth
     params <- matchReefGrowth(params)
+    # species_params(params)["pred_eng", "sigma"] <- 3
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_grab", "sigma"] <- 3
+    # params <- matchReefGrowth(params)
+    # species_params(params)["eels", "beta"] <- 100
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_inv", "sigma"] <- 3
+    # params <- matchReefGrowth(params)
+    
+    # betas <- seq(20,400,30)
+    # species_params(params)["pred_grab", "beta"] <- betas[1]
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_grab", "beta"] <- betas[2]
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_grab", "beta"] <- betas[3]
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_grab", "beta"] <- betas[4]
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_grab", "beta"] <- betas[5]
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_grab", "beta"] <- betas[6]
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_grab", "beta"] <- betas[7]
+    # params <- matchReefGrowth(params)
+    # species_params(params)["pred_grab", "beta"] <- betas[8]
+    # params <- matchReefGrowth(params)
+    
     params <- params |>
         reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
         reefSteady() |> reefSteady() |> reefSteady() |> reefSteady()
@@ -93,10 +134,12 @@ tuning_profile  <- tuning_profile
     params <- setBevertonHolt(params, erepro = 0.0001)
     getReproductionLevel(params)
     
-    params <- setBevertonHolt(params, erepro = 0.008)
+    # Set to same for all species
+    params <- setBevertonHolt(params, erepro = 0.3)
     getReproductionLevel(params)
+    getRDD(params)/getRDI(params)
     
-    #params <- setBevertonHolt(params, species =  reproduction_level = rdi)
+    #params <- setBevertonHolt(params, reproduction_level = rdi)
     
     params <- reefSteady(params)
     
@@ -107,11 +150,15 @@ tuning_profile  <- tuning_profile
     getReproductionLevel(params)
     
     
-    plotSpectra(params, power = 2)
-    plotPredMort(params)
+    plotSpectra(params, power = 2) + 
+        geom_vline(xintercept = 1600) +
+        geom_vline(xintercept = 100) +
+        geom_vline(xintercept = 50)
+    
+    plotPredMort(params) + facet_wrap(~Species)
     plotFeedingLevel(params)
-    plotDiet(params) + scale_x_log10(limits = c(1, 10000))
-    plotDiet(karpata_model2)+ scale_x_log10(limits = c(1, 10000))
+    plotDiet(params) + scale_x_log10(limits = c(0.1, 1e4))
+    # plotDiet(karpata_model2)+ scale_x_log10(limits = c(1, 10000))
     params <- tuneParams(params)
     
     ## Now switch to competitive method --------------------------------------------
@@ -124,8 +171,9 @@ tuning_profile  <- tuning_profile
         matchBiomasses()|> reefSteady()|> 
         matchBiomasses()|> reefSteady()|>
         matchBiomasses()|> reefSteady()|>
-        matchBiomasses()|> reefSteady()|> reefSteady()|>
-        reefSteady()|> reefSteady()|> reefSteady()|> reefSteady()
+        matchBiomasses()|> reefSteady()|> 
+        reefSteady()|> reefSteady()|> reefSteady()|> 
+        reefSteady()|> reefSteady()
     
     # Make sure new refuge is in place
     plotRefuge(params)
