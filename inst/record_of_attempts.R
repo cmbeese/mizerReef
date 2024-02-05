@@ -22,11 +22,12 @@ karpata_10plus  <- read.csv(here("inst/karpata_10plus.csv"))
 karpata_int     <- read.csv(here("inst/cbn_interaction.csv"),  row.names = 1)
 karpata_refuge  <- karpata_refuge
 tuning_profile  <- tuning_profile
-tuning_profile$prop_protect[1:4] <- 0.4
+# tuning_profile$prop_protect[1:4] <- 0.4
 
 # Attempt 1 --------------------------------------------------------------------
     karpata_10plus$k_vb     <- NULL
     karpata_10plus$l_mat    <- NULL
+    karpata_10plus$age_mat <- NULL
     # karpata_10plus$alpha <- NULL
     # karpata_10plus$interaction_resource[karpata_10plus$species == "pred_inv"] <- 0.3
     # karpata_10plus$beta[karpata_10plus$species == "pred_inv"] <- 30
@@ -111,7 +112,7 @@ tuning_profile$prop_protect[1:4] <- 0.4
     plotFeedingLevel(params)
     
     # # Scale down background??
-    params <- scaleReefBackground(params, 2)
+    # params <- scaleReefBackground(params, 5)
     
     params <- params |>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
@@ -119,6 +120,8 @@ tuning_profile$prop_protect[1:4] <- 0.4
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()|>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
         reefSteady() |> reefSteady()
 
     
