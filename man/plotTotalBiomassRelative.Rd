@@ -107,6 +107,7 @@ Other plotting functions:
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotRefuge}()},
 \code{\link{plotSpectraRelative}()},
+\code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotVulnerable}()}
 }
