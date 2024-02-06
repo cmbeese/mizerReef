@@ -253,7 +253,7 @@ plotSpectraRelative <- function(object1, object2,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
-                mutate(rel_diff = 100*((value.y - value.x) / value.x))
+                mutate(rel_diff = (value.y - value.x) / value.x)
         yLabel <- "% Change in Biomass"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
@@ -697,7 +697,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |> 
-                mutate(rel_diff = 100*((value.y - value.x) / value.x))
+                mutate(rel_diff = (value.y - value.x) / value.x)
         yLabel <- "% Change in Productivity"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
@@ -1131,7 +1131,7 @@ plotTotalBiomassRelative <- function(object1, object2,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                mutate(rel_diff = 100*((value.y - value.x) / value.x))
+                mutate(rel_diff = (value.y - value.x) / value.x)
             yLabel <- "% Change in Total Biomass"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
