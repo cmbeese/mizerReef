@@ -151,6 +151,9 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.html</loc>
   </url>
   <url>
@@ -194,6 +197,12 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/rescale_detritus.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/scaleReefAbundance.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/scaleReefBackground.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/scaleReefModel.html</loc>

@@ -72,11 +72,34 @@ that productions equals consumption at steady state.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The growth of rate of algae is set to \((c_A \cdot B_A)/(1-\frac{B_A}{K_A})\)
-grams per meter squared per year.</p>
-<p>The external production of detritus is set to
+    <p>With a carrying capacity, the time evolution of the algae biomass
+\(B_A(t)\) is described by</p>
+<p>$$ \frac{dB_A}{dt} = P_A\left( 1 - 
+                         \frac{B_A}{K_A} \right) - c_A \, B_A $$</p>
+<p>where \(K_A\) is the system's carrying capacity for algae in grams/ year,
+\(c_A\) is the mass-specific rate of consumption calculated with
+<code><a href="algae_consumption.html">algae_consumption()</a></code> and \(P_A\) is the rate at which algae
+grows, calculated with <code><a href="getAlgaeProduction.html">getAlgaeProduction()</a></code>.</p>
+<p>In this tuning function, the growth of rate of algae is set to
+\((c_A \cdot B_A)/(1-\frac{B_A}{K_A})\) grams per meter squared per year
+so that consumption is equal to production for steady state.</p>
+<p>Similarly, the time evolution of the detritus biomass \(B_D(t)\) is
+described by</p>
+<p>$$ \frac{dB_D}{dt} = P_D\left( 1 - 
+                         \frac{B_D}{K_D} \right) - c_D \, B_D $$</p>
+<p>where \(K_D\) is the system's carrying capacity for detritus in grams/ year,
+\(c_D\) is the mass-specific rate of consumption calculated with
+<code><a href="detritus_consumption.html">detritus_consumption()</a></code> and \(P_D\) is the rate at which detritus
+is produced calculated with <code><a href="getDetritusProduction.html">getDetritusProduction()</a></code>. Total detritus
+production is given with</p>
+<p>$$p_D = p_{D.f} + p_{D.d} + p_{D.ext}$$</p>
+<p>In this tuning function, the external production of detritus is set to
 \((c_D \cdot B_D)/(1-\frac{B_D}{K_D}) - P_{D.f} - P_{D.d}\) grams per meter
-squared per year.</p>
+squared per year so that production equals consumption at steady state.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="reefSteady.html">reefSteady()</a></code>, <code><a href="algae_dynamics_cc.html">algae_dynamics_cc()</a></code>, <code><a href="detritus_dynamics_cc.html">detritus_dynamics_cc()</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

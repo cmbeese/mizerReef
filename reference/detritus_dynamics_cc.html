@@ -90,9 +90,9 @@ detritus biomass</p>
 <code><a href="detritus_consumption.html">detritus_consumption()</a></code> and \(P_D\) is the rate at which detritus
 is produced calculated with <code><a href="getDetritusProduction.html">getDetritusProduction()</a></code>.</p>
 <p>The dynamical equation is solved analytically to</p>
-<p>$$B_D(t + dt) = B_D(t) \cdot e^{-\frac{dt}{K_D}(P_D+ K_D \, C_D)}
-                       - \frac{K_D \, P_D}{P_D + K \, c_D}
-                       e^{-\frac{dt}{K_D}(P_D + K_D \, c_D)} $$</p>
+<p>$$B_D(t + dt) = B_D(t) \cdot e^{-\frac{dt}{K_D}(P_D+ K_D \, c_D)}
+                       + \frac{K_D \, P_D}{P_D+ K_D \, c_D} \left(1-
+                       e^{-\frac{dt}{K_D}(P_D+ K_D \, c_D)}\right) $$</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
