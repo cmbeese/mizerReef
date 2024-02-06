@@ -71,6 +71,8 @@ resource components, senescence mortality, and predation refuge.</p>
 <span>  ext_decomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  initial_d_external <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ext_mort_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  include_ext_mort <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  include_sen_mort <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -174,7 +176,7 @@ actually use it. Defaults to 1.</p></dd>
 <dt>carry_capacity</dt>
 <dd><p>A boolean value that indicates whether the user wants
 to implement a carrying capacity for unstructured
-resources.</p></dd>
+resources. Defaults to FALSE.</p></dd>
 
 
 <dt>initial_algae_growth</dt>
@@ -219,6 +221,16 @@ values.</p></dd>
 
 <dt>ext_mort_params</dt>
 <dd><p>Named list containing desired mortality parameters</p></dd>
+
+
+<dt>include_ext_mort</dt>
+<dd><p>A boolean value that indicates whether the user wants
+to use default external mortality. Defaults to TRUE.</p></dd>
+
+
+<dt>include_sen_mort</dt>
+<dd><p>A boolean value that indicates whether the user wants
+to use default senescence mortality. Defaults to TRUE.</p></dd>
 
 
 <dt>...</dt>
