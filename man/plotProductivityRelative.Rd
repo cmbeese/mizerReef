@@ -118,6 +118,7 @@ Other plotting functions:
 \code{\link{plotBiomass}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotRefuge}()},
+\code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},

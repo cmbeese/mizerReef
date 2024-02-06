@@ -357,7 +357,7 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 plotProductivity <- function(object, end  = TRUE,
                              species = NULL, ylim = c(NA, NA),
                              total = FALSE,  return_data = FALSE,
-                             min_fishing_l = 7, max_fishing_l = NULL,
+                             min_fishing_l = NULL, max_fishing_l = NULL,
                              start_time = NULL, end_time = NULL,...) {
     
     if (is(object, "MizerSim")) {
@@ -1182,4 +1182,51 @@ plotlyTotalBiomassRelative <- function(object1, object2,
     argg <- as.list(environment())
     ggplotly(do.call("TotalBiomassRelative", argg),
              tooltip = c("Species", "value"))
+}
+
+
+#' Plot the relative contribution of each species group to total abundance and
+#' total biomass
+#' 
+#' The individual abundance and biomasses are calculated by the 
+#' [plotTotalAbundance()] and [plotTotalBiomass()] functions. These are
+#'  passed all additional arguments you supply. See [plotTotalAbundance()]
+#'  and [plotTotalBiomass()] for more details.
+#'
+#' @inheritParams plotTotalBiomass
+#' @inheritDotParams plotTotalAbundance
+#' 
+#' @import ggplot2
+#' @export
+#' 
+#' @concept sumplots
+#' @family plotting functions
+#' @seealso [plotTotalAbundance()], [plotTotalBiomass()], 
+plotRelativeContribution <- function(params,...){
+    
+    abd <- plotTotalAbundance(params, return_data = TRUE)
+    abd$Metric <- "Abundance"
+
+    biom <- plotTotalBiomass(params, return_data = TRUE)
+    biom$Metric <- "Biomass"
+
+    # Relative Contribution
+    # Abundance
+    abd  <- dplyr::mutate(rel = value / sum(value) * 100)
+    biom <- dplr:: mutate(rel = value / sum(value) * 100)
+    
+    rel <- rbind(abd, biom)
+
+    # Legend       
+    legend_levels <- intersect(names(params@linecolour), unique(rel$Legend))
+    rel$Legend  <- factor(rel$Species, levels = legend_levels)   
+
+    # Plot
+    p <- ggplot(rel, aes(x = Metric, y = rel, fill = Legend))
+    
+    P + geom_bar(stat = "identity", position = "fill", color = "black") +
+        scale_fill_manual(values = params@linecolour[legend_levels]) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+        labs(y = "Relative Contribution", x = "Metric", fill = "")
+    
 }
