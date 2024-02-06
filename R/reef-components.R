@@ -166,6 +166,7 @@ tuneUR <- function(params,...) {
 #'   }
 #'
 #' @return An object of type \linkS4class{MizerParams}
+#' @concept Uresources
 #' @export
 scaleReefAbundance <- function(params, factor) {
     params <- validParams(params)
@@ -188,7 +189,7 @@ scaleReefAbundance <- function(params, factor) {
     params@initial_n[to_rescale, ] <-
         params@initial_n[to_rescale, ] * factor
     
-    return(setBevertonHolt(params, reproduction_level = 4/5))
+    return(setBevertonHolt(params, reproduction_level = 1/2))
 }
 
 #' Scale model parameters
@@ -254,6 +255,7 @@ scaleReefModel <- function(params, factor) {
 #' @param factor A number giving the factor by which the background abundance
 #'   will be reduced
 #' @export
+#' @concept Uresources
 scaleReefBackground <- function(params, factor) {
     scaleReefAbundance(params, factor = factor) %>%
         scaleModel(factor = 1 / factor)
