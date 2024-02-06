@@ -1193,7 +1193,7 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 #'  passed all additional arguments you supply. See [plotTotalAbundance()]
 #'  and [plotTotalBiomass()] for more details.
 #'
-#' @inheritParams plotTotalBiomass
+#' @inheritDotParams plotTotalBiomass
 #' @inheritDotParams plotTotalAbundance
 #' 
 #' @import ggplot2
@@ -1202,7 +1202,9 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 #' @concept sumplots
 #' @family plotting functions
 #' @seealso [plotTotalAbundance()], [plotTotalBiomass()], 
-plotRelativeContribution <- function(params,...){
+plotRelativeContribution <- function(object,...){
+    
+    params <- object@params
     
     abd <- plotTotalAbundance(params, return_data = TRUE)
     abd$Metric <- "Abundance"

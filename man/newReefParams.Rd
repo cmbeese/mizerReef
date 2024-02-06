@@ -30,6 +30,8 @@ newReefParams(
   ext_decomp = NULL,
   initial_d_external = NULL,
   ext_mort_params = NULL,
+  include_ext_mort = TRUE,
+  include_sen_mort = TRUE,
   ...
 )
 }
@@ -96,7 +98,7 @@ actually use it. Defaults to 1.}
 
 \item{carry_capacity}{A boolean value that indicates whether the user wants
 to implement a carrying capacity for unstructured
-resources.}
+resources. Defaults to FALSE.}
 
 \item{initial_algae_growth}{The initial growth rate of algae in
 grams/m^2/year. This value is reset to match
@@ -127,6 +129,12 @@ so that steady state abundances match observed
 values.}
 
 \item{ext_mort_params}{Named list containing desired mortality parameters}
+
+\item{include_ext_mort}{A boolean value that indicates whether the user wants
+to use default external mortality. Defaults to TRUE.}
+
+\item{include_sen_mort}{A boolean value that indicates whether the user wants
+to use default senescence mortality. Defaults to TRUE.}
 
 \item{...}{Extra parameters to be passed to \code{\link[=newMultispeciesParams]{newMultispeciesParams()}}}
 }

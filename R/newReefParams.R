@@ -16,9 +16,17 @@
 #'                      observed abundances, and the cut-off size for 
 #'                      observations in grams.
 #' @param interaction The group specific interaction matrix, \eqn{\theta_{ij}}
+#' 
 #' @param carry_capacity A boolean value that indicates whether the user wants
 #'                      to implement a carrying capacity for unstructured 
-#'                      resources.
+#'                      resources. Defaults to FALSE.
+#'                      
+#' @param include_ext_mort A boolean value that indicates whether the user wants
+#'                         to use default external mortality. Defaults to TRUE.
+#'                      
+#' @param include_sen_mort A boolean value that indicates whether the user wants
+#'                         to use default senescence mortality. Defaults to TRUE.
+#'                         
 #' @param min_w_pp Minimum size of plankton in grams
 #' @param w_pp_cutoff Maximum size of plankton in grams
 #' @param n Growth exponent (also used as metabolic exponent p)
@@ -50,7 +58,9 @@ newReefParams <- function(# Original mizer parameters
                             sen_decomp = NULL, ext_decomp = NULL, 
                             initial_d_external = NULL,
                           # Parameters for external mortality
-                            ext_mort_params = NULL, ...) {
+                            ext_mort_params = NULL,
+                            include_ext_mort = TRUE,
+                            include_sen_mort = TRUE,...) {
     
     ## Initialize model with newMultispeciesParams ----
     params <- newMultispeciesParams(species_params = group_params,
@@ -62,6 +72,9 @@ newReefParams <- function(# Original mizer parameters
     # Change resource color
     params@linecolour["Resource"] <- "lightseagreen"
     params@linecolour["Fishing"] <- "blue"
+    
+    # Save include_sen_mort
+    params@other_params$include_sen_mort <- include_sen_mort
     
     # Add parameters ----
     ### Refuge ----
@@ -170,6 +183,7 @@ newReefParams <- function(# Original mizer parameters
     }
 
     # External mortality - Weight dependent ----
+    if (include_ext_mort == TRUE){
         ext_mort_params <- params@other_params[['ext_mort_params']]
     
         # Change to allometric external mortality
@@ -180,6 +194,7 @@ newReefParams <- function(# Original mizer parameters
     
         # Change the external mortality rate in the params object
         mizer::ext_mort(params) <- allo_mort
+    }
 
     # Changes rates for refuge ----
         # Replace mizerRate functions with mizerReef versions

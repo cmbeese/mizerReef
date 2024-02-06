@@ -647,8 +647,15 @@ reefSenMort <- function(params, n, n_pp, n_other, t = 0, ...) {
 #' @concept extmort
 #' @export
 reefMort <- function(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) {
+    
+    include_sen_mort <- params@other_params$include_sen_mort
+    
+    if(include_sen_mort == TRUE){
     mizerMort(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) +
         reefSenMort(params, ...)
+    } else {
+        mizerMort(params, n, n_pp, n_other, t, f_mort, pred_mort, ...)
+    }
 }
 
 
