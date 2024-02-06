@@ -27,6 +27,11 @@
 #' @param include_sen_mort A boolean value that indicates whether the user wants
 #'                         to use default senescence mortality. Defaults to TRUE.
 #'                         
+#' @param z0pre If `include_ext_mort`is FALSE, the external mortality rate for
+#'              each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
+#'              to 1-n where n is the given allometric scaling exponent and 
+#'              z0pre defaults to 0.2.
+#'                         
 #' @param min_w_pp Minimum size of plankton in grams
 #' @param w_pp_cutoff Maximum size of plankton in grams
 #' @param n Growth exponent (also used as metabolic exponent p)
@@ -60,7 +65,8 @@ newReefParams <- function(# Original mizer parameters
                           # Parameters for external mortality
                             ext_mort_params = NULL,
                             include_ext_mort = TRUE,
-                            include_sen_mort = TRUE,...) {
+                            include_sen_mort = TRUE,
+                            z0pre = 0.2, ...) {
     
     ## Initialize model with newMultispeciesParams ----
     params <- newMultispeciesParams(species_params = group_params,
@@ -192,6 +198,16 @@ newReefParams <- function(# Original mizer parameters
         nat_mort  <- rep(nat_mort, nrow(species_params(params)))
         allo_mort <- outer(nat_mort, params@w^(z0exp))
     
+        # Change the external mortality rate in the params object
+        mizer::ext_mort(params) <- allo_mort
+    } else {
+        # Set coefficient for each species. Here we choose 0.1 for each species
+        z0pre <- rep(z0pre, nrow(species_params(params)))
+        z0exp     <- 1 - n
+        # Multiply by power of size with exponent, here chosen to be -1/4
+        # The outer() function makes it an array species x size
+        allo_mort <- outer(z0pre, w(params)^z0exp)
+        
         # Change the external mortality rate in the params object
         mizer::ext_mort(params) <- allo_mort
     }

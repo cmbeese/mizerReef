@@ -104,9 +104,7 @@ tuneUR_cc <- function(params,...) {
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
-        warning("Fecal matter and decomposition are producing more 
-        detritus than detritivores consume. To achieve a steady state,
-        the influx of external detritus is negative.")
+        warning("The flux of external detritus is negative.")
     }
     params@other_params$detritus$external <- ((dout*bd)/(1-bd/kd)) - din
     
@@ -137,9 +135,7 @@ tuneUR <- function(params,...) {
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
-        warning("Fecal matter and decomposition are producing more 
-        detritus than detritivores consume. To achieve a steady state,
-        the influx of external detritus is negative.")
+        warning("The flux of external detritus is negative.")
     }
     params@other_params$detritus$external <- dout - din
 

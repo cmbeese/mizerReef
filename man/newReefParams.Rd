@@ -32,6 +32,7 @@ newReefParams(
   ext_mort_params = NULL,
   include_ext_mort = TRUE,
   include_sen_mort = TRUE,
+  z0pre = 0.2,
   ...
 )
 }
@@ -135,6 +136,11 @@ to use default external mortality. Defaults to TRUE.}
 
 \item{include_sen_mort}{A boolean value that indicates whether the user wants
 to use default senescence mortality. Defaults to TRUE.}
+
+\item{z0pre}{If \code{include_ext_mort}is FALSE, the external mortality rate for
+each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
+to 1-n where n is the given allometric scaling exponent and
+z0pre defaults to 0.2.}
 
 \item{...}{Extra parameters to be passed to \code{\link[=newMultispeciesParams]{newMultispeciesParams()}}}
 }
