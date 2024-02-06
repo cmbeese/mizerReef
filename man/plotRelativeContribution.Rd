@@ -5,11 +5,11 @@
 \title{Plot the relative contribution of each species group to total abundance and
 total biomass}
 \usage{
-plotRelativeContribution(params, ...)
+plotRelativeContribution(object, ...)
 }
 \arguments{
 \item{...}{
-  Arguments passed on to \code{\link[=plotTotalAbundance]{plotTotalAbundance}}
+  Arguments passed on to \code{\link[=plotTotalBiomass]{plotTotalBiomass}}, \code{\link[=plotTotalAbundance]{plotTotalAbundance}}
   \describe{
     \item{\code{object}}{An object of class \linkS4class{MizerParams}}
     \item{\code{species}}{The species to be selected. Optional. By default all
