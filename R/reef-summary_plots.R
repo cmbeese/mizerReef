@@ -297,11 +297,13 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 
 #' Plot the total productivity for each Species Group
 #'
-#' When called with a \linkS4class{MizerParams} object the steady state 
-#' productivity is plotted. When called with a \linkS4class{MizerSim} 
-#' object the productivity is plotted.
+#' When called with a \linkS4class{MizerParams} object the total steady 
+#' state productivity is plotted for each group. When called with a
+#' \linkS4class{MizerSim} object the productivity of each species 
+#' through time is plotted.
 #'
-#' @param object An object of class \linkS4class{MizerParams}
+#' @param object An object of class \linkS4class{MizerParams} or
+#'                  \linkS4class{MizerSim}
 #' 
 #' @param species   The species to be selected. Optional. By default all
 #'                  species are selected. A vector of species names, or a 
@@ -355,7 +357,7 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 plotProductivity <- function(object, end  = TRUE,
                              species = NULL, ylim = c(NA, NA),
                              total = FALSE,  return_data = FALSE,
-                             min_fishing_l = NULL, max_fishing_l = NULL,
+                             min_fishing_l = 7, max_fishing_l = NULL,
                              start_time = NULL, end_time = NULL,...) {
     
     if (is(object, "MizerSim")) {
@@ -377,7 +379,9 @@ plotProductivity <- function(object, end  = TRUE,
             stop("start_time must be less than end_time")
         }
         
-        p <- getProductivity(sim, ...)
+        p <- getProductivity(sim,
+                             min_fishing_l = min_fishing_l,
+                             max_fishing_l = max_fishing_l, ...)
         # Select time range
         p <- p[(as.numeric(dimnames(p)[[1]]) >= start_time) &
                (as.numeric(dimnames(p)[[1]]) <= end_time), , drop = FALSE]
@@ -745,6 +749,119 @@ plotlyProductivityRelative <- function(object1, object2,
              tooltip = c("Species", "value"))
 }
 
+#' Plot the total fishable abundance for each species Group at steady state
+#' 
+#' This functions creates a barplot with the abundance of each Species Group
+#' within a size range. 
+#' 
+#' @param object An object of class \linkS4class{MizerParams}
+#' 
+#' @param species   The species to be selected. Optional. By default all
+#'                  species are selected. A vector of species names, or a 
+#'                  numeric vector with the species indices, or a logical 
+#'                  vector indicating for each species whether it is to be 
+#'                  selected (TRUE) or not.
+#'                  
+#' @param min_fishing_l parameters be passed to [getProductivity()]. The 
+#'                      minimum length (cm) of fished individuals for
+#'                      biomass estimates. Defaults to 7 cm.
+#'                      
+#' @param max_fishing_l parameters be passed to [getProductivity()]. The 
+#'                      maximum length (cm) of fished individuals for
+#'                      biomass estimates. Defaults to max length.
+#'                  
+#' @param return_data   A boolean value that determines whether the formatted 
+#'                      data used for the plot is returned instead of the plot 
+#'                      itself. Default value is FALSE.
+#'                      
+#' @param ... unused
+#'
+#' @return A ggplot2 object
+#' 
+#' @import ggplot2
+#' @export
+#' 
+#' @family plotting functions
+#' @concept sumplots
+#' @seealso [plotBiomass()], [plot2TotalBiomass()], 
+#'          [plotTotalBiomassRelative()],
+#'          [plotProductivity()], 
+#'          [plot2Productivity()], [plotProductivityRelative()]
+plotTotalAbundance <- function(object,
+                               species = NULL,
+                               min_fishing_l = NULL, 
+                               max_fishing_l = NULL,
+                               return_data = FALSE, ...) {
+    
+    # object checks ----
+    if (is(object, "MizerSim")) {
+        ## sim values ----
+        # get total biomass at last timestep
+        params <- object@params
+        end_time  <- max(as.numeric(dimnames(object@n)$time))
+        
+        abd <- mizer::getN(object,
+                           min_l = min_fishing_l,
+                           max_l = max_fishing_l)
+        
+        abd <- abd[end_time, ,drop = TRUE]
+        
+    } else {
+        
+    # params ----
+    params <- object
+    assert_that(is(params, "MizerParams"),
+                    is.flag(return_data))
+    
+    abd <- mizer::getN(params,
+                       min_l = min_fishing_l,
+                       max_l = max_fishing_l)
+
+    # create plot_dat ----
+    ## values from object ----
+    sp <- params@species_params
+    no_sp <- dim(params@interaction)[1]
+    
+    ## group names ----
+    if (is.null(params@species_params$group_names)){
+        group_names <- params@species_params$species
+    } else {
+        group_names <- params@species_params$group_names
+    }
+    
+    ## species selector ----
+    sel_sp <- mizer::valid_species_arg(params, species, 
+                                       return.logical = TRUE, 
+                                       error_on_empty = TRUE)
+    species <- dimnames(params@initial_n)$sp[sel_sp]
+    species <- gsub('inverts', NA, species)
+    species <- species[!is.na(species)]
+    sel_sp <- which(!is.na(species))
+    abd <- abd[sel_sp, drop = FALSE]
+    
+    ## data frame from selected species ----
+    plot_dat <- data.frame(value = abd, Species = species)
+    
+    ## colors ----
+    legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
+    plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
+    
+    ## return data if requested ----
+    if (return_data) return(plot_dat)
+    
+    # plot ----
+    p <- ggplot(plot_dat, aes(x = Species, y = value,
+                              group = Legend, fill = Legend))
+    
+    p + geom_bar(stat = "identity", position = "dodge") +
+        scale_y_continuous(name = expression("Total Biomass (g/m^2)")) +
+        scale_fill_manual(values = params@linecolour[legend_levels],
+                          labels = group_names) +
+        labs(fill = "Species Group", x = "Species Group")
+    }
+}
+
+
 #' Plot the total fishable biomass for each Species Group at steady state
 #' 
 #' This functions creates a barplot with the biomass of each Species Group
@@ -781,10 +898,11 @@ plotlyProductivityRelative <- function(object1, object2,
 #' @family plotting functions
 #' @concept sumplots
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
-#'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
+#'          [plotProductivity()], [plot2Productivity()],[plotProductivityRelative()]
 plotTotalBiomass <- function(object,
                              species = NULL,
-                             min_fishing_l = NULL, max_fishing_l = NULL,
+                             min_fishing_l = NULL, 
+                             max_fishing_l = NULL,
                              return_data = FALSE, ...) {
     
     # object checks ----
@@ -799,16 +917,17 @@ plotTotalBiomass <- function(object,
                                   max_l = max_fishing_l)
         
         biom <- biom[end_time, ,drop = TRUE]
-    } else if (is(object, "MizerParams")) {
-        ## params ----
-        params <- object
-        biom <- mizer::getBiomass(params, 
-                                  min_l = min_fishing_l,
-                                  max_l = max_fishing_l)
-    } else if (all(is(object, "MizerSim"), is(object, "MizerParams"))){
-        stop('object should be a mizerParams or mizerSim object.')
-    }
+    } else {
+        
+    # params ----
+    params <- object
+    assert_that(is(params, "MizerParams"),
+                is.flag(return_data))
     
+    biom <- mizer::getBiomass(params, 
+                              min_l = min_fishing_l,
+                              max_l = max_fishing_l)
+        
     # create plot_dat ----
     ## values from object ----
     sp <- params@species_params
@@ -820,11 +939,6 @@ plotTotalBiomass <- function(object,
     } else {
         group_names <- params@species_params$group_names
     }
-    
-    ## get productivity ----
-    biom <- mizer::getBiomass(params, 
-                              min_l = min_fishing_l,
-                              max_l = max_fishing_l)
     
     ## species selector ----
     sel_sp <- mizer::valid_species_arg(params, species, 
@@ -855,7 +969,7 @@ plotTotalBiomass <- function(object,
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
         labs(fill = "Species Group", x = "Species Group")
-    
+    }
 }
 
 #' @rdname plotTotalBiomass

@@ -12,7 +12,7 @@ plotProductivity(
   ylim = c(NA, NA),
   total = FALSE,
   return_data = FALSE,
-  min_fishing_l = NULL,
+  min_fishing_l = 7,
   max_fishing_l = NULL,
   start_time = NULL,
   end_time = NULL,
@@ -22,7 +22,8 @@ plotProductivity(
 plotlyProductivity(object, species = NULL, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams}}
+\item{object}{An object of class \linkS4class{MizerParams} or
+\linkS4class{MizerSim}}
 
 \item{end}{A boolean value that indicated whether you want the end
 productivity of a simulation (default, TRUE) or the
@@ -67,9 +68,10 @@ frame with the the productivity for each Species Group
 is returned.
 }
 \description{
-When called with a \linkS4class{MizerParams} object the steady state
-productivity is plotted. When called with a \linkS4class{MizerSim}
-object the productivity is plotted.
+When called with a \linkS4class{MizerParams} object the total steady
+state productivity is plotted for each group. When called with a
+\linkS4class{MizerSim} object the productivity of each species
+through time is plotted.
 }
 \seealso{
 \code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
@@ -83,6 +85,7 @@ Other plotting functions:
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotRefuge}()},
 \code{\link{plotSpectraRelative}()},
+\code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotVulnerable}()}

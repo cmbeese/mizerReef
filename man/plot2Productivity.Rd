@@ -62,7 +62,8 @@ itself. Default value is FALSE.}
 \item{...}{
   Arguments passed on to \code{\link[=plotProductivity]{plotProductivity}}
   \describe{
-    \item{\code{object}}{An object of class \linkS4class{MizerParams}}
+    \item{\code{object}}{An object of class \linkS4class{MizerParams} or
+\linkS4class{MizerSim}}
     \item{\code{end}}{A boolean value that indicated whether you want the end
 productivity of a simulation (default, TRUE) or the
 productivity through time.}
@@ -103,6 +104,7 @@ Other plotting functions:
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotRefuge}()},
 \code{\link{plotSpectraRelative}()},
+\code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
 \code{\link{plotVulnerable}()}
