@@ -53,7 +53,11 @@ reproduction have been accounted for.</p>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>n</dt>
+    <dl><dt>object</dt>
+<dd><p>A <code>MizerParams</code> object or a <code>MizerSim</code> object</p></dd>
+
+
+<dt>n</dt>
 <dd><p>A matrix of species abundances (species x size).</p></dd>
 
 
@@ -64,6 +68,17 @@ reproduction have been accounted for.</p>
 <dt>n_other</dt>
 <dd><p>A list of abundances for other dynamical components of the
 ecosystem</p></dd>
+
+
+<dt>time_range</dt>
+<dd><p>A vector of times. Only the range of times is relevant,
+i.e., all times between the smallest and largest will be selected.
+The time_range can be character or numeric.</p></dd>
+
+
+<dt>drop</dt>
+<dd><p>If <code>drop = TRUE</code> then the dimension of length 1 will be
+removed from the returned array.</p></dd>
 
 
 <dt>...</dt>

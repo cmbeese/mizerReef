@@ -73,6 +73,7 @@ resource components, senescence mortality, and predation refuge.</p>
 <span>  ext_mort_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include_ext_mort <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_sen_mort <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  z0pre <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -231,6 +232,13 @@ to use default external mortality. Defaults to TRUE.</p></dd>
 <dt>include_sen_mort</dt>
 <dd><p>A boolean value that indicates whether the user wants
 to use default senescence mortality. Defaults to TRUE.</p></dd>
+
+
+<dt>z0pre</dt>
+<dd><p>If <code>include_ext_mort</code>is FALSE, the external mortality rate for
+each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
+to 1-n where n is the given allometric scaling exponent and
+z0pre defaults to 0.2.</p></dd>
 
 
 <dt>...</dt>
