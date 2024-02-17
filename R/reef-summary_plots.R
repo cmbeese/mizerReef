@@ -1219,16 +1219,22 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 plotRelativeContribution <- function(object,
                                      return_data = FALSE,...){
     
-    params <- object@params
-    
-    abd <- plotTotalAbundance(params, return_data = TRUE, ...)
+    abd <- plotTotalAbundance(object, return_data = TRUE, ...)
     abd$Metric <- "Abundance"
 
-    biom <- plotTotalBiomass(params, return_data = TRUE, ...)
+    biom <- plotTotalBiomass(object, return_data = TRUE, ...)
     biom$Metric <- "Biomass"
     
-    prod <- plotProductivity(params, return_data = TRUE, ...)
+    prod <- plotProductivity(object, return_data = TRUE, ...)
     prod$Metric <- "Productivity"
+    
+    if (is(object, "MizerSim")) { 
+        params <- object@params 
+    } else {
+        params <- object
+        assert_that(is(params, "MizerParams"))
+    }
+    
 
     # Relative Contribution
     # Abundance
