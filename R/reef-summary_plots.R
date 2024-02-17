@@ -1136,13 +1136,17 @@ plotTotalBiomassRelative <- function(object1, object2,
     
     # Calculate relative difference
     if (diff_method == "percent_change"){
-        sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
+        sf <- dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
+              dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
+        
             yLabel <- "% Change in Total Biomass"
+            
     } else if (diff_method == "rel_diff"){
-        sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                dplyr::mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+        sf <- dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
+              dplyr::mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+        
             yLabel <- "Relative Difference in Total Biomass"
+            
     } else {
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
     }
@@ -1236,10 +1240,9 @@ plotRelativeContribution <- function(object,
     }
     
     # Relative Contribution
-    # Abundance
-    abd  <- dplyr::mutate(rel = value / sum(value) * 100)
-    biom <- dplyr::mutate(rel = value / sum(value) * 100)
-    prod <- dplyr::mutate(rel = value / sum(value) * 100)
+    abd  <- dplyr::mutate(abd, rel = value / sum(value) * 100)
+    biom <- dplyr::mutate(biom, rel = value / sum(value) * 100)
+    prod <- dplyr::mutate(prod, rel = value / sum(value) * 100)
     
     rel <- rbind(abd, biom, prod)
 
