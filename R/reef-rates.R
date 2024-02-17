@@ -114,7 +114,14 @@ getSenMort <- function(params, n = initialN(params),
 #' species and size for growth after metabolism, movement and 
 #' reproduction have been accounted for.
 #' 
+#' @param object A `MizerParams` object or a `MizerSim` object
+#' 
+#' @param drop If \code{drop = TRUE} then the dimension of length 1 will be 
+#'      removed from the returned array.
+#' 
 #' @inheritParams reefRates
+#' 
+#' @inheritParams mizer::get_time_elements
 #'   
 #' @return If a `MizerParams` object is passed in, the function returns a two
 #'   dimensional array (predator species x predator size) based on the

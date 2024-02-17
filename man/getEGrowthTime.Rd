@@ -7,12 +7,21 @@
 getEGrowthTime(object, n, n_pp, n_other, time_range, drop = FALSE, ...)
 }
 \arguments{
+\item{object}{A \code{MizerParams} object or a \code{MizerSim} object}
+
 \item{n}{A matrix of species abundances (species x size).}
 
 \item{n_pp}{A vector of the resource abundance by size}
 
 \item{n_other}{A list of abundances for other dynamical components of the
 ecosystem}
+
+\item{time_range}{A vector of times. Only the range of times is relevant,
+i.e., all times between the smallest and largest will be selected.
+The time_range can be character or numeric.}
+
+\item{drop}{If \code{drop = TRUE} then the dimension of length 1 will be
+removed from the returned array.}
 
 \item{...}{Unused}
 }

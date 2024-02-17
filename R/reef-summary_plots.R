@@ -7,6 +7,7 @@ library(dplyr)
 # Hackiness to get past the 'no visible binding ... ' warning when running check
 utils::globalVariables(c("Species", "value", "Model", "Legend",
                          "value.y", "value.x","rel_diff", "l",
+                         "y_ticks", "highlight", "Metric",
                          # variables used by ggplot for detritus and algae
                          "Rate", "Source", "Consumer"))
 
@@ -57,6 +58,7 @@ utils::globalVariables(c("Species", "value", "Model", "Legend",
 #'          'Legend' is returned.
 #'
 #' @import ggplot2
+#' @importFrom reshape2 melt
 #' @export
 #' 
 #' @concept sumplots
@@ -108,7 +110,7 @@ plotBiomass <- function(sim, species = NULL,
     dimnames(bu) <- dimnames(sim@n_other)
     times <- as.numeric(dimnames(bu)[[1]])
     bu <- bu[(times >= start_time) & (times <= end_time), , drop = FALSE]
-    bu <- melt(bu)
+    bu <- reshape2::melt(bu)
     # Implement ylim and a minimal cutoff and bring columns in desired order
     min_value <- 1e-20
     bu <- bu[bu$value >= min_value &
@@ -236,6 +238,10 @@ plotSpectra2 <- function(object1, object2,
 #'                      calculated relative to the value from object 1 with 
 #'                      formula 100*(new-old)/old. If `rel.diff` the relative 
 #'                      difference is returned given by (new - old)/(old + new).
+#' @param power The abundance is plotted as the number density times the weight
+#'   raised to this power. The default power = 1 gives the biomass density,
+#'   whereas power = 2 gives the biomass density with respect to logarithmic
+#'   size bins.
 #' @param ... Parameters passed to `plotSpectra()`
 #' @concept sumplots
 #' @family plotting functions
@@ -253,11 +259,11 @@ plotSpectraRelative <- function(object1, object2,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
-                mutate(rel_diff = (value.y - value.x) / value.x)
+                dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
         yLabel <- "% Change in Biomass"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
-                mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+                dplyr::mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
         yLabel <- "Relative Difference in Biomass"
     } else {
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
@@ -697,11 +703,11 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |> 
-                mutate(rel_diff = (value.y - value.x) / value.x)
+                dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
         yLabel <- "% Change in Productivity"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+                dplyr::mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
         yLabel <- "Relative Difference in Productivity"
     } else {
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
@@ -1131,11 +1137,11 @@ plotTotalBiomassRelative <- function(object1, object2,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                mutate(rel_diff = (value.y - value.x) / value.x)
+                dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
             yLabel <- "% Change in Total Biomass"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-                mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+                dplyr::mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
             yLabel <- "Relative Difference in Total Biomass"
     } else {
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
@@ -1185,48 +1191,64 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 }
 
 
-#' Plot the relative contribution of each species group to total abundance and
-#' total biomass
+#' Plot the relative contribution of each species group to total abundance,
+#' total biomass, and total productivity
 #' 
-#' The individual abundance and biomasses are calculated by the 
-#' [plotTotalAbundance()] and [plotTotalBiomass()] functions. These are
-#'  passed all additional arguments you supply. See [plotTotalAbundance()]
-#'  and [plotTotalBiomass()] for more details.
+#' The group abundances, biomasses, productivities are calculated by the 
+#' [plotTotalAbundance()], [plotTotalBiomass()], and [plotProductivity()] 
+#'  functions. These are passed all additional arguments you supply. See
+#'  [plotTotalAbundance()], [plotTotalBiomass()] and [plotProductivity()]
+#'  for more details.
+#'
+#' @param object An object of class \linkS4class{MizerParams}
+#' @param return_data   A boolean value that determines whether the formatted 
+#'                      data used for the plot is returned instead of the plot 
+#'                      itself. Default value is FALSE.
+#'
 #'
 #' @inheritDotParams plotTotalBiomass
 #' @inheritDotParams plotTotalAbundance
+#' @inheritDotParams plotProductivity
 #' 
 #' @import ggplot2
 #' @export
 #' 
 #' @concept sumplots
 #' @family plotting functions
-#' @seealso [plotTotalAbundance()], [plotTotalBiomass()], 
-plotRelativeContribution <- function(object,...){
+#' @seealso [plotTotalAbundance()], [plotTotalBiomass()], [plotProductivity()]
+plotRelativeContribution <- function(object,
+                                     return_data = FALSE,...){
     
     params <- object@params
     
-    abd <- plotTotalAbundance(params, return_data = TRUE)
+    abd <- plotTotalAbundance(params, return_data = TRUE, ...)
     abd$Metric <- "Abundance"
 
-    biom <- plotTotalBiomass(params, return_data = TRUE)
+    biom <- plotTotalBiomass(params, return_data = TRUE, ...)
     biom$Metric <- "Biomass"
+    
+    prod <- plotProductivity(params, return_data = TRUE, ...)
+    prod$Metric <- "Productivity"
 
     # Relative Contribution
     # Abundance
     abd  <- dplyr::mutate(rel = value / sum(value) * 100)
-    biom <- dplr:: mutate(rel = value / sum(value) * 100)
+    biom <- dplyr::mutate(rel = value / sum(value) * 100)
+    prod <- dplyr::mutate(rel = value / sum(value) * 100)
     
-    rel <- rbind(abd, biom)
+    rel <- rbind(abd, biom, prod)
 
     # Legend       
     legend_levels <- intersect(names(params@linecolour), unique(rel$Legend))
-    rel$Legend  <- factor(rel$Species, levels = legend_levels)   
+    rel$Legend  <- factor(rel$Species, levels = legend_levels) 
+    
+    # Return data if requested
+    if(return_data == TRUE){ return(rel) }
 
     # Plot
     p <- ggplot(rel, aes(x = Metric, y = rel, fill = Legend))
     
-    P + geom_bar(stat = "identity", position = "fill", color = "black") +
+    p + geom_bar(stat = "identity", position = "fill", color = "black") +
         scale_fill_manual(values = params@linecolour[legend_levels]) +
         theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
         labs(y = "Relative Contribution", x = "Metric", fill = "")

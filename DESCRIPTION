@@ -37,7 +37,8 @@ Imports:
     splus2R,
     stats,
     plyr,
-    lifecycle
+    lifecycle,
+    reshape2
 Suggests: 
     knitr,
     patchwork,

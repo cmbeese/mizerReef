@@ -20,6 +20,11 @@ plotlySpectraRelative(object1, object2, diff_method, ...)
 
 \item{object2}{An object of class MizerSim or MizerParams}
 
+\item{power}{The abundance is plotted as the number density times the weight
+raised to this power. The default power = 1 gives the biomass density,
+whereas power = 2 gives the biomass density with respect to logarithmic
+size bins.}
+
 \item{diff_method}{The method to calculate the relative change between
 models. If \code{percent.change}, the percent change is
 calculated relative to the value from object 1 with

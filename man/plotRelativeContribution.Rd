@@ -2,16 +2,21 @@
 % Please edit documentation in R/reef-summary_plots.R
 \name{plotRelativeContribution}
 \alias{plotRelativeContribution}
-\title{Plot the relative contribution of each species group to total abundance and
-total biomass}
+\title{Plot the relative contribution of each species group to total abundance,
+total biomass, and total productivity}
 \usage{
-plotRelativeContribution(object, ...)
+plotRelativeContribution(object, return_data = FALSE, ...)
 }
 \arguments{
+\item{object}{An object of class \linkS4class{MizerParams}}
+
+\item{return_data}{A boolean value that determines whether the formatted
+data used for the plot is returned instead of the plot
+itself. Default value is FALSE.}
+
 \item{...}{
-  Arguments passed on to \code{\link[=plotTotalBiomass]{plotTotalBiomass}}, \code{\link[=plotTotalAbundance]{plotTotalAbundance}}
+  Arguments passed on to \code{\link[=plotTotalBiomass]{plotTotalBiomass}}, \code{\link[=plotTotalAbundance]{plotTotalAbundance}}, \code{\link[=plotProductivity]{plotProductivity}}
   \describe{
-    \item{\code{object}}{An object of class \linkS4class{MizerParams}}
     \item{\code{species}}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a
 numeric vector with the species indices, or a logical
@@ -23,19 +28,29 @@ biomass estimates. Defaults to 7 cm.}
     \item{\code{max_fishing_l}}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
 maximum length (cm) of fished individuals for
 biomass estimates. Defaults to max length.}
-    \item{\code{return_data}}{A boolean value that determines whether the formatted
-data used for the plot is returned instead of the plot
-itself. Default value is FALSE.}
+    \item{\code{end}}{A boolean value that indicated whether you want the end
+productivity of a simulation (default, TRUE) or the
+productivity through time.}
+    \item{\code{total}}{A boolean value that determines whether the total productivity
+from all species is plotted as well. Default is FALSE.}
+    \item{\code{ylim}}{A numeric vector of length two providing lower and upper limits
+for the y axis. Use NA to refer to the existing minimum or
+maximum. Any values below 1e-20 are always cut off.}
+    \item{\code{start_time}}{The first time to be plotted. Default is the beginning
+of the time series.}
+    \item{\code{end_time}}{The last time to be plotted. Default is the end of the time
+series.}
   }}
 }
 \description{
-The individual abundance and biomasses are calculated by the
-\code{\link[=plotTotalAbundance]{plotTotalAbundance()}} and \code{\link[=plotTotalBiomass]{plotTotalBiomass()}} functions. These are
-passed all additional arguments you supply. See \code{\link[=plotTotalAbundance]{plotTotalAbundance()}}
-and \code{\link[=plotTotalBiomass]{plotTotalBiomass()}} for more details.
+The group abundances, biomasses, productivities are calculated by the
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}}, \code{\link[=plotTotalBiomass]{plotTotalBiomass()}}, and \code{\link[=plotProductivity]{plotProductivity()}}
+functions. These are passed all additional arguments you supply. See
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}}, \code{\link[=plotTotalBiomass]{plotTotalBiomass()}} and \code{\link[=plotProductivity]{plotProductivity()}}
+for more details.
 }
 \seealso{
-\code{\link[=plotTotalAbundance]{plotTotalAbundance()}}, \code{\link[=plotTotalBiomass]{plotTotalBiomass()}},
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}}, \code{\link[=plotTotalBiomass]{plotTotalBiomass()}}, \code{\link[=plotProductivity]{plotProductivity()}}
 
 Other plotting functions: 
 \code{\link{plot2Productivity}()},

@@ -248,6 +248,7 @@ scaleReefModel <- function(params, factor) {
 #' 
 #' Replaces scale down background function
 #' 
+#' @param params a mizer model object
 #' @param factor A number giving the factor by which the background abundance
 #'   will be reduced
 #' @export

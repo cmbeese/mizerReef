@@ -7,6 +7,8 @@
 scaleReefBackground(params, factor)
 }
 \arguments{
+\item{params}{a mizer model object}
+
 \item{factor}{A number giving the factor by which the background abundance
 will be reduced}
 }
