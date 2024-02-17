@@ -8,35 +8,6 @@
 #' @source PhD Thesis
 "karpata_model"
 
-#' MizerParams object for a generic Caribbean reef
-#' 
-#' Includes 10 species groups.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"karpata_model2"
-
-#' MizerParams object for a generic Caribbean reef
-#' 
-#' Includes 10 species groups.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"karpata_model3"
-
-# MizerParams object for a generic Caribbean reef
-# 
-# Includes 10 species groups.
-# 
-# PhD Thesis chapter 4
-#
-# @format A MizerParams object
-# @source PhD Thesis
-#"aquarius_model"
 
 #' species_params dataframe for a generic Caribbean reef
 #' 
