@@ -933,6 +933,7 @@ plotTotalBiomass <- function(object,
     biom <- mizer::getBiomass(params, 
                               min_l = min_fishing_l,
                               max_l = max_fishing_l)
+    }
         
     # create plot_dat ----
     ## values from object ----
@@ -964,7 +965,7 @@ plotTotalBiomass <- function(object,
     plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
     
     ## return data if requested ----
-    if (return_data) return(plot_dat)
+    if (return_data){ return(plot_dat) }
     
     # plot ----
     p <- ggplot(plot_dat, aes(x = Species, y = value,
@@ -975,7 +976,6 @@ plotTotalBiomass <- function(object,
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
         labs(fill = "Species Group", x = "Species Group")
-    }
 }
 
 #' @rdname plotTotalBiomass
