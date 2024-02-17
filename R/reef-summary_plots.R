@@ -1235,7 +1235,6 @@ plotRelativeContribution <- function(object,
         assert_that(is(params, "MizerParams"))
     }
     
-
     # Relative Contribution
     # Abundance
     abd  <- dplyr::mutate(rel = value / sum(value) * 100)
