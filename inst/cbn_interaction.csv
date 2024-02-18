@@ -1,8 +1,8 @@
 ﻿species,pred_eng,pred_grab,eels,pred_crypt,pred_inv,pred_plank,parrotfish,farm_damsel,herbs,inverts
-pred_eng,1,1,1,1,0.5,1,1,1,1,0.5
-pred_grab,1,1,1,1,0.5,1,1,1,1,0.5
-eels,1,1,1,1,0.5,1,1,1,1,0.5
-pred_crypt,1,1,1,1,0.5,1,1,1,1,0.5
+pred_eng,1,1,1,0.4,0.5,1,1,1,1,0.5
+pred_grab,1,1,1,0.4,0.5,1,1,1,1,0.5
+eels,1,1,1,0.4,0.5,1,1,1,1,0.5
+pred_crypt,1,1,1,0.4,0.5,1,1,1,1,0.5
 pred_inv,0,0,0,0,0,0,0,0,0,1
 pred_plank,1,1,1,1,1,1,1,1,1,1
 parrotfish,0,0,0,0,0,0,0,0,0,0

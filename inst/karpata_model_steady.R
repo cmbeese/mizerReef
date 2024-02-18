@@ -71,8 +71,9 @@ data.frame(age_mat_model, age_mat_observed)
 # Check predation mortality, feeding levels, and diets
 plotPredMort(params) + facet_wrap(~Species)
 plotFeedingLevel(params)
-plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
-plotSpectra(params, power = 1)
+plotDiet(params) + scale_x_log10(limits = c(0.1, 1e4),
+                                 breaks = c(1, 10, 100, 1000))
+plotSpectra(params, power = 2)
 
 ## Now switch to competitive method ----------------------------
 params <- newRefuge(params,
@@ -88,11 +89,11 @@ params <- params |>
 
 # Make sure new refuge is in place
 plotVulnerable(params)
-
+plotRefuge(params)
 plotBiomassVsSpecies(params) # spot on
 
 # Check match with observed age at maturity
-age_mat_observed = karpata_species$age_mat
+age_mat_observed = karpata_10plus$age_mat
 age_mat_model = age_mat(params)
 data.frame(age_mat_model, age_mat_observed)
 # Still look good
@@ -115,7 +116,7 @@ plotFeedingLevel(params, species = "inverts")
 # First attempt to set very low to see what the minimum values are
 params <- setBevertonHolt(params, erepro = 0.0001)
 # Now set setting erepro same for all species, as low as possible
-params <- setBevertonHolt(params, erepro = 0.35)
+params <- setBevertonHolt(params, erepro = 0.36)
 # Project back to steady
 params <- reefSteady(params)
 # Check reproduction level (value between 0 and 1) - should be higher for
@@ -151,7 +152,7 @@ plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
 plotSpectra(params, power = 1)
 
 # Save!
-karpata_model <- reefSteady(params)
+karpata_model2 <- reefSteady(params)
 
 # Plots ------------------------------------------
 plotBiomassVsSpecies(karpata_model)
@@ -162,7 +163,7 @@ plotGrowthCurves(karpata_model)
 
 # Save in package --------------------------------------------
 # Params object
-save(karpata_model,   file = "data/karpata_model.rda")
+save(karpata_model2,   file = "data/karpata_model2.rda")
 
 # CSV Files
 save(karpata_species, file = "data/karpata_species.rda")

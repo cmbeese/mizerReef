@@ -2,10 +2,10 @@
 pred_eng,45,50,2,0.4,30,1,12.62968984,5.51,0.011,3.06,0.5,0,0,0.8,0.15,TRUE,TRUE,FALSE,#d35569,Cephalopholis cruentatus,Engulfers,medium,Predators
 pred_grab,60,140,2,0.1,50,1,17.80529807,27.6,0.0174,3.01,0.5,0,0,0.8,0.15,TRUE,TRUE,FALSE,#b95236,Lutjanus apodus,Grabbers,medium,Predators
 eels,100,300,3,0.19,60,2,NA,NA,0.00098,3.24,0.5,0,0,0.8,0.15,TRUE,FALSE,FALSE,#d078ca,Gymnothorax miliaris,Eels,medium,Predators
-pred_crypt,8,0.3,NA,3,30,2,NA,NA,0.01122,3.04,0.5,0.5,0,0.8,0.15,TRUE,FALSE,FALSE,#9b2f68,Gramma loreto,Cryptobenthic Predators,high,Predators
+pred_crypt,8,0.3,NA,3,10,1,NA,NA,0.01122,3.04,0.3,0.5,0,0.8,0.15,TRUE,FALSE,FALSE,#9b2f68,Gramma loreto,Cryptobenthic Predators,high,Predators
 pred_inv,45,50,0.5,0.4,20,1,26.58539448,14.13,0.012,3.1,0.5,0,0,0.8,0.1,TRUE,FALSE,FALSE,#58449e,Mulloidichthys martinicus,Nocturnal Invertivores,medium,Predators
 pred_plank,20,2.5,1,0.3,800,1,13.49042805,0.55,0.01259,3.03,1,0,0,0.8,0.15,TRUE,FALSE,TRUE,#678cde,Azurina multilineata,Planktivores,medium,Predators
-parrotfish,64,63,2,0.6,30,2,15.48385467,30.56,0.0138,3.05,0.5,0.5,0.5,0.8,0.1,TRUE,FALSE,FALSE,#70c464,Sparisoma viride,Parrotfish,medium,Herbivores
+parrotfish,64,63,2,0.6,30,1,15.48385467,30.56,0.0138,3.05,0.5,0.5,0.5,0.8,0.1,TRUE,FALSE,FALSE,#70c464,Sparisoma viride,Parrotfish,medium,Herbivores
 farm_damsel,13,1,1,0.3,30,2,NA,NA,0.02042,2.97,0.5,0.5,0.5,0.8,0.1,TRUE,FALSE,FALSE,#aabc51,Stegastes planifrons,Farming damselfish,high,Herbivores
-herbs,39,105,2,0.4,30,2,75.75343623,1.5,0.0257,2.95,0.5,0.5,0.5,0.8,0.1,TRUE,FALSE,FALSE,#54832f,Acanthurus coeruleus,Herbivores,medium,Herbivores
+herbs,39,105,2,0.4,30,1,75.75343623,1.5,0.0257,2.95,0.5,0.5,0.5,0.8,0.1,TRUE,FALSE,FALSE,#54832f,Acanthurus coeruleus,Herbivores,medium,Herbivores
 inverts,30,0.1,0.2,NA,30,2,25,15,0.025,3,0.5,1,0,0.8,0.1,FALSE,FALSE,TRUE,#c7923f,Inverts,Invertebrates,high,Inverts
