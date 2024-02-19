@@ -510,14 +510,9 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     no_w <- length(params@w)
     no_w_full <- length(params@w_full)
     
-    # Find number of size bins in resource spectra smaller than smallest fish
-    p <- no_w_full - no_w  
-    
-    # Add columns for entire model size range to vulnerability matrix
-    larval_vul <- matrix(1, nrow = no_sp, ncol = p)
-
-    # Add larval vulnerability to vulnerability matrix
-    vul_pp <- cbind(larval_vul, vulnerable)
+    # Get index of species that have grown out of the resource spectrum
+    idx_sp <- (length(params@w_full) - length(params@w) + 1):length(params@w_full)
+    pr <- base::t(params@interaction) %*% pred_rate[,idx_sp, drop = FALSE]
     
     # Find indices of predator species whose foraging is hindered by refuge
     bad_pred  <- which(params@species_params$bad_pred == TRUE)
@@ -525,31 +520,27 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     
     # Create list of vulnerabilities for each predator
     vul <- vector("list", no_sp)
-    vul[bad_pred] <- list(vul_pp)
-    vul[good_pred] <- list(matrix(1, nrow = no_sp, ncol = ncol(vul_pp)))
+    vul[bad_pred] <- list(vulnerable)
+    vul[good_pred] <- list(matrix(1, nrow = no_sp, ncol = ncol(vulnerable)))
     
     # Loop through predator species to calculate predation mortality on
     # each prey species & size by all predators
-    pm <- matrix(0, no_sp, length(params@w_full))
+    pm <- matrix(0, no_sp, length(params@w))
     
     for (i in 1:no_sp){
         # Vulnerability rate of all prey, including resource
         # (species by size) to predator i
         v <- vul[[i]]
         # Predation rate of predator species i on all prey (by size)
-        pr_i <- pred_rate[i,]
+        pr_i <- pr[i,]
         pr_i <- matrix(rep(pr_i, each = nrow(v)), 
                        nrow = nrow(v), ncol = ncol(v))
         # vul*pr_i predation mortality on prey (species by size) by 
-        # predator i 
+        # predator i, adding to pm to sum over all predators
         pm <- pm + v*pr_i
     }
-    
-    # Get index of species that have grown out of the resource spectrum
-    idx_sp <- (length(params@w_full) - length(params@w) + 1):length(params@w_full)
 
-    # Account for interaction of species
-    pred_mort <- base::t(params@interaction) %*% pm[, idx_sp, drop = FALSE]
+    pred_mort <- pm
     
     return(pred_mort)
 }

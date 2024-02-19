@@ -60,6 +60,12 @@ tuning_profile  <- tuning_profile
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()|>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()
     
     plotBiomassVsSpecies(params) # spot on
@@ -82,10 +88,17 @@ tuning_profile  <- tuning_profile
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()|>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+        reefSteady()|>
+        calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()
     
     # Make sure new refuge is in place
     plotVulnerable(params)
+    plotRefuge(params)
     
     plotBiomassVsSpecies(params) # spot on
     
@@ -112,7 +125,8 @@ tuning_profile  <- tuning_profile
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.065)
+    params <- setBevertonHolt(params, erepro = 0.04)
+    params <- reefSteady(params)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
     rep <- getReproductionLevel(params)
@@ -147,22 +161,20 @@ tuning_profile  <- tuning_profile
     plotSpectra(params, total = TRUE, power = 1)
     plotSpectra(params, total = TRUE, power = 2)
 
-    # Save!
-    bonaire_model <- reefSteady(params)
-    
-    # Meh
-
 # Plots ------------------------------------------------------------------------
-    plotBiomassVsSpecies(bonaire_model)
-    plotRefuge(bonaire_model)
-    plotSpectra(bonaire_model, power = 1, total = TRUE)
-    plotDiet(bonaire_model)  
-    plotGrowthCurves(bonaire_model)
+    plotBiomassVsSpecies(params)
+    plotRefuge(params)
+    plotSpectra(params, power = 1, total = TRUE)
+    plotDiet(params)  
+    plotGrowthCurves(params)
+    plotPredMort(params)
+
+    # Save!
+    new_pm2 <- reefSteady(params)
 
 # Save in package --------------------------------------------------------------
     # Params object
-    save(bonaire_model,   file = "data/bonaire_model.rda")
-    save(Jan23,   file = "data/Jan23.rda")
+    save(new_pm2,   file = "data/new_pm2.rda")
     
     # CSV Files
     save(bonaire_species, file = "data/bonaire_species.rda")

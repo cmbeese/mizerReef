@@ -124,7 +124,7 @@ plotBiomass <- function(sim, species = NULL,
     if (return_data) return(plot_dat)
     
     p <- mizer::plotDataFrame(plot_dat, params,
-                              xlab = "Year", ylab = "Biomass [g]",
+                              xlab = "Year", ylab = "Biomass (g)",
                               ytrans = "log10", y_ticks = y_ticks, 
                               highlight = highlight,
                               legend_var = "Legend")
@@ -416,7 +416,7 @@ plotProductivity <- function(object, end  = TRUE,
         if (return_data) return(plot_dat) 
         
         mizer::plotDataFrame(plot_dat, params, xlab = "Year", 
-                             ylab = "Productivity [g/m^2/year]",
+                             ylab = expression(Productivity~"("*g/m^2/year*")"),
                              ytrans = "log10",
                              y_ticks = y_ticks, highlight = highlight,
                              legend_var = "Legend")
@@ -470,7 +470,7 @@ plotProductivity <- function(object, end  = TRUE,
                                   group = Legend, fill = Legend))
         
         p + geom_bar(stat = "identity", position = "dodge") +
-            scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
+            scale_y_continuous(name = expression(Productivity~"("*g/m^2/year*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
                               labels = group_names) +
             labs(fill = "Species Group", x = "Species Group")
@@ -608,8 +608,7 @@ plot2Productivity <- function(object1, object2, species = NULL,
                             group = Model, alpha = Model, fill = Legend))
         
         p + geom_bar(stat = "identity", position = "dodge", color = "black") +
-            scale_y_continuous(name = 
-                                   expression(Productivity~"("*g/m^2*"/year)")) +
+            scale_y_continuous(name = expression(Productivity~"("*g/m^2/year*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
                               labels = group_names) +
             scale_alpha_manual(values = c(0.5,1),
@@ -622,8 +621,7 @@ plot2Productivity <- function(object1, object2, species = NULL,
                             alpha = Model,fill = Legend))
         
         p + geom_bar(stat = "identity", position = "stack", color = "black") +
-            scale_y_continuous(name = 
-                    expression(Productivity~"("*g/m^2*"/year)")) +
+            scale_y_continuous(name = expression(Productivity~"("*g/m^2/year*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
                               labels = group_names) +
             scale_alpha_manual(values = c(0.5,1),
@@ -1015,7 +1013,7 @@ plotTotalBiomass <- function(object,
                               group = Legend, fill = Legend))
     
     p + geom_bar(stat = "identity", position = "dodge") +
-        scale_y_continuous(name = expression("Total Biomass (g/m^2)")) +
+        scale_y_continuous(name = expression("Total Biomass"~"("*g/m^2*")")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
         labs(fill = "Species Group", x = "Species Group")
@@ -1111,7 +1109,7 @@ plot2TotalBiomass <- function(object1, object2,
                             group = Model, alpha = Model, fill = Legend))
         
         p + geom_bar(stat = "identity", position = "dodge", color = "black") +
-            scale_y_continuous(name = expression("Biomass (g/m^2)")) +
+            scale_y_continuous(name = expression("Total Biomass"~"("*g/m^2*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
                               labels = group_names) +
             scale_alpha_manual(values = c(0.5,1),
@@ -1124,7 +1122,7 @@ plot2TotalBiomass <- function(object1, object2,
                             alpha = Model,fill = Legend))
         
         p + geom_bar(stat = "identity", position = "stack", color = "black") +
-            scale_y_continuous(name = expression("Biomass (g/m^2)")) +
+            scale_y_continuous(name = expression("Total Biomass"~"("*g/m^2*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
                               labels = group_names) +
             scale_alpha_manual(values = c(0.5,1),

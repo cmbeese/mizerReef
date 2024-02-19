@@ -103,6 +103,26 @@
 #' @source PhD Thesis
 "Jan23"
 
+#' MizerParams object for a simple, generic Caribbean reef
+#' 
+#' Includes predators, herbivores, and invertebrates. 
+#' 
+#' PhD Thesis chapter 3 vignettes
+#'
+#' @format A MizerParams object
+#' @source PhD Thesis
+"new_pm1"
+
+#' MizerParams object for a simple, generic Caribbean reef
+#' 
+#' Includes predators, herbivores, and invertebrates. 
+#' 
+#' PhD Thesis chapter 3 vignettes
+#'
+#' @format A MizerParams object
+#' @source PhD Thesis
+"new_pm2"
+
 #' species_params for a simple, generic Caribbean reef
 #' 
 #' Includes predators, herbivores, and invertebrates. 
