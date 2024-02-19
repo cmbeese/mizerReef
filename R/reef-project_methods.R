@@ -546,9 +546,8 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     }
     
     # Get index of species that have grown out of the resource spectrum
-    idx_sp <- (length(params@w_full) - 
-                   length(params@w) + 1):length(params@w_full)
-    
+    idx_sp <- (length(params@w_full) - length(params@w) + 1):length(params@w_full)
+
     # Account for interaction of species
     pred_mort <- base::t(params@interaction) %*% pm[, idx_sp, drop = FALSE]
     

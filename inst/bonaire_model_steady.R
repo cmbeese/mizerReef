@@ -162,6 +162,7 @@ tuning_profile  <- tuning_profile
 # Save in package --------------------------------------------------------------
     # Params object
     save(bonaire_model,   file = "data/bonaire_model.rda")
+    save(Jan23,   file = "data/Jan23.rda")
     
     # CSV Files
     save(bonaire_species, file = "data/bonaire_species.rda")

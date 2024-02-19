@@ -18,6 +18,16 @@
 #' @source PhD Thesis
 "karpata_model2"
 
+#' MizerParams object for a generic Caribbean reef
+#' 
+#' Includes 10 species groups.
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format A MizerParams object
+#' @source PhD Thesis
+"karpata_model3"
+
 
 #' species_params dataframe for a generic Caribbean reef
 #' 
@@ -82,6 +92,16 @@
 #' @format A MizerParams object
 #' @source PhD Thesis
 "bonaire_model"
+
+#' MizerParams object for a simple, generic Caribbean reef
+#' 
+#' Includes predators, herbivores, and invertebrates. 
+#' 
+#' PhD Thesis chapter 3 vignettes
+#'
+#' @format A MizerParams object
+#' @source PhD Thesis
+"Jan23"
 
 #' species_params for a simple, generic Caribbean reef
 #' 

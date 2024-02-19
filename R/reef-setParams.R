@@ -983,8 +983,7 @@ newRefuge <- function(params,
     
     # Check that the user provided at least one new input
         inputs <- list(new_method, new_method_params, 
-                    new_L_refuge, new_prop_protect,
-                    scale_bin)
+                       new_L_refuge, new_prop_protect,scale_bin)
         if (all(sapply(inputs, is.null))) {
             stop("Error: At least one input must be provided.")
         }
@@ -1001,7 +1000,7 @@ newRefuge <- function(params,
         # Check if the user provided one of the available refuge profile methods
         m_opt <- c('sigmoidal','binned','competitive','noncomplex')
         if(is.null(new_method)) {
-            warning("Since you did not provide a new method for determinging 
+            warning("Since you did not provide a new method to set 
                     the refuge profile, I will use the one currently stored in 
                     params@other_params$refuge_params$method.")
             # If user did not provide a method, use old one
@@ -1033,6 +1032,7 @@ newRefuge <- function(params,
                         if(new_L_refuge < 0) {
                             stop("new_L_refuge must be non-negative.")
                         }
+                    # If it's not given, use the old one
                     } else { new_L_refuge <- method_params$L_refuge }
                     # If new prop_protect given, check that it's between 0 and 1
                     if(!is.null(new_prop_protect)){
@@ -1040,11 +1040,12 @@ newRefuge <- function(params,
                            method_params$prop_protect > 1) {
                         stop("prop_protect should be a proportion between 0 and 1.")
                         }
+                    # If it's not given, use the old one
                     } else { new_prop_protect <- method_params$prop_protect }
                     
                     new_mp <- method_params
                     new_mp$L_refuge <- new_L_refuge
-                    new_mp$prop_protect = new_prop_protect
+                    new_mp$prop_protect <- new_prop_protect
                     
                     ## Binned or Competitive ----
                 } else if (new_method == "binned" || new_method == "competitive") {
@@ -1078,11 +1079,20 @@ newRefuge <- function(params,
         }
         
     #### Update parameters ----
+        # Store new parameters
         params <- setRefuge(params = params, 
                             method = new_method,
                             method_params = new_mp)
-        
+    
+        # Find new refuge profile   
         params <- getRefuge(params = params)
+        
+        # Save time parameters were modified
+        params@time_modified <- lubridate::now()
+    
+    # Return mizer params object    
+    return(params)
+        
 }
 
 

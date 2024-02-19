@@ -116,7 +116,7 @@ plotFeedingLevel(params, species = "inverts")
 # First attempt to set very low to see what the minimum values are
 params <- setBevertonHolt(params, erepro = 0.0001)
 # Now set setting erepro same for all species, as low as possible
-params <- setBevertonHolt(params, erepro = 0.36)
+params <- setBevertonHolt(params, erepro = 0.2)
 # Project back to steady
 params <- reefSteady(params)
 # Check reproduction level (value between 0 and 1) - should be higher for
@@ -152,7 +152,7 @@ plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
 plotSpectra(params, power = 1)
 
 # Save!
-karpata_model2 <- reefSteady(params)
+karpata_model3 <- reefSteady(params)
 
 # Plots ------------------------------------------
 plotBiomassVsSpecies(karpata_model)
@@ -163,7 +163,7 @@ plotGrowthCurves(karpata_model)
 
 # Save in package --------------------------------------------
 # Params object
-save(karpata_model2,   file = "data/karpata_model2.rda")
+save(karpata_model3,   file = "data/karpata_model3.rda")
 
 # CSV Files
 save(karpata_species, file = "data/karpata_species.rda")

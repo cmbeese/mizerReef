@@ -434,8 +434,10 @@ plotProductivity <- function(object, end  = TRUE,
         ### group names ----
         if (is.null(params@species_params$group_names)){
             group_names <- params@species_params$species
+            names(group_names) <- params@species_params$species
         } else {
             group_names <- params@species_params$group_names
+            names(group_names) <- params@species_params$species
         }
         
         ### get productivity ----
@@ -451,6 +453,7 @@ plotProductivity <- function(object, end  = TRUE,
         species <- species[!is.na(species)]
         sel_sp <- which(!is.na(species))
         prod <- prod[sel_sp, drop = FALSE]
+        group_names <- group_names[sel_sp]
         
         ### data frame from selected species ----
         plot_dat <- data.frame(value = prod, Species = species)
@@ -524,6 +527,12 @@ plotlyProductivity <- function(object,
 #'                          individuals for model 1. Defaults to max length.
 #'                          A parameter passed to [getProductivity()].
 #'                          
+#' @param stack     A boolean value that determines whether bars are separated
+#'                  by species. Defaults to FALSE. If true, returns a stacked
+#'                  barplot with the total biomass for each group instead of
+#'                  individual bars for each group. Useful for comparison
+#'                  between steady states. 
+#'                          
 #' @param return_data   A boolean value that determines whether the formatted 
 #'                      data used for the plot is returned instead of the plot 
 #'                      itself. Default value is FALSE.
@@ -546,16 +555,19 @@ plot2Productivity <- function(object1, object2, species = NULL,
                               name1 = "First", name2 = "Second",
                               min_fishing_l1 = NULL, max_fishing_l1 = NULL,
                               min_fishing_l2 = NULL, max_fishing_l2 = NULL,
+                              stack = FALSE,
                               return_data = FALSE, ...){
     
     # get data frames with plotProductivity ----
     sf1 <- plotProductivity(object1, 
+                            species = species,
                             drop = TRUE,
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
         sf1$Model <- name1
     sf2 <- plotProductivity(object2, 
+                            species = species,
                             drop = TRUE,
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
@@ -577,28 +589,47 @@ plot2Productivity <- function(object1, object2, species = NULL,
     # group names ----
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
+        names(group_names) <- params@species_params$species
     } else {
         group_names <- params@species_params$group_names
+        names(group_names) <- params@species_params$species
     }
     
     # plot ----
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     sf$Legend <- factor(sf$Species, levels = legend_levels)
+    group_names <- group_names[sf$Legend]
     
     # Return data frame if requested
     if(return_data == TRUE){return(sf)}
     
-    p <- ggplot(sf, aes(x = Species, y = value,
-                        group = Model, alpha = Model, fill = Legend))
-    
-    p + geom_bar(stat = "identity", position = "dodge", 
-                 color = "black") +
-        scale_y_continuous(name = expression("Productivity (g/m^2/year)")) +
-        scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names) +
-        labs(fill = "Species Group", x = "Species Group") + 
-        scale_alpha_manual(values = c(0.5,1),
-                           labels = c(name1, name2))
+    if (stack == FALSE){
+        p <- ggplot(sf, aes(x = Species, y = value, 
+                            group = Model, alpha = Model, fill = Legend))
+        
+        p + geom_bar(stat = "identity", position = "dodge", color = "black") +
+            scale_y_continuous(name = 
+                                   expression(Productivity~"("*g/m^2*"/year)")) +
+            scale_fill_manual(values = params@linecolour[legend_levels],
+                              labels = group_names) +
+            scale_alpha_manual(values = c(0.5,1),
+                               labels = c(name1, name2)) +
+            labs(fill = "Species Group", x = "Species Group") 
+        
+    } else if (stack == TRUE){
+        
+        p <- ggplot(sf, aes(x = Model, y = value, 
+                            alpha = Model,fill = Legend))
+        
+        p + geom_bar(stat = "identity", position = "stack", color = "black") +
+            scale_y_continuous(name = 
+                    expression(Productivity~"("*g/m^2*"/year)")) +
+            scale_fill_manual(values = params@linecolour[legend_levels],
+                              labels = group_names) +
+            scale_alpha_manual(values = c(0.5,1),
+                               labels = c(name1, name2)) +
+            labs(fill = "Species Group", x = "Model")
+    }
     
 }
 
@@ -692,10 +723,12 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     
     # get data frames with plotProductivity ----
     sf1 <- plotProductivity(object1, 
+                            species = species,
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
     sf2 <- plotProductivity(object2, 
+                            species = species,
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
@@ -703,7 +736,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |> 
-                dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
+                dplyr::mutate(rel_diff = 100*(value.y - value.x) / value.x)
         yLabel <- "% Change in Productivity"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
@@ -726,12 +759,16 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     # group names ----
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
+        names(group_names) <- params@species_params$species
     } else {
         group_names <- params@species_params$group_names
+        names(group_names) <- params@species_params$species
     }
 
     # plot -----
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
+    sf$Legend <- factor(sf$Species, levels = legend_levels)
+    group_names <- group_names[sf$Legend]
     
     p <- ggplot(sf, aes(x = Species, y = rel_diff,
                         fill = Legend))
@@ -831,8 +868,10 @@ plotTotalAbundance <- function(object,
     ## group names ----
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
+        names(group_names) <- params@species_params$species
     } else {
         group_names <- params@species_params$group_names
+        names(group_names) <- params@species_params$species
     }
     
     ## species selector ----
@@ -844,6 +883,7 @@ plotTotalAbundance <- function(object,
     species <- species[!is.na(species)]
     sel_sp <- which(!is.na(species))
     abd <- abd[sel_sp, drop = FALSE]
+    group_names <- group_names[sel_sp]
     
     ## data frame from selected species ----
     plot_dat <- data.frame(value = abd, Species = species)
@@ -943,8 +983,10 @@ plotTotalBiomass <- function(object,
     ## group names ----
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
+        names(group_names) <- params@species_params$species
     } else {
         group_names <- params@species_params$group_names
+        names(group_names) <- params@species_params$species
     }
     
     ## species selector ----
@@ -956,6 +998,7 @@ plotTotalBiomass <- function(object,
     species <- species[!is.na(species)]
     sel_sp <- which(!is.na(species))
     biom <- biom[sel_sp, drop = FALSE]
+    group_names <- group_names[sel_sp]
     
     ## data frame from selected species ----
     plot_dat <- data.frame(value = biom, Species = species)
@@ -1012,19 +1055,23 @@ plotlyTotalBiomass <- function(object,...) {
 #' 
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
 #'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
-plot2TotalBiomass <- function(object1, object2, species = NULL,
+plot2TotalBiomass <- function(object1, object2, 
+                              species = NULL,
                               name1 = "First", name2 = "Second",
                               min_fishing_l1 = NULL, max_fishing_l1 = NULL,
                               min_fishing_l2 = NULL, max_fishing_l2 = NULL,
+                              stack = FALSE,
                               return_data = FALSE, ...){
     
     # get data frames with plotTotalBiomass ----
     sf1 <- plotTotalBiomass(object1, 
+                            species = species,
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
         sf1$Model <- name1
     sf2 <- plotTotalBiomass(object2, 
+                            species = species,
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
@@ -1045,27 +1092,46 @@ plot2TotalBiomass <- function(object1, object2, species = NULL,
     # group names ----
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
+        names(group_names) <- params@species_params$species
     } else {
         group_names <- params@species_params$group_names
+        names(group_names) <- params@species_params$species
     }
     
     # plot ----
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     sf$Legend <- factor(sf$Species, levels = legend_levels)
+    group_names <- group_names[sf$Legend]
     
     # Return data frame if requested
     if(return_data == TRUE){return(sf)}
     
-    p <- ggplot(sf, aes(x = Species, y = value, 
-                        group = Model, alpha = Model, fill = Legend))
-    
-    p + geom_bar(stat = "identity", position = "dodge", color = "black") +
-        scale_y_continuous(name = expression("Biomass (g/m^2)")) +
-        scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names) +
-        scale_alpha_manual(values = c(0.5,1),
-                           labels = c(name1, name2)) +
-        labs(fill = "Species Group", x = "Species Group") 
+    if (stack == FALSE){
+        p <- ggplot(sf, aes(x = Species, y = value, 
+                            group = Model, alpha = Model, fill = Legend))
+        
+        p + geom_bar(stat = "identity", position = "dodge", color = "black") +
+            scale_y_continuous(name = expression("Biomass (g/m^2)")) +
+            scale_fill_manual(values = params@linecolour[legend_levels],
+                              labels = group_names) +
+            scale_alpha_manual(values = c(0.5,1),
+                               labels = c(name1, name2)) +
+            labs(fill = "Species Group", x = "Species Group") 
+        
+    } else if (stack == TRUE){
+        
+        p <- ggplot(sf, aes(x = Model, y = value, 
+                            alpha = Model,fill = Legend))
+        
+        p + geom_bar(stat = "identity", position = "stack", color = "black") +
+            scale_y_continuous(name = expression("Biomass (g/m^2)")) +
+            scale_fill_manual(values = params@linecolour[legend_levels],
+                              labels = group_names) +
+            scale_alpha_manual(values = c(0.5,1),
+                                   labels = c(name1, name2)) +
+            labs(fill = "Species Group", x = "Model")
+    }
+            
 }
 
 #' @rdname plot2TotalBiomass
@@ -1126,10 +1192,12 @@ plotTotalBiomassRelative <- function(object1, object2,
     
     # get data frames with plotTotalBiomass ----
     sf1 <- plotTotalBiomass(object1, 
+                            species = species,
                             min_fishing_l = min_fishing_l1,
                             max_fishing_l = max_fishing_l1,
                             return_data = TRUE, ...)
     sf2 <- plotTotalBiomass(object2, 
+                            species = species,
                             min_fishing_l = min_fishing_l2,
                             max_fishing_l = max_fishing_l2,
                             return_data = TRUE, ...)
@@ -1137,7 +1205,7 @@ plotTotalBiomassRelative <- function(object1, object2,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <- dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-              dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
+              dplyr::mutate(rel_diff = 100*(value.y - value.x) / value.x)
         
             yLabel <- "% Change in Total Biomass"
             
@@ -1164,13 +1232,16 @@ plotTotalBiomassRelative <- function(object1, object2,
     # group names ----
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
+        names(group_names) <- params@species_params$species
     } else {
         group_names <- params@species_params$group_names
+        names(group_names) <- params@species_params$species
     }
     
     # plot ----
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     sf$Legend <- factor(sf$Species, levels = legend_levels)
+    group_names <- group_names[sf$Legend]
     
     p <- ggplot(sf, aes(x = Species, y = rel_diff, fill = Legend))
     

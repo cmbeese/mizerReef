@@ -16,6 +16,7 @@ plot2TotalBiomass(
   max_fishing_l1 = NULL,
   min_fishing_l2 = NULL,
   max_fishing_l2 = NULL,
+  stack = FALSE,
   return_data = FALSE,
   ...
 )
@@ -54,6 +55,12 @@ A parameter passed to \code{\link[=getProductivity]{getProductivity()}}.}
 \item{max_fishing_l2}{Optional.  The maximum length (cm) of fished
 individuals for model 1. Defaults to max length.
 A parameter passed to \code{\link[=getProductivity]{getProductivity()}}.}
+
+\item{stack}{A boolean value that determines whether bars are separated
+by species. Defaults to FALSE. If true, returns a stacked
+barplot with the total biomass for each group instead of
+individual bars for each group. Useful for comparison
+between steady states.}
 
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot
