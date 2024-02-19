@@ -58,6 +58,7 @@ object the steady state productivities are plotted.</p>
 <span>  max_fishing_l1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min_fishing_l2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_fishing_l2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  stack <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -115,6 +116,14 @@ A parameter passed to <code><a href="getProductivity.html">getProductivity()</a>
 <dd><p>Optional.  The maximum length (cm) of fished
 individuals for model 1. Defaults to max length.
 A parameter passed to <code><a href="getProductivity.html">getProductivity()</a></code>.</p></dd>
+
+
+<dt>stack</dt>
+<dd><p>A boolean value that determines whether bars are separated
+by species. Defaults to FALSE. If true, returns a stacked
+barplot with the total biomass for each group instead of
+individual bars for each group. Useful for comparison
+between steady states.</p></dd>
 
 
 <dt>return_data</dt>
