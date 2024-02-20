@@ -46,39 +46,37 @@ function.
 \section{Predation encounter}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ The encounter rate \eqn{E_i(w)} at which a predator of species \eqn{i}
- and weight \eqn{w} encounters food has contributions from the encounter
- of fish prey and of resources. This is determined by summing over all
- prey species and the resource spectrum and then integrating over all
- prey sizes \eqn{w_p}, weighted by predation kernel \eqn{\phi(w,w_p)}:
+The encounter rate \eqn{E_i(w)} at which a predator of species \eqn{i}
+and weight \eqn{w} encounters food has contributions from the encounter
+of fish prey and of resources. This is determined by summing over all
+prey species and the resource spectrum and then integrating over all
+prey sizes \eqn{w_p}, weighted by predation kernel \eqn{\phi(w,w_p)}:
 
-      \deqn{
-         E_i(w) = \gamma_i(w) \int
-         \left( \theta_{ip} N_R(w_p) + \sum_{j} \theta_{ij}
-         V_{ji}(w_p) N_j(w_p) \right)
-         \phi_i(w,w_p) w_p \, dw_p.
-         }{\gamma_i(w) \int
-         ( \theta_{ip} N_R(w_p) + \sum_{j} \theta_{ij} V_{ji}(w_p) N_j(w_p) )
-         \phi_i(w,w_p) w_p dw_p.}
+\deqn{
+ E_i(w) = \gamma_i(w) \int
+ \left( \theta_{ip} N_R(w_p) + \sum_{j} \theta_{ij}
+ V_{ji}(w_p) N_j(w_p) \right)
+ \phi_i(w,w_p) w_p \, dw_p.
+ }{\gamma_i(w) \int
+ ( \theta_{ip} N_R(w_p) + \sum_{j} \theta_{ij} V_{ji}(w_p) N_j(w_p) )
+ \phi_i(w,w_p) w_p dw_p.}
+Here \eqn{N_j(w)} is the abundance density of species \eqn{j} and
+\eqn{N_R(w)} is the abundance density of resource. The overall
+prefactor \eqn{\gamma_i(w)} determines the predation power of the
+predator. It could be interpreted as a search volume and is set with
+the \code{\link[=setSearchVolume]{setSearchVolume()}} function.
 
- Here \eqn{N_j(w)} is the abundance density of species \eqn{j} and
- \eqn{N_R(w)} is the abundance density of resource. The overall
- prefactor \eqn{\gamma_i(w)} determines the predation power of the
- predator. It could be interpreted as a search volume and is set with
- the [setSearchVolume()] function.
+The predation kernel \eqn{\phi(w,w_p)}is set with the \code{\link[=setPredKernel]{setPredKernel()}}
+function.
 
- The predation kernel \eqn{\phi(w,w_p)}is set with the [setPredKernel()]
- function.
+The vulnerability to predation, \eqn{V_{ji}(w)} accounts for protective
+behavior of the prey. The parameters that control this are set with the
+\code{\link[=setRefuge]{setRefuge()}} function.
 
- The vulnerability to predation, \eqn{V_{ji}(w)} accounts for protective
- behavior of the prey. The parameters that control this are set with the
- [setRefuge()] function.
-
- The species interaction matrix \eqn{\theta_{ij}} is set with
- [setInteraction()] and the resource interaction vector \eqn{\theta_{ip}}
- is taken from the `interaction_resource`column in
- `params@species_params`.
-}\if{html}{\out{</div>}}
+The species interaction matrix \eqn{\theta_{ij}} is set with
+\code{\link[=setInteraction]{setInteraction()}} and the resource interaction vector \eqn{\theta_{ip}}
+is taken from the \code{interaction_resource}column in
+\code{params@species_params}.
 }
 
 \section{Details}{

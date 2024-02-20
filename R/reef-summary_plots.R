@@ -301,12 +301,14 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 }
 
 
-#' Plot the total productivity for each Species Group
+#' Plot the total productivity for each species Group
 #'
 #' When called with a \linkS4class{MizerParams} object the total steady 
 #' state productivity is plotted for each group. When called with a
 #' \linkS4class{MizerSim} object the productivity of each species 
 #' through time is plotted.
+#' 
+#' @inheritSection getProductivity Potential fisheries productivity
 #'
 #' @param object An object of class \linkS4class{MizerParams} or
 #'                  \linkS4class{MizerSim}
@@ -357,7 +359,8 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #' @concept sumplots
 #' @family plotting functions
 #' 
-#' @seealso [plotBiomass()], [plot2TotalBiomass()], 
+#' @seealso [getEGrowthTime()],[getProductivity()],
+#'          [plotBiomass()], [plot2TotalBiomass()], 
 #'          [plotTotalBiomassRelative()], [plotProductivity()],
 #'          [plot2Productivity()], [plotProductivityRelative()]
 plotProductivity <- function(object, end  = TRUE,

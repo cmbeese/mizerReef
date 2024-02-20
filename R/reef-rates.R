@@ -133,6 +133,7 @@ getSenMort <- function(params, n = initialN(params),
 #'   the returned array.
 #' @export
 #' @concept summary
+#' @seealso [getProductivity()]
 getEGrowthTime <- function(object, n, n_pp, n_other,
                            time_range,
                            drop = FALSE, ...) {

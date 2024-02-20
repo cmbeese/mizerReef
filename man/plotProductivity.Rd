@@ -3,7 +3,7 @@
 \name{plotProductivity}
 \alias{plotProductivity}
 \alias{plotlyProductivity}
-\title{Plot the total productivity for each Species Group}
+\title{Plot the total productivity for each species Group}
 \usage{
 plotProductivity(
   object,
@@ -73,7 +73,31 @@ state productivity is plotted for each group. When called with a
 \linkS4class{MizerSim} object the productivity of each species
 through time is plotted.
 }
+\section{Potential fisheries productivity}{
+
+
+Productivity refers to the rate at which fish biomass is produced
+and available for harvest in a given area over a given period of time.
+Productivity cannot be measured in situ.
+
+The productivity \eqn{P_i(w)} of species group \eqn{i} is given by
+
+\deqn{P_i(w) = \int_w^{w+dw} \left( N_i(w) + g_i(w) \right) w \, dw.}{
+      P_i(w) = \int_w^{w+dw} ( N_i(w) + g_i(w) ) w \, dw.}
+
+\eqn{N_i(w)} is the abundance density \eqn{(no./m^{2})} and
+\eqn{g_i(w)} is the energy rate available for growth after metabolism
+and movement have been accounted for \eqn{(grams/year)}.
+The productivity is calculated for all fish in the size range between
+\code{min_fishing_length} and \code{max_fishing_length}. These lengths can be the
+same for all groups or can be specified as a vector with one value for
+each species in the model. The minimum length defaults to \eqn{7 cm}
+regardless of species group and maximum length defaults to the
+maximum weight in the model.
+}
+
 \seealso{
+\code{\link[=getEGrowthTime]{getEGrowthTime()}},\code{\link[=getProductivity]{getProductivity()}},
 \code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
 \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}}, \code{\link[=plotProductivity]{plotProductivity()}},
 \code{\link[=plot2Productivity]{plot2Productivity()}}, \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}

@@ -2,11 +2,11 @@
 % Please edit documentation in R/reef-summary_methods.R
 \name{getProductivity}
 \alias{getProductivity}
-\title{Calculate fisheries productivity for each functional group above a chosen
-minimum fishing size}
+\title{Calculate fisheries productivity for each species group}
 \usage{
 getProductivity(
   object,
+  time_range = NULL,
   include_repro = FALSE,
   min_fishing_l = NULL,
   max_fishing_l = NULL,
@@ -20,63 +20,59 @@ final time of a simulation to calculate productivity. If
 given a \linkS4class{MizerParams} object, uses the initial
 growth rates.}
 
+\item{time_range}{The time range (either a vector of values, a vector of min
+and max time, or a single value) to provide productivity
+for. Default is the final time step. Ignored when called
+with a \linkS4class{MizerParams} object.}
+
 \item{include_repro}{A boolean value that indicates whether to include
 energy for reproduction in productivity estimates.
-Defaults to false.}
+Defaults to using \code{\link[=getEGrowthTime]{getEGrowthTime()}} if FALSE or
+mizer's \code{\link[mizer:getEReproAndGrowth]{mizer::getEReproAndGrowth()}} if TRUE.}
 
 \item{min_fishing_l}{The minimum length (cm) of fished individuals for
 productivity estimates. Defaults to 7 cm.}
 
 \item{max_fishing_l}{The maximum length (cm) of fished individuals for
 productivity estimates. Defaults to max length.}
-
-\item{...}{
-  Arguments passed on to \code{\link[mizer:get_size_range_array]{mizer::get_size_range_array}}
-  \describe{
-    \item{\code{min_w}}{Smallest weight in size range. Defaults to smallest weight in
-the model.}
-    \item{\code{max_w}}{Largest weight in size range. Defaults to largest weight in the
-model.}
-    \item{\code{min_l}}{Smallest length in size range. If supplied, this takes
-precedence over \code{min_w}.}
-    \item{\code{max_l}}{Largest length in size range. If supplied, this takes precedence
-over \code{max_w}.}
-  }}
 }
 \value{
 If called with a MizerParams object, a vector with the productivity
-in grams/year/m^-2 for each functional group in the model. If called with
-a MizerSim object, an array (time x species) containing the productivity
-at each time step for all species.
+in \eqn{\frac{grams}{m^2}/year} for each species group in the model.
+If called with a MizerSim object, an array (time x species)
+containing the total productivity at each time step for each
+species.
 }
 \description{
-Calculate fisheries productivity for each functional group above a chosen
-minimum fishing size
+This function calculates the total potential fisheries productivity by
+species group in a given size range using species abundances and
+the \code{\link[=getEGrowthTime]{getEGrowthTime()}} function.
 }
 \section{Potential fisheries productivity}{
 
 
-Fisheries productivity refers to the rate at which fish biomass is produced
+Productivity refers to the rate at which fish biomass is produced
 and available for harvest in a given area over a given period of time.
 Productivity cannot be measured in situ.
 
-The productivity \eqn{P_i(w)} of functional group \eqn{i} is given by
+The productivity \eqn{P_i(w)} of species group \eqn{i} is given by
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{\deqn{P_i(w) = \int_w^{w+dw} \left( N_i(w) + E_{R.i}(w) \right) w \, dw.}
-     \{P_i(w) = \\int_w^\{w+dw\} ( N_i(w) + E_\{R.i\}(w)) w \\, dw.\}
-}\if{html}{\out{</div>}}
+\deqn{P_i(w) = \int_w^{w+dw} \left( N_i(w) + g_i(w) \right) w \, dw.}{
+      P_i(w) = \int_w^{w+dw} ( N_i(w) + g_i(w) ) w \, dw.}
 
-\eqn{N_i(w)} is the abundance density (1/m^-2) and \eqn{E_{R.i}}
-is the energy rate available for growth after metabolism and movement have
-been accounted for (grams/year).
-
+\eqn{N_i(w)} is the abundance density \eqn{(no./m^{2})} and
+\eqn{g_i(w)} is the energy rate available for growth after metabolism
+and movement have been accounted for \eqn{(grams/year)}.
 The productivity is calculated for all fish in the size range between
-\code{min_fishing_length} and \code{max_fishing_length}which can be the same for
-all functional groups or can be specified as a vector with one value for
-each species in the model.\code{min_fishing_length} defaults to \eqn{7 cm}
-regardless of functional group and \code{max_fishing_length} defaults to the
+\code{min_fishing_length} and \code{max_fishing_length}. These lengths can be the
+same for all groups or can be specified as a vector with one value for
+each species in the model. The minimum length defaults to \eqn{7 cm}
+regardless of species group and maximum length defaults to the
 maximum weight in the model.
 }
 
+\seealso{
+\code{\link[=getEGrowthTime]{getEGrowthTime()}},\code{\link[=plotProductivity]{plotProductivity()}}
+}
 \concept{summary}
 \concept{summary functions}
