@@ -34,6 +34,9 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/bon_species3.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/bon_species4.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/bon_test1.html</loc>
   </url>
   <url>
@@ -41,6 +44,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/bon_test3.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/bon_test4.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/bonaire_int.html</loc>
@@ -53,6 +59,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/constant_dynamics.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/constant_tune.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/detritus_biomass.html</loc>
@@ -229,12 +238,12 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/setURParams.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/step_tune.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/tuneUR.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.html</loc>
-  </url>
-  <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/tuning_profile.html</loc>
   </url>
 </urlset>
