@@ -1,8 +1,8 @@
 # Setting up a Caribbean coral reef mizer model with multiple resources
+# Three groups: Predators, Herbivores, Invertebrates
 # Model steady state calibration
-# last tuned 21st January 2024
+# last tuned 20th February 2024
 
-# THIS NO LONGER WORKS
 ## Setup - load packages -------------------------------------------------------
 library(mizer)
 library(mizerExperimental)
@@ -22,7 +22,6 @@ tuning_profile  <- tuning_profile
 #   transition fully to algae by maturity 
 # With these parameters, invertebrates consume plankton and detritus,
 #   with the proportion of detritus increasing with size
-# Try original interaction params
 
 ## Set model -------------------------------------------------------------------
     params <- newReefParams(group_params = bonaire_species,
@@ -30,8 +29,16 @@ tuning_profile  <- tuning_profile
                             method = "binned",
                             method_params = tuning_profile)
 
+## Reduce density dependence of reproduction -----------------------------------
+    # rdi <- rep(0.5, dim(bonaire_int)[1])
+    # 
+    # params <- setBevertonHolt(params, reproduction_level = rdi)
+    # getReproductionLevel(params)
+
 ## Project to first steady state -----------------------------------------------
-    params <- reefSteady(params)
+    params <- params |>
+        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
+        reefSteady() |> reefSteady() |> reefSteady() |>reefSteady() 
 
 ## Calibrate biomasses and growth ----------------------------------------------
 
@@ -106,10 +113,11 @@ tuning_profile  <- tuning_profile
     age_mat_observed = bonaire_species$age_mat
     age_mat_model = age_mat(params)
     data.frame(age_mat_model, age_mat_observed)
+    # Also spot on
 
 ## Check resulting spectra and tune resources ----------------------------------
 
-    # Resource looks low - should match sheldon's spectrum
+    # Resource looks too high - should match sheldon's spectrum
     # looks fairly straight not bad but some bumps
     plotSpectra(params, total = TRUE, power = 1)
     plotSpectra(params, total = TRUE, power = 2)
@@ -117,8 +125,8 @@ tuning_profile  <- tuning_profile
     # plot feeding level to check if resource is too low
     plotFeedingLevel(params, species = "inverts")
     
-    # Invert feeding level is relatively stable through life, non-linearities
-    #   are probably due to refuge
+    # Invertebrate feeding level is stable throughout life - there is enough
+    # reosurce
     
 # Tune reproduction ------------------------------------------------------------
     # We do not have yield or catch data - can't tune size distribution
@@ -130,18 +138,16 @@ tuning_profile  <- tuning_profile
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
     rep <- getReproductionLevel(params)
-    # These are low for predators, and strangely high for 
-    # inverts. A reproduction level closer to one means reproduction rate is 
-    # almost totally independent of the investment into reproduction
+    # These look good. A reproduction level closer to one means reproduction 
+    # rate is almost totally independent of the investment into reproduction
     # Reproduction should be density independent on reefs
     
     # Check comparison of density dependent & independent reduction
     getRDI(params) / getRDD(params)
-    # Reproduction is density independent for inverts, density dependent for 
-    # preds but possible too much - RDI is only slightly higher
+    # Reproduction is equally density independent nad density dependent for 
+    # invwerts, more density independent for herbivores
     
     # Let's increase reproduction level to 0.5 for predators and herbivores
-    # so that 
     rep_level <- c(0.5, 0.5, rep[3])
     names(rep_level) <- c("predators","herbivores","inverts")
     params <- setBevertonHolt(params,
@@ -156,6 +162,7 @@ tuning_profile  <- tuning_profile
     # Check new reproduction - these look better
     rep <- getReproductionLevel(params)
     getRDI(params) / getRDD(params)
+    # Now density independent reproduction is double for predators
     
     # Check new spectra
     plotSpectra(params, total = TRUE, power = 1)
@@ -170,15 +177,18 @@ tuning_profile  <- tuning_profile
     plotPredMort(params)
 
     # Save!
-    new_pm2 <- reefSteady(params)
+    bon_test3 <- reefSteady(params)
+    bon_species3 <- bonaire_species
 
 # Save in package --------------------------------------------------------------
     # Params object
-    save(new_pm2,   file = "data/new_pm2.rda")
+    save(bon_test3,   file = "data/bon_test3.rda")
     
     # CSV Files
-    save(bonaire_species, file = "data/bonaire_species.rda")
+    save(bon_species3,    file = "data/bon_species3.rda")
     save(bonaire_int,     file = "data/bonaire_int.rda")
+    
+    # Things that dont change
     save(bonaire_refuge,  file = "data/bonaire_refuge.rda")
     save(tuning_profile,  file = "data/tuning_profile.rda")
     

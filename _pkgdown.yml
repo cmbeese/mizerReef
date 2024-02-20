@@ -74,15 +74,15 @@ reference:
 - contents: 
     - bonaire_int
     - bonaire_refuge
-    - bonaire_species
-    - bonaire_model
+    - bon_species1
+    - bon_species2
+    - bon_species3
+    - bon_test1
+    - bon_test2
+    - bon_test3
     - karpata_int
     - karpata_refuge
     - karpata_species
-    - karpata_model
-    - karpata_model2
-    - karpata_model3
-    - Jan23
     - aquarius_refuge
     - tuning_profile
 

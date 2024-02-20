@@ -1,34 +1,3 @@
-#' MizerParams object for a generic Caribbean reef
-#' 
-#' Includes 10 species groups.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"karpata_model"
-
-#' MizerParams object for a generic Caribbean reef
-#' 
-#' Includes 10 species groups.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"karpata_model2"
-
-#' MizerParams object for a generic Caribbean reef
-#' 
-#' Includes 10 species groups.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"karpata_model3"
-
-
 #' species_params dataframe for a generic Caribbean reef
 #' 
 #' Biomass estimates from Karpata Reef 
@@ -91,7 +60,7 @@
 #'
 #' @format A MizerParams object
 #' @source PhD Thesis
-"bonaire_model"
+"bon_test1"
 
 #' MizerParams object for a simple, generic Caribbean reef
 #' 
@@ -101,7 +70,7 @@
 #'
 #' @format A MizerParams object
 #' @source PhD Thesis
-"Jan23"
+"bon_test2"
 
 #' MizerParams object for a simple, generic Caribbean reef
 #' 
@@ -111,17 +80,8 @@
 #'
 #' @format A MizerParams object
 #' @source PhD Thesis
-"new_pm1"
+"bon_test3"
 
-#' MizerParams object for a simple, generic Caribbean reef
-#' 
-#' Includes predators, herbivores, and invertebrates. 
-#' 
-#' PhD Thesis chapter 3 vignettes
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"new_pm2"
 
 #' species_params for a simple, generic Caribbean reef
 #' 
@@ -131,7 +91,27 @@
 #' 
 #' @format dataframe
 #' @source PhD Thesis
-"bonaire_species"
+"bon_species1"
+
+#' species_params for a simple, generic Caribbean reef
+#' 
+#' Includes predators, herbivores, and invertebrates. 
+#' 
+#' PhD Thesis chapter 3 vignettes
+#' 
+#' @format dataframe
+#' @source PhD Thesis
+"bon_species2"
+
+#' species_params for a simple, generic Caribbean reef
+#' 
+#' Includes predators, herbivores, and invertebrates. 
+#' 
+#' PhD Thesis chapter 3 vignettes
+#' 
+#' @format dataframe
+#' @source PhD Thesis
+"bon_species3"
 
 #' interaction matrix for for a simple, generic Caribbean reef
 #' 
