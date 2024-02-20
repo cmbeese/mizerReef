@@ -1,7 +1,7 @@
 # Setting up a Caribbean coral reef mizer model with multiple resources
 # Three groups: Predators, Herbivores, Invertebrates
 # Model steady state calibration
-# last tuned 20th February 2024
+# last tuned 21st February 2024
 
 ## Setup - load packages -------------------------------------------------------
 library(mizer)
@@ -16,12 +16,14 @@ library(here)
 bonaire_species <- read.csv(here("inst/bonaire_species.csv"))
 bonaire_int     <- read.csv(here("inst/bonaire_int.csv"),  row.names = 1)
 bonaire_refuge  <- bonaire_refuge
-constant_tune   <- constant_tune
-step_tune       <- step_tune
+constant  <- constant_tune
+step      <- step_tune
 
+bonaire_int[1,] <- c(0.33, 0.17, 0.5)
 # Increase refuge in tuning profile
-#step_tune$prop_protect <- 2*step_tune$prop_protect
-step_tune$prop_protect <- 0.5*step_tune$prop_protect
+scale_tune <- 2
+step$prop_protect <- scale_tune*step$prop_protect
+constant$prop_protect <- 3*constant$prop_protect
 # With these parameters, herbivores consume plankton at small sizes and 
 #   transition fully to algae by maturity 
 # With these parameters, invertebrates consume plankton and detritus,
@@ -31,7 +33,8 @@ step_tune$prop_protect <- 0.5*step_tune$prop_protect
     params <- newReefParams(group_params = bonaire_species,
                             interaction = bonaire_int,
                             method = "binned",
-                            method_params = step_tune)
+                            method_params = constant)
+                            # method_params = step)
                             # method_params = tuning_profile)
 
 ## Project to first steady state -----------------------------------------------
@@ -87,7 +90,7 @@ step_tune$prop_protect <- 0.5*step_tune$prop_protect
                         new_method = "competitive",
                         new_method_params = bonaire_refuge)
     
-    # Match biomasses again
+    # Match biomasses again - again run three times
     params <- params |>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()|>
@@ -132,7 +135,7 @@ step_tune$prop_protect <- 0.5*step_tune$prop_protect
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.06)
+    params <- setBevertonHolt(params, erepro = 0.11)
     params <- reefSteady(params)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
