@@ -511,8 +511,10 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     no_w_full <- length(params@w_full)
     
     # Get index of species that have grown out of the resource spectrum
-    idx_sp <- (length(params@w_full) - length(params@w) + 1):length(params@w_full)
-    pr <- base::t(params@interaction) %*% pred_rate[,idx_sp, drop = FALSE]
+    idx_sp <- (length(params@w_full) - 
+                   length(params@w) + 1):length(params@w_full)
+    pr  <- pred_rate[,idx_sp, drop = FALSE]
+    int <- params@interaction
     
     # Find indices of predator species whose foraging is hindered by refuge
     bad_pred  <- which(params@species_params$bad_pred == TRUE)
@@ -526,18 +528,25 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     # Loop through predator species to calculate predation mortality on
     # each prey species & size by all predators
     pm <- matrix(0, no_sp, length(params@w))
+    dimnames(pm) <- dimnames(vulnerable)
     
     for (i in 1:no_sp){
+        i = 1
         # Vulnerability rate of all prey, including resource
         # (species by size) to predator i
         v <- vul[[i]]
-        # Predation rate of predator species i on all prey (by size)
+        # Predation rate of predator species i on all prey species (by size)
         pr_i <- pr[i,]
+        # Predation rate of predator species i (prey species x prey size)
         pr_i <- matrix(rep(pr_i, each = nrow(v)), 
-                       nrow = nrow(v), ncol = ncol(v))
+                         nrow = nrow(v), ncol = ncol(v))
+        # Interaction of predator species i with all prey
+        int_i <- int[i,]
+        # Predation rate predator species i * interaction of predator species i
+        pr_int <- pr_i * int_i
         # vul*pr_i predation mortality on prey (species by size) by 
         # predator i, adding to pm to sum over all predators
-        pm <- pm + v*pr_i
+        pm <- pm + v*pr_int
     }
 
     pred_mort <- pm
