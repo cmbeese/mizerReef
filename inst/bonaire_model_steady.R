@@ -16,8 +16,11 @@ library(here)
 bonaire_species <- read.csv(here("inst/bonaire_species.csv"))
 bonaire_int     <- read.csv(here("inst/bonaire_int.csv"),  row.names = 1)
 bonaire_refuge  <- bonaire_refuge
-tuning_profile  <- tuning_profile
+constant_tune   <- constant_tune
+step_tune       <- step_tune
 
+# Increase refuge in tuning profile
+step_tune$prop_protect <- 2*step_tune$prop_protect
 # With these parameters, herbivores consume plankton at small sizes and 
 #   transition fully to algae by maturity 
 # With these parameters, invertebrates consume plankton and detritus,
@@ -27,13 +30,8 @@ tuning_profile  <- tuning_profile
     params <- newReefParams(group_params = bonaire_species,
                             interaction = bonaire_int,
                             method = "binned",
-                            method_params = tuning_profile)
-
-## Reduce density dependence of reproduction -----------------------------------
-    # rdi <- rep(0.5, dim(bonaire_int)[1])
-    # 
-    # params <- setBevertonHolt(params, reproduction_level = rdi)
-    # getReproductionLevel(params)
+                            method_params = step_tune)
+                            # method_params = tuning_profile)
 
 ## Project to first steady state -----------------------------------------------
     params <- params |>
@@ -133,7 +131,7 @@ tuning_profile  <- tuning_profile
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.04)
+    params <- setBevertonHolt(params, erepro = 0.057)
     params <- reefSteady(params)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
@@ -148,7 +146,7 @@ tuning_profile  <- tuning_profile
     # invwerts, more density independent for herbivores
     
     # Let's increase reproduction level to 0.5 for predators and herbivores
-    rep_level <- c(0.5, 0.5, rep[3])
+    rep_level <- c(0.5, 0.5, 0.5)
     names(rep_level) <- c("predators","herbivores","inverts")
     params <- setBevertonHolt(params,
                               reproduction_level = rep_level)
@@ -177,18 +175,19 @@ tuning_profile  <- tuning_profile
     plotPredMort(params)
 
     # Save!
-    bon_test3 <- reefSteady(params)
-    bon_species3 <- bonaire_species
+    bon_test4 <- reefSteady(params)
+    bon_species4 <- bonaire_species
 
 # Save in package --------------------------------------------------------------
     # Params object
-    save(bon_test3,   file = "data/bon_test3.rda")
+    save(bon_test4,   file = "data/bon_test4.rda")
     
     # CSV Files
-    save(bon_species3,    file = "data/bon_species3.rda")
+    save(bon_species4,    file = "data/bon_species4.rda")
     save(bonaire_int,     file = "data/bonaire_int.rda")
     
     # Things that dont change
-    save(bonaire_refuge,  file = "data/bonaire_refuge.rda")
-    save(tuning_profile,  file = "data/tuning_profile.rda")
+    save(bonaire_refuge, file = "data/bonaire_refuge.rda")
+    save(constant_tune,  file = "data/constant_tune.rda")
+    save(step_tune,      file = "data/step_tune.rda")
     
