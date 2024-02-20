@@ -108,38 +108,31 @@ the encounter rates.</p>
     
 
 
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a> The encounter rate \eqn{<span class="fu">E_i</span>(w)} at which a predator of species \eqn{i}</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a> and weight \eqn{w} encounters food has contributions from the encounter</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> of fish prey and of resources. This is determined by summing over all</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> prey species and the resource spectrum and then integrating over all</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> prey sizes \eqn{w_p}, weighted by predation kernel \eqn{\<span class="fu">phi</span>(w,w_p)}<span class="sc">:</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>      \deqn{</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>         <span class="fu">E_i</span>(w) <span class="ot">=</span> \<span class="fu">gamma_i</span>(w) \int</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>         \<span class="fu">left</span>( \theta_{ip} <span class="fu">N_R</span>(w_p) <span class="sc">+</span> \sum_{j} \theta_{ij}</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>         V_{ji}(w_p) <span class="fu">N_j</span>(w_p) \right)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>         \<span class="fu">phi_i</span>(w,w_p) w_p \, dw_p.</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>         }{\<span class="fu">gamma_i</span>(w) \int</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>         ( \theta_{ip} <span class="fu">N_R</span>(w_p) <span class="sc">+</span> \sum_{j} \theta_{ij} V_{ji}(w_p) <span class="fu">N_j</span>(w_p) )</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>         \<span class="fu">phi_i</span>(w,w_p) w_p dw_p.}</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a> Here \eqn{<span class="fu">N_j</span>(w)} is the abundance density of species \eqn{j} and</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a> \eqn{<span class="fu">N_R</span>(w)} is the abundance density of resource. The overall</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a> prefactor \eqn{\<span class="fu">gamma_i</span>(w)} determines the predation power of the</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a> predator. It could be interpreted as a search volume and is set with</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a> the [<span class="fu">setSearchVolume</span>()] function.</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a> The predation kernel \eqn{\<span class="fu">phi</span>(w,w_p)}is set with the [<span class="fu">setPredKernel</span>()]</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a> function.</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a> The vulnerability to predation, \eqn{V_{ji}(w)} accounts <span class="cf">for</span> protective</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a> behavior of the prey. The parameters that control this are set with the</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a> [<span class="fu">setRefuge</span>()] function.</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a> The species interaction matrix \eqn{\theta_{ij}} is set with</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a> [<span class="fu">setInteraction</span>()] and the resource interaction vector \eqn{\theta_{ip}}</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a> is taken from the <span class="st">`</span><span class="at">interaction_resource</span><span class="st">`</span>column <span class="cf">in</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a> <span class="st">`</span><span class="at">params@species_params</span><span class="st">`</span>.</span></code></pre><p></p></div>
+<p>The encounter rate \(E_i(w)\) at which a predator of species \(i\)
+and weight \(w\) encounters food has contributions from the encounter
+of fish prey and of resources. This is determined by summing over all
+prey species and the resource spectrum and then integrating over all
+prey sizes \(w_p\), weighted by predation kernel \(\phi(w,w_p)\):</p>
+<p>$$
+ E_i(w) = \gamma_i(w) \int
+ \left( \theta_{ip} N_R(w_p) + \sum_{j} \theta_{ij}
+ V_{ji}(w_p) N_j(w_p) \right)
+ \phi_i(w,w_p) w_p \, dw_p.
+ $$
+Here \(N_j(w)\) is the abundance density of species \(j\) and
+\(N_R(w)\) is the abundance density of resource. The overall
+prefactor \(\gamma_i(w)\) determines the predation power of the
+predator. It could be interpreted as a search volume and is set with
+the <code>setSearchVolume()</code> function.</p>
+<p>The predation kernel \(\phi(w,w_p)\)is set with the <code>setPredKernel()</code>
+function.</p>
+<p>The vulnerability to predation, \(V_{ji}(w)\) accounts for protective
+behavior of the prey. The parameters that control this are set with the
+<code><a href="setRefuge.html">setRefuge()</a></code> function.</p>
+<p>The species interaction matrix \(\theta_{ij}\) is set with
+<code>setInteraction()</code> and the resource interaction vector \(\theta_{ip}\)
+is taken from the <code>interaction_resource</code>column in
+<code>params@species_params</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
