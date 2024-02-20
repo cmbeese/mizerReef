@@ -82,6 +82,16 @@
 #' @source PhD Thesis
 "bon_test3"
 
+#' MizerParams object for a simple, generic Caribbean reef
+#' 
+#' Includes predators, herbivores, and invertebrates. 
+#' 
+#' PhD Thesis chapter 3 vignettes
+#'
+#' @format A MizerParams object
+#' @source PhD Thesis
+"bon_test4"
+
 
 #' species_params for a simple, generic Caribbean reef
 #' 
@@ -113,6 +123,16 @@
 #' @source PhD Thesis
 "bon_species3"
 
+#' species_params for a simple, generic Caribbean reef
+#' 
+#' Includes predators, herbivores, and invertebrates. 
+#' 
+#' PhD Thesis chapter 3 vignettes
+#' 
+#' @format dataframe
+#' @source PhD Thesis
+"bon_species4"
+
 #' interaction matrix for for a simple, generic Caribbean reef
 #' 
 #' Includes predators, herbivores, and invertebrates. 
@@ -133,10 +153,36 @@
 #' @source PhD Thesis
 "bonaire_refuge"
 
-#' Constant refuge profile
+#' Constant refuge profile for tuning steady states
 #' 
 #' This is a 2-dimensional array containing start and end lengths for size bins
-#' and prop_protect equal to 10% for all bins.
+#' and prop_protect equal to 20% for all size bins up to 50 cm in length.
+#' 
+#' These refuge parameters are intended for tuning the steady state when
+#' using the density-dependent competitive method. The tuning profile provides
+#' a constant proportion of refuges to all fish up to 50 cm in length. 
+#' 
+#' When creating a model using the competitive method, you should run
+#' [newReefParams()] with the "binned" method and a proportional 
+#' tuning profile.
+#' 
+#' After species biomasses and growth rates have been calibrated to match
+#' empirical observations, use the [newRefuge()] function to implement your
+#' competitive refuge parameters. After using [newRefuge()], make sure to
+#' iterate through [mizer:: matchBiomasses()], [matchReefGrowth()], and 
+#' [reefSteady()] again to regain the steady state.
+#' 
+#' @format dataframe         
+#' @source PhD Thesis
+"constant_tune"
+
+#' Stepped refuge profile for tuning steady states
+#' 
+#' This is a 2-dimensional array containing start and end lengths for size bins
+#' and prop_protect decreasing from 30% to 10% over the ten bins. 
+#' 
+#' This profile provides more protection to smaller size classes than larger
+#' ones, as would be observed on a natural reef. 
 #' 
 #' These refuge parameters are intended for tuning the steady state when
 #' using the density-dependent competitive method. The tuning profile provides
@@ -147,9 +193,10 @@
 #' 
 #' After species biomasses and growth rates have been calibrated to match
 #' empirical observations, use the [newRefuge()] function to implement your
-#' competitive refuge parameters. After using [newRefuge()], make sure to run
+#' competitive refuge parameters. After using [newRefuge()],  make sure to
+#' iterate through [mizer:: matchBiomasses()], [matchReefGrowth()], and 
 #' [reefSteady()] again to regain the steady state.
 #' 
 #' @format dataframe         
 #' @source PhD Thesis
-"tuning_profile"
+"step_tune"
