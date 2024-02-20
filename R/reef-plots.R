@@ -84,8 +84,8 @@ plotVulnerable <- function(object,
         # Remove vulnerability for sizes outside a species' size range
         for (sp in species) {
             plot_dat$value[plot_dat$Species == sp &
-                            (plot_dat$w < params@species_params[sp, "w_min"] |
-                            plot_dat$w > params@species_params[sp, "w_max"])] <- NA
+                        (plot_dat$w < params@species_params[sp, "w_min"] |
+                        plot_dat$w > params@species_params[sp, "w_max"])] <- NA
         }
         
         plot_dat <- plot_dat[complete.cases(plot_dat), ]
@@ -102,12 +102,7 @@ plotVulnerable <- function(object,
     if (return_data) return(plot_dat)
     
     # plot ----
-    ## faceting ----
     p <- ggplot(plot_dat, aes(group = Species))
-    #    facet_wrap(~ Species, scales = "free_x") +
-    #    theme(strip.text.x = element_text(size = 6))
-    #   strip.background = element_blank(),
-    #   strip.text.x =element_blank())
     
     ## labels and scales ----
     p + geom_line(aes(x = w, y = value,
@@ -115,11 +110,7 @@ plotVulnerable <- function(object,
                       linewidth = Legend)) +
         labs(colour = 'Species', linetype = 'Species',
              linewidth = 'Species') +
-        # scale_x_continuous(name = "Total Length [cm]",
-        #                    limits = c(0,x_limit)) +
-        scale_x_continuous(name = "Log Size [g]", trans = "log10") +#,
-                           #breaks = c(10^-2, 10^0, 10^2, 10^4),
-                           #labels = c(-2, 0, 2, 4)) +
+        scale_x_continuous(name = "Size [g]", trans = "log10") +
         scale_y_continuous(name = "Proportion Vulnerable", 
                            limits = c(0, 1)) +
         scale_colour_manual(values = params@linecolour[legend_levels],
@@ -140,7 +131,7 @@ plotlyVulnerable <- function(object,
 
     argg <- as.list(environment())
     ggplotly(do.call("plotVulnerable", argg),
-             tooltip = c("Functional Group", "w", "value"))
+             tooltip = c("Species Group", "w", "value"))
 }
 
 
@@ -215,7 +206,8 @@ plotRefuge <- function(object,
         refuge <- refuge[sel_sp, , drop = FALSE]
         
         # Convert length bins in to weight bins for each functional group
-        group_length_bins <- matrix(0, nrow = length(species), ncol = length(params@w))
+        group_length_bins <- matrix(0, nrow = length(species), 
+                                       ncol = length(params@w))
         for (i in 1:length(species)) {
             group_length_bins[i,] <- (params@w / sp$a[i])^(1 / sp$b[i])
         }
@@ -235,8 +227,8 @@ plotRefuge <- function(object,
             # Remove vulnerability for sizes outside a species' size range
             for (sp in species) {
                 plot_dat$value[plot_dat$Species == sp &
-                            (plot_dat$w < params@species_params[sp, "w_min"] |
-                             plot_dat$w > params@species_params[sp, "w_max"])] <- NA
+                        (plot_dat$w < params@species_params[sp, "w_min"] |
+                        plot_dat$w > params@species_params[sp, "w_max"])] <- NA
             }
             
             plot_dat <- plot_dat[complete.cases(plot_dat), ]
@@ -256,9 +248,8 @@ plotRefuge <- function(object,
         ## faceting ----
         p <- ggplot(plot_dat, aes(group = Species)) +
             facet_wrap(~ Species, scales = "free_x") +
-            theme(strip.text.x = element_text(size = 6))
-            #   strip.background = element_blank(),
-            #   strip.text.x =element_blank())
+            theme(strip.text.x = element_text(size = 6),
+                  strip.background = element_rect(fill = "slategray4"))
         
         ## labels and scales ----
         p + geom_line(aes(x = l, y = value,
