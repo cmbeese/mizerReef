@@ -19,7 +19,7 @@ bonaire_refuge  <- bonaire_refuge
 constant  <- constant_tune
 step      <- step_tune
 
-bonaire_int[1,] <- c(0.33, 0.17, 0.5)
+bonaire_int[1,] <- c(1, 0.5, 1)
 # Increase refuge in tuning profile
 scale_tune <- 2
 step$prop_protect <- scale_tune*step$prop_protect
@@ -135,7 +135,7 @@ constant$prop_protect <- 3*constant$prop_protect
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.11)
+    params <- setBevertonHolt(params, erepro = 0.045)
     params <- reefSteady(params)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
@@ -179,15 +179,15 @@ constant$prop_protect <- 3*constant$prop_protect
     plotPredMort(params)
 
     # Save!
-    bon_test4 <- reefSteady(params)
-    bon_species4 <- bonaire_species
+    bon_test1 <- reefSteady(params)
+    bon_species1 <- bonaire_species
 
 # Save in package --------------------------------------------------------------
     # Params object
-    save(bon_test4,   file = "data/bon_test4.rda")
+    save(bon_test1,   file = "data/bon_test1.rda")
     
     # CSV Files
-    save(bon_species4,    file = "data/bon_species4.rda")
+    save(bon_species1,    file = "data/bon_species1.rda")
     save(bonaire_int,     file = "data/bonaire_int.rda")
     
     # Things that dont change

@@ -247,9 +247,9 @@ plotRefuge <- function(object,
         # plot ----
         ## faceting ----
         p <- ggplot(plot_dat, aes(group = Species)) +
-            facet_wrap(~ Species, scales = "free_x") +
-            theme(strip.text.x = element_text(size = 6),
-                  strip.background = element_rect(fill = "slategray4"))
+             facet_wrap(~Species, scales = "free_x") +
+             theme(strip.text.x = element_text(size = 6),
+                   strip.background = element_rect(fill = "slategray4"))
         
         ## labels and scales ----
         p + geom_line(aes(x = l, y = value,
