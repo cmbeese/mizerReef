@@ -20,7 +20,8 @@ constant_tune   <- constant_tune
 step_tune       <- step_tune
 
 # Increase refuge in tuning profile
-step_tune$prop_protect <- 2*step_tune$prop_protect
+#step_tune$prop_protect <- 2*step_tune$prop_protect
+step_tune$prop_protect <- 0.5*step_tune$prop_protect
 # With these parameters, herbivores consume plankton at small sizes and 
 #   transition fully to algae by maturity 
 # With these parameters, invertebrates consume plankton and detritus,
@@ -58,7 +59,7 @@ step_tune$prop_protect <- 2*step_tune$prop_protect
     # Check biomass match - still way off
     plotBiomassVsSpecies(params)
 
-    # Iterate to refine biomass
+    # Iterate to refine biomass - run this three times
     params <- params |>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()|>
@@ -131,7 +132,7 @@ step_tune$prop_protect <- 2*step_tune$prop_protect
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.057)
+    params <- setBevertonHolt(params, erepro = 0.06)
     params <- reefSteady(params)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
