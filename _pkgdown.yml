@@ -74,14 +74,8 @@ reference:
 - contents: 
     - bonaire_int
     - bonaire_refuge
-    - bon_species1
-    - bon_species2
-    - bon_species3
-    - bon_species4
-    - bon_test1
-    - bon_test2
-    - bon_test3
-    - bon_test4
+    - bonaire_species
+    - bonaire_model
     - karpata_int
     - karpata_refuge
     - karpata_species

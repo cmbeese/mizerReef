@@ -15,15 +15,9 @@ library(here)
 # Load species parameter data
 bonaire_species <- read.csv(here("inst/bonaire_species.csv"))
 bonaire_int     <- read.csv(here("inst/bonaire_int.csv"),  row.names = 1)
-bonaire_refuge  <- bonaire_refuge
-constant  <- constant_tune
-step      <- step_tune
+bonaire_refuge  <- bonaire_refuge # Average refuge density per square meter 
+tuning_profile  <- tuning_profile # 60% refuge for all size classes
 
-bonaire_int[1,] <- c(1, 0.5, 1)
-# Increase refuge in tuning profile
-scale_tune <- 2
-step$prop_protect <- scale_tune*step$prop_protect
-constant$prop_protect <- 3*constant$prop_protect
 # With these parameters, herbivores consume plankton at small sizes and 
 #   transition fully to algae by maturity 
 # With these parameters, invertebrates consume plankton and detritus,
@@ -33,14 +27,10 @@ constant$prop_protect <- 3*constant$prop_protect
     params <- newReefParams(group_params = bonaire_species,
                             interaction = bonaire_int,
                             method = "binned",
-                            method_params = constant)
-                            # method_params = step)
-                            # method_params = tuning_profile)
+                            method_params = tuning_profile)
 
 ## Project to first steady state -----------------------------------------------
-    params <- params |>
-        reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-        reefSteady() |> reefSteady() |> reefSteady() |>reefSteady() 
+    params <- reefSteady(params)
 
 ## Calibrate biomasses and growth ----------------------------------------------
 
@@ -59,9 +49,10 @@ constant$prop_protect <- 3*constant$prop_protect
     data.frame(age_mat_model, age_mat_observed)
     # Not bad
     
-    # Check biomass match - still way off
+    # Check biomass match
     plotBiomassVsSpecies(params)
-
+    # Biomasses way off from observations
+    
     # Iterate to refine biomass - run this three times
     params <- params |>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
@@ -90,7 +81,7 @@ constant$prop_protect <- 3*constant$prop_protect
                         new_method = "competitive",
                         new_method_params = bonaire_refuge)
     
-    # Match biomasses again - again run three times
+    # Match biomasses again - run twice
     params <- params |>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()|>
@@ -108,6 +99,7 @@ constant$prop_protect <- 3*constant$prop_protect
     # Make sure new refuge is in place
     plotVulnerable(params)
     plotRefuge(params)
+    # looks good
     
     plotBiomassVsSpecies(params) # spot on
     
@@ -118,38 +110,38 @@ constant$prop_protect <- 3*constant$prop_protect
     # Also spot on
 
 ## Check resulting spectra and tune resources ----------------------------------
-
-    # Resource looks too high - should match sheldon's spectrum
-    # looks fairly straight not bad but some bumps
-    plotSpectra(params, total = TRUE, power = 1)
-    plotSpectra(params, total = TRUE, power = 2)
+    
+    # Spectra should be reasonably straight to match predictions of Sheldon's
+    # spectrum but also have nonlinearities at refuge sizes
+    plotSpectra(params, total = TRUE, power = 1) # looks straight, some bumps
+    plotSpectra(params, total = TRUE, power = 2) # resource looks low
     
     # plot feeding level to check if resource is too low
     plotFeedingLevel(params, species = "inverts")
-    
     # Invertebrate feeding level is stable throughout life - there is enough
-    # reosurce
+    # resource to support fish, not too little or too much
     
 # Tune reproduction ------------------------------------------------------------
     # We do not have yield or catch data - can't tune size distribution
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.045)
+    params <- setBevertonHolt(params, erepro = 0.104)
     params <- reefSteady(params)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
     rep <- getReproductionLevel(params)
-    # These look good. A reproduction level closer to one means reproduction 
+    # These are very low for predators, should be higher and too high
+    # for invertebrates. A reproduction level closer to one means reproduction 
     # rate is almost totally independent of the investment into reproduction
-    # Reproduction should be density independent on reefs
+    # Reproduction should be somewhat density independent on reefs
     
     # Check comparison of density dependent & independent reduction
     getRDI(params) / getRDD(params)
-    # Reproduction is equally density independent nad density dependent for 
-    # invwerts, more density independent for herbivores
+    # preds, 1:1 - maybe too density dependent 
+    # inverts, herbs 20+:1 more density independent - maybe too much
     
-    # Let's increase reproduction level to 0.5 for predators and herbivores
+    # increase reproduction level to 0.5 for all
     rep_level <- c(0.5, 0.5, 0.5)
     names(rep_level) <- c("predators","herbivores","inverts")
     params <- setBevertonHolt(params,
@@ -165,10 +157,12 @@ constant$prop_protect <- 3*constant$prop_protect
     rep <- getReproductionLevel(params)
     getRDI(params) / getRDD(params)
     # Now density independent reproduction is double for predators
+    # And reproduction is somewhat density dependent for herbs and inverts
     
     # Check new spectra
     plotSpectra(params, total = TRUE, power = 1)
     plotSpectra(params, total = TRUE, power = 2)
+    # These still look good
 
 # Plots ------------------------------------------------------------------------
     plotBiomassVsSpecies(params)
@@ -177,21 +171,20 @@ constant$prop_protect <- 3*constant$prop_protect
     plotDiet(params)  
     plotGrowthCurves(params)
     plotPredMort(params)
-
+    # Everything looks good here! I am happy with my results.
+    
     # Save!
-    bon_test1 <- reefSteady(params)
-    bon_species1 <- bonaire_species
+    bonaire_model <- reefSteady(params)
 
 # Save in package --------------------------------------------------------------
     # Params object
-    save(bon_test1,   file = "data/bon_test1.rda")
+    save(bonaire_model,   file = "data/bonaire_model.rda")
     
     # CSV Files
-    save(bon_species1,    file = "data/bon_species1.rda")
-    save(bonaire_int,     file = "data/bonaire_int.rda")
+    save(bonaire_species,    file = "data/bonaire_species.rda")
+    save(bonaire_int,        file = "data/bonaire_int.rda")
     
     # Things that dont change
-    save(bonaire_refuge, file = "data/bonaire_refuge.rda")
-    save(constant_tune,  file = "data/constant_tune.rda")
-    save(step_tune,      file = "data/step_tune.rda")
+    save(bonaire_refuge,  file = "data/bonaire_refuge.rda")
+    save(tuning_profile,  file = "data/tuning_profile.rda")
     

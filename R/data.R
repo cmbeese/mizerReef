@@ -60,38 +60,7 @@
 #'
 #' @format A MizerParams object
 #' @source PhD Thesis
-"bon_test1"
-
-#' MizerParams object for a simple, generic Caribbean reef
-#' 
-#' Includes predators, herbivores, and invertebrates. 
-#' 
-#' PhD Thesis chapter 3 vignettes
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"bon_test2"
-
-#' MizerParams object for a simple, generic Caribbean reef
-#' 
-#' Includes predators, herbivores, and invertebrates. 
-#' 
-#' PhD Thesis chapter 3 vignettes
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"bon_test3"
-
-#' MizerParams object for a simple, generic Caribbean reef
-#' 
-#' Includes predators, herbivores, and invertebrates. 
-#' 
-#' PhD Thesis chapter 3 vignettes
-#'
-#' @format A MizerParams object
-#' @source PhD Thesis
-"bon_test4"
-
+"bonaire_model"
 
 #' species_params for a simple, generic Caribbean reef
 #' 
@@ -101,37 +70,7 @@
 #' 
 #' @format dataframe
 #' @source PhD Thesis
-"bon_species1"
-
-#' species_params for a simple, generic Caribbean reef
-#' 
-#' Includes predators, herbivores, and invertebrates. 
-#' 
-#' PhD Thesis chapter 3 vignettes
-#' 
-#' @format dataframe
-#' @source PhD Thesis
-"bon_species2"
-
-#' species_params for a simple, generic Caribbean reef
-#' 
-#' Includes predators, herbivores, and invertebrates. 
-#' 
-#' PhD Thesis chapter 3 vignettes
-#' 
-#' @format dataframe
-#' @source PhD Thesis
-"bon_species3"
-
-#' species_params for a simple, generic Caribbean reef
-#' 
-#' Includes predators, herbivores, and invertebrates. 
-#' 
-#' PhD Thesis chapter 3 vignettes
-#' 
-#' @format dataframe
-#' @source PhD Thesis
-"bon_species4"
+"bonaire_species"
 
 #' interaction matrix for for a simple, generic Caribbean reef
 #' 
