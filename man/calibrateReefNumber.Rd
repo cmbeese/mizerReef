@@ -36,3 +36,4 @@ blog post at https://bit.ly/2YqXESV.
 If you have observations of the yearly yield instead of numbers, you can
 use \code{\link[=calibrateYield]{calibrateYield()}} instead of this function.
 }
+\concept{calibration}

@@ -162,7 +162,7 @@ tuneUR <- function(params,...) {
 #'   }
 #'
 #' @return An object of type \linkS4class{MizerParams}
-#' @concept Uresources
+#' @concept calibration
 #' @export
 scaleReefAbundance <- function(params, factor) {
     params <- validParams(params)
@@ -196,7 +196,7 @@ scaleReefAbundance <- function(params, factor) {
 #' @param factor a numeric value by which to scale the model
 #'
 #' @return a mizer model object with scaled parameters
-#' @concept Uresources
+#' @concept calibration
 #' @export
 scaleReefModel <- function(params, factor) {
 
@@ -281,7 +281,7 @@ scaleReefBackground <- function(params, factor) {
 #' 
 #' @param params A MizerParams object
 #' @return A MizerParams object
-#' @concept Uresources
+#' @concept calibration
 #' @export
 calibrateReefBiomass <- function(params) {
     if ((!("biomass_observed" %in% names(params@species_params))) ||
@@ -336,6 +336,7 @@ calibrateReefBiomass <- function(params) {
 #'
 #' @param params A MizerParams object
 #' @return A MizerParams object
+#' @concept calibration
 #' @export
 calibrateReefNumber <- function(params) {
     if ((!("number_observed" %in% names(params@species_params))) ||
@@ -390,7 +391,7 @@ constant_dynamics <- function(params, n_other, component, ...) {
 #'   the total number of individuals constant.
 #' @return A modified MizerParams object with rescaled rates and rescaled 
 #'   species parameters `gamma`,`h`, `ks` and `k`.
-#' @concept Uresources
+#' @concept calibration
 #' @export
 matchReefGrowth <- function(params, species = NULL,
                             keep = c("egg", "biomass", "number")) {

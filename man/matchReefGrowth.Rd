@@ -28,4 +28,4 @@ species parameters \code{gamma},\code{h}, \code{ks} and \code{k}.
 This does the same as \code{mizer::matchGrowth()} but in addition also rescales
 the consumption rates of algae and detritus.
 }
-\concept{Uresources}
+\concept{calibration}

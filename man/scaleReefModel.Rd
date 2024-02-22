@@ -17,4 +17,4 @@ a mizer model object with scaled parameters
 \description{
 This function scales various model parameters by a given factor.
 }
-\concept{Uresources}
+\concept{calibration}
