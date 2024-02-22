@@ -1,26 +1,159 @@
+#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
+#' 
+#' Includes 10 species groups with biomass estimates from Karpata Reef 
+#' study site in the FORCE data set.
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test1"
+
+#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
+#' 
+#' Includes 10 species groups with biomass estimates from Karpata Reef 
+#' study site in the FORCE data set.
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test2"
+
+#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
+#' 
+#' Includes 10 species groups with biomass estimates from Karpata Reef 
+#' study site in the FORCE data set.
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test3"
+
+#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
+#' 
+#' Includes 10 species groups with biomass estimates from Karpata Reef 
+#' study site in the FORCE data set.
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test4"
+
+#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
+#' 
+#' Includes 10 species groups with biomass estimates from Karpata Reef 
+#' study site in the FORCE data set.
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test5"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i1"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i2"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i3"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i4"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i5"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_sp4"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_sp1"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_sp2"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_sp3"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_sp4"
+
+#' species_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_sp5"
+
+################################################################################
+################################################################################
+
 #' species_params dataframe for a generic Caribbean reef
 #' 
-#' Biomass estimates from Karpata Reef 
-#' 
-#' Includes 10 species groups.
+#' Includes 10 species groups with biomass estimates from Karpata Reef 
+#' study site in the FORCE data set.
 #' 
 #' PhD Thesis chapter 4
 #'
 #' @format dataframe
 #' @source PhD Thesis
 "karpata_species"
-
-# species_params dataframe for a generic Caribbean reef
-# 
-# Biomass estimates from Aquarius reef.
-# 
-# Includes 10 species groups.
-# 
-# PhD Thesis chapter 4
-#
-# @format dataframe
-# @source PhD Thesis
-#"aquarius_species"
 
 #' Interaction matrix for a generic Caribbean reef
 #' 
@@ -34,7 +167,10 @@
 
 #' Competitive method refuge parameters for a generic Caribbean reef
 #' 
-#' Refuge densities from Karpata Reef site
+#' This is a 2-dimensional array containing start and end lengths for size bins
+#' and `prop_protect` for each size bin, which gives the refuge density per 
+#' square meter for ten 5cm wide fish length bins ranging from 0 to 50 cm.
+#' Data from the Karpata reef study site.
 #'  
 #' PhD Thesis chapter 4
 #'
@@ -44,7 +180,10 @@
 
 #' Competitive method refuge parameters for a generic Caribbean reef
 #' 
-#' Refuge densities from Aquarius Reef site
+#' This is a 2-dimensional array containing start and end lengths for size bins
+#' and `prop_protect` for each size bin, which gives the refuge density per 
+#' square meter for ten 5cm wide fish length bins ranging from 0 to 50 cm.
+#' Data from the Aquarius reef study site.
 #' 
 #' PhD Thesis chapter 4
 #'
@@ -52,9 +191,9 @@
 #' @source PhD Thesis
 "aquarius_refuge"
 
-#' MizerParams object for a simple, generic Caribbean reef
+#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
 #' 
-#' Includes predators, herbivores, and invertebrates. 
+#' Includes 3 species groups: predators, herbivores, and invertebrates. 
 #' 
 #' PhD Thesis chapter 3 vignettes
 #'
@@ -62,9 +201,9 @@
 #' @source PhD Thesis
 "bonaire_model"
 
-#' species_params for a simple, generic Caribbean reef
+#' species_params dataframe for a simple, generic Caribbean reef
 #' 
-#' Includes predators, herbivores, and invertebrates. 
+#' Includes 3 species groups: predators, herbivores, and invertebrates. 
 #' 
 #' PhD Thesis chapter 3 vignettes
 #' 
@@ -74,7 +213,7 @@
 
 #' interaction matrix for for a simple, generic Caribbean reef
 #' 
-#' Includes predators, herbivores, and invertebrates. 
+#' Includes 3 species groups: predators, herbivores, and invertebrates. 
 #' 
 #' PhD Thesis chapter 3 vignettes
 #' 
@@ -82,20 +221,22 @@
 #' @source PhD Thesis
 "bonaire_int"
 
-#' refuge parameters for for a simple, generic Caribbean reef
+#' Competitive method refuge parameters for a simple, generic Caribbean reef
 #' 
-#' Includes predators, herbivores, and invertebrates. 
+#' This is a 2-dimensional array containing start and end lengths for size bins
+#' and `prop_protect` for each size bin, which gives the refuge density per 
+#' square meter for ten 5cm wide fish length bins ranging from 0 to 50 cm.
 #' 
 #' PhD Thesis chapter 3 vignettes
 #' 
-#' @format datafram
+#' @format dataframe
 #' @source PhD Thesis
 "bonaire_refuge"
 
 #' Constant refuge profile for tuning steady states
 #' 
 #' This is a 2-dimensional array containing start and end lengths for size bins
-#' and prop_protect equal to 20% for all size bins up to 50 cm in length.
+#' and `prop_protect` equal to 20% for all size bins up to 50 cm in length.
 #' 
 #' These refuge parameters are intended for tuning the steady state when
 #' using the density-dependent competitive method. The tuning profile provides

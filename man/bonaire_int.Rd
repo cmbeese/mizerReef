@@ -14,7 +14,7 @@ PhD Thesis
 bonaire_int
 }
 \description{
-Includes predators, herbivores, and invertebrates.
+Includes 3 species groups: predators, herbivores, and invertebrates.
 }
 \details{
 PhD Thesis chapter 3 vignettes

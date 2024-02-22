@@ -15,7 +15,7 @@ constant_tune
 }
 \description{
 This is a 2-dimensional array containing start and end lengths for size bins
-and prop_protect equal to 20\% for all size bins up to 50 cm in length.
+and \code{prop_protect} equal to 20\% for all size bins up to 50 cm in length.
 }
 \details{
 These refuge parameters are intended for tuning the steady state when

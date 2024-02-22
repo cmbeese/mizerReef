@@ -81,7 +81,7 @@ setURParams <- function(params,
         
         # Check if user wants to use carrying capacity
         assert_that(is.flag(carry_capacity))
-        params@other_params$carry_capacity = carry_capacity
+        params@other_params$carry_capacity <- carry_capacity
         
     # interaction ----
     # Check if user included in species params
@@ -158,7 +158,7 @@ setURParams <- function(params,
         
         # Set default algae carrying capacity
         if(is.null(algae_capacity)){ 
-            params@other_params$algae_capacity <- 2e3
+            params@other_params$algae_capacity <- 1
         } else {
             if (!is.numeric(algae_capacity)){
                 stop("algae_capacity should be a numerical value.")
@@ -210,7 +210,7 @@ setURParams <- function(params,
         
         # Set default detritus carrying capacity
         if(is.null(detritus_capacity)){ 
-            params@other_params$detritus_capacity <- 2e3
+            params@other_params$detritus_capacity <- 1
         } else {
             if (!is.numeric(detritus_capacity)){
                 stop("detritus_capacity should be a numerical value.")
@@ -924,7 +924,7 @@ getRefuge <- function(params, ...) {
         # Store indices of each bin
         params@other_params[['bin.id']] <- bin.id
         
-        # Store length bins by functional group in a data frame
+        # Store length bins by species group in a data frame
         start_l.i <- t(do.call(rbind, start_l.i))
         end_l.i  <- t(do.call(rbind, end_l.i))
         refuge_lengths <- cbind(start_l.i, end_l.i)

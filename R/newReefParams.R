@@ -153,7 +153,6 @@ newReefParams <- function(# Original mizer parameters
             dynamics_fun = "algae_dynamics",
             encounter_fun = "encounter_contribution",
             component_params = list(rho = rho_alg,
-                                    capacity = params@other_params$algae_capacity,
                                     growth = params@other_params$initial_algae_growth))
         
         ### Detritus component - Add in detritus ----
@@ -164,8 +163,8 @@ newReefParams <- function(# Original mizer parameters
             component_params = list(rho = rho_det,
                                     sen_decomp = params@other_params$sen_decomp,
                                     ext_decomp = params@other_params$ext_decomp,
-                                    capacity = params@other_params$detritus_capacity,
-                                    external  = params@other_params$initial_d_external))
+                                    external   = params@other_params$initial_d_external))
+        
     } else if (carry_capacity == TRUE){
         ### Algae Component - Add in algae ----
         params <- setComponent(
@@ -174,7 +173,7 @@ newReefParams <- function(# Original mizer parameters
             encounter_fun = "encounter_contribution",
             component_params = list(rho = rho_alg,
                                     capacity = params@other_params$algae_capacity,
-                                    growth = params@other_params$initial_algae_growth))
+                                    growth   = params@other_params$initial_algae_growth))
         
         ### Detritus component - Add in detritus ----
         params <- setComponent(
@@ -184,8 +183,8 @@ newReefParams <- function(# Original mizer parameters
             component_params = list(rho = rho_det,
                                     sen_decomp = params@other_params$sen_decomp,
                                     ext_decomp = params@other_params$ext_decomp,
-                                    capacity = params@other_params$detritus_capacity,
-                                    external  = params@other_params$initial_d_external))
+                                    capacity   = params@other_params$detritus_capacity,
+                                    external   = params@other_params$initial_d_external))
     }
 
     # External mortality - Weight dependent ----

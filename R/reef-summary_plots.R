@@ -793,10 +793,10 @@ plotlyProductivityRelative <- function(object1, object2,
              tooltip = c("Species", "value"))
 }
 
-#' Plot the total fishable abundance for each species Group at steady state
+#' Plot the total abundance for each species group at steady state
 #' 
-#' This functions creates a barplot with the abundance of each Species Group
-#' within a size range. 
+#' This functions creates a barplot with the abundance of each species group
+#' within a given size range. 
 #' 
 #' @param object An object of class \linkS4class{MizerParams}
 #' 
@@ -806,13 +806,11 @@ plotlyProductivityRelative <- function(object1, object2,
 #'                  vector indicating for each species whether it is to be 
 #'                  selected (TRUE) or not.
 #'                  
-#' @param min_fishing_l parameters be passed to [getProductivity()]. The 
-#'                      minimum length (cm) of fished individuals for
-#'                      biomass estimates. Defaults to 7 cm.
+#' @param min_fishing_l The minimum length (cm) for abundance estimates. 
+#'                      Defaults to smallest size.
 #'                      
-#' @param max_fishing_l parameters be passed to [getProductivity()]. The 
-#'                      maximum length (cm) of fished individuals for
-#'                      biomass estimates. Defaults to max length.
+#' @param max_fishing_l The maximum length (cm) of for abundance estimates. 
+#'                      Defaults to max length.
 #'                  
 #' @param return_data   A boolean value that determines whether the formatted 
 #'                      data used for the plot is returned instead of the plot 
@@ -840,7 +838,7 @@ plotTotalAbundance <- function(object,
     # object checks ----
     if (is(object, "MizerSim")) {
         ## sim values ----
-        # get total biomass at last timestep
+        # get total abundance at last timestep
         params <- object@params
         end_time  <- max(as.numeric(dimnames(object@n)$time))
         
@@ -880,7 +878,6 @@ plotTotalAbundance <- function(object,
                                        return.logical = TRUE, 
                                        error_on_empty = TRUE)
     species <- dimnames(params@initial_n)$sp[sel_sp]
-    species <- gsub('inverts', NA, species)
     species <- species[!is.na(species)]
     sel_sp <- which(!is.na(species))
     abd <- abd[sel_sp, drop = FALSE]
@@ -901,7 +898,7 @@ plotTotalAbundance <- function(object,
                               group = Legend, fill = Legend))
     
     p + geom_bar(stat = "identity", position = "dodge") +
-        scale_y_continuous(name = expression("Total Biomass (g/m^2)")) +
+        scale_y_continuous(name = expression("Total Abundance (no./m^2)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
                           labels = group_names) +
         labs(fill = "Species Group", x = "Species Group")
@@ -923,13 +920,11 @@ plotTotalAbundance <- function(object,
 #'                  vector indicating for each species whether it is to be 
 #'                  selected (TRUE) or not.
 #'                  
-#' @param min_fishing_l parameters be passed to [getProductivity()]. The 
-#'                      minimum length (cm) of fished individuals for
-#'                      biomass estimates. Defaults to 7 cm.
+#' @param min_fishing_l The minimum length (cm) for biomass estimates. 
+#'                      Defaults to smallest size.
 #'                      
-#' @param max_fishing_l parameters be passed to [getProductivity()]. The 
-#'                      maximum length (cm) of fished individuals for
-#'                      biomass estimates. Defaults to max length.
+#' @param max_fishing_l The maximum length (cm) of for biomass estimates. 
+#'                      Defaults to max length.
 #'                  
 #' @param return_data   A boolean value that determines whether the formatted 
 #'                      data used for the plot is returned instead of the plot 
@@ -995,7 +990,6 @@ plotTotalBiomass <- function(object,
                                        return.logical = TRUE, 
                                        error_on_empty = TRUE)
     species <- dimnames(params@initial_n)$sp[sel_sp]
-    species <- gsub('inverts', NA, species)
     species <- species[!is.na(species)]
     sel_sp <- which(!is.na(species))
     biom <- biom[sel_sp, drop = FALSE]

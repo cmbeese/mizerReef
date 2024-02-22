@@ -306,6 +306,60 @@ calibrateReefBiomass <- function(params) {
     scaleReefModel(params, factor = observed_total / model_total)
 }
 
+# The following is a copy of the code for `calibrateBiomass()` just with
+# the text replacements "Biomass" -> "Number" and "biomass" to "number" and
+# the removal of the `params@w` factor in the calculations.
+
+#' Calibrate the model scale to match total observed number
+#'
+#' Replaces mizer's [mizer::calibrateNumber()] function. Given a MizerParams
+#' object `params` for which number observations are available for at least 
+#' some species via the `number_observed` column in the species_params data 
+#' frame, this function returns an updated MizerParams object which is 
+#' rescaled with [scaleReefModel()] so that the total number in
+#' the model agrees with the total observed number.
+#'
+#' Number observations usually only include individuals above a certain size.
+#' This size should be specified in a number_cutoff column of the species
+#' parameter data frame. If this is missing, it is assumed that all sizes are
+#' included in the observed number, i.e., it includes larval number.
+#'
+#' After using this function the total number in the model will match the
+#' total number, summed over all species. However the numbers of the
+#' individual species will not match observations yet, with some species
+#' having numbers that are too high and others too low. So after this
+#' function you may want to use [matchNumbers()]. This is described in the
+#' blog post at https://bit.ly/2YqXESV.
+#'
+#' If you have observations of the yearly yield instead of numbers, you can
+#' use [calibrateYield()] instead of this function.
+#'
+#' @param params A MizerParams object
+#' @return A MizerParams object
+#' @export
+calibrateReefNumber <- function(params) {
+    if ((!("number_observed" %in% names(params@species_params))) ||
+        all(is.na(params@species_params$number_observed))) {
+        return(params)
+    }
+    no_sp <- nrow(params@species_params)
+    cutoff <- params@species_params$number_cutoff
+    # When no cutoff known, set it to 0
+    if (is.null(cutoff)) cutoff <- rep(0, no_sp)
+    cutoff[is.na(cutoff)] <- 0
+    observed <- params@species_params$number_observed
+    observed_total <- sum(observed, na.rm = TRUE)
+    sp_observed <- which(!is.na(observed))
+    model_total <- 0
+    for (sp_idx in sp_observed) {
+        model_total <-
+            model_total +
+            sum((params@initial_n[sp_idx, ] * params@dw)
+                [params@w >= cutoff[[sp_idx]]])
+    }
+    scaleReefModel(params, factor = observed_total / model_total)
+}
+
 
 #' Hold resource dynamics constant
 #' 

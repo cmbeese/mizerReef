@@ -2,7 +2,7 @@
 % Please edit documentation in R/reef-summary_plots.R
 \name{plotTotalAbundance}
 \alias{plotTotalAbundance}
-\title{Plot the total fishable abundance for each species Group at steady state}
+\title{Plot the total abundance for each species group at steady state}
 \usage{
 plotTotalAbundance(
   object,
@@ -22,13 +22,11 @@ numeric vector with the species indices, or a logical
 vector indicating for each species whether it is to be
 selected (TRUE) or not.}
 
-\item{min_fishing_l}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
-minimum length (cm) of fished individuals for
-biomass estimates. Defaults to 7 cm.}
+\item{min_fishing_l}{The minimum length (cm) for abundance estimates.
+Defaults to smallest size.}
 
-\item{max_fishing_l}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
-maximum length (cm) of fished individuals for
-biomass estimates. Defaults to max length.}
+\item{max_fishing_l}{The maximum length (cm) of for abundance estimates.
+Defaults to max length.}
 
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot
@@ -40,8 +38,8 @@ itself. Default value is FALSE.}
 A ggplot2 object
 }
 \description{
-This functions creates a barplot with the abundance of each Species Group
-within a size range.
+This functions creates a barplot with the abundance of each species group
+within a given size range.
 }
 \seealso{
 \code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},

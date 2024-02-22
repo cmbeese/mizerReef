@@ -62,12 +62,10 @@ itself. Default value is FALSE.}
   Arguments passed on to \code{\link[=plotTotalBiomass]{plotTotalBiomass}}
   \describe{
     \item{\code{object}}{An object of class \linkS4class{MizerParams}}
-    \item{\code{min_fishing_l}}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
-minimum length (cm) of fished individuals for
-biomass estimates. Defaults to 7 cm.}
-    \item{\code{max_fishing_l}}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
-maximum length (cm) of fished individuals for
-biomass estimates. Defaults to max length.}
+    \item{\code{min_fishing_l}}{The minimum length (cm) for biomass estimates.
+Defaults to smallest size.}
+    \item{\code{max_fishing_l}}{The maximum length (cm) of for biomass estimates.
+Defaults to max length.}
   }}
 }
 \value{

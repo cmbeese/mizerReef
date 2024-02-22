@@ -14,11 +14,10 @@ PhD Thesis
 karpata_species
 }
 \description{
-Biomass estimates from Karpata Reef
+Includes 10 species groups with biomass estimates from Karpata Reef
+study site in the FORCE data set.
 }
 \details{
-Includes 10 species groups.
-
 PhD Thesis chapter 4
 }
 \keyword{datasets}

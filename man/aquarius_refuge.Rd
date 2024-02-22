@@ -14,7 +14,10 @@ PhD Thesis
 aquarius_refuge
 }
 \description{
-Refuge densities from Aquarius Reef site
+This is a 2-dimensional array containing start and end lengths for size bins
+and \code{prop_protect} for each size bin, which gives the refuge density per
+square meter for ten 5cm wide fish length bins ranging from 0 to 50 cm.
+Data from the Aquarius reef study site.
 }
 \details{
 PhD Thesis chapter 4

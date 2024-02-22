@@ -3,9 +3,9 @@
 \docType{data}
 \name{bonaire_refuge}
 \alias{bonaire_refuge}
-\title{refuge parameters for for a simple, generic Caribbean reef}
+\title{Competitive method refuge parameters for a simple, generic Caribbean reef}
 \format{
-datafram
+dataframe
 }
 \source{
 PhD Thesis
@@ -14,7 +14,9 @@ PhD Thesis
 bonaire_refuge
 }
 \description{
-Includes predators, herbivores, and invertebrates.
+This is a 2-dimensional array containing start and end lengths for size bins
+and \code{prop_protect} for each size bin, which gives the refuge density per
+square meter for ten 5cm wide fish length bins ranging from 0 to 50 cm.
 }
 \details{
 PhD Thesis chapter 3 vignettes

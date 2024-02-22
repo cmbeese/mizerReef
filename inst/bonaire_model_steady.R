@@ -1,7 +1,7 @@
 # Setting up a Caribbean coral reef mizer model with multiple resources
 # Three groups: Predators, Herbivores, Invertebrates
 # Model steady state calibration
-# last tuned 21st February 2024
+# last tuned 23rd February 2024
 
 ## Setup - load packages -------------------------------------------------------
 library(mizer)
@@ -53,7 +53,7 @@ tuning_profile  <- tuning_profile # 60% refuge for all size classes
     plotBiomassVsSpecies(params)
     # Biomasses way off from observations
     
-    # Iterate to refine biomass - run this three times
+    # Iterate to refine biomass - run twice
     params <- params |>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()|>
@@ -76,12 +76,15 @@ tuning_profile  <- tuning_profile # 60% refuge for all size classes
     data.frame(age_mat_model, age_mat_observed)
     # Closer than needed
     
+    plotTotalAbundance(params)
+    plotTotalBiomass(params)
+    
 ## Now switch to competitive method --------------------------------------------
     params <- newRefuge(params,
                         new_method = "competitive",
                         new_method_params = bonaire_refuge)
     
-    # Match biomasses again - run twice
+    # Match biomasses again - run three times
     params <- params |>
         calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
         reefSteady()|>
@@ -126,7 +129,7 @@ tuning_profile  <- tuning_profile # 60% refuge for all size classes
     # First attempt to set very low to see what the minimum values are
     params <- setBevertonHolt(params, erepro = 0.0001)
     # Now set setting erepro same for all species, as low as possible
-    params <- setBevertonHolt(params, erepro = 0.104)
+    params <- setBevertonHolt(params, erepro = 0.009)
     params <- reefSteady(params)
     # Check reproduction level (value between 0 and 1) - should be higher for
     # larger, slow growing species and low for small, fast growing ones
@@ -142,7 +145,7 @@ tuning_profile  <- tuning_profile # 60% refuge for all size classes
     # inverts, herbs 20+:1 more density independent - maybe too much
     
     # increase reproduction level to 0.5 for all
-    rep_level <- c(0.5, 0.5, 0.5)
+    rep_level <- c(0.5, 0.5, rep["inverts"])
     names(rep_level) <- c("predators","herbivores","inverts")
     params <- setBevertonHolt(params,
                               reproduction_level = rep_level)
@@ -165,6 +168,8 @@ tuning_profile  <- tuning_profile # 60% refuge for all size classes
     # These still look good
 
 # Plots ------------------------------------------------------------------------
+    plotTotalAbundance(params) # Total abundances look reasonable, inverts in range
+    plotTotalBiomass(params)
     plotBiomassVsSpecies(params)
     plotRefuge(params)
     plotSpectra(params, power = 1, total = TRUE)

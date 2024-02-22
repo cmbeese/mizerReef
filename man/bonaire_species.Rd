@@ -3,7 +3,7 @@
 \docType{data}
 \name{bonaire_species}
 \alias{bonaire_species}
-\title{species_params for a simple, generic Caribbean reef}
+\title{species_params dataframe for a simple, generic Caribbean reef}
 \format{
 dataframe
 }
@@ -14,7 +14,7 @@ PhD Thesis
 bonaire_species
 }
 \description{
-Includes predators, herbivores, and invertebrates.
+Includes 3 species groups: predators, herbivores, and invertebrates.
 }
 \details{
 PhD Thesis chapter 3 vignettes

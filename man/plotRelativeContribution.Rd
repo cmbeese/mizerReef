@@ -22,12 +22,10 @@ species are selected. A vector of species names, or a
 numeric vector with the species indices, or a logical
 vector indicating for each species whether it is to be
 selected (TRUE) or not.}
-    \item{\code{min_fishing_l}}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
-minimum length (cm) of fished individuals for
-biomass estimates. Defaults to 7 cm.}
-    \item{\code{max_fishing_l}}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
-maximum length (cm) of fished individuals for
-biomass estimates. Defaults to max length.}
+    \item{\code{min_fishing_l}}{The minimum length (cm) for biomass estimates.
+Defaults to smallest size.}
+    \item{\code{max_fishing_l}}{The maximum length (cm) of for biomass estimates.
+Defaults to max length.}
     \item{\code{end}}{A boolean value that indicated whether you want the end
 productivity of a simulation (default, TRUE) or the
 productivity through time.}

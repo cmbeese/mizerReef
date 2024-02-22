@@ -25,6 +25,7 @@ tuning_profile  <- tuning_profile
 ## Set model ----------------------------------------
 params <- newReefParams(group_params = karpata_10plus,
                         interaction = karpata_int,
+                        w_pp_cutoff = 0.1,
                         method = "binned",
                         method_params = tuning_profile)
 
@@ -36,8 +37,9 @@ getReproductionLevel(params)
 
 ## Project to first steady state -------------------------------
 params <- params |>
-    reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-    reefSteady() |> reefSteady() 
+    reefSteady() |> reefSteady() |> reefSteady() |>
+    reefSteady() |> reefSteady() |> reefSteady() |> 
+    reefSteady()
 
 ## Calibrate biomasses and growth ---------------------------------
 
@@ -53,14 +55,16 @@ params <- reefSteady(params)
 # Iterate to refine biomass
 params <- params |>
     calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
-    reefSteady()|>
+    reefSteady() |>
     calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
-    reefSteady()|>
+    reefSteady() |>
     calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
     reefSteady()
 
 # Check biomass match
 plotBiomassVsSpecies(params) # spot on
+plotTotalAbundance(params)
+plotTotalBiomass(params)
 
 # Check match with observed age at maturity
 age_mat_observed = karpata_10plus$age_mat
@@ -80,12 +84,14 @@ params <- newRefuge(params,
                     new_method = "competitive",
                     new_method_params = karpata_refuge)
 
-# Match biomasses again
+# Iterate to refine biomass
 params <- params |>
-    matchBiomasses()|> reefSteady()|> 
-    matchBiomasses()|> reefSteady()|>
-    matchBiomasses()|> reefSteady()|>
-    matchBiomasses()|> reefSteady() 
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    reefSteady()|>
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    reefSteady()|>
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    reefSteady()
 
 # Make sure new refuge is in place
 plotVulnerable(params)
@@ -106,8 +112,9 @@ plotSpectra(params, total = TRUE, power = 1)
 plotSpectra(params, total = TRUE, power = 2)
 
 # plot feeding level to check if resource is too low
-plotFeedingLevel(params, species = "inverts")
+plotFeedingLevel(params)
 
+params <- scaleReefBackground(params, 2)
 # Invert feeding level is relatively stable through life, non-linearities
 #   are probably due to refuge
 
@@ -116,7 +123,7 @@ plotFeedingLevel(params, species = "inverts")
 # First attempt to set very low to see what the minimum values are
 params <- setBevertonHolt(params, erepro = 0.0001)
 # Now set setting erepro same for all species, as low as possible
-params <- setBevertonHolt(params, erepro = 0.2)
+params <- setBevertonHolt(params, erepro = 0.0004)
 # Project back to steady
 params <- reefSteady(params)
 # Check reproduction level (value between 0 and 1) - should be higher for
@@ -152,16 +159,17 @@ plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
 plotSpectra(params, power = 1)
 
 # Save!
-karpata_model3 <- reefSteady(params)
-
-# Plots ------------------------------------------
-plotBiomassVsSpecies(karpata_model)
-plotRefuge(karpata_model)
-plotSpectra(karpata_model, power = 1, total = TRUE)
-plotDiet(karpata_model)  
-plotGrowthCurves(karpata_model)
+test1 <- reefSteady(params)
+test_sp1 <- karpata_10plus
+test_i1 <- karpata_int
 
 # Save in package --------------------------------------------
+save(test1,    file = "data/test1.rda")
+save(test_sp1, file = "data/test_sp1.rda")
+save(test_i1,  file = "data/test_i1.rda")
+
+
+
 # Params object
 save(karpata_model3,   file = "data/karpata_model3.rda")
 

@@ -128,6 +128,44 @@ reefRates <- function(params, n, n_pp, n_other,
     return(r)
 }
 
+# #' Degrade coral reef habitat structure by decreasing the availability of
+# #' refuge at certain sizes
+# #'
+# #' TO DO: ADD CODE AND DESCRIPTION HERE OF DEGRADATION
+# #'
+# #' @inheritParams reefRates
+# #' @param vulnerable A two dimensional array (prey species x prey size) with
+# #'      the proportion of prey vulnerable to being encountered.
+# #' @param ... Unused
+# #'
+# #' @return A new methods parameters data frame scaled by bleaching
+# #'
+# #' @export
+# #' @family mizer rate functions
+# # Account for species that don't utilize refuge
+# reefDegrade <- function(params, n, n_pp, n_other, t) {
+#     
+#     # Pull initial refuge
+#     method_params <- params@other_params[['method_params']]
+#     refuge_params <- params@other_params[['refuge_params']]
+#     
+#     # Initialize new method params
+#     new_mp <- method_params
+#     
+#     # If no bleaching, return old profile
+#     if (params@other_params$degrade == FALSE){ return(new_mp) }
+#     
+#     # If bleaching, check time
+#     if(t == bleach_time) { return(new_mp) }
+#     
+#     if(t >= bleach_time){    
+#         
+#         scale_bin <- 
+#         new_mp$refuge_density <- scale_bin * new_mp$refuge_density
+#     }
+# }
+
+
 #' Find the proportion of fish vulnerable to being encountered by predators 
 #' at each time step
 #'
@@ -144,7 +182,7 @@ reefRates <- function(params, n, n_pp, n_other,
 #' @export
 #' @concept refugeRates
 #' @family mizer rate functions
-reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
+reefVulnerable <- function(params, n, n_pp, n_other, t = 0,...) {
     
     # Extract relevant data from params
     refuge_params <- params@other_params[['refuge_params']]
@@ -158,8 +196,6 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
     # Pull no of species and size bins
     no_w <- length(params@w)
     no_sp <- dim(params@interaction)[1]
-    # Pull indices of size bins less than w_settle
-    
     
     # Store which functional groups use refuge
     refuge_user <- params@species_params$refuge_user
@@ -185,69 +221,38 @@ reefVulnerable <- function(params, n, n_pp, n_other, t = 0, ...) {
         
         # Loop through each refuge bin
         for (k in 1:nrow(method_params)) {
-            
             # Get indices of fish in size bin k
             bin.id <- params@other_params$bin.id[[k]]
             
-            # Creat vector of zeroes and ones
+            # Create logical vector and use to get abundances in size bin
             bin_fish <- 1:no_w %in% bin.id
+            bin_fish <- sweep(n, 2, bin_fish, "*") 
             
-            # Calculate number of competitors from each functional group in bin k
-            competitors <- (n * bin_fish) %*% params@dw
+            # Calculate number of competitors from each species group in bin k
+            competitors <- bin_fish %*% params@dw
             
-            # Eliminate functional groups that don't use refuge and sum
-            competitor_density[k] <- sum(refuge_user * competitors)
+            # Remove species that don't use refuge
+            sp <- params@species_params$species
+            sp <- sp[params@species_params$refuge_user ==TRUE]
+            competitors <- competitors[sp,]
+            
+            # sum competitors from all species groups for refuge bin k
+            competitor_density[k] <- sum(competitors)
             
             # Set vulnerability for fish in size bin based on the number of
             # available refuges and the number of competitors
             refuge[,bin.id] <- ifelse(competitor_density[k] == 0, 
-                                      max_protect,
-                                      tau * method_params$refuge_density[k]/competitor_density[k])
-            
-            # Make sure none of the values are higher than maximum protection allowed
-            refuge[refuge > max_protect] = max_protect
-            
-            # Account for species that don't utilize refuge
-            vulnerable = 1 - (refuge_user*refuge)
+                max_protect,
+                tau * method_params$refuge_density[k]/competitor_density[k])
         }
+        # Make sure none of the values are higher than max_protect
+        refuge[refuge > max_protect] <- max_protect
+        # Account for vulnerability of species that don't utilize refuge
+        vulnerable <- 1 - (refuge_user*refuge)
     }
     
     return(vulnerable)
 }
-
-
-# #' Degrade coral reef habitat structure by decreasing the availability of 
-# #' refuge at certain sizes
-# #'
-# #' TO DO: ADD CODE AND DESCRIPTION HERE OF DEGRADATION
-# #'
-# #' @inheritParams reefRates
-# #' @param vulnerable A two dimensional array (prey species x prey size) with
-# #'      the proportion of prey vulnerable to being encountered.
-# #' @param ... Unused
-# #'
-# #' @return Array (species x size) with the proportion of individuals that are
-# #'          not protected from predation by refuge
-# #'
-# #' @export
-# #' @family mizer rate functions
-# # Account for species that don't utilize refuge
-# reefDegrade <- function(params, n, n_pp, n_other, t, 
-#                         vulnerable = reefVulnerable(params, 
-#                                                     n, n_pp, n_other, t),...)
-#     {
-#     
-#     if (degrade == FALSE){
-#         return(vulnerable)
-#     } else {
-#         
-#         decrease_amount <- (percentage / 100) * value
-#         result <- value - decrease_amount
-#         
-#     }   
-#     
-# }
-
 
 #' Get encounter rate needed to project a mizerReef model
 #'
