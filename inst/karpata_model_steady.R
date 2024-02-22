@@ -25,7 +25,7 @@ tuning_profile  <- tuning_profile
 ## Set model ----------------------------------------
 params <- newReefParams(group_params = karpata_10plus,
                         interaction = karpata_int,
-                        w_pp_cutoff = 0.1,
+                        w_pp_cutoff = 1,
                         method = "binned",
                         method_params = tuning_profile)
 
@@ -36,10 +36,7 @@ params <- setBevertonHolt(params, reproduction_level = rdi)
 getReproductionLevel(params)
 
 ## Project to first steady state -------------------------------
-params <- params |>
-    reefSteady() |> reefSteady() |> reefSteady() |>
-    reefSteady() |> reefSteady() |> reefSteady() |> 
-    reefSteady()
+params <- reefSteady(params)
 
 ## Calibrate biomasses and growth ---------------------------------
 
@@ -74,10 +71,40 @@ data.frame(age_mat_model, age_mat_observed)
 
 # Check predation mortality, feeding levels, and diets
 plotPredMort(params) + facet_wrap(~Species)
-plotFeedingLevel(params)
 plotDiet(params) + scale_x_log10(limits = c(0.1, 1e4),
                                  breaks = c(1, 10, 100, 1000))
-plotSpectra(params, power = 2)
+
+## Check resulting spectra and tune resources-----------------------------------
+
+# Resource looks low - should match sheldon's spectrum
+# looks fairly straight not bad but some bumps
+plotSpectra(params, total = TRUE, power = 1)
+plotSpectra(params, total = TRUE, power = 2)
+
+# plot feeding level to check if resource is too low
+plotFeedingLevel(params)
+
+params <- scaleReefBackground(params, factor = 1.5)
+# Invert feeding level is relatively stable through life, non-linearities
+#   are probably due to refuge
+
+# Iterate to refine biomass
+params <- params |>
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    reefSteady()|>
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    reefSteady()|>
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    reefSteady()
+
+# Resource looks low - should match sheldon's spectrum
+# looks fairly straight not bad but some bumps
+plotSpectra(params, power = 1)
+plotSpectra(params, total = TRUE, power = 2)
+
+# plot feeding level to check if resource is too low
+plotFeedingLevel(params)
+
 
 ## Now switch to competitive method ----------------------------
 params <- newRefuge(params,
@@ -104,26 +131,12 @@ age_mat_model = age_mat(params)
 data.frame(age_mat_model, age_mat_observed)
 # Still look good
 
-## Check resulting spectra and tune resources------------------------
-
-# Resource looks low - should match sheldon's spectrum
-# looks fairly straight not bad but some bumps
-plotSpectra(params, total = TRUE, power = 1)
-plotSpectra(params, total = TRUE, power = 2)
-
-# plot feeding level to check if resource is too low
-plotFeedingLevel(params)
-
-params <- scaleReefBackground(params, 2)
-# Invert feeding level is relatively stable through life, non-linearities
-#   are probably due to refuge
-
 # Tune reproduction -----------------------------------------------
 # We do not have yield or catch data - can't tune size distribution
 # First attempt to set very low to see what the minimum values are
 params <- setBevertonHolt(params, erepro = 0.0001)
 # Now set setting erepro same for all species, as low as possible
-params <- setBevertonHolt(params, erepro = 0.0004)
+params <- setBevertonHolt(params, erepro = 0.0006)
 # Project back to steady
 params <- reefSteady(params)
 # Check reproduction level (value between 0 and 1) - should be higher for
@@ -159,14 +172,14 @@ plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
 plotSpectra(params, power = 1)
 
 # Save!
-test1 <- reefSteady(params)
-test_sp1 <- karpata_10plus
-test_i1 <- karpata_int
+test4 <- reefSteady(params)
+test_sp4 <- karpata_10plus
+test_i4 <- karpata_int
 
 # Save in package --------------------------------------------
-save(test1,    file = "data/test1.rda")
-save(test_sp1, file = "data/test_sp1.rda")
-save(test_i1,  file = "data/test_i1.rda")
+save(test4,    file = "data/test4.rda")
+save(test_sp4, file = "data/test_sp4.rda")
+save(test_i4,  file = "data/test_i4.rda")
 
 
 

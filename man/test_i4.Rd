@@ -6,14 +6,22 @@
 \title{species_params dataframe for testing}
 \format{
 dataframe
+
+dataframe
 }
 \source{
+PhD Thesis
+
 PhD Thesis
 }
 \usage{
 test_i4
+
+test_i4
 }
 \description{
+PhD Thesis chapter 4
+
 PhD Thesis chapter 4
 }
 \keyword{datasets}

@@ -141,6 +141,46 @@
 #' @source PhD Thesis
 "test_sp5"
 
+#' iecies_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i1"
+
+#' iecies_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i2"
+
+#' iecies_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i3"
+
+#' iecies_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i4"
+
+#' iecies_params dataframe for testing
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format dataframe
+#' @source PhD Thesis
+"test_i5"
+
 ################################################################################
 ################################################################################
 

@@ -25,6 +25,11 @@ reference:
         These functions are for setting up a new mizerReef model and finding a
         steady state for the dynamical system.
 - contents: has_concept("setup")
+- title: Tuning a mizerReef model
+  desc:  >
+        These functions are for calibrating mizerReef model to match empirical
+        observations.
+- contents: has_concept("calibration")
 - title: Predation Refuge
   desc:  >
         These functions set up the mediation of predation with refuge.
@@ -92,4 +97,8 @@ reference:
     - test_sp3
     - test_sp4
     - test_sp5
-
+    - test_i1
+    - test_i2
+    - test_i3
+    - test_i4
+    - test_i5
