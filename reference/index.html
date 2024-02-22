@@ -56,6 +56,42 @@
         </dt>
         <dd>Project a mizerReef model to steady state</dd>
       </dl></div><div class="section level2">
+      <h2 id="tuning-a-mizerreef-model">Tuning a mizerReef model<a class="anchor" aria-label="anchor" href="#tuning-a-mizerreef-model"></a></h2>
+      
+      <p class="section-desc"></p><p>These functions are for calibrating mizerReef model to match empirical observations.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="calibrateReefBiomass.html">calibrateReefBiomass()</a></code> 
+        </dt>
+        <dd>Calibrate the scale of a mizerReef model to match total observed biomass</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calibrateReefNumber.html">calibrateReefNumber()</a></code> 
+        </dt>
+        <dd>Calibrate the model scale to match total observed number</dd>
+      </dl><dl><dt>
+          
+          <code><a href="matchReefGrowth.html">matchReefGrowth()</a></code> 
+        </dt>
+        <dd>Match observed growth rates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="scaleReefAbundance.html">scaleReefAbundance()</a></code> 
+        </dt>
+        <dd>Scale reef abundances</dd>
+      </dl><dl><dt>
+          
+          <code><a href="scaleReefModel.html">scaleReefModel()</a></code> 
+        </dt>
+        <dd>Scale model parameters</dd>
+      </dl></div><div class="section level2">
       <h2 id="predation-refuge">Predation Refuge<a class="anchor" aria-label="anchor" href="#predation-refuge"></a></h2>
       
       <p class="section-desc"></p><p>These functions set up the mediation of predation with refuge.</p>
@@ -277,11 +313,6 @@ at each time step</dd>
 
       <dl><dt>
           
-          <code><a href="calibrateReefBiomass.html">calibrateReefBiomass()</a></code> 
-        </dt>
-        <dd>Calibrate the scale of a mizerReef model to match total observed biomass</dd>
-      </dl><dl><dt>
-          
           <code><a href="constant_dynamics.html">constant_dynamics()</a></code> 
         </dt>
         <dd>Hold resource dynamics constant</dd>
@@ -292,29 +323,14 @@ at each time step</dd>
         <dd>Contribution of unstructured components to the encounter rate</dd>
       </dl><dl><dt>
           
-          <code><a href="matchReefGrowth.html">matchReefGrowth()</a></code> 
-        </dt>
-        <dd>Match observed growth rates</dd>
-      </dl><dl><dt>
-          
           <code><a href="rescaleComponents.html">rescaleComponents()</a></code> 
         </dt>
         <dd>Rescale algae and detritus biomass without changing anything else</dd>
       </dl><dl><dt>
           
-          <code><a href="scaleReefAbundance.html">scaleReefAbundance()</a></code> 
-        </dt>
-        <dd>Scale reef abundances</dd>
-      </dl><dl><dt>
-          
           <code><a href="scaleReefBackground.html">scaleReefBackground()</a></code> 
         </dt>
         <dd>Scale background down by a factor</dd>
-      </dl><dl><dt>
-          
-          <code><a href="scaleReefModel.html">scaleReefModel()</a></code> 
-        </dt>
-        <dd>Scale model parameters</dd>
       </dl><dl><dt>
           
           <code><a href="setURParams.html">setURParams()</a></code> 
@@ -448,7 +464,7 @@ total biomass, and total productivity</dd>
           
           <code><a href="plotTotalAbundance.html">plotTotalAbundance()</a></code> 
         </dt>
-        <dd>Plot the total fishable abundance for each species Group at steady state</dd>
+        <dd>Plot the total abundance for each species group at steady state</dd>
       </dl><dl><dt>
           
           <code><a href="plotTotalBiomass.html">plotTotalBiomass()</a></code> <code><a href="plotTotalBiomass.html">plotlyTotalBiomass()</a></code> 
@@ -501,12 +517,12 @@ each Species Group at steady state</dd>
           
           <code><a href="bonaire_refuge.html">bonaire_refuge</a></code> 
         </dt>
-        <dd>refuge parameters for for a simple, generic Caribbean reef</dd>
+        <dd>Competitive method refuge parameters for a simple, generic Caribbean reef</dd>
       </dl><dl><dt>
           
           <code><a href="bonaire_species.html">bonaire_species</a></code> 
         </dt>
-        <dd>species_params for a simple, generic Caribbean reef</dd>
+        <dd>species_params dataframe for a simple, generic Caribbean reef</dd>
       </dl><dl><dt>
           
           <code><a href="bonaire_model.html">bonaire_model</a></code> 
@@ -542,6 +558,81 @@ each Species Group at steady state</dd>
           <code><a href="step_tune.html">step_tune</a></code> 
         </dt>
         <dd>Stepped refuge profile for tuning steady states</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test1.html">test1</a></code> 
+        </dt>
+        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test2.html">test2</a></code> 
+        </dt>
+        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test3.html">test3</a></code> 
+        </dt>
+        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test4.html">test4</a></code> 
+        </dt>
+        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test5.html">test5</a></code> 
+        </dt>
+        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_sp1.html">test_sp1</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_sp2.html">test_sp2</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_sp3.html">test_sp3</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_sp4.html">test_sp4</a></code> <code><a href="test_sp4.html">test_sp4</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_sp5.html">test_sp5</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_i1.html">test_i1</a></code> <code><a href="test_i1.html">test_i1</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_i2.html">test_i2</a></code> <code><a href="test_i2.html">test_i2</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_i3.html">test_i3</a></code> <code><a href="test_i3.html">test_i3</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_i4.html">test_i4</a></code> <code><a href="test_i4.html">test_i4</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_i5.html">test_i5</a></code> <code><a href="test_i5.html">test_i5</a></code> 
+        </dt>
+        <dd>species_params dataframe for testing</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

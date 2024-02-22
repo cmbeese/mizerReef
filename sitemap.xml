@@ -40,6 +40,9 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/calibrateReefBiomass.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/calibrateReefNumber.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/constant_dynamics.html</loc>
   </url>
   <url>
@@ -221,6 +224,51 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/step_tune.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test1.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test2.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test3.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test4.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test5.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_i1.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_i2.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_i3.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_i4.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_i5.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_sp1.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_sp2.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_sp3.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_sp4.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/test_sp5.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/tuneUR.html</loc>
