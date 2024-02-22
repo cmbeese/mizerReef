@@ -201,7 +201,7 @@ plotSpectra2 <- function(object1, object2,
     }
     
     ggplot(sf, aes(x = w, y = value, colour = Legend, linetype = Model)) +
-        geom_line(linewidth = 0.95) +
+        geom_line(linewidth = 0.8) +
         scale_x_log10("Weight [g]") +
         scale_y_log10(y_label) + 
         scale_colour_manual(values = linecolours)
