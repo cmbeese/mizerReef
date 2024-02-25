@@ -58,7 +58,7 @@
       </dl></div><div class="section level2">
       <h2 id="tuning-a-mizerreef-model">Tuning a mizerReef model<a class="anchor" aria-label="anchor" href="#tuning-a-mizerreef-model"></a></h2>
       
-      <p class="section-desc"></p><p>These functions are for calibrating mizerReef model to match empirical observations.</p>
+      <p class="section-desc"></p><p>These functions are for calibrating mizerReef models to match empirical observations.</p>
 
       
     </div><div id="" class="section level2">
@@ -91,6 +91,37 @@
           <code><a href="scaleReefModel.html">scaleReefModel()</a></code> 
         </dt>
         <dd>Scale model parameters</dd>
+      </dl><dl><dt>
+          
+          <code><a href="step_tune.html">step_tune</a></code> 
+        </dt>
+        <dd>Stepped refuge profile for tuning steady states</dd>
+      </dl><dl><dt>
+          
+          <code><a href="tuning_profile.html">tuning_profile</a></code> 
+        </dt>
+        <dd>Constant refuge profile for tuning steady states</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="tuning-profiles">Tuning Profiles<a class="anchor" aria-label="anchor" href="#tuning-profiles"></a></h3>
+      <p class="section-desc"></p><p>These refuge profiles are useful for tuning mizerReef models to steady state.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="tuning_profile.html">tuning_profile</a></code> 
+        </dt>
+        <dd>Constant refuge profile for tuning steady states</dd>
+      </dl><dl><dt>
+          
+          <code><a href="step_tune.html">step_tune</a></code> 
+        </dt>
+        <dd>Stepped refuge profile for tuning steady states</dd>
       </dl></div><div class="section level2">
       <h2 id="predation-refuge">Predation Refuge<a class="anchor" aria-label="anchor" href="#predation-refuge"></a></h2>
       
@@ -498,9 +529,15 @@ each Species Group at steady state</dd>
         </dt>
         <dd>Remove some species from the model</dd>
       </dl></div><div class="section level2">
-      <h2 id="example-parameters">Example Parameters<a class="anchor" aria-label="anchor" href="#example-parameters"></a></h2>
+      <h2 id="example-models">Example Models<a class="anchor" aria-label="anchor" href="#example-models"></a></h2>
       
-      <p class="section-desc"></p><p>These files hold example parameters and mizer params object to explore a model set up to emulate the coral reefs of Bonaire.</p>
+      <p class="section-desc"></p><p>These files hold example parameters and mizer params object to explore models set up to emulate the coral reefs of Bonaire.</p>
+
+      
+    </div><div class="section level2">
+      
+      <h3 id="simple-trait-based-model">Simple trait based model<a class="anchor" aria-label="anchor" href="#simple-trait-based-model"></a></h3>
+      
 
       
     </div><div id="" class="section level2">
@@ -528,7 +565,18 @@ each Species Group at steady state</dd>
           <code><a href="bonaire_model.html">bonaire_model</a></code> 
         </dt>
         <dd>MizerParams object for a simple, generic Caribbean reef</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      
+      <h3 id="multi-species-model">Multi-species model<a class="anchor" aria-label="anchor" href="#multi-species-model"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="karpata_int.html">karpata_int</a></code> 
         </dt>
@@ -545,94 +593,25 @@ each Species Group at steady state</dd>
         <dd>species_params dataframe for a generic Caribbean reef</dd>
       </dl><dl><dt>
           
+          <code><a href="karpata_model.html">karpata_model</a></code> 
+        </dt>
+        <dd>MizerParams object for a multispecies generic reef</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="refuge-profiles">Refuge profiles<a class="anchor" aria-label="anchor" href="#refuge-profiles"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
           <code><a href="aquarius_refuge.html">aquarius_refuge</a></code> 
         </dt>
         <dd>Competitive method refuge parameters for a generic Caribbean reef</dd>
-      </dl><dl><dt>
-          
-          <code><a href="constant_tune.html">constant_tune</a></code> 
-        </dt>
-        <dd>Constant refuge profile for tuning steady states</dd>
-      </dl><dl><dt>
-          
-          <code><a href="step_tune.html">step_tune</a></code> 
-        </dt>
-        <dd>Stepped refuge profile for tuning steady states</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test1.html">test1</a></code> 
-        </dt>
-        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test2.html">test2</a></code> 
-        </dt>
-        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test3.html">test3</a></code> 
-        </dt>
-        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test4.html">test4</a></code> 
-        </dt>
-        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test5.html">test5</a></code> 
-        </dt>
-        <dd>MizerParams object for a simple, generic Caribbean reef</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_sp1.html">test_sp1</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_sp2.html">test_sp2</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_sp3.html">test_sp3</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_sp4.html">test_sp4</a></code> <code><a href="test_sp4.html">test_sp4</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_sp5.html">test_sp5</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_i1.html">test_i1</a></code> <code><a href="test_i1.html">test_i1</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_i2.html">test_i2</a></code> <code><a href="test_i2.html">test_i2</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_i3.html">test_i3</a></code> <code><a href="test_i3.html">test_i3</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_i4.html">test_i4</a></code> <code><a href="test_i4.html">test_i4</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_i5.html">test_i5</a></code> <code><a href="test_i5.html">test_i5</a></code> 
-        </dt>
-        <dd>species_params dataframe for testing</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
