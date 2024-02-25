@@ -27,7 +27,6 @@
 #'          simulation. If \code{drop = TRUE} then the dimension of length 1 
 #'          will be removed from the returned array.
 #' 
-#' @import plyr 
 #' @export
 #' @concept refugeRates
 #' @family rate functions
@@ -131,6 +130,7 @@ getSenMort <- function(params, n = initialN(params),
 #'   energy for growth calculated at every time step in the simulation.
 #'   If \code{drop = TRUE} then the dimension of length 1 will be removed from
 #'   the returned array.
+#' 
 #' @export
 #' @concept summary
 #' @seealso [getProductivity()]
