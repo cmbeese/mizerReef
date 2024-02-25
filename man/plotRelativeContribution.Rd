@@ -5,10 +5,25 @@
 \title{Plot the relative contribution of each species group to total abundance,
 total biomass, and total productivity}
 \usage{
-plotRelativeContribution(object, return_data = FALSE, ...)
+plotRelativeContribution(
+  object,
+  min_size = NULL,
+  min_fishing_l = NULL,
+  return_data = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerParams}}
+
+\item{min_size}{parameters be passed to \code{\link[=plotTotalAbundance]{plotTotalAbundance()}} and
+\code{\link[=plotTotalBiomass]{plotTotalBiomass()}}. The minimum length (cm) of
+individuals for biomass estimates. Defaults to
+smallest size in the model.}
+
+\item{min_fishing_l}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
+minimum length (cm) of fished individuals for
+productivity estimates. Defaults to 7 cm.}
 
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot
@@ -22,8 +37,6 @@ species are selected. A vector of species names, or a
 numeric vector with the species indices, or a logical
 vector indicating for each species whether it is to be
 selected (TRUE) or not.}
-    \item{\code{min_fishing_l}}{The minimum length (cm) for biomass estimates.
-Defaults to smallest size.}
     \item{\code{max_fishing_l}}{The maximum length (cm) of for biomass estimates.
 Defaults to max length.}
     \item{\code{end}}{A boolean value that indicated whether you want the end

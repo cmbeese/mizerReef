@@ -47,13 +47,16 @@
 #'                   and max time, or a single value) to provide productivity
 #'                   for. Default is the final time step. Ignored when called 
 #'                   with a \linkS4class{MizerParams} object.
+#'                   
+#' @inheritDotParams mizer::get_size_range_array
 #'
 #' @return  If called with a MizerParams object, a vector with the productivity
 #'          in \eqn{\frac{grams}{m^2}/year} for each species group in the model. 
 #'          If called with a MizerSim object, an array (time x species) 
 #'          containing the total productivity at each time step for each 
 #'          species.
-#'
+#' 
+#' @importFrom plyr aaply
 #' @export
 #' @family summary functions
 #' @concept summary
@@ -85,7 +88,8 @@ getProductivity <- function(object,
             energy <- mizer::getEReproAndGrowth(params) 
         }
         
-        prod <- ((energy * params@initial_n * size_range) %*% params@dw)[,, drop = TRUE]
+        prod <- ((energy * params@initial_n * size_range) %*% 
+                     params@dw)[,,drop = TRUE]
         
         return(prod)
     

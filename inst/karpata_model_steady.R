@@ -172,19 +172,17 @@ plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
 plotSpectra(params, power = 1)
 
 # Save!
-test4 <- reefSteady(params)
-test_sp4 <- karpata_10plus
-test_i4 <- karpata_int
+karpata_model <- reefSteady(params)
+karpata_species <- karpata_10plus
+karpata_int <- karpata_int
 
 # Save in package --------------------------------------------
-save(test4,    file = "data/test4.rda")
-save(test_sp4, file = "data/test_sp4.rda")
-save(test_i4,  file = "data/test_i4.rda")
-
-
+# save(test,    file = "data/test.rda")
+# save(test_sp, file = "data/test_sp.rda")
+# save(test_i,  file = "data/test_i.rda")
 
 # Params object
-save(karpata_model3,   file = "data/karpata_model3.rda")
+save(karpata_model,   file = "data/karpata_model.rda")
 
 # CSV Files
 save(karpata_species, file = "data/karpata_species.rda")

@@ -33,9 +33,9 @@ Imports:
     methods,
     ggplot2,
     plotly,
-    dplyr,
     splus2R,
     stats,
+    dplyr,
     plyr,
     lifecycle,
     reshape2

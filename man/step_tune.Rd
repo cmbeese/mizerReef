@@ -34,4 +34,5 @@ competitive refuge parameters. After using \code{\link[=newRefuge]{newRefuge()}}
 iterate through \code{\link[mizer:matchBiomasses]{mizer:: matchBiomasses()}}, \code{\link[=matchReefGrowth]{matchReefGrowth()}}, and
 \code{\link[=reefSteady]{reefSteady()}} again to regain the steady state.
 }
+\concept{calibration}
 \keyword{datasets}

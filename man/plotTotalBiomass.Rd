@@ -46,8 +46,10 @@ within a size range. Usually used in conjunction with \code{\link[=plotProductiv
 to check for decoupling.
 }
 \seealso{
-\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}}, \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
-\code{\link[=plotProductivity]{plotProductivity()}}, \code{\link[=plot2Productivity]{plot2Productivity()}},\code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
+\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
+\code{\link[=plotProductivity]{plotProductivity()}}, \code{\link[=plot2Productivity]{plot2Productivity()}},
+\code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
 
 Other plotting functions: 
 \code{\link{plot2Productivity}()},

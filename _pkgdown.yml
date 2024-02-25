@@ -27,9 +27,16 @@ reference:
 - contents: has_concept("setup")
 - title: Tuning a mizerReef model
   desc:  >
-        These functions are for calibrating mizerReef model to match empirical
+        These functions are for calibrating mizerReef models to match empirical
         observations.
 - contents: has_concept("calibration")
+- subtitle: Tuning Profiles
+  desc:  >
+        These refuge profiles are useful for tuning mizerReef models to steady 
+        state.
+- contents:
+    - tuning_profile
+    - step_tune
 - title: Predation Refuge
   desc:  >
         These functions set up the mediation of predation with refuge.
@@ -72,33 +79,36 @@ reference:
 - contents: has_concept("sumplots")
 - title: Helper Functions
 - contents: has_concept("helper")
-- title: Example Parameters
+- title: Example Models
   desc:  >
         These files hold example parameters and mizer params object to explore
-        a model set up to emulate the coral reefs of Bonaire.
+        models set up to emulate the coral reefs of Bonaire.
+- subtitle: Simple trait based model
+- desc: >
+        This simple trait based model divides reef organisms into three broad
+        groups based on diet: predators, herbivores, and invertebrates.
 - contents: 
     - bonaire_int
     - bonaire_refuge
     - bonaire_species
     - bonaire_model
+- subtitle: Multi-species model
+- desc: >
+        This multi-species model contains 10 species groups based on diet,
+        body size and shape, functional role, and relationship to habitat
+        structural complexity.
+- contents:
     - karpata_int
     - karpata_refuge
     - karpata_species
+    - karpata_model
+- subtitle: Refuge profiles
+- desc: >
+        A collection of empirical and theoretical refuge profiles for
+        testing steady states with.
+- contents:
     - aquarius_refuge
-    - constant_tune
-    - step_tune
-    - test1
-    - test2
-    - test3
-    - test4
-    - test5
-    - test_sp1
-    - test_sp2
-    - test_sp3
-    - test_sp4
-    - test_sp5
-    - test_i1
-    - test_i2
-    - test_i3
-    - test_i4
-    - test_i5
+    # - test
+    # - test_sp
+    # - test_i
+

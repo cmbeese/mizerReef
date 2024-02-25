@@ -1,6 +1,6 @@
 library(ggplot2)
 library(plotly)
-library(dplyr)
+#library(dplyr)
 
 # Set global variables ----
 # Variables used - ggplot2 - known bug
@@ -737,7 +737,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |> 
-                dplyr::mutate(rel_diff = 100*(value.y - value.x) / value.x)
+                dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
         yLabel <- "% Change in Productivity"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
@@ -939,8 +939,10 @@ plotTotalAbundance <- function(object,
 #' 
 #' @family plotting functions
 #' @concept sumplots
-#' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
-#'          [plotProductivity()], [plot2Productivity()],[plotProductivityRelative()]
+#' @seealso [plotBiomass()], [plot2TotalBiomass()], 
+#'          [plotTotalBiomassRelative()],
+#'          [plotProductivity()], [plot2Productivity()],
+#'          [plotProductivityRelative()]
 plotTotalBiomass <- function(object,
                              species = NULL,
                              min_fishing_l = NULL, 
@@ -993,7 +995,6 @@ plotTotalBiomass <- function(object,
     species <- species[!is.na(species)]
     sel_sp <- which(!is.na(species))
     biom <- biom[sel_sp, drop = FALSE]
-    group_names <- group_names[sel_sp]
     
     ## data frame from selected species ----
     plot_dat <- data.frame(value = biom, Species = species)
@@ -1012,7 +1013,7 @@ plotTotalBiomass <- function(object,
     p + geom_bar(stat = "identity", position = "dodge") +
         scale_y_continuous(name = expression("Total Biomass"~"("*g/m^2*")")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names) +
+                          labels = group_names[legend_levels]) +
         labs(fill = "Species Group", x = "Species Group")
 }
 
@@ -1200,7 +1201,7 @@ plotTotalBiomassRelative <- function(object1, object2,
     # Calculate relative difference
     if (diff_method == "percent_change"){
         sf <- dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-              dplyr::mutate(rel_diff = 100*(value.y - value.x) / value.x)
+              dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
         
             yLabel <- "% Change in Total Biomass"
             
@@ -1271,10 +1272,19 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 #'  for more details.
 #'
 #' @param object An object of class \linkS4class{MizerParams}
+#'                      
+#' @param min_size  parameters be passed to [plotTotalAbundance()] and
+#'                  [plotTotalBiomass()]. The minimum length (cm) of
+#'                  individuals for biomass estimates. Defaults to
+#'                  smallest size in the model.
+#'                      
+#' @param min_fishing_l parameters be passed to [getProductivity()]. The 
+#'                      minimum length (cm) of fished individuals for
+#'                      productivity estimates. Defaults to 7 cm.
+#'                      
 #' @param return_data   A boolean value that determines whether the formatted 
 #'                      data used for the plot is returned instead of the plot 
 #'                      itself. Default value is FALSE.
-#'
 #'
 #' @inheritDotParams plotTotalBiomass
 #' @inheritDotParams plotTotalAbundance
@@ -1287,15 +1297,23 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 #' @family plotting functions
 #' @seealso [plotTotalAbundance()], [plotTotalBiomass()], [plotProductivity()]
 plotRelativeContribution <- function(object,
+                                     min_size = NULL,
+                                     min_fishing_l = NULL,
                                      return_data = FALSE,...){
     
-    abd <- plotTotalAbundance(object, return_data = TRUE, ...)
+    abd <- plotTotalAbundance(object,
+                              min_fishing_l = min_size,
+                              return_data = TRUE, ...)
     abd$Metric <- "Abundance"
 
-    biom <- plotTotalBiomass(object, return_data = TRUE, ...)
+    biom <- plotTotalBiomass(object, 
+                             min_fishing_l = min_size,
+                             return_data = TRUE, ...)
     biom$Metric <- "Biomass"
     
-    prod <- plotProductivity(object, return_data = TRUE, ...)
+    prod <- plotProductivity(object, 
+                             min_fishing_l = min_fishing_l,
+                             return_data = TRUE, ...)
     prod$Metric <- "Productivity"
     
     if (is(object, "MizerSim")) { 
@@ -1304,6 +1322,11 @@ plotRelativeContribution <- function(object,
         params <- object
         assert_that(is(params, "MizerParams"))
     }
+    
+    # Remove invertebrates
+    abd  <- subset(abd,  Species != 'inverts')
+    biom <- subset(biom, Species != 'inverts')
+    prod <- subset(prod, Species != 'inverts')
     
     # Relative Contribution
     abd  <- dplyr::mutate(abd, rel = value / sum(value) * 100)

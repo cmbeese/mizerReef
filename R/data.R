@@ -1,188 +1,41 @@
-#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
-#' 
-#' Includes 10 species groups with biomass estimates from Karpata Reef 
-#' study site in the FORCE data set.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test1"
+# \linkS4class{MizerParams} object for testing
+# 
+# PhD Thesis chapter 4
+#
+# @format dataframe
+# @source PhD Thesis
+#"test"
 
-#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
-#' 
-#' Includes 10 species groups with biomass estimates from Karpata Reef 
-#' study site in the FORCE data set.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test2"
+# species_params dataframe for testing
+# 
+# PhD Thesis chapter 4
+#
+# @format dataframe
+# @source PhD Thesis
+# "test_sp"
 
-#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
-#' 
-#' Includes 10 species groups with biomass estimates from Karpata Reef 
-#' study site in the FORCE data set.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test3"
-
-#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
-#' 
-#' Includes 10 species groups with biomass estimates from Karpata Reef 
-#' study site in the FORCE data set.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test4"
-
-#' \linkS4class{MizerParams} object for a simple, generic Caribbean reef
-#' 
-#' Includes 10 species groups with biomass estimates from Karpata Reef 
-#' study site in the FORCE data set.
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test5"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i1"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i2"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i3"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i4"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i5"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_sp4"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_sp1"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_sp2"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_sp3"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_sp4"
-
-#' species_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_sp5"
-
-#' iecies_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i1"
-
-#' iecies_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i2"
-
-#' iecies_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i3"
-
-#' iecies_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i4"
-
-#' iecies_params dataframe for testing
-#' 
-#' PhD Thesis chapter 4
-#'
-#' @format dataframe
-#' @source PhD Thesis
-"test_i5"
+# interaction dataframe for testing
+# 
+# PhD Thesis chapter 4
+#
+# @format dataframe
+# @source PhD Thesis
+# "test_i"
 
 ################################################################################
 ################################################################################
+
+#' \linkS4class{MizerParams} object for a multispecies generic reef
+#' 
+#' Includes 10 species groups with biomass estimates from Karpata Reef 
+#' study site in the FORCE data set (Caribbean).
+#' 
+#' PhD Thesis chapter 4
+#'
+#' @format A MizerParams object
+#' @source PhD Thesis
+"karpata_model"
+
 
 #' species_params dataframe for a generic Caribbean reef
 #' 
@@ -294,7 +147,8 @@
 #' 
 #' @format dataframe         
 #' @source PhD Thesis
-"constant_tune"
+#' @concept calibration
+"tuning_profile"
 
 #' Stepped refuge profile for tuning steady states
 #' 
@@ -319,4 +173,5 @@
 #' 
 #' @format dataframe         
 #' @source PhD Thesis
+#' @concept calibration
 "step_tune"

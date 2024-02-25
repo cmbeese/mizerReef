@@ -10,12 +10,13 @@
 #'for coral reefs where we could compare areas based on their benthic complexity.
 #'
 #' @import mizer mizerExperimental ggplot2
+#' @importFrom plyr aaply
 #' @importFrom plotly ggplotly
 #' @importFrom lubridate now
 #' @importFrom methods is
 #' @importFrom assertthat assert_that is.flag is.number
 #' @importFrom lifecycle deprecated
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% mutate left_join
 #' @importFrom stats mvfft complete.cases
 #' @md
 #' @keywords internal

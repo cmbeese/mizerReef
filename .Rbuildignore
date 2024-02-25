@@ -4,3 +4,7 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+
+test2.rda
+test_sp2.rda
+test_i2.rda
