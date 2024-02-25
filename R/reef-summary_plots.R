@@ -1329,9 +1329,9 @@ plotRelativeContribution <- function(object,
     prod <- subset(prod, Species != 'inverts')
     
     # Relative Contribution
-    abd  <- dplyr::mutate(abd, rel = value / sum(value) * 100)
-    biom <- dplyr::mutate(biom, rel = value / sum(value) * 100)
-    prod <- dplyr::mutate(prod, rel = value / sum(value) * 100)
+    abd  <- dplyr::mutate(abd, rel = value / sum(value))
+    biom <- dplyr::mutate(biom, rel = value / sum(value))
+    prod <- dplyr::mutate(prod, rel = value / sum(value))
     
     rel <- rbind(abd, biom, prod)
 
