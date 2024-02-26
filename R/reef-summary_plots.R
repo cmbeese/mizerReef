@@ -404,11 +404,7 @@ plotProductivity <- function(object, end  = TRUE,
         
         # Implement ylim and a minimal cutoff and bring columns in 
         # desired order
-        min_value <- 1e-20
-        p <- p[p$value >= min_value &
-                     (is.na(ylim[1]) | p$value >= ylim[1]) &
-                     (is.na(ylim[2]) | p$value <= ylim[2]), c(1, 3, 2)]
-        names(p) <- c("Year", "Biomass", "Species")
+        names(p) <- c("Year", "Species", "Productivity")
         
         if (end == TRUE) { p <- p[end_time, ,drop = TRUE] }
         
@@ -418,13 +414,19 @@ plotProductivity <- function(object, end  = TRUE,
         
         if (return_data) return(plot_dat) 
         
-        mizer::plotDataFrame(plot_dat, params, xlab = "Year", 
-                             ylab = expression(Productivity~"("*g/m^2/year*")"),
-                             ytrans = "log10",
-                             y_ticks = y_ticks, highlight = highlight,
-                             legend_var = "Legend")
+        linecolour <- params@linecolour[legend_levels]
+        linetype <- params@linetype[legend_levels]
         
-    } else {
+        p <- p +
+            geom_line(aes(x = Year, y = Productivity,
+                          colour = Legend,
+                          linetype = Legend)) +
+            scale_colour_manual(values = linecolour) +
+            scale_linetype_manual(values = linetype) +
+            facet_wrap(~Legend) +
+            labs(fill = "Species Group", x = "Species Group")
+        
+    } else if(is(object, "MizerParams")) {
         # params ----
         params <- object
         assert_that(is(params, "MizerParams"),
@@ -477,6 +479,9 @@ plotProductivity <- function(object, end  = TRUE,
             scale_fill_manual(values = params@linecolour[legend_levels],
                               labels = group_names) +
             labs(fill = "Species Group", x = "Species Group")
+        
+    } else {
+        stop("Object should be a MizerParams or MizerSim object.")
     }
 }
 

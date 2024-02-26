@@ -93,12 +93,12 @@ getProductivity <- function(object,
         
         return(prod)
     
-    } else {
+    } else if (is(object, "MizerSim")) {
         
         # If no time range is given, default to the final time step
         sim <- object
         if (missing(time_range)) {
-            time_range <- max(as.numeric(dimnames(object@n)$time))
+            time_range <- max(as.numeric(dimnames(sim@n)$time))
         }
         
         # Get matrix of true false values for fish in size range
@@ -126,6 +126,8 @@ getProductivity <- function(object,
             }, .drop = FALSE)
             
         return(prod)
+    } else {
+        stop("Object should be a MizerParams or MizerSim object.")
     }
 }
 
