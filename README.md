@@ -10,7 +10,7 @@ This package was developed to support the creation and exploration of a generic 
 
 ## Installation
 
-mizerReef is still in development and not quite ready to be used yet! Check back here for news. 
+mizerReef is still in development. Check back here for news. 
 
 You can install the development version of mizerReef from GitHub with
 

@@ -47,6 +47,7 @@ the a feeding level of 0 for piscivores.
 }
 \seealso{
 Other mizer rate functions: 
+\code{\link{reefDegrade}()},
 \code{\link{reefEncounter}()},
 \code{\link{reefMort}()},
 \code{\link{reefPredMort}()},

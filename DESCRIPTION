@@ -1,6 +1,6 @@
 Package: mizerReef
 Title: Mizer Models with Benthic Coupling for Coral Reefs
-Version: 1.0.0
+Version: 1.0.1
 Date: 2024-31-01
 Authors@R: c(
     person("Chelsey M.", "Beese",

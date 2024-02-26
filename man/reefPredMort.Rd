@@ -54,6 +54,7 @@ use \code{\link[=getPredMort]{getPredMort()}}, which then calls this function.
 }
 \seealso{
 Other mizer rate functions: 
+\code{\link{reefDegrade}()},
 \code{\link{reefEncounter}()},
 \code{\link{reefFeedingLevel}()},
 \code{\link{reefMort}()},

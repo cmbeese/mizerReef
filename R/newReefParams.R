@@ -54,6 +54,9 @@ newReefParams <- function(# Original mizer parameters
                             a_bar = NULL, b_bar = NULL,
                             w_settle = NULL, max_protect = NULL, 
                             tau = NULL,
+                          # # Parameters for setting up degradation
+                          #   bleach_time = NULL,
+                          #   degrade = FALSE,
                           # Parameters for unstructured resources
                             UR_interaction,
                             carry_capacity = FALSE,
@@ -116,14 +119,14 @@ newReefParams <- function(# Original mizer parameters
         # Determine the necessary detritus and algae encounter rates so that at
         # maximum size the group has feeding level f0
         if(is.null(crit_feed)){ crit_feed <- 0.7 }
-        f0 <- set_species_param_default(params@species_params, "f0", crit_feed)$f0
+        f0 <- mizer::set_species_param_default(params@species_params, "f0", crit_feed)$f0
         
         # Get interaction of each species with detritus and algae
         ia <- params@species_params$interaction_algae
         id <- params@species_params$interaction_detritus
         
         # Calculate encounter rates divided by w^n of largest individuals
-        E <- getEncounter(params)[, length(params@w)] /
+        E <- mizer::getEncounter(params)[, length(params@w)] /
             (params@w[length(params@w)] ^ n)
         
         # Calculate rho for each unstructured resource
@@ -148,7 +151,7 @@ newReefParams <- function(# Original mizer parameters
     
     if (carry_capacity == FALSE){
         ### Algae Component - Add in algae ----
-        params <- setComponent(
+        params <- mizer::setComponent(
             params, "algae", initial_value = 1,
             dynamics_fun = "algae_dynamics",
             encounter_fun = "encounter_contribution",
@@ -156,7 +159,7 @@ newReefParams <- function(# Original mizer parameters
                                     growth = params@other_params$initial_algae_growth))
         
         ### Detritus component - Add in detritus ----
-        params <- setComponent(
+        params <- mizer::setComponent(
             params, "detritus", initial_value = 1,
             dynamics_fun = "detritus_dynamics",
             encounter_fun = "encounter_contribution",
@@ -167,7 +170,7 @@ newReefParams <- function(# Original mizer parameters
         
     } else if (carry_capacity == TRUE){
         ### Algae Component - Add in algae ----
-        params <- setComponent(
+        params <- mizer::setComponent(
             params, "algae", initial_value = 1,
             dynamics_fun = "algae_dynamics_cc",
             encounter_fun = "encounter_contribution",
@@ -176,7 +179,7 @@ newReefParams <- function(# Original mizer parameters
                                     growth   = params@other_params$initial_algae_growth))
         
         ### Detritus component - Add in detritus ----
-        params <- setComponent(
+        params <- mizer::setComponent(
             params, "detritus", initial_value = 1,
             dynamics_fun = "detritus_dynamics_cc",
             encounter_fun = "encounter_contribution",

@@ -1096,5 +1096,85 @@ newRefuge <- function(params,
 }
 
 
-
-
+#' Prepare a steady state model for projections with degradation
+#' 
+#' Stores degradation parameters in the other_params slot of the object
+#' and implements a carrying capacity for algae and detritus that is twice the
+#' current steady state biomass. See [algae_dynamics_cc()] and 
+#' [detritus_dynamics_cc()] for additional detail.
+#' 
+#' @param params a mizer object
+#' 
+#' @param degrade   A boolean value indicating whether to implement 
+#'                  degradation. Defaults to true.                  
+#' 
+#' @param bleach_time   The year of the simulation to implement bleaching. 
+#'                      Defaults to year 2. 
+#' 
+#' @param trajectory    The trajectory for degraded reefs. Options are 
+#'                      "rubble", "algae", or "recovery"                 
+#'                      
+#' @param deg_scale     A 2 x 2 array (refuge size x years post bleaching) that
+#'                      gives the scalar values for scaling the degradation
+#'                      profile. Default scaling matrices for 15 years with
+#'                      the "rubble", "algae", and "recovery" trajectories are 
+#'                      included as data objects in the package.
+#'                          
+#' @param ... Unused
+#'
+#' @return A mizer object with updated degradation parameters profiles
+#' @concept degradation
+#' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
+#'          [tune_UR_cc()], [reefDegrade()]
+#' @export
+addDegrade <- function(params, degrade = TRUE, bleach_time = 2,
+                       trajectory, deg_scale){
+    
+    # Add new parameters to params object
+    params@other_params$degrade <- degrade
+    params@other_params$bleach_time <- bleach_time 
+    params@other_params$trajectory <- trajectory
+    params@other_params[['deg_scale']]<- deg_scale
+    
+    # Calculate algae and detritus carrying capacities
+    # Steady state biomasses
+        ba <- algae_biomass(params)
+        new_a_carry <- 2*ba
+        bd <- detritus_biomass(params)
+        new_d_carry <- 2*bd
+        
+    # store old values
+        # Algae
+        rho_a <- params@other_params$algae$rho
+        a_growth <- params@other_params$algae$growth
+        
+        # Detritus
+        rho_d <- params@other_params$detritus$rho
+        sen.d <- params@other_params$detritus$sen_decomp
+        ext.d <- params@other_params$detritus$ext_decomp
+        d_ext <- params@other_params$detritus$external
+        
+    # Change to carrying capacity dynamics
+        ### Algae Component - Add in algae ----
+        params <- mizer::setComponent(
+            params, "algae", initial_value = ba,
+            dynamics_fun = "algae_dynamics_cc",
+            encounter_fun = "encounter_contribution",
+            component_params = list(rho = rho_a,
+                                    capacity = new_a_carry,
+                                    growth   = a_growth))
+        
+        ### Detritus component - Add in detritus ----
+        params <- mizer::setComponent(
+            params, "detritus", initial_value = bd,
+            dynamics_fun = "detritus_dynamics_cc",
+            encounter_fun = "encounter_contribution",
+            component_params = list(rho = rho_d,
+                                    sen_decomp = sen.d,
+                                    ext_decomp = ext.d,
+                                    capacity   = new_d_carry,
+                                    external   = d_ext)) 
+        
+        # Save time parameters were modified
+        params@time_modified <- lubridate::now()
+}

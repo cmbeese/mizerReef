@@ -96,6 +96,7 @@ the encounters of these components will be included in the returned value.
 
 \seealso{
 Other mizer rate functions: 
+\code{\link{reefDegrade}()},
 \code{\link{reefFeedingLevel}()},
 \code{\link{reefMort}()},
 \code{\link{reefPredMort}()},

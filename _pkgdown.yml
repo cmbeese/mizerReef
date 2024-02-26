@@ -49,6 +49,10 @@ reference:
         These functions supplement or replace mizer's default rate functions
         so that refuge impacts simulations.
 - contents: has_concept("refugeRates")
+- subtitle: Degradation
+  desc:  >
+        These functions prepare a mizer model for projections with degradation.
+- contents: has_concept("degradation")
 - subtitle: Plotting the refuge profile
   desc:  >
         These functions allow users visualize the refuge profile for different

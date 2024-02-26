@@ -312,23 +312,6 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #'
 #' @param object An object of class \linkS4class{MizerParams} or
 #'                  \linkS4class{MizerSim}
-#' 
-#' @param species   The species to be selected. Optional. By default all
-#'                  species are selected. A vector of species names, or a 
-#'                  numeric vector with the species indices, or a logical 
-#'                  vector indicating for each species whether it is to be 
-#'                  selected (TRUE) or not.
-#'                  
-#' @param end   A boolean value that indicated whether you want the end
-#'              productivity of a simulation (default, TRUE) or the
-#'              productivity through time. 
-#'                  
-#' @param total A boolean value that determines whether the total productivity
-#'              from all species is plotted as well. Default is FALSE.
-#'              
-#' @param ylim  A numeric vector of length two providing lower and upper limits
-#'              for the y axis. Use NA to refer to the existing minimum or 
-#'              maximum. Any values below 1e-20 are always cut off.
 #'                  
 #' @param start_time    The first time to be plotted. Default is the beginning 
 #'                      of the time series.
@@ -336,10 +319,18 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #' @param end_time  The last time to be plotted. Default is the end of the time
 #'                  series.
 #'                  
-#' @param return_data   A boolean value that determines whether the formatted 
-#'                      data used for the plot is returned instead of the plot 
-#'                      itself. Default value is FALSE.
-#'                      
+#' @param facet   A boolean value indicating whether to facet the result plot
+#'                by species group. Defaults to TRUE.  
+#' 
+#' @param species   The species to be selected. Optional. By default all
+#'                  species are selected. A vector of species names, or a 
+#'                  numeric vector with the species indices, or a logical 
+#'                  vector indicating for each species whether it is to be 
+#'                  selected (TRUE) or not.
+#'                  
+#' @param total A boolean value that determines whether the total productivity
+#'              from all species is plotted as well. Default is FALSE.
+#'              
 #' @param min_fishing_l parameters be passed to [getProductivity()]. The 
 #'                      minimum length (cm) of fished individuals for
 #'                      productivity estimates. Defaults to 7 cm.
@@ -347,6 +338,11 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #' @param max_fishing_l parameters be passed to [getProductivity()]. The 
 #'                      maximum length (cm) of fished individuals for
 #'                      productivity estimates. Defaults to max length. 
+#'                  
+#' @param return_data   A boolean value that determines whether the formatted 
+#'                      data used for the plot is returned instead of the plot 
+#'                      itself. Default value is FALSE.
+#'                      
 #' @param ... unused
 #'
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
@@ -363,11 +359,11 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #'          [plotBiomass()], [plot2TotalBiomass()], 
 #'          [plotTotalBiomassRelative()], [plotProductivity()],
 #'          [plot2Productivity()], [plotProductivityRelative()]
-plotProductivity <- function(object, end  = TRUE,
-                             species = NULL, ylim = c(NA, NA),
-                             total = FALSE,  return_data = FALSE,
+plotProductivity <- function(object, 
+                             start_time = NULL, end_time = NULL,
+                             facet = TRUE, species = NULL, total = FALSE,
                              min_fishing_l = NULL, max_fishing_l = NULL,
-                             start_time = NULL, end_time = NULL,...) {
+                             return_data = FALSE,...) {
     
     if (is(object, "MizerSim")) {
         # sim values ----
@@ -389,12 +385,9 @@ plotProductivity <- function(object, end  = TRUE,
         
         time_range <- start_time:end_time
         
-        p <- getProductivity(sim,
+        p <- getProductivity(sim, time_range = time_range,
                              min_fishing_l = min_fishing_l,
                              max_fishing_l = max_fishing_l, ...)
-        # Select time range
-        p <- p[(as.numeric(dimnames(p)[[1]]) >= start_time) &
-               (as.numeric(dimnames(p)[[1]]) <= end_time), , drop = FALSE]
         
         # Include total
         if (total) {
@@ -407,18 +400,18 @@ plotProductivity <- function(object, end  = TRUE,
         # desired order
         names(p) <- c("Year", "Species", "Productivity")
         
-        if (end == TRUE) { p <- p[end_time, ,drop = TRUE] }
         if (missing(species)) {species <- params@species_params$species}
         
         # Select species
         plot_dat <- p[p$Species %in% c("Total", species), ]
         plot_dat$Legend <- plot_dat$Species
         
-        if (return_data) return(plot_dat) 
-        
         legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
+        plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
         linecolour <- params@linecolour[legend_levels]
         linetype <- params@linetype[legend_levels]
+        
+        if (return_data) return(plot_dat) 
         
         p <- ggplot(plot_dat, aes(x = Species, y = Productivity,
                            group = Legend, colour = Legend,
@@ -427,8 +420,9 @@ plotProductivity <- function(object, end  = TRUE,
             geom_line() +
             scale_colour_manual(values = linecolour) +
             scale_linetype_manual(values = linetype) +
-            facet_wrap(~Legend, scales = "free_y") +
             labs(colour = "Species Group", x = "Species Group")
+        
+        if (facet == TRUE) { p + facet_wrap(~Legend, scales = "free_y") }
         
     } else if(is(object, "MizerParams")) {
         # params ----

@@ -59,6 +59,7 @@ function if you wish, see \code{\link[=setRateFunction]{setRateFunction()}} for 
 }
 \seealso{
 Other mizer rate functions: 
+\code{\link{reefDegrade}()},
 \code{\link{reefEncounter}()},
 \code{\link{reefFeedingLevel}()},
 \code{\link{reefMort}()},

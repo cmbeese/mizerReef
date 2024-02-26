@@ -39,18 +39,14 @@ vector indicating for each species whether it is to be
 selected (TRUE) or not.}
     \item{\code{max_fishing_l}}{The maximum length (cm) of for biomass estimates.
 Defaults to max length.}
-    \item{\code{end}}{A boolean value that indicated whether you want the end
-productivity of a simulation (default, TRUE) or the
-productivity through time.}
-    \item{\code{total}}{A boolean value that determines whether the total productivity
-from all species is plotted as well. Default is FALSE.}
-    \item{\code{ylim}}{A numeric vector of length two providing lower and upper limits
-for the y axis. Use NA to refer to the existing minimum or
-maximum. Any values below 1e-20 are always cut off.}
     \item{\code{start_time}}{The first time to be plotted. Default is the beginning
 of the time series.}
     \item{\code{end_time}}{The last time to be plotted. Default is the end of the time
 series.}
+    \item{\code{facet}}{A boolean value indicating whether to facet the result plot
+by species group. Defaults to TRUE.}
+    \item{\code{total}}{A boolean value that determines whether the total productivity
+from all species is plotted as well. Default is FALSE.}
   }}
 }
 \description{

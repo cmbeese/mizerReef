@@ -52,15 +52,15 @@ reefRates <- function(params, n, n_pp, n_other,
                       t = 0, effort, rates_fns, ...) {
     r <- list()
     
-    # # Implement degradation
-    # r$degrade <- reefDegrade(
-    #     params, n = n, n_pp = n_pp, n_other = n_other, 
-    #     vulnerable = r$vulnerable, t = t, ...)
+    # Implement degradation
+    r$degrade <- reefDegrade(
+        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
     
     ## Vulnerability ----
     # Calculate vulnerability of fish based on complexity
     r$vulnerable <- reefVulnerable(
-        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+        params, n = n, n_pp = n_pp, n_other = n_other, t = t,
+        mp  = r$degrade, ...)
     
     ## Growth ----
     # Calculate rate E_{e,i}(w) of encountered food
@@ -128,42 +128,75 @@ reefRates <- function(params, n, n_pp, n_other,
     return(r)
 }
 
-# #' Degrade coral reef habitat structure by decreasing the availability of
-# #' refuge at certain sizes
-# #'
-# #' TO DO: ADD CODE AND DESCRIPTION HERE OF DEGRADATION
-# #'
-# #' @inheritParams reefRates
-# #' @param vulnerable A two dimensional array (prey species x prey size) with
-# #'      the proportion of prey vulnerable to being encountered.
-# #' @param ... Unused
-# #'
-# #' @return A new methods parameters data frame scaled by bleaching
-# #'
-# #' @export
-# #' @family mizer rate functions
-# # Account for species that don't utilize refuge
-# reefDegrade <- function(params, n, n_pp, n_other, t) {
-#     
-#     # Pull initial refuge
-#     method_params <- params@other_params[['method_params']]
-#     refuge_params <- params@other_params[['refuge_params']]
-#     
-#     # Initialize new method params
-#     new_mp <- method_params
-#     
-#     # If no bleaching, return old profile
-#     if (params@other_params$degrade == FALSE){ return(new_mp) }
-#     
-#     # If bleaching, check time
-#     if(t == bleach_time) { return(new_mp) }
-#     
-#     if(t >= bleach_time){    
-#         
-#         scale_bin <- 
-#         new_mp$refuge_density <- scale_bin * new_mp$refuge_density
-#     }
-# }
+#' Degrade coral reef habitat structure by decreasing the 
+#' availability of refuge 
+#'
+#' @inheritParams reefRates
+#' @param ... Unused
+#'
+#' @return A new methods parameters data frame scaled by bleaching
+#' @concept degradation
+#' @export
+#' @family mizer rate functions
+# Account for species that don't utilize refuge
+reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
+    
+    method_params <- params@other_params[['method_params']]
+    refuge_params <- params@other_params[['refuge_params']]
+    degrade <- params@other_params$degrade
+    
+    if (degrade == TRUE){
+        # If not competitive method, error
+        if (refuge_params$method != "competitive"){
+            stop("Degradation is only available for the competitive
+                 method.")
+        }
+        # Pull time for bleaching & scaling parameters
+        bleach_time <- params@other_params$bleach_time
+        trajectory <- params@other_params$trajectory
+        deg_scale <- params@other_params[['deg_scale']]
+    
+        # Initialize new method params
+        new_mp <- method_params
+    
+        # If no bleaching, return old profile
+        if (params@other_params$degrade == FALSE){ return(new_mp) }
+    
+        # If bleaching, check time
+        if(t < bleach_time) { return(new_mp) }
+        
+        if(t == bleach_time) {
+            # If bleaching time, immediate 10% reduction of all refuges
+            new_mp$refuge_density <- 0.9 * new_mp$refuge_density
+            return(new_mp)
+        }
+        
+        if(t >= bleach_time){
+            # Calculate number of years post bleaching
+            years_post <- t - bleach_time
+            # Find vector of values to scale bins by
+            scale_bin <- deg_scale[,years_post]
+            # multiply bins by scaling values
+            new_mp$refuge_density <- scale_bin * new_mp$refuge_density
+            # Increase algae growth and capacity if algae method
+            # and in first three years following bleaching
+            if (trajectory == "algae"){
+                if (years_post %in% (1:3)) {
+                    a_growth <- params@other_params$algae$growth
+                    a_carry <- params@other_params$algae$carry
+                    a_growth <- 1.26*a_growth
+                    a_carry <- 1.26*a_carry
+                    params@other_params$algae$growth <- a_growth
+                    params@other_params$algae$carry <- a_carry
+                }}}
+        
+        params@time_modified <- lubridate::now()
+        return(new_mp)
+        
+    } else {
+        return(method_params)
+    }
+}
 
 
 #' Find the proportion of fish vulnerable to being encountered by predators 
@@ -174,6 +207,7 @@ reefRates <- function(params, n, n_pp, n_other,
 #' 
 #' @inheritSection setRefuge Setting the refuge profile
 #' @inheritParams reefRates
+#' @param mp The degraded refuge densities from [reefDegrade()]
 #' @param ... Unused
 #'
 #' @return Array (species x size) with the proportion of individuals that are
@@ -182,11 +216,13 @@ reefRates <- function(params, n, n_pp, n_other,
 #' @export
 #' @concept refugeRates
 #' @family mizer rate functions
-reefVulnerable <- function(params, n, n_pp, n_other, t = 0,...) {
+reefVulnerable <- function(params, n, n_pp, n_other, t = 0,
+                           mp = reefDegrade(params, n, n_pp, n_other, t)
+                           ,...) {
     
     # Extract relevant data from params
     refuge_params <- params@other_params[['refuge_params']]
-    method_params <- params@other_params[['method_params']]
+    method_params <- mp
     
     # Set parameters used with all methods
     w_settle    <- refuge_params$w_settle

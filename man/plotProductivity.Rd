@@ -7,15 +7,14 @@
 \usage{
 plotProductivity(
   object,
-  end = TRUE,
-  species = NULL,
-  ylim = c(NA, NA),
-  total = FALSE,
-  return_data = FALSE,
-  min_fishing_l = NULL,
-  max_fishing_l = NULL,
   start_time = NULL,
   end_time = NULL,
+  facet = TRUE,
+  species = NULL,
+  total = FALSE,
+  min_fishing_l = NULL,
+  max_fishing_l = NULL,
+  return_data = FALSE,
   ...
 )
 
@@ -25,9 +24,14 @@ plotlyProductivity(object, species = NULL, ...)
 \item{object}{An object of class \linkS4class{MizerParams} or
 \linkS4class{MizerSim}}
 
-\item{end}{A boolean value that indicated whether you want the end
-productivity of a simulation (default, TRUE) or the
-productivity through time.}
+\item{start_time}{The first time to be plotted. Default is the beginning
+of the time series.}
+
+\item{end_time}{The last time to be plotted. Default is the end of the time
+series.}
+
+\item{facet}{A boolean value indicating whether to facet the result plot
+by species group. Defaults to TRUE.}
 
 \item{species}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a
@@ -35,16 +39,8 @@ numeric vector with the species indices, or a logical
 vector indicating for each species whether it is to be
 selected (TRUE) or not.}
 
-\item{ylim}{A numeric vector of length two providing lower and upper limits
-for the y axis. Use NA to refer to the existing minimum or
-maximum. Any values below 1e-20 are always cut off.}
-
 \item{total}{A boolean value that determines whether the total productivity
 from all species is plotted as well. Default is FALSE.}
-
-\item{return_data}{A boolean value that determines whether the formatted
-data used for the plot is returned instead of the plot
-itself. Default value is FALSE.}
 
 \item{min_fishing_l}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
 minimum length (cm) of fished individuals for
@@ -54,11 +50,9 @@ productivity estimates. Defaults to 7 cm.}
 maximum length (cm) of fished individuals for
 productivity estimates. Defaults to max length.}
 
-\item{start_time}{The first time to be plotted. Default is the beginning
-of the time series.}
-
-\item{end_time}{The last time to be plotted. Default is the end of the time
-series.}
+\item{return_data}{A boolean value that determines whether the formatted
+data used for the plot is returned instead of the plot
+itself. Default value is FALSE.}
 
 \item{...}{unused}
 }
