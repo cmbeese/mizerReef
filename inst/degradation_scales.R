@@ -2,7 +2,7 @@ library(here)
 
 # Rubble trajectory
 rubble_scale <- read.csv(here("inst/rubble.csv"), header = FALSE)
-rubble_scale <- as.matrix(rubble)
+rubble_scale <- as.matrix(rubble_scale)
 
 save(rubble_scale,   file = "data/rubble_scale.rda")
 

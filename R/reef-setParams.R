@@ -1177,4 +1177,6 @@ addDegrade <- function(params, degrade = TRUE, bleach_time = 2,
         
         # Save time parameters were modified
         params@time_modified <- lubridate::now()
+        
+        return(params)
 }
