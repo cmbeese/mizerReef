@@ -10,6 +10,9 @@
     <loc>https://cmbeese.github.io/mizerReef/index.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/addDegrade.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/algae_biomass.html</loc>
   </url>
   <url>
@@ -20,6 +23,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/algae_dynamics_cc.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/algae_scale.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/aquarius_refuge.html</loc>
@@ -169,6 +175,12 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/plotVulnerable.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/recovery_scale.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/reefDegrade.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/reefEncounter.html</loc>
   </url>
   <url>
@@ -203,6 +215,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/rescale_detritus.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/rubble_scale.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/scaleReefAbundance.html</loc>

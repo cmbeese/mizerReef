@@ -16,7 +16,7 @@ through time is plotted."><!-- mathjax --><script src="https://cdnjs.cloudflare.
     
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,15 +53,14 @@ through time is plotted.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotProductivity</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  end <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
-<span>  total <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  return_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  min_fishing_l <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  max_fishing_l <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  start_time <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  end_time <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  facet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  total <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  min_fishing_l <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  max_fishing_l <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  return_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -75,10 +74,19 @@ through time is plotted.</p>
 MizerSim</p></dd>
 
 
-<dt>end</dt>
-<dd><p>A boolean value that indicated whether you want the end
-productivity of a simulation (default, TRUE) or the
-productivity through time.</p></dd>
+<dt>start_time</dt>
+<dd><p>The first time to be plotted. Default is the beginning
+of the time series.</p></dd>
+
+
+<dt>end_time</dt>
+<dd><p>The last time to be plotted. Default is the end of the time
+series.</p></dd>
+
+
+<dt>facet</dt>
+<dd><p>A boolean value indicating whether to facet the result plot
+by species group. Defaults to TRUE.</p></dd>
 
 
 <dt>species</dt>
@@ -89,21 +97,9 @@ vector indicating for each species whether it is to be
 selected (TRUE) or not.</p></dd>
 
 
-<dt>ylim</dt>
-<dd><p>A numeric vector of length two providing lower and upper limits
-for the y axis. Use NA to refer to the existing minimum or
-maximum. Any values below 1e-20 are always cut off.</p></dd>
-
-
 <dt>total</dt>
 <dd><p>A boolean value that determines whether the total productivity
 from all species is plotted as well. Default is FALSE.</p></dd>
-
-
-<dt>return_data</dt>
-<dd><p>A boolean value that determines whether the formatted
-data used for the plot is returned instead of the plot
-itself. Default value is FALSE.</p></dd>
 
 
 <dt>min_fishing_l</dt>
@@ -118,14 +114,10 @@ maximum length (cm) of fished individuals for
 productivity estimates. Defaults to max length.</p></dd>
 
 
-<dt>start_time</dt>
-<dd><p>The first time to be plotted. Default is the beginning
-of the time series.</p></dd>
-
-
-<dt>end_time</dt>
-<dd><p>The last time to be plotted. Default is the end of the time
-series.</p></dd>
+<dt>return_data</dt>
+<dd><p>A boolean value that determines whether the formatted
+data used for the plot is returned instead of the plot
+itself. Default value is FALSE.</p></dd>
 
 
 <dt>...</dt>

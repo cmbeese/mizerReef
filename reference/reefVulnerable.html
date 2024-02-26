@@ -14,7 +14,7 @@ predation refuge and thus vulnerable to being encountered by predators."><!-- ma
     
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,15 @@ predation refuge and thus vulnerable to being encountered by predators.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">reefVulnerable</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, t <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">reefVulnerable</span><span class="op">(</span></span>
+<span>  <span class="va">params</span>,</span>
+<span>  <span class="va">n</span>,</span>
+<span>  <span class="va">n_pp</span>,</span>
+<span>  <span class="va">n_other</span>,</span>
+<span>  t <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  mp <span class="op">=</span> <span class="fu"><a href="reefDegrade.html">reefDegrade</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -74,6 +82,10 @@ ecosystem</p></dd>
 <dd><p>The time for which to do the calculation (Not used by standard
 mizer rate functions but useful for extensions with time-dependent
 parameters.)</p></dd>
+
+
+<dt>mp</dt>
+<dd><p>The degraded refuge densities from <code><a href="reefDegrade.html">reefDegrade()</a></code></p></dd>
 
 
 <dt>...</dt>
@@ -183,6 +195,7 @@ as a .csv file. The data can then be read into R using the command
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other mizer rate functions: 
+<code><a href="reefDegrade.html">reefDegrade</a>()</code>,
 <code><a href="reefEncounter.html">reefEncounter</a>()</code>,
 <code><a href="reefFeedingLevel.html">reefFeedingLevel</a>()</code>,
 <code><a href="reefMort.html">reefMort</a>()</code>,

@@ -18,7 +18,7 @@ must have the same species groups."><!-- mathjax --><script src="https://cdnjs.c
     
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,20 +131,6 @@ itself. Default value is FALSE.</p></dd>
 <dd><p>An object of class MizerParams or
 MizerSim</p></dd>
 
-    <dt><code>end</code></dt>
-<dd><p>A boolean value that indicated whether you want the end
-productivity of a simulation (default, TRUE) or the
-productivity through time.</p></dd>
-
-    <dt><code>total</code></dt>
-<dd><p>A boolean value that determines whether the total productivity
-from all species is plotted as well. Default is FALSE.</p></dd>
-
-    <dt><code>ylim</code></dt>
-<dd><p>A numeric vector of length two providing lower and upper limits
-for the y axis. Use NA to refer to the existing minimum or
-maximum. Any values below 1e-20 are always cut off.</p></dd>
-
     <dt><code>start_time</code></dt>
 <dd><p>The first time to be plotted. Default is the beginning
 of the time series.</p></dd>
@@ -152,6 +138,14 @@ of the time series.</p></dd>
     <dt><code>end_time</code></dt>
 <dd><p>The last time to be plotted. Default is the end of the time
 series.</p></dd>
+
+    <dt><code>facet</code></dt>
+<dd><p>A boolean value indicating whether to facet the result plot
+by species group. Defaults to TRUE.</p></dd>
+
+    <dt><code>total</code></dt>
+<dd><p>A boolean value that determines whether the total productivity
+from all species is plotted as well. Default is FALSE.</p></dd>
 
     <dt><code>min_fishing_l</code></dt>
 <dd><p>parameters be passed to <code><a href="getProductivity.html">getProductivity()</a></code>. The
