@@ -372,10 +372,9 @@ plotProductivity <- function(object, end  = TRUE,
     if (is(object, "MizerSim")) {
         # sim values ----
         sim <- object
+        params <- sim@params
         assert_that(is(sim, "MizerSim"),
                     is.flag(return_data))
-        
-        params <- sim@params
         
         species <- mizer::valid_species_arg(sim, species, 
                                             error_on_empty = TRUE)
@@ -387,6 +386,8 @@ plotProductivity <- function(object, end  = TRUE,
         if (start_time >= end_time) {
             stop("start_time must be less than end_time")
         }
+        
+        time_range <- start_time:end_time
         
         p <- getProductivity(sim,
                              min_fishing_l = min_fishing_l,
@@ -407,6 +408,7 @@ plotProductivity <- function(object, end  = TRUE,
         names(p) <- c("Year", "Species", "Productivity")
         
         if (end == TRUE) { p <- p[end_time, ,drop = TRUE] }
+        if (missing(species)) {species <- params@species_params$species}
         
         # Select species
         plot_dat <- p[p$Species %in% c("Total", species), ]
@@ -414,17 +416,19 @@ plotProductivity <- function(object, end  = TRUE,
         
         if (return_data) return(plot_dat) 
         
+        legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
         linecolour <- params@linecolour[legend_levels]
         linetype <- params@linetype[legend_levels]
         
+        p <- ggplot(plot_dat, aes(x = Species, y = Productivity,
+                           group = Legend, colour = Legend,
+                           linetype = Legend))
         p <- p +
-            geom_line(aes(x = Year, y = Productivity,
-                          colour = Legend,
-                          linetype = Legend)) +
+            geom_line() +
             scale_colour_manual(values = linecolour) +
             scale_linetype_manual(values = linetype) +
-            facet_wrap(~Legend) +
-            labs(fill = "Species Group", x = "Species Group")
+            facet_wrap(~Legend, scales = "free_y") +
+            labs(colour = "Species Group", x = "Species Group")
         
     } else if(is(object, "MizerParams")) {
         # params ----
