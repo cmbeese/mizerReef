@@ -72,7 +72,7 @@ setURParams <- function(params,
                         sen_decomp = NULL, ext_decomp = NULL, 
                         initial_d_external = NULL) {
     
-    # object check ----
+    # object check 
         # Check if mizerParams is valid
         assert_that(is(params, "MizerParams"))
 
@@ -83,7 +83,7 @@ setURParams <- function(params,
         assert_that(is.flag(carry_capacity))
         params@other_params$carry_capacity <- carry_capacity
         
-    # interaction ----
+    # interaction
     # Check if user included in species params
     res_cols <- c('interaction_algae','interaction_detritus')
     if (any(!res_cols %in% names(params@species_params))) {
@@ -134,15 +134,15 @@ setURParams <- function(params,
         }
     }
         
-    # set plotting aesthetics ---- 
+    # set plotting aesthetics 
         params@linecolour["detritus"] <- "plum4"
         params@linecolour["algae"]    <- "darkseagreen3"
         params@linetype["detritus"] <- "solid"
         params@linetype["algae"]    <- "solid"
         
-    # other parameters ----
+    # other parameters 
         
-        ## Production ----
+        ## Production 
         # Set default algae growth rate
         if(is.null(initial_algae_growth)){ 
             params@other_params$initial_algae_growth <- 2e3
@@ -276,10 +276,10 @@ setURParams <- function(params,
 setExtMortParams <- function(params,
                              ext_mort_params = NULL) {
 
-    # object - Check if mizerParams is valid ----
+    # object - Check if mizerParams is valid 
     assert_that(is(params, "MizerParams"))
 
-    # mort_params - Check if user provided valid mortality parameters ----
+    # mort_params - Check if user provided valid mortality parameters 
     if(!is.null(ext_mort_params)) {
         if (!all(sapply(ext_mort_params, is.numeric))) {
             stop("The external mortality parameters should be numeric.")
@@ -314,7 +314,7 @@ setExtMortParams <- function(params,
         ext_mort_params$sen_curve <- 0.3
     }
 
-    # Store in params ----
+    # Store in params 
     params@other_params[['ext_mort_params']] <- ext_mort_params
     
     params@time_modified <- lubridate::now()
@@ -561,7 +561,7 @@ setRefuge <- function(params, method, method_params = NULL,
             params@species_params$satiation <- satiation
         }
     
-    # refuge_params set up and checks ----
+    # refuge_params set up and checks 
         # Check if the user provided one of the available refuge profile methods
         method_options <- c('sigmoidal','binned','competitive','noncomplex')
         if(is.null(method)) {
@@ -631,7 +631,7 @@ setRefuge <- function(params, method, method_params = NULL,
         refuge_params <- data.frame(method, a_bar, b_bar, 
                                     w_settle, max_protect, tau)
     
-    #  method_params set up and checks ----
+    #  method_params set up and checks 
     if (method != "noncomplex"){
     
         # check if method_params provided
@@ -655,7 +655,7 @@ setRefuge <- function(params, method, method_params = NULL,
         # Store column names of method_params for checking
         cnames = colnames(method_params)
 
-        ## Sigmoidal method ----
+        ## Sigmoidal method 
         if (refuge_params$method == "sigmoidal") {
             # Prop protect
             if(!("prop_protect" %in% cnames)) {
@@ -676,7 +676,7 @@ setRefuge <- function(params, method, method_params = NULL,
             if (is.null(method_params$slope)){ method_params$slope <- 100 } 
         }
 
-        # Binned method ----
+        # Binned method 
         if (refuge_params$method == "binned") {
             if(!("start_L" %in% cnames)) {
                 stop("The binned method parameters dataframe needs a column called
@@ -699,7 +699,7 @@ setRefuge <- function(params, method, method_params = NULL,
             }
         }
 
-        # Competitive method ----
+        # Competitive method 
         if (refuge_params$method == "competitive") {
             if(!("start_L" %in% cnames)) {
                 stop("The competitive method parameters dataframe needs a 
@@ -761,7 +761,7 @@ setRefuge <- function(params, method, method_params = NULL,
 #' @export
 getRefuge <- function(params, ...) {
     
-    # object - Check if mizerParams is valid ----
+    # object - Check if mizerParams is valid 
     assert_that(is(params, "MizerParams"))
     
     # Extract relevant data from params
@@ -948,6 +948,11 @@ getRefuge <- function(params, ...) {
 #' 
 #' @param params a mizer object
 #' 
+#' @param new_refuge    A boolean value that states whether this new refuge 
+#'                      profile is being used for simulation. Determines
+#'                      whether algae and detritus production and tuned when
+#'                      the model is run to steady state. Defaults to false.
+#' 
 #' @param new_method    The new method to be used for setting the refuge 
 #'                      profile. Options are "sigmoidal", "binned", 
 #'                      "competitive", or "noncomplex". If no method is
@@ -973,7 +978,7 @@ getRefuge <- function(params, ...) {
 #' @return A mizer object with updated refuge profiles
 #' @concept refugeParams
 #' @export
-newRefuge <- function(params,
+newRefuge <- function(params, new_refuge = FALSE,
                       # Fully changing method
                       new_method = NULL, new_method_params = NULL,
                       # Sigmoidal - changing refuge length prop protect
@@ -987,8 +992,11 @@ newRefuge <- function(params,
         if (all(sapply(inputs, is.null))) {
             stop("Error: At least one input must be provided.")
         }
+        
+    # Save new refuge flag
+        params@other_params$new_refuge <- new_refuge
     
-      # object check ----  
+      # object check 
         # Check if given mizerParams object is valid
         assert_that(is(params, "MizerParams"))
         
@@ -996,7 +1004,7 @@ newRefuge <- function(params,
         refuge_params <- params@other_params[['refuge_params']]
         method_params <- params@other_params[['method_params']]
     
-    # method checks ----
+    # method checks 
         # Check if the user provided one of the available refuge profile methods
         m_opt <- c('sigmoidal','binned','competitive','noncomplex')
         if(is.null(new_method)) {
@@ -1010,7 +1018,7 @@ newRefuge <- function(params,
             stop("Method must be 'sigmoidal','binned', 'competitive', 'noncomplex'.")
         }
     
-    #  method_params checks ----
+    #  method_params checks 
         if (new_method != "noncomplex"){
             # check if method_params provided
             if (is.null(new_method_params)) {
@@ -1019,8 +1027,8 @@ newRefuge <- function(params,
                     stop("You must provide a new method_params data frame to
                          switch methods.") 
                 }
-                # Check method ----
-                ## Sigmoidal ----
+                # Check method 
+                ## Sigmoidal 
                 if (new_method == "sigmoidal") {
                     # Check if new L or new_prop given
                     if (all(is.null(new_L_refuge), is.null(new_prop_protect))){
@@ -1047,7 +1055,7 @@ newRefuge <- function(params,
                     new_mp$L_refuge <- new_L_refuge
                     new_mp$prop_protect <- new_prop_protect
                     
-                    ## Binned or Competitive ----
+                    ## Binned or Competitive 
                 } else if (new_method == "binned" || new_method == "competitive") {
                     # Find number of bins used in old method
                     no_bins <- length(method_params)
@@ -1078,7 +1086,7 @@ newRefuge <- function(params,
             } else { new_mp <- new_method_params }
         }
         
-    #### Update parameters ----
+    # Update parameters 
         # Store new parameters
         params <- setRefuge(params = params, 
                             method = new_method,
@@ -1098,27 +1106,25 @@ newRefuge <- function(params,
 
 #' Prepare a steady state model for projections with degradation
 #' 
-#' Stores degradation parameters in the other_params slot of the object
-#' and implements a carrying capacity for algae and detritus that is twice the
-#' current steady state biomass. See [algae_dynamics_cc()] and 
-#' [detritus_dynamics_cc()] for additional detail.
+#' This function stores degradation parameters in the other_params slot of 
+#' the params object.
 #' 
 #' @param params a mizer object
-#' 
-#' @param degrade   A boolean value indicating whether to implement 
-#'                  degradation. Defaults to true.                  
-#' 
-#' @param bleach_time   The year of the simulation to implement bleaching. 
-#'                      Defaults to year 2. 
 #' 
 #' @param trajectory    The trajectory for degraded reefs. Options are 
 #'                      "rubble", "algae", or "recovery"                 
 #'                      
 #' @param deg_scale     A 2 x 2 array (refuge size x years post bleaching) that
-#'                      gives the scalar values for scaling the degradation
-#'                      profile. Default scaling matrices for 15 years with
+#'                      gives the values for scaling the refuge density at each
+#'                      size bin. Default scaling matrices for 15 years with
 #'                      the "rubble", "algae", and "recovery" trajectories are 
 #'                      included as data objects in the package.
+#'                      
+#' @param degrade   A boolean value indicating whether to implement 
+#'                  degradation. Defaults to true.                  
+#' 
+#' @param bleach_time   The year of the simulation to implement bleaching. 
+#'                      Defaults to year 2. 
 #'                          
 #' @param ... Unused
 #'
@@ -1127,56 +1133,64 @@ newRefuge <- function(params,
 #' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
 #'          [tune_UR_cc()], [reefDegrade()]
 #' @export
-addDegrade <- function(params, degrade = TRUE, bleach_time = 2,
-                       trajectory, deg_scale){
+setDegradation <- function(params, trajectory, deg_scale,
+                           degrade = TRUE, 
+                           bleach_time = 2,...){
     
     # Add new parameters to params object
     params@other_params$degrade <- degrade
     params@other_params$bleach_time <- bleach_time 
     params@other_params$trajectory <- trajectory
-    params@other_params[['deg_scale']]<- deg_scale
+    params@other_params[['deg_scale']]<- as.matrix(deg_scale)
+    
+    # Save time parameters were modified
+    params@time_modified <- lubridate::now()
+    
+    return(params)
+}
+
+#' Switch to unstructured resource dynamics with carrying capacities
+#' 
+#' This function calculates new carrying capacities for algae and detritus
+#' resources and switches the resource dynamics from the standard linear
+#' dynamics to fluxes with a carrying capacity. The carrying capacity is set 
+#' at two times the current steady state biomass of the resource. 
+#' 
+#' See [algae_dynamics_cc()] and [detritus_dynamics_cc()] for additional detail.
+#' 
+#' @param params a \linkS4class{MizerParams} object
+#' @param cap   Value to scale the steady state biomass by. Defaults to 1.1,
+#'              setting the carrying capacity 10% higher than the current
+#'              standing biomass.
+#' @param ... Unused
+#'
+#' @return A mizer object with updated degradation parameters profiles
+#' @concept UResources
+#' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
+#'          [tune_UR_cc()]
+#' @export
+setURcapacity <- function(params, cap = 1.1, ...){
+    
+    # Change capacity boolean to true
+    params@other_params$carry_capacity <- TRUE
     
     # Calculate algae and detritus carrying capacities
-    # Steady state biomasses
-        ba <- algae_biomass(params)
-        new_a_carry <- 2*ba
-        bd <- detritus_biomass(params)
-        new_d_carry <- 2*bd
-        
-    # store old values
-        # Algae
-        rho_a <- params@other_params$algae$rho
-        a_growth <- params@other_params$algae$growth
-        
-        # Detritus
-        rho_d <- params@other_params$detritus$rho
-        sen.d <- params@other_params$detritus$sen_decomp
-        ext.d <- params@other_params$detritus$ext_decomp
-        d_ext <- params@other_params$detritus$external
-        
-    # Change to carrying capacity dynamics
-        ### Algae Component - Add in algae ----
-        params <- mizer::setComponent(
-            params, "algae", initial_value = ba,
-            dynamics_fun = "algae_dynamics_cc",
-            encounter_fun = "encounter_contribution",
-            component_params = list(rho = rho_a,
-                                    capacity = new_a_carry,
-                                    growth   = a_growth))
-        
-        ### Detritus component - Add in detritus ----
-        params <- mizer::setComponent(
-            params, "detritus", initial_value = bd,
-            dynamics_fun = "detritus_dynamics_cc",
-            encounter_fun = "encounter_contribution",
-            component_params = list(rho = rho_d,
-                                    sen_decomp = sen.d,
-                                    ext_decomp = ext.d,
-                                    capacity   = new_d_carry,
-                                    external   = d_ext)) 
-        
-        # Save time parameters were modified
-        params@time_modified <- lubridate::now()
-        
-        return(params)
+    # from steady state biomasses
+    # Algae
+    ba <- algae_biomass(params)
+    new_a_carry <- cap*ba
+    params@other_params$algae$capacity <- new_a_carry
+    # Detritus
+    bd <- detritus_biomass(params)
+    new_d_carry <- cap*bd
+    params@other_params$detritus$capacity <- new_a_carry
+    
+    # Switch to carrying capacity dynamics
+    params@other_dynamics$algae <- "algae_dynamics_cc"
+    params@other_dynamics$detritus <- "detritus_dynamics_cc"
+    
+    # Save time parameters were modified
+    params@time_modified <- lubridate::now()
+    
+    return(params)
 }
