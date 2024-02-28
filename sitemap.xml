@@ -10,9 +10,6 @@
     <loc>https://cmbeese.github.io/mizerReef/index.html</loc>
   </url>
   <url>
-    <loc>https://cmbeese.github.io/mizerReef/reference/addDegrade.html</loc>
-  </url>
-  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/algae_biomass.html</loc>
   </url>
   <url>
@@ -50,6 +47,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/constant_dynamics.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/constant_scale.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/detritus_biomass.html</loc>
@@ -229,6 +229,9 @@
     <loc>https://cmbeese.github.io/mizerReef/reference/scaleReefModel.html</loc>
   </url>
   <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/setDegradation.html</loc>
+  </url>
+  <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/setExtMortParams.html</loc>
   </url>
   <url>
@@ -236,6 +239,9 @@
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/setURParams.html</loc>
+  </url>
+  <url>
+    <loc>https://cmbeese.github.io/mizerReef/reference/setURcapacity.html</loc>
   </url>
   <url>
     <loc>https://cmbeese.github.io/mizerReef/reference/step_tune.html</loc>

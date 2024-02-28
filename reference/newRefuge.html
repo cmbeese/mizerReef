@@ -53,6 +53,7 @@ should run <code><a href="reefSteady.html">reefSteady()</a></code> after this fu
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">newRefuge</span><span class="op">(</span></span>
 <span>  <span class="va">params</span>,</span>
+<span>  new_refuge <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  new_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  new_method_params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  new_L_refuge <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -66,6 +67,13 @@ should run <code><a href="reefSteady.html">reefSteady()</a></code> after this fu
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>params</dt>
 <dd><p>a mizer object</p></dd>
+
+
+<dt>new_refuge</dt>
+<dd><p>A boolean value that states whether this new refuge
+profile is being used for simulation. Determines
+whether algae and detritus production and tuned when
+the model is run to steady state. Defaults to false.</p></dd>
 
 
 <dt>new_method</dt>
