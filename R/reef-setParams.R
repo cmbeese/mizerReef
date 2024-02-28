@@ -1165,7 +1165,7 @@ setDegradation <- function(params, trajectory, deg_scale,
 #' @param ... Unused
 #'
 #' @return A mizer object with updated degradation parameters profiles
-#' @concept UResources
+#' @concept Uresources 
 #' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
 #'          [tune_UR_cc()]
 #' @export

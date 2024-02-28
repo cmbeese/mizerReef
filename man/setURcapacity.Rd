@@ -31,4 +31,4 @@ See \code{\link[=algae_dynamics_cc]{algae_dynamics_cc()}} and \code{\link[=detri
 \code{\link[=algae_dynamics_cc]{algae_dynamics_cc()}},\code{\link[=detritus_dynamics_cc]{detritus_dynamics_cc()}},
 \code{\link[=tune_UR_cc]{tune_UR_cc()}}
 }
-\concept{UResources}
+\concept{Uresources}
