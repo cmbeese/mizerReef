@@ -17,6 +17,7 @@ plotBiomass(
   background = TRUE,
   highlight = NULL,
   return_data = FALSE,
+  min_length = NULL,
   ...
 )
 
@@ -30,6 +31,7 @@ plotlyBiomass(
   total = FALSE,
   background = TRUE,
   highlight = NULL,
+  min_length = NULL,
   ...
 )
 }
@@ -66,6 +68,9 @@ contain background species. Default is TRUE.}
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot
 itself. Default value is FALSE}
+
+\item{min_length}{minimum length of organism to include in biomass
+calculation}
 
 \item{...}{
   Arguments passed on to \code{\link[mizer:get_size_range_array]{mizer::get_size_range_array}}
