@@ -57,15 +57,14 @@ detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     kd <- params@other_params$detritus$capacity
     
     # If consumption is non-zero, return analytic solution
-    if (consumption > 0) {
+    if (consumption) {
         et <- exp(-dt/kd * (production + kd * consumption))
         frac <- (kd*production) / (production + kd * consumption)
         fracet <- frac *(1- et)
         return(n_other$detritus * et + fracet)
-    } else {
-        et <- exp(-dt/kd * (production))
-        return(n_other$detritus * et)
-    }
+    } 
+    et <- exp(-dt/kd * (production))
+    return(n_other$detritus * et)
 }
 
 #' Detritus dynamics
@@ -111,7 +110,7 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
     consumption <- detritus_consumption(params, n, rates)
     production <- sum(getDetritusProduction(params, n, rates))
 
-    if (consumption > 0) {
+    if (consumption) {
         et <- exp(-consumption * dt)
         return(n_other$detritus * et + production / consumption  * (1 - et))
     }

@@ -57,15 +57,14 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     ka <- params@other_params$algae$capacity
 
     # If consumption is non-zero, return analytic solution
-    if (consumption > 0) {
+    if (consumption) {
         et <- exp(-dt/ka * (production + ka * consumption))
         frac <- (ka*production) / (production + ka * consumption)
         fracet <- frac *(1- et)
         return(n_other$algae * et + fracet)
-    } else {
+    }
     et <- exp(-dt/ka * (production))
     return(n_other$algae * et)
-    }
 }
 
 
@@ -156,10 +155,8 @@ algae_consumption <- function(params,
                               n = params@initial_n,
                               rates = getRates(params)) {
 
-    feeding_level <- rates$feeding_level
-    feeding_level[is.na(feeding_level)] <- 0
-    sum((params@other_params$algae$rho * n * (1 - feeding_level))
-        %*% params@dw)
+    sum((params@other_params$algae$rho * n * 
+             (1 - rates$feeding_level)) %*% params@dw)
 }
 
 #' Get algae consumption rates
@@ -178,7 +175,6 @@ getAlgaeConsumption <- function(params) {
 
     # With feeding level
     feeding_level <- getFeedingLevel(params)
-    feeding_level[is.na(feeding_level)] <- 0
     consumption <- (params@other_params$algae$rho * params@initial_n *
                         (1 - feeding_level)) %*% params@dw
     # Fix names
