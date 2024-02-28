@@ -11,7 +11,7 @@ plotProductivity(
   end_time = NULL,
   facet = TRUE,
   species = NULL,
-  total = FALSE,
+  total = TRUE,
   min_fishing_l = NULL,
   max_fishing_l = NULL,
   return_data = FALSE,
@@ -40,7 +40,7 @@ vector indicating for each species whether it is to be
 selected (TRUE) or not.}
 
 \item{total}{A boolean value that determines whether the total productivity
-from all species is plotted as well. Default is FALSE.}
+from all species is plotted as well. Default is TRUE.}
 
 \item{min_fishing_l}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
 minimum length (cm) of fished individuals for

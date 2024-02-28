@@ -46,7 +46,7 @@ series.}
     \item{\code{facet}}{A boolean value indicating whether to facet the result plot
 by species group. Defaults to TRUE.}
     \item{\code{total}}{A boolean value that determines whether the total productivity
-from all species is plotted as well. Default is FALSE.}
+from all species is plotted as well. Default is TRUE.}
   }}
 }
 \description{

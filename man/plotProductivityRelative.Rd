@@ -70,7 +70,7 @@ series.}
     \item{\code{facet}}{A boolean value indicating whether to facet the result plot
 by species group. Defaults to TRUE.}
     \item{\code{total}}{A boolean value that determines whether the total productivity
-from all species is plotted as well. Default is FALSE.}
+from all species is plotted as well. Default is TRUE.}
     \item{\code{min_fishing_l}}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
 minimum length (cm) of fished individuals for
 productivity estimates. Defaults to 7 cm.}

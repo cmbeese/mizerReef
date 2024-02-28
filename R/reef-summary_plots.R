@@ -2,7 +2,7 @@ library(ggplot2)
 library(plotly)
 #library(dplyr)
 
-# Set global variables ----
+# Set global variables -
 # Variables used - ggplot2 - known bug
 # Hackiness to get past the 'no visible binding ... ' warning when running check
 utils::globalVariables(c("Species", "value", "Model", "Legend",
@@ -87,7 +87,7 @@ plotBiomass <- function(sim, species = NULL,
         }
     }
     
-    # User mizer function to create dataframe ----
+    # User mizer function to create dataframe -
     df <- mizer::plotBiomass(sim, species = species,
                              start_time = start_time, end_time = end_time,
                              y_ticks = y_ticks, ylim = ylim,
@@ -119,7 +119,7 @@ plotBiomass <- function(sim, species = NULL,
     names(bu) <- c("Year", "Biomass", "Species")
     bu$Legend <- bu$Species
     
-    # Return data ----
+    # Return data -
     plot_dat <- rbind(df, bu)
     if (return_data) return(plot_dat)
     
@@ -329,7 +329,7 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #'                  selected (TRUE) or not.
 #'                  
 #' @param total A boolean value that determines whether the total productivity
-#'              from all species is plotted as well. Default is FALSE.
+#'              from all species is plotted as well. Default is TRUE.
 #'              
 #' @param min_fishing_l parameters be passed to [getProductivity()]. The 
 #'                      minimum length (cm) of fished individuals for
@@ -361,24 +361,23 @@ plotlySpectraRelative <- function(object1, object2, diff_method,...) {
 #'          [plot2Productivity()], [plotProductivityRelative()]
 plotProductivity <- function(object, 
                              start_time = NULL, end_time = NULL,
-                             facet = TRUE, species = NULL, total = FALSE,
+                             facet = TRUE, species = NULL, total = TRUE,
                              min_fishing_l = NULL, max_fishing_l = NULL,
                              return_data = FALSE,...) {
     
     if (is(object, "MizerSim")) {
-        # sim values ----
+        # sim values 
         sim <- object
         params <- sim@params
         assert_that(is(sim, "MizerSim"),
                     is.flag(return_data))
         
-        species <- mizer::valid_species_arg(sim, species, 
-                                            error_on_empty = TRUE)
+        if (missing(species)) {species <- params@species_params$species}
         
-        if (missing(start_time)) start_time <- 
-            as.numeric(dimnames(sim@n)[[1]][1])
-        if (missing(end_time)) end_time <- 
-            as.numeric(dimnames(sim@n)[[1]][dim(sim@n)[1]])
+        if (missing(start_time)) {
+            start_time <- as.numeric(dimnames(sim@n)[[1]][1]) }
+        if (missing(end_time)) {
+            end_time <- as.numeric(dimnames(sim@n)[[1]][dim(sim@n)[1]]) }
         if (start_time >= end_time) {
             stop("start_time must be less than end_time")
         }
@@ -400,41 +399,40 @@ plotProductivity <- function(object,
         # desired order
         names(p) <- c("Year", "Species", "Productivity")
         
-        if (missing(species)) {species <- params@species_params$species}
-        
         # Select species
         plot_dat <- p[p$Species %in% c("Total", species), ]
         plot_dat$Legend <- plot_dat$Species
         
-        legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
+        legend_levels   <- intersect(names(params@linecolour),plot_dat$Species)
         plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
-        linecolour <- params@linecolour[legend_levels]
-        linetype <- params@linetype[legend_levels]
         
         if (return_data) return(plot_dat) 
         
-        p <- ggplot(plot_dat, aes(x = Species, y = Productivity,
+        p <- ggplot(plot_dat, aes(x = Year, y = Productivity,
                            group = Legend, colour = Legend,
                            linetype = Legend))
-        p <- p +
-            geom_line() +
-            scale_colour_manual(values = linecolour) +
-            scale_linetype_manual(values = linetype) +
-            labs(colour = "Species Group", x = "Species Group")
         
         if (facet == TRUE) { p + facet_wrap(~Legend, scales = "free_y") }
         
+        p <- p +
+            geom_line(linewidth = 0.8) +
+            scale_colour_manual(values = params@linecolour[legend_levels]) +
+            scale_linetype_manual(values = params@linetype[legend_levels]) +
+            labs(colour = "Species Group", 
+                 linetype = "Species Group",
+                 x = "Year")
+        
     } else if(is(object, "MizerParams")) {
-        # params ----
+        # params 
         params <- object
         assert_that(is(params, "MizerParams"),
                     is.flag(return_data))
     
-        ### values from object ----
+        ### values from object 
         sp <- params@species_params
         no_sp <- dim(params@interaction)[1]
         
-        ### group names ----
+        ### group names 
         if (is.null(params@species_params$group_names)){
             group_names <- params@species_params$species
             names(group_names) <- params@species_params$species
@@ -443,12 +441,12 @@ plotProductivity <- function(object,
             names(group_names) <- params@species_params$species
         }
         
-        ### get productivity ----
+        ### get productivity 
         prod <- getProductivity(params, 
                                 min_fishing_l = min_fishing_l,
                                 max_fishing_l = max_fishing_l)
         
-        ### species selector ----
+        ### species selector 
         sel_sp <- valid_species_arg(params, species, return.logical = TRUE,
                                     error_on_empty = TRUE)
         species <- dimnames(params@initial_n)$sp[sel_sp]
@@ -456,26 +454,25 @@ plotProductivity <- function(object,
         species <- species[!is.na(species)]
         sel_sp <- which(!is.na(species))
         prod <- prod[sel_sp, drop = FALSE]
-        group_names <- group_names[sel_sp]
         
-        ### data frame from selected species ----
+        ### data frame from selected species 
         plot_dat <- data.frame(value = prod, Species = species)
         
-        ### colors ----
+        ### colors 
         legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
         plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
         
-        ### return data if requested ----
+        ### return data if requested -
         if (return_data) return(plot_dat)
         
-        # plot ----
+        # plot -
         p <- ggplot(plot_dat, aes(x = Species, y = value,
                                   group = Legend, fill = Legend))
         
         p + geom_bar(stat = "identity", position = "dodge") +
             scale_y_continuous(name = expression(Productivity~"("*g/m^2/year*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
-                              labels = group_names) +
+                              labels = group_names[legend_levels]) +
             labs(fill = "Species Group", x = "Species Group")
         
     } else {
@@ -564,7 +561,7 @@ plot2Productivity <- function(object1, object2, species = NULL,
                               stack = FALSE,
                               return_data = FALSE, ...){
     
-    # get data frames with plotProductivity ----
+    # get data frames with plotProductivity -
     sf1 <- plotProductivity(object1, 
                             species = species,
                             drop = TRUE,
@@ -585,14 +582,14 @@ plot2Productivity <- function(object1, object2, species = NULL,
     # Make sure order of models isnt changed by names
     sf$Model <- factor(sf$Model, levels = c(name1, name2))
     
-    # if sim, get params ----
+    # if sim, get params -
     if (is(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
     }
     
-    # group names ----
+    # group names -
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
         names(group_names) <- params@species_params$species
@@ -601,10 +598,9 @@ plot2Productivity <- function(object1, object2, species = NULL,
         names(group_names) <- params@species_params$species
     }
     
-    # plot ----
+    # plot -
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     sf$Legend <- factor(sf$Species, levels = legend_levels)
-    group_names <- group_names[sf$Legend]
     
     # Return data frame if requested
     if(return_data == TRUE){return(sf)}
@@ -616,7 +612,7 @@ plot2Productivity <- function(object1, object2, species = NULL,
         p + geom_bar(stat = "identity", position = "dodge", color = "black") +
             scale_y_continuous(name = expression(Productivity~"("*g/m^2/year*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
-                              labels = group_names) +
+                              labels = group_names[legend_levels]) +
             scale_alpha_manual(values = c(0.5,1),
                                labels = c(name1, name2)) +
             labs(fill = "Species Group", x = "Species Group") 
@@ -725,7 +721,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
                                      max_fishing_l2 = NULL,
                                      return_data = FALSE, ...){
     
-    # get data frames with plotProductivity ----
+    # get data frames with plotProductivity -
     sf1 <- plotProductivity(object1, 
                             species = species,
                             min_fishing_l = min_fishing_l1,
@@ -750,17 +746,17 @@ plotProductivityRelative <- function(object1, object2, diff_method,
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
     }
     
-    # return data if requested ----
+    # return data if requested -
     if(return_data == TRUE){return(sf)}
     
-    # save 1 set for species names ----
+    # save 1 set for species names -
     if (is(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
     }
     
-    # group names ----
+    # group names -
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
         names(group_names) <- params@species_params$species
@@ -769,10 +765,9 @@ plotProductivityRelative <- function(object1, object2, diff_method,
         names(group_names) <- params@species_params$species
     }
 
-    # plot -----
+    # plot --
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     sf$Legend <- factor(sf$Species, levels = legend_levels)
-    group_names <- group_names[sf$Legend]
     
     p <- ggplot(sf, aes(x = Species, y = rel_diff,
                         fill = Legend))
@@ -780,7 +775,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     p + geom_bar(stat = "identity", position = "dodge", color = "black") +
         scale_y_continuous(name = yLabel) +
         scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names) +
+                          labels = group_names[legend_levels]) +
         labs(fill = "Species Group", x = "Species Group") +
         geom_hline(yintercept = 0, linetype = 1,
                    colour = "dark grey", linewidth = 0.9)
@@ -838,9 +833,9 @@ plotTotalAbundance <- function(object,
                                max_fishing_l = NULL,
                                return_data = FALSE, ...) {
     
-    # object checks ----
+    # object checks -
     if (is(object, "MizerSim")) {
-        ## sim values ----
+        ## sim values -
         # get total abundance at last timestep
         params <- object@params
         end_time  <- max(as.numeric(dimnames(object@n)$time))
@@ -853,7 +848,7 @@ plotTotalAbundance <- function(object,
         
     } else {
         
-    # params ----
+    # params -
     params <- object
     assert_that(is(params, "MizerParams"),
                     is.flag(return_data))
@@ -862,12 +857,12 @@ plotTotalAbundance <- function(object,
                        min_l = min_fishing_l,
                        max_l = max_fishing_l)
 
-    # create plot_dat ----
-    ## values from object ----
+    # create plot_dat -
+    ## values from object -
     sp <- params@species_params
     no_sp <- dim(params@interaction)[1]
     
-    ## group names ----
+    ## group names -
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
         names(group_names) <- params@species_params$species
@@ -876,7 +871,7 @@ plotTotalAbundance <- function(object,
         names(group_names) <- params@species_params$species
     }
     
-    ## species selector ----
+    ## species selector -
     sel_sp <- mizer::valid_species_arg(params, species, 
                                        return.logical = TRUE, 
                                        error_on_empty = TRUE)
@@ -884,26 +879,25 @@ plotTotalAbundance <- function(object,
     species <- species[!is.na(species)]
     sel_sp <- which(!is.na(species))
     abd <- abd[sel_sp, drop = FALSE]
-    group_names <- group_names[sel_sp]
     
-    ## data frame from selected species ----
+    ## data frame from selected species -
     plot_dat <- data.frame(value = abd, Species = species)
     
-    ## colors ----
+    ## colors -
     legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
     plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
     
-    ## return data if requested ----
+    ## return data if requested -
     if (return_data) return(plot_dat)
     
-    # plot ----
+    # plot -
     p <- ggplot(plot_dat, aes(x = Species, y = value,
                               group = Legend, fill = Legend))
     
     p + geom_bar(stat = "identity", position = "dodge") +
         scale_y_continuous(name = expression("Total Abundance (no./m^2)")) +
         scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names) +
+                          labels = group_names[legend_levels]) +
         labs(fill = "Species Group", x = "Species Group")
     }
 }
@@ -952,9 +946,9 @@ plotTotalBiomass <- function(object,
                              max_fishing_l = NULL,
                              return_data = FALSE, ...) {
     
-    # object checks ----
+    # object checks -
     if (is(object, "MizerSim")) {
-        ## sim values ----
+        ## sim values -
             # get total biomass at last timestep
         params <- object@params
         end_time  <- max(as.numeric(dimnames(object@n)$time))
@@ -966,7 +960,7 @@ plotTotalBiomass <- function(object,
         biom <- biom[end_time, ,drop = TRUE]
     } else {
         
-    # params ----
+    # params -
     params <- object
     assert_that(is(params, "MizerParams"),
                 is.flag(return_data))
@@ -976,12 +970,12 @@ plotTotalBiomass <- function(object,
                               max_l = max_fishing_l)
     }
         
-    # create plot_dat ----
-    ## values from object ----
+    # create plot_dat -
+    ## values from object -
     sp <- params@species_params
     no_sp <- dim(params@interaction)[1]
     
-    ## group names ----
+    ## group names -
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
         names(group_names) <- params@species_params$species
@@ -990,7 +984,7 @@ plotTotalBiomass <- function(object,
         names(group_names) <- params@species_params$species
     }
     
-    ## species selector ----
+    ## species selector -
     sel_sp <- mizer::valid_species_arg(params, species, 
                                        return.logical = TRUE, 
                                        error_on_empty = TRUE)
@@ -999,17 +993,17 @@ plotTotalBiomass <- function(object,
     sel_sp <- which(!is.na(species))
     biom <- biom[sel_sp, drop = FALSE]
     
-    ## data frame from selected species ----
+    ## data frame from selected species -
     plot_dat <- data.frame(value = biom, Species = species)
     
-    ## colors ----
+    ## colors -
     legend_levels   <- intersect(names(params@linecolour), plot_dat$Species)
     plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
     
-    ## return data if requested ----
+    ## return data if requested -
     if (return_data){ return(plot_dat) }
     
-    # plot ----
+    # plot -
     p <- ggplot(plot_dat, aes(x = Species, y = value,
                               group = Legend, fill = Legend))
     
@@ -1062,7 +1056,7 @@ plot2TotalBiomass <- function(object1, object2,
                               stack = FALSE,
                               return_data = FALSE, ...){
     
-    # get data frames with plotTotalBiomass ----
+    # get data frames with plotTotalBiomass -
     sf1 <- plotTotalBiomass(object1, 
                             species = species,
                             min_fishing_l = min_fishing_l1,
@@ -1081,14 +1075,14 @@ plot2TotalBiomass <- function(object1, object2,
     # Make sure model names dont change order
     sf$Model <- factor(sf$Model, levels = c(name1, name2))
     
-    # if sim, get params ----
+    # if sim, get params -
     if (is(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
     }
     
-    # group names ----
+    # group names -
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
         names(group_names) <- params@species_params$species
@@ -1097,10 +1091,9 @@ plot2TotalBiomass <- function(object1, object2,
         names(group_names) <- params@species_params$species
     }
     
-    # plot ----
+    # plot -
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     sf$Legend <- factor(sf$Species, levels = legend_levels)
-    group_names <- group_names[sf$Legend]
     
     # Return data frame if requested
     if(return_data == TRUE){return(sf)}
@@ -1125,7 +1118,7 @@ plot2TotalBiomass <- function(object1, object2,
         p + geom_bar(stat = "identity", position = "stack", color = "black") +
             scale_y_continuous(name = expression("Total Biomass"~"("*g/m^2*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
-                              labels = group_names) +
+                              labels = group_names[legend_levels]) +
             scale_alpha_manual(values = c(0.5,1),
                                    labels = c(name1, name2)) +
             labs(fill = "Species Group", x = "Model")
@@ -1189,7 +1182,7 @@ plotTotalBiomassRelative <- function(object1, object2,
                                      max_fishing_l2 = NULL,
                                      return_data = FALSE, ...){
     
-    # get data frames with plotTotalBiomass ----
+    # get data frames with plotTotalBiomass -
     sf1 <- plotTotalBiomass(object1, 
                             species = species,
                             min_fishing_l = min_fishing_l1,
@@ -1221,14 +1214,14 @@ plotTotalBiomassRelative <- function(object1, object2,
     # Return data frame if requested
     if(return_data == TRUE){return(sf)}
     
-    # if sim, get params ----
+    # if sim, get params -
     if (is(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
     }
     
-    # group names ----
+    # group names -
     if (is.null(params@species_params$group_names)){
         group_names <- params@species_params$species
         names(group_names) <- params@species_params$species
@@ -1237,17 +1230,16 @@ plotTotalBiomassRelative <- function(object1, object2,
         names(group_names) <- params@species_params$species
     }
     
-    # plot ----
+    # plot -
     legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
     sf$Legend <- factor(sf$Species, levels = legend_levels)
-    group_names <- group_names[sf$Legend]
     
     p <- ggplot(sf, aes(x = Species, y = rel_diff, fill = Legend))
     
     p + geom_bar(stat = "identity", position = "dodge", color = "black") +
         scale_y_continuous(name = yLabel) +
         scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names) +
+                          labels = group_names[legend_levels]) +
         labs(fill = "Species Group", x = "Species Group") + 
         geom_hline(yintercept = 0, linetype = 1,
                    colour = "dark grey", linewidth = 0.9)
@@ -1326,6 +1318,15 @@ plotRelativeContribution <- function(object,
         assert_that(is(params, "MizerParams"))
     }
     
+    # group names -
+    if (is.null(params@species_params$group_names)){
+        group_names <- params@species_params$species
+        names(group_names) <- params@species_params$species
+    } else {
+        group_names <- params@species_params$group_names
+        names(group_names) <- params@species_params$species
+    }
+    
     # Remove invertebrates
     abd  <- subset(abd,  Species != 'inverts')
     biom <- subset(biom, Species != 'inverts')
@@ -1340,17 +1341,20 @@ plotRelativeContribution <- function(object,
 
     # Legend       
     legend_levels <- intersect(names(params@linecolour), unique(rel$Legend))
-    rel$Legend  <- factor(rel$Species, levels = legend_levels) 
+    rel$Legend  <- factor(rel$Species, levels = legend_levels)
+    rel$Metric <- factor(rel$Metric, levels = c("Abundance",
+                                                "Biomass",
+                                                "Productivity"))
     
     # Return data if requested
     if(return_data == TRUE){ return(rel) }
 
     # Plot
-    p <- ggplot(rel, aes(x = Metric, y = rel, fill = Legend))
+    p <- ggplot(rel, aes(x = rel, y = Metric, fill = Legend))
     
-    p + geom_bar(stat = "identity", position = "fill", color = "black") +
-        scale_fill_manual(values = params@linecolour[legend_levels]) +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-        labs(y = "Relative Contribution", x = "Metric", fill = "")
+    p + geom_bar(stat = "identity", position = "fill") +
+        scale_fill_manual(values = params@linecolour[legend_levels],
+                          labels = group_names[legend_levels]) +
+        labs(x = "Relative Contribution", y = "Metric", fill = "")
     
 }
