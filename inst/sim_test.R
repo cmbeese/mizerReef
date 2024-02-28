@@ -12,10 +12,11 @@ params <- karpata_model
 
 # Normal
 sim1 <- project(params, tmax = 10) # works fine
-b <- plotBiomass(sim1, start_time = 1, end_time = 10, 
+b <- plotBiomass(sim1, start_time = 1, end_time = 10, total = TRUE, 
                  return_data = TRUE)
 p <- plotProductivity(sim1, start_time = 1, end_time = 10, 
                       return_data = TRUE) # also works
+df <- mizer::plotBiomass(sim1,total = TRUE, return_data = TRUE)
 
 # Add carrying capacity
 params2 <- setURcapacity(params)

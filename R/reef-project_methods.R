@@ -140,13 +140,14 @@ reefRates <- function(params, n, n_pp, n_other,
 #' @concept degradation
 #' @export
 #' @family mizer rate functions
-# Account for species that don't utilize refuge
-reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
+# Check with Gustav about hard coding dt, see if its stored anywhere or can
+# be use in rate functions
+reefDegrade <- function(params, n, n_pp, n_other, t, dt = 0.1, ...) {
     
     method_params <- params@other_params[['method_params']]
     refuge_params <- params@other_params[['refuge_params']]
     degrade <- params@other_params$degrade
-    
+        
     if (degrade == TRUE){
         # If not competitive method, error
         if (refuge_params$method != "competitive"){
@@ -244,7 +245,7 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
 #' @concept refugeRates
 #' @family mizer rate functions
 #' 
-reefVulnerable <- function(params, n, n_pp, n_other, t = 0,...) {
+reefVulnerable <- function(params, n, n_pp, n_other, t,...) {
     
     # Extract relevant data from params
     refuge_params <- params@other_params[['refuge_params']]
@@ -653,7 +654,7 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 #'          mortality rates.
 #' @concept extmort
 #' @export
-reefSenMort <- function(params, n, n_pp, n_other, t = 0, ...) {
+reefSenMort <- function(params, n, n_pp, n_other, t, ...) {
 
     # Pull values from params for use later
     no_sp <- dim(params@interaction)[1]

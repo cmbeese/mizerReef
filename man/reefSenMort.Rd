@@ -4,7 +4,7 @@
 \alias{reefSenMort}
 \title{Expanding external mortality rate to include senescence}
 \usage{
-reefSenMort(params, n, n_pp, n_other, t = 0, ...)
+reefSenMort(params, n, n_pp, n_other, t, ...)
 }
 \arguments{
 \item{params}{A MizerParams object}

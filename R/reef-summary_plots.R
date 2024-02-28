@@ -74,6 +74,7 @@ plotBiomass <- function(sim, species = NULL,
                         ...) {
     
     params <- sim@params
+    
     # If there are no unstructured components then call the mizer function
     if (is.null(getComponent(params, "algae"))) {
         if (is.null(getComponent(params, "detritus"))) {
@@ -81,7 +82,8 @@ plotBiomass <- function(sim, species = NULL,
                                       start_time = start_time, 
                                       end_time = end_time,
                                       y_ticks = y_ticks, ylim = ylim,
-                                      total = total, background = background,
+                                      total = total, 
+                                      background = background,
                                       highlight = highlight,
                                       return_data = return_data, ...))
         }
@@ -89,13 +91,17 @@ plotBiomass <- function(sim, species = NULL,
     
     # User mizer function to create dataframe -
     df <- mizer::plotBiomass(sim, species = species,
-                             start_time = start_time, end_time = end_time,
-                             y_ticks = y_ticks, ylim = ylim,
-                             total = total, background = background,
+                             start_time = start_time, 
+                             end_time = end_time,
+                             y_ticks = y_ticks, 
+                             ylim = ylim,
+                             total = total, 
+                             background = background,
                              highlight = highlight,
                              return_data = TRUE, ...)
     
     species <- valid_species_arg(sim, species)
+    
     if (missing(start_time)) start_time <-
         as.numeric(dimnames(sim@n)[[1]][1])
     if (missing(end_time)) end_time <-
@@ -111,7 +117,9 @@ plotBiomass <- function(sim, species = NULL,
     times <- as.numeric(dimnames(bu)[[1]])
     bu <- bu[(times >= start_time) & (times <= end_time), , drop = FALSE]
     bu <- reshape2::melt(bu)
-    # Implement ylim and a minimal cutoff and bring columns in desired order
+    
+    # Implement ylim and a minimal cutoff and bring columns 
+    # in desired order
     min_value <- 1e-20
     bu <- bu[bu$value >= min_value &
                  (is.na(ylim[1]) | bu$value >= ylim[1]) &
