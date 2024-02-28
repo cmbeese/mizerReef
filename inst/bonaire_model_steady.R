@@ -182,6 +182,11 @@ tuning_profile  <- tuning_profile # 60% refuge for all size classes
     bonaire_model <- reefSteady(params)
 
 # Save in package --------------------------------------------------------------
+    # 
+    # bonaire_model <- bonaire_model
+    # bonaire_model@other_params$degrade <- FALSE
+    # bonaire_model@other_params$new_refuge <- FALSE
+    
     # Params object
     save(bonaire_model,   file = "data/bonaire_model.rda")
     

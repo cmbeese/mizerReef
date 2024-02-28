@@ -181,6 +181,10 @@ karpata_int <- karpata_int
 # save(test_sp, file = "data/test_sp.rda")
 # save(test_i,  file = "data/test_i.rda")
 
+# karpata_model <- karpata_model
+# karpata_model@other_params$degrade <- FALSE
+# karpata_model@other_params$new_refuge <- FALSE
+
 # Params object
 save(karpata_model,   file = "data/karpata_model.rda")
 
