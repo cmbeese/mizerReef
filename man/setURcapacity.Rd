@@ -4,7 +4,7 @@
 \alias{setURcapacity}
 \title{Switch to unstructured resource dynamics with carrying capacities}
 \usage{
-setURcapacity(params, cap = 1.1, ...)
+setURcapacity(params, cap = 1.5, ...)
 }
 \arguments{
 \item{params}{a \linkS4class{MizerParams} object}

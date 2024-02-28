@@ -1169,7 +1169,7 @@ setDegradation <- function(params, trajectory, deg_scale,
 #' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
 #'          [tune_UR_cc()]
 #' @export
-setURcapacity <- function(params, cap = 1.1, ...){
+setURcapacity <- function(params, cap = 1.5, ...){
     
     # Change capacity boolean to true
     params@other_params$carry_capacity <- TRUE
