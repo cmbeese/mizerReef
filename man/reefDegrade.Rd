@@ -2,8 +2,7 @@
 % Please edit documentation in R/reef-project_methods.R
 \name{reefDegrade}
 \alias{reefDegrade}
-\title{Degrade coral reef habitat structure by decreasing the
-availability of refuge}
+\title{Scales the refuge density by a given value at set times}
 \usage{
 reefDegrade(params, n, n_pp, n_other, t, ...)
 }
@@ -27,8 +26,8 @@ parameters.)}
 A new methods parameters data frame scaled by bleaching
 }
 \description{
-Degrade coral reef habitat structure by decreasing the
-availability of refuge
+Allows for the degradation of coral reef habitat structure following an
+acute disturbance by decreasing the availability of refuge over time.
 }
 \seealso{
 Other mizer rate functions: 

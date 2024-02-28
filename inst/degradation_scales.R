@@ -17,3 +17,7 @@ recovery_scale <- read.csv(here("inst/recovery.csv"), header = FALSE)
 recovery_scale <- as.matrix(recovery_scale)
 
 save(recovery_scale,   file = "data/recovery_scale.rda")
+
+# No degradation - for testing
+constant_scale <- matrix(1, nrow = nrow(algae_scale), ncol = ncol(algae_scale))
+save(constant_scale,   file = "data/constant_scale.rda")

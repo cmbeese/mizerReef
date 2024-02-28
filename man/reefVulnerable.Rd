@@ -5,15 +5,7 @@
 \title{Find the proportion of fish vulnerable to being encountered by predators
 at each time step}
 \usage{
-reefVulnerable(
-  params,
-  n,
-  n_pp,
-  n_other,
-  t = 0,
-  mp = reefDegrade(params, n, n_pp, n_other, t),
-  ...
-)
+reefVulnerable(params, n, n_pp, n_other, t = 0, ...)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}
@@ -28,8 +20,6 @@ ecosystem}
 \item{t}{The time for which to do the calculation (Not used by standard
 mizer rate functions but useful for extensions with time-dependent
 parameters.)}
-
-\item{mp}{The degraded refuge densities from \code{\link[=reefDegrade]{reefDegrade()}}}
 
 \item{...}{Unused}
 }
