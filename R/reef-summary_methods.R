@@ -119,7 +119,7 @@ getProductivity <- function(object,
             # species which makes using drop impossible
             n <- array(sim@n[x, , ], dim = dim(sim@n)[2:3])
             dimnames(n) <- dimnames(sim@n)[2:3]
-            energy <- array(e_time[,,x], dim = dim(e_time)[2:3])
+            energy <- array(e_time[x,,], dim = dim(e_time)[2:3])
             dimnames(energy) <- dimnames(e_time)[2:3]
             prod <- ((energy * n * size_range) %*% params@dw)[,, drop = TRUE]
             return(prod)

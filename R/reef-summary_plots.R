@@ -47,6 +47,9 @@ utils::globalVariables(c("Species", "value", "Model", "Legend",
 #'                      contain background species. Default is TRUE.
 #' @param highlight Name or vector of names of the species to be highlighted.
 #' 
+#' @param min_length minimum length of organism to include in biomass
+#'                   calculation
+#' 
 #' @param return_data   A boolean value that determines whether the formatted 
 #'                      data used for the plot is returned instead of the plot 
 #'                      itself. Default value is FALSE
@@ -71,6 +74,7 @@ plotBiomass <- function(sim, species = NULL,
                         y_ticks = 6, ylim = c(NA, NA),
                         total = FALSE, background = TRUE,
                         highlight = NULL, return_data = FALSE,
+                        min_length = NULL,
                         ...) {
     
     params <- sim@params
@@ -85,7 +89,8 @@ plotBiomass <- function(sim, species = NULL,
                                       total = total, 
                                       background = background,
                                       highlight = highlight,
-                                      return_data = return_data, ...))
+                                      return_data = return_data,
+                                      min_l = min_length, ...))
         }
     }
     
@@ -98,7 +103,8 @@ plotBiomass <- function(sim, species = NULL,
                              total = total, 
                              background = background,
                              highlight = highlight,
-                             return_data = TRUE, ...)
+                             return_data = TRUE, 
+                             min_l = min_length, ...)
     
     species <- valid_species_arg(sim, species)
     
@@ -151,6 +157,7 @@ plotlyBiomass <- function(sim,
                           total = FALSE,
                           background = TRUE,
                           highlight = NULL,
+                          min_length = NULL,
                           ...) {
     argg <- c(as.list(environment()), list(...))
     ggplotly(do.call("plotBiomass", argg),
