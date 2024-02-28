@@ -11,6 +11,7 @@ newReefParams(
   min_w_pp = NA,
   w_pp_cutoff = 1,
   n = 0.75,
+  new_refuge = FALSE,
   method,
   method_params,
   refuge_user = NULL,
@@ -21,6 +22,10 @@ newReefParams(
   w_settle = NULL,
   max_protect = NULL,
   tau = NULL,
+  degrade = FALSE,
+  bleach_time = 2,
+  trajectory = NULL,
+  deg_scale = 1,
   UR_interaction,
   carry_capacity = FALSE,
   initial_algae_growth = NULL,
@@ -93,6 +98,21 @@ grams.}
 
 \item{tau}{Optional. The proportion of fish with access to refuge that
 actually use it. Defaults to 1.}
+
+\item{degrade}{A boolean value indicating whether to implement
+degradation. Defaults to true.}
+
+\item{bleach_time}{The year of the simulation to implement bleaching.
+Defaults to year 2.}
+
+\item{trajectory}{The trajectory for degraded reefs. Options are
+"rubble", "algae", or "recovery"}
+
+\item{deg_scale}{A 2 x 2 array (refuge size x years post bleaching) that
+gives the values for scaling the refuge density at each
+size bin. Default scaling matrices for 15 years with
+the "rubble", "algae", and "recovery" trajectories are
+included as data objects in the package.}
 
 \item{UR_interaction}{Interaction matrix for unstructured resources
 (species x resource)}

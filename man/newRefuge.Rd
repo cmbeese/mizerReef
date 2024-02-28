@@ -6,6 +6,7 @@
 \usage{
 newRefuge(
   params,
+  new_refuge = FALSE,
   new_method = NULL,
   new_method_params = NULL,
   new_L_refuge = NULL,
@@ -16,6 +17,11 @@ newRefuge(
 }
 \arguments{
 \item{params}{a mizer object}
+
+\item{new_refuge}{A boolean value that states whether this new refuge
+profile is being used for simulation. Determines
+whether algae and detritus production and tuned when
+the model is run to steady state. Defaults to false.}
 
 \item{new_method}{The new method to be used for setting the refuge
 profile. Options are "sigmoidal", "binned",

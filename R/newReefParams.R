@@ -11,6 +11,8 @@
 #' @inheritParams setURParams
 #' @inheritParams setExtMortParams
 #' @inheritParams setRefuge
+#' @inheritParams setDegradation
+#' 
 #' @param group_params  A functional group parameter data frame containing at
 #'                      least the name of each functional group, their
 #'                      observed abundances, and the cut-off size for 
@@ -48,15 +50,16 @@ newReefParams <- function(# Original mizer parameters
                             min_w_pp = NA, w_pp_cutoff = 1, 
                             n = 0.75,
                           # Parameters for setting up refuge
+                            new_refuge = FALSE,
                             method, method_params, 
                             refuge_user = NULL, bad_pred = NULL, 
                             satiation = NULL,
                             a_bar = NULL, b_bar = NULL,
                             w_settle = NULL, max_protect = NULL, 
                             tau = NULL,
-                          # # Parameters for setting up degradation
-                          #   bleach_time = NULL,
-                          #   degrade = FALSE,
+                          # Parameters for setting up degradation
+                            degrade = FALSE, bleach_time = 2,
+                            trajectory = NULL, deg_scale = 1,
                           # Parameters for unstructured resources
                             UR_interaction,
                             carry_capacity = FALSE,
@@ -87,6 +90,7 @@ newReefParams <- function(# Original mizer parameters
     
     # Add parameters ----
     ### Refuge ----
+    params@other_params$new_refuge <- FALSE
     params <- setRefuge(params = params, method = method, 
                         method_params = method_params,
                         refuge_user = refuge_user, 
@@ -156,6 +160,7 @@ newReefParams <- function(# Original mizer parameters
             dynamics_fun = "algae_dynamics",
             encounter_fun = "encounter_contribution",
             component_params = list(rho = rho_alg,
+                                    capacity = params@other_params$algae_capacity,
                                     growth = params@other_params$initial_algae_growth))
         
         ### Detritus component - Add in detritus ----
@@ -164,6 +169,7 @@ newReefParams <- function(# Original mizer parameters
             dynamics_fun = "detritus_dynamics",
             encounter_fun = "encounter_contribution",
             component_params = list(rho = rho_det,
+                                    capacity   = params@other_params$detritus_capacity,
                                     sen_decomp = params@other_params$sen_decomp,
                                     ext_decomp = params@other_params$ext_decomp,
                                     external   = params@other_params$initial_d_external))
