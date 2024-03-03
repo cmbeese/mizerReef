@@ -65,6 +65,7 @@ calculated within user defined size limits (min_w, max_w, min_l, max_l, see
 <span>  background <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  return_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  min_length <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -78,6 +79,7 @@ calculated within user defined size limits (min_w, max_w, min_l, max_l, see
 <span>  total <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  background <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  min_length <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -135,6 +137,11 @@ contain background species. Default is TRUE.</p></dd>
 <dd><p>A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot
 itself. Default value is FALSE</p></dd>
+
+
+<dt>min_length</dt>
+<dd><p>minimum length of organism to include in biomass
+calculation</p></dd>
 
 
 <dt>...</dt>

@@ -45,14 +45,7 @@ the params object.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">setDegradation</span><span class="op">(</span></span>
-<span>  <span class="va">params</span>,</span>
-<span>  <span class="va">trajectory</span>,</span>
-<span>  <span class="va">deg_scale</span>,</span>
-<span>  degrade <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  bleach_time <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">setDegradation</span><span class="op">(</span><span class="va">params</span>, <span class="va">trajectory</span>, <span class="va">deg_scale</span>, bleach_time <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -72,11 +65,6 @@ gives the values for scaling the refuge density at each
 size bin. Default scaling matrices for 15 years with
 the "rubble", "algae", and "recovery" trajectories are
 included as data objects in the package.</p></dd>
-
-
-<dt>degrade</dt>
-<dd><p>A boolean value indicating whether to implement
-degradation. Defaults to true.</p></dd>
 
 
 <dt>bleach_time</dt>

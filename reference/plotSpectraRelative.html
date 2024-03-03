@@ -54,6 +54,7 @@ calculated. Let the spectra of the two objects be represented as
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotSpectraRelative</span><span class="op">(</span></span>
 <span>  <span class="va">object1</span>,</span>
 <span>  <span class="va">object2</span>,</span>
+<span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">power</span>,</span>
 <span>  diff_method <span class="op">=</span> <span class="st">"percent_change"</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -70,6 +71,14 @@ calculated. Let the spectra of the two objects be represented as
 
 <dt>object2</dt>
 <dd><p>An object of class MizerSim or MizerParams</p></dd>
+
+
+<dt>species</dt>
+<dd><p>The species to be selected. Optional. By default all
+species are selected. A vector of species names, or a
+numeric vector with the species indices, or a logical
+vector indicating for each species whether it is to be
+selected (TRUE) or not.</p></dd>
 
 
 <dt>power</dt>
