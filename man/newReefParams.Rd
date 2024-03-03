@@ -99,9 +99,6 @@ grams.}
 \item{tau}{Optional. The proportion of fish with access to refuge that
 actually use it. Defaults to 1.}
 
-\item{degrade}{A boolean value indicating whether to implement
-degradation. Defaults to true.}
-
 \item{bleach_time}{The year of the simulation to implement bleaching.
 Defaults to year 2.}
 

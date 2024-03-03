@@ -248,6 +248,11 @@ plotSpectra2 <- function(object1, object2,
 #' 
 #' @param object1 An object of class MizerSim or MizerParams
 #' @param object2 An object of class MizerSim or MizerParams
+#' @param species   The species to be selected. Optional. By default all
+#'                  species are selected. A vector of species names, or a 
+#'                  numeric vector with the species indices, or a logical 
+#'                  vector indicating for each species whether it is to be 
+#'                  selected (TRUE) or not.
 #' @param diff_method   The method to calculate the relative change between 
 #'                      models. If `percent.change`, the percent change is 
 #'                      calculated relative to the value from object 1 with 
@@ -262,13 +267,15 @@ plotSpectra2 <- function(object1, object2,
 #' @family plotting functions
 #' @return A ggplot2 object
 #' @export
-plotSpectraRelative <- function(object1, object2,
+plotSpectraRelative <- function(object1, object2, species = NULL,
                                 power,
                                 diff_method = "percent_change", ...) {
     
     sf1 <- mizer::plotSpectra(object1, power = power,
+                              species = species,
                               return_data = TRUE, ...)
     sf2 <- mizer::plotSpectra(object2, power = power,
+                              species = species,
                               return_data = TRUE, ...)
     
     # Calculate relative difference
@@ -278,7 +285,8 @@ plotSpectraRelative <- function(object1, object2,
         yLabel <- "% Change in Biomass"
     } else if (diff_method == "rel_diff"){
         sf <-   dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
-                dplyr::mutate(rel_diff = ((value.y - value.x) / (value.x + value.y)))
+                dplyr::mutate(rel_diff = 
+                                  ((value.y - value.x) / (value.x + value.y)))
         yLabel <- "Relative Difference in Biomass"
     } else {
         stop("diff_method should be either 'percent_change' or 'rel_diff'.")
@@ -288,6 +296,18 @@ plotSpectraRelative <- function(object1, object2,
         params <- object1@params
     } else {
         params <- object1
+    }
+    
+    min_size <- min(sf$w)
+    max_size <- max(sf$w)
+    
+    # group names -
+    if (is.null(params@species_params$group_names)){
+        group_names <- params@species_params$species
+        names(group_names) <- params@species_params$species
+    } else {
+        group_names <- params@species_params$group_names
+        names(group_names) <- params@species_params$species
     }
     
     # Ensures that and species stay in the order we expect regardless of
@@ -302,8 +322,9 @@ plotSpectraRelative <- function(object1, object2,
     ggplot(sf, aes(x = w, y = rel_diff, colour = Legend)) +
         geom_line(linewidth = 0.95) +
         labs(x = "Weight [g]", y = yLabel) +
-        scale_x_log10() +
-        scale_color_manual(values = linecolours) +
+        scale_x_log10(limits = c(min_size, max_size)) +
+        scale_color_manual(values = linecolours,
+                           labels = group_names[legend_levels]) +
         geom_hline(yintercept = 0, linetype = 1,
                    colour = "dark grey", linewidth = 1)
 }
@@ -417,7 +438,6 @@ plotProductivity <- function(object,
         # Select species
         plot_dat <- p[p$Species %in% c("Total", species), ]
         plot_dat$Legend <- plot_dat$Species
-        
         legend_levels   <- intersect(names(params@linecolour),plot_dat$Species)
         plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
         
@@ -640,7 +660,7 @@ plot2Productivity <- function(object1, object2, species = NULL,
         p + geom_bar(stat = "identity", position = "stack", color = "black") +
             scale_y_continuous(name = expression(Productivity~"("*g/m^2/year*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
-                              labels = group_names) +
+                              labels = group_names[legend_levels]) +
             scale_alpha_manual(values = c(0.5,1),
                                labels = c(name1, name2)) +
             labs(fill = "Species Group", x = "Model")
@@ -829,6 +849,12 @@ plotlyProductivityRelative <- function(object1, object2,
 #'                      data used for the plot is returned instead of the plot 
 #'                      itself. Default value is FALSE.
 #'                      
+#' @param stack     A boolean value that determines whether bars are separated
+#'                  by species. Defaults to FALSE. If true, returns a stacked
+#'                  barplot with the total biomass for each group instead of
+#'                  individual bars for each group. Useful for comparison
+#'                  between steady states. 
+#'                      
 #' @param ... unused
 #'
 #' @return A ggplot2 object
@@ -842,7 +868,7 @@ plotlyProductivityRelative <- function(object1, object2,
 #'          [plotTotalBiomassRelative()],
 #'          [plotProductivity()], 
 #'          [plot2Productivity()], [plotProductivityRelative()]
-plotTotalAbundance <- function(object,
+plotTotalAbundance <- function(object,  stack = FALSE,
                                species = NULL,
                                min_fishing_l = NULL, 
                                max_fishing_l = NULL,
@@ -871,6 +897,8 @@ plotTotalAbundance <- function(object,
     abd <- mizer::getN(params,
                        min_l = min_fishing_l,
                        max_l = max_fishing_l)
+    
+    }
 
     # create plot_dat -
     ## values from object -
@@ -891,8 +919,6 @@ plotTotalAbundance <- function(object,
                                        return.logical = TRUE, 
                                        error_on_empty = TRUE)
     species <- dimnames(params@initial_n)$sp[sel_sp]
-    species <- species[!is.na(species)]
-    sel_sp <- which(!is.na(species))
     abd <- abd[sel_sp, drop = FALSE]
     
     ## data frame from selected species -
@@ -903,17 +929,24 @@ plotTotalAbundance <- function(object,
     plot_dat$Legend <- factor(plot_dat$Species, levels = legend_levels)
     
     ## return data if requested -
-    if (return_data) return(plot_dat)
+    if (return_data) { return(plot_dat) }
     
-    # plot -
-    p <- ggplot(plot_dat, aes(x = Species, y = value,
-                              group = Legend, fill = Legend))
-    
-    p + geom_bar(stat = "identity", position = "dodge") +
-        scale_y_continuous(name = expression("Total Abundance (no./m^2)")) +
-        scale_fill_manual(values = params@linecolour[legend_levels],
-                          labels = group_names[legend_levels]) +
-        labs(fill = "Species Group", x = "Species Group")
+    if (stack == FALSE){
+        p <- ggplot(plot_dat, aes(x = Species, y = value, fill = Legend))
+        
+        p + geom_bar(stat = "identity", position = "dodge") +
+            scale_y_continuous(name = expression("Total Abundance (no./m^2)")) +
+            scale_fill_manual(values = params@linecolour[legend_levels],
+                              labels = group_names[legend_levels]) 
+        
+    } else if (stack == TRUE){
+        
+        p <- ggplot(plot_dat, aes(x = Species, y = value, fill = Legend))
+        
+        p + geom_bar(stat = "identity", position = "stack") +
+            scale_y_continuous(name = expression("Total Abundance (no./m^2)")) +
+            scale_fill_manual(values = params@linecolour[legend_levels],
+                              labels = group_names[legend_levels])
     }
 }
 
@@ -1120,7 +1153,7 @@ plot2TotalBiomass <- function(object1, object2,
         p + geom_bar(stat = "identity", position = "dodge", color = "black") +
             scale_y_continuous(name = expression("Total Biomass"~"("*g/m^2*")")) +
             scale_fill_manual(values = params@linecolour[legend_levels],
-                              labels = group_names) +
+                              labels = group_names[legend_levels]) +
             scale_alpha_manual(values = c(0.5,1),
                                labels = c(name1, name2)) +
             labs(fill = "Species Group", x = "Species Group") 
@@ -1321,7 +1354,7 @@ plotRelativeContribution <- function(object,
                              return_data = TRUE, ...)
     biom$Metric <- "Biomass"
     
-    prod <- plotProductivity(object, 
+    prod <- plotProductivity(object,
                              min_fishing_l = min_fishing_l,
                              return_data = TRUE, ...)
     prod$Metric <- "Productivity"

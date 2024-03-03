@@ -52,15 +52,19 @@ reefRates <- function(params, n, n_pp, n_other,
                       t = 0, effort, rates_fns, ...) {
     r <- list()
     
+    dt <- params@other_params$dt
     ## Degradation -----
     # Implement degradation in projections
     r$degrade <- reefDegrade(
-        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+        params, n = n, n_pp = n_pp, n_other = n_other, t = t,
+        old_rd = reefDegrade(params, n, n_pp, n_other,
+                             t = t, dt = dt), ...)
     
     ## Vulnerability ----
     # Calculate vulnerability of fish based on complexity
     r$vulnerable <- reefVulnerable(
-        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+        params, n = n, n_pp = n_pp, n_other = n_other, t = t, 
+        new_rd = r$degrade, ...)
     
     ## Growth ----
     # Calculate rate E_{e,i}(w) of encountered food
@@ -142,11 +146,15 @@ reefRates <- function(params, n, n_pp, n_other,
 #' @family mizer rate functions
 # Check with Gustav about hard coding dt, see if its stored anywhere or can
 # be use in rate functions
-reefDegrade <- function(params, n, n_pp, n_other, t, dt = 0.1, ...) {
+reefDegrade <- function(params, n, n_pp, n_other, t,...) {
     
     method_params <- params@other_params[['method_params']]
     refuge_params <- params@other_params[['refuge_params']]
     degrade <- params@other_params$degrade
+    
+    # Save original refuge density
+    rd <- method_params$refuge_density
+    
         
     if (degrade == TRUE){
         # If not competitive method, error
@@ -154,27 +162,20 @@ reefDegrade <- function(params, n, n_pp, n_other, t, dt = 0.1, ...) {
             stop("Degradation is only available for the competitive
                  method.")
         }
-        
+    
         # Pull time for bleaching & scaling parameters
-        bleach_time <- params@other_params$bleach_time
+        t_bleach    <- params@other_params$t_bleach
         trajectory  <- params@other_params$trajectory
         deg_scale   <- params@other_params[['deg_scale']]
-    
-        # Initialize new method params
-        new_mp <- method_params
-        
-        # Convert bleaching time to time steps
-        t_bleach <- bleach_time/dt
-        
-        # Find maximum time & convert to time step
-        max_t_bleach <- dim(deg_scale)[2] + bleach_time
-        max_t_bleach <- max_t_bleach/dt
         
         # If before bleaching, return old method parameters
-        if(t < t_bleach | t > max_t_bleach) {}
+        time <- t
+        if(time < t_bleach) {return(rd)}
+        
+        old_rd <- reefDegrade(params, n, n_pp, n_other, t = t-1)
         
         # Bleaching time - at bleach year
-        if(t == t_bleach) {
+        if(time == t_bleach) {
             # Set bleach time scale factors
             sev_bleach  <- c(0.1, 0.1, rep(0.9, 8))
             mild_bleach <- c(0.3, 0.7, rep(0.9, 8))
@@ -184,49 +185,61 @@ reefDegrade <- function(params, n, n_pp, n_other, t, dt = 0.1, ...) {
             
             # Scale refuge
             if(trajectory %in% sev_traj) {
-                new_mp$refuge_density <-  sev_bleach*new_mp$refuge_density
+                new_rd <-  sev_bleach * old_rd
             }
             if(trajectory %in% mild_traj){
-                new_mp$refuge_density <-  mild_bleach*new_mp$refuge_density
+                new_rd <-  mild_bleach * old_rd
             }
-            return(new_mp)
             
-            # Algal dynamics
+            # # Algal dynamics
             if (trajectory == "algae"){
                 a_growth <- params@other_params$algae$growth
-                a_carry <- params@other_params$algae$carry
-                params@other_params$algae$growth <- 1.11*a_growth
-                params@other_params$algae$carry  <- 2*a_carry
+                a_capacity <- params@other_params$algae$capacity
+                new_a_growth <- 1.11*a_growth
+                new_a_capacity <- 2*a_capacity
+                params@other_params$algae$growth <- 1.11*new_a_growth
+                params@other_params$algae$capacity <- new_a_capacity
             }
+            if(trajectory == "rubble"){
+                a_capacity <- params@other_params$algae$carry
+                new_a_capacity <- 1.5*a_capacity
+                params@other_params$algae$capacity <- new_a_capacity
+            }
+
+            # Save new method_params in parameter spot so that scaling
+            # occurs on new values next time step
+            params@time_modified <- lubridate::now()
+
+            return(new_rd)
         }
         
-        if(t > t_bleach){
+        if(time > t_bleach){
             # Calculate number of years post bleaching
-            years_post <- dt*(t - t_bleach)
-            # Get refuge density scaling from deg_scale
-            # if in bleaching time range, otherwise scale by 1
-            scale_bin <- ifelse(t < max_t_bleach, deg_scale[,years_post], 1)
-            # multiply bins by scaling values
-            new_mp$refuge_density <- scale_bin * new_mp$refuge_density
-            # Increase algae growth and capacity if algae method
-            # and in first three years following bleaching
-            if (trajectory == "algae"){
-                if (years_post %in% (1:3)) {
-                    a_growth <- params@other_params$algae$growth
-                    new_a_growth <- 1.11*a_growth
-                    params@other_params$algae$growth <- new_a_growth
-                }}}
+            years_post <- time - t_bleach
             
-            # Save new method_params in parameter spot
-            params@other_params[['method_params']] <- new_mp
-            params@time_modified <- lubridate::now()
-            
-        return(params)
+            if(years_post %in% 1:dim(deg_scale)[2]) {
+                # Get refuge density scaling from deg_scale
+                # if in bleaching time range, otherwise scale by 1
+                scale_bin <- deg_scale[,years_post]
+                # multiply bins by scaling values
+                new_rd <- scale_bin * old_rd
+                # Increase algae growth and capacity if algae method
+                # and in first three years following bleaching
+                if (trajectory == "algae"){
+                    if (years_post %in% (1:3)) {
+                        a_growth <- params@other_params$algae$growth
+                        new_a_growth <- 1.11*a_growth
+                        params@other_params$algae$growth <- new_a_growth
+                    }
+                }
+                return(new_rd)
+            }
+            return(old_rd)
+        }
     } else {
-        return(params)
+        return(rd)
     }
 }
-
 
 #' Find the proportion of fish vulnerable to being encountered by predators 
 #' at each time step
@@ -245,12 +258,14 @@ reefDegrade <- function(params, n, n_pp, n_other, t, dt = 0.1, ...) {
 #' @concept refugeRates
 #' @family mizer rate functions
 #' 
-reefVulnerable <- function(params, n, n_pp, n_other, t,...) {
+reefVulnerable <- function(params, n, n_pp, n_other, t,
+    new_rd = reefDegrade(params,  n, n_pp, n_other, t,...)) {
     
     # Extract relevant data from params
     refuge_params <- params@other_params[['refuge_params']]
     method_params <- params@other_params[['method_params']]
-    # method_params <- mp
+    
+    method_params$refuge_density <- new_rd
     
     # Set parameters used with all methods
     w_settle    <- refuge_params$w_settle
@@ -276,7 +291,7 @@ reefVulnerable <- function(params, n, n_pp, n_other, t,...) {
     } else if (refuge_params$method == "competitive") {
         
         # Initialize empty list to hold number of competitors for each bin
-        competitor_density = numeric(nrow(method_params))
+        competitor_density = numeric(length(method_params$refuge_density))
         
         # Initialize storage for the array of refuge proportions
         refuge <- matrix(0, nrow = no_sp, ncol = no_w)
@@ -383,9 +398,9 @@ reefVulnerable <- function(params, n, n_pp, n_other, t,...) {
 #' @export
 #' @concept refugeRates
 #' @family mizer rate functions
-reefEncounter <- function(params, n, n_pp, n_other, t, 
-                          vulnerable = reefVulnerable(params, 
-                                                      n, n_pp, n_other, t),...) {
+reefEncounter <- function(params, n, n_pp, n_other, t,
+                vulnerable = reefVulnerable(params, n, n_pp, n_other, t,
+                    new_rd = reefDegrade(params, n, n_pp, n_other, t)),...) {
 
     # Pull values from params
     no_sp <- dim(params@interaction)[1]
@@ -531,15 +546,15 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 #' @family mizer rate functions
 #' @concept extmort
 #' @export
-reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,
-                             vulnerable = reefVulnerable(params, 
-                                                         n, n_pp, n_other, t),
-                             ...) {
+reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,...) {
+    
     # Set predator max intake to Inf
     params@intake_max[params@species_params$satiation == FALSE] <- Inf
     
     # Find mizer feeding level and set to 0 for any NAs (if use wants to set h)
     fl <- mizerFeedingLevel(params, n, n_pp, n_other, t, encounter, ...)
+    
+    fl[is.na(fl)] <- 0
     
     return(fl)
 }
@@ -567,8 +582,8 @@ reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,
 #' @concept refugeRates
 #' @export
 reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
-                         vulnerable = reefVulnerable(params, n, n_pp,
-                                                     n_other, t), ...) {
+            vulnerable = reefVulnerable(params, n, n_pp, n_other, t,
+            new_rd = reefDegrade(params, n, n_pp, n_other, t)),...) {
     
     # Number of species, number of bins in resource spectrum and full
     # size spectrum

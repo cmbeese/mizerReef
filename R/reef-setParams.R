@@ -1120,9 +1120,6 @@ newRefuge <- function(params, new_refuge = FALSE,
 #'                      the "rubble", "algae", and "recovery" trajectories are 
 #'                      included as data objects in the package.
 #'                      
-#' @param degrade   A boolean value indicating whether to implement 
-#'                  degradation. Defaults to true.                  
-#' 
 #' @param bleach_time   The year of the simulation to implement bleaching. 
 #'                      Defaults to year 2. 
 #'                          
@@ -1134,14 +1131,14 @@ newRefuge <- function(params, new_refuge = FALSE,
 #'          [tune_UR_cc()], [reefDegrade()]
 #' @export
 setDegradation <- function(params, trajectory, deg_scale,
-                           degrade = TRUE, 
                            bleach_time = 2,...){
     
     # Add new parameters to params object
-    params@other_params$degrade <- degrade
-    params@other_params$bleach_time <- bleach_time 
-    params@other_params$trajectory <- trajectory
-    params@other_params[['deg_scale']]<- as.matrix(deg_scale)
+    params@other_params$degrade        <- TRUE
+    # Convert bleaching year to bleaching time step
+    params@other_params$t_bleach       <- bleach_time 
+    params@other_params$trajectory     <- trajectory
+    params@other_params[['deg_scale']] <- as.matrix(deg_scale)
     
     # Save time parameters were modified
     params@time_modified <- lubridate::now()
@@ -1183,7 +1180,7 @@ setURcapacity <- function(params, cap = 1.5, ...){
     # Detritus
     bd <- detritus_biomass(params)
     new_d_carry <- cap*bd
-    params@other_params$detritus$capacity <- new_a_carry
+    params@other_params$detritus$capacity <- new_d_carry
     
     # Switch to carrying capacity dynamics
     params@other_dynamics$algae <- "algae_dynamics_cc"

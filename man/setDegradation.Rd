@@ -4,14 +4,7 @@
 \alias{setDegradation}
 \title{Prepare a steady state model for projections with degradation}
 \usage{
-setDegradation(
-  params,
-  trajectory,
-  deg_scale,
-  degrade = TRUE,
-  bleach_time = 2,
-  ...
-)
+setDegradation(params, trajectory, deg_scale, bleach_time = 2, ...)
 }
 \arguments{
 \item{params}{a mizer object}
@@ -24,9 +17,6 @@ gives the values for scaling the refuge density at each
 size bin. Default scaling matrices for 15 years with
 the "rubble", "algae", and "recovery" trajectories are
 included as data objects in the package.}
-
-\item{degrade}{A boolean value indicating whether to implement
-degradation. Defaults to true.}
 
 \item{bleach_time}{The year of the simulation to implement bleaching.
 Defaults to year 2.}

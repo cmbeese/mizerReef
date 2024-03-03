@@ -11,7 +11,8 @@ reefPredMort(
   n_other,
   t,
   pred_rate,
-  vulnerable = reefVulnerable(params, n, n_pp, n_other, t),
+  vulnerable = reefVulnerable(params, n, n_pp, n_other, t, new_rd = reefDegrade(params,
+    n, n_pp, n_other, t)),
   ...
 )
 }

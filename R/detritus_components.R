@@ -56,6 +56,11 @@ detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     production <- sum(getDetritusProduction(params))
     kd <- params@other_params$detritus$capacity
     
+    if(is.nan(consumption)){ 
+        warning("The detritus consumption function is producing NaNs.")
+    }
+    
+    
     # If consumption is non-zero, return analytic solution
     if (consumption) {
         et <- exp(-dt/kd * (production + kd * consumption))
@@ -109,7 +114,11 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
 
     consumption <- detritus_consumption(params, n, rates)
     production <- sum(getDetritusProduction(params, n, rates))
-
+    
+    if(is.nan(consumption)){ 
+        warning("The detritus consumption function is producing NaNs.")
+    }
+    
     if (consumption) {
         et <- exp(-consumption * dt)
         return(n_other$detritus * et + production / consumption  * (1 - et))

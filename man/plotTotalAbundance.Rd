@@ -6,6 +6,7 @@
 \usage{
 plotTotalAbundance(
   object,
+  stack = FALSE,
   species = NULL,
   min_fishing_l = NULL,
   max_fishing_l = NULL,
@@ -15,6 +16,12 @@ plotTotalAbundance(
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerParams}}
+
+\item{stack}{A boolean value that determines whether bars are separated
+by species. Defaults to FALSE. If true, returns a stacked
+barplot with the total biomass for each group instead of
+individual bars for each group. Useful for comparison
+between steady states.}
 
 \item{species}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a

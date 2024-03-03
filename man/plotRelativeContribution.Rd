@@ -39,6 +39,11 @@ vector indicating for each species whether it is to be
 selected (TRUE) or not.}
     \item{\code{max_fishing_l}}{The maximum length (cm) of for biomass estimates.
 Defaults to max length.}
+    \item{\code{stack}}{A boolean value that determines whether bars are separated
+by species. Defaults to FALSE. If true, returns a stacked
+barplot with the total biomass for each group instead of
+individual bars for each group. Useful for comparison
+between steady states.}
     \item{\code{start_time}}{The first time to be plotted. Default is the beginning
 of the time series.}
     \item{\code{end_time}}{The last time to be plotted. Default is the end of the time

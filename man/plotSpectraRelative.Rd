@@ -8,6 +8,7 @@
 plotSpectraRelative(
   object1,
   object2,
+  species = NULL,
   power,
   diff_method = "percent_change",
   ...
@@ -19,6 +20,12 @@ plotlySpectraRelative(object1, object2, diff_method, ...)
 \item{object1}{An object of class MizerSim or MizerParams}
 
 \item{object2}{An object of class MizerSim or MizerParams}
+
+\item{species}{The species to be selected. Optional. By default all
+species are selected. A vector of species names, or a
+numeric vector with the species indices, or a logical
+vector indicating for each species whether it is to be
+selected (TRUE) or not.}
 
 \item{power}{The abundance is plotted as the number density times the weight
 raised to this power. The default power = 1 gives the biomass density,

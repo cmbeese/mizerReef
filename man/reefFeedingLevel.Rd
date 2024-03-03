@@ -4,16 +4,7 @@
 \alias{reefFeedingLevel}
 \title{Reef feeding level}
 \usage{
-reefFeedingLevel(
-  params,
-  n,
-  n_pp,
-  n_other,
-  t,
-  encounter,
-  vulnerable = reefVulnerable(params, n, n_pp, n_other, t),
-  ...
-)
+reefFeedingLevel(params, n, n_pp, n_other, t, encounter, ...)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}
@@ -31,9 +22,6 @@ parameters.)}
 
 \item{encounter}{A two dimensional array (predator species x predator size)
 with the encounter rate.}
-
-\item{vulnerable}{A two dimensional array (prey species x prey size) with
-the proportion of prey vulnerable to being encountered.}
 
 \item{...}{Unused}
 }

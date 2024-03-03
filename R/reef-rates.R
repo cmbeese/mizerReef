@@ -17,6 +17,90 @@
 #' @param drop  If `TRUE` then any dimension of length 1 will be removed
 #'              from the returned array.
 #'
+#' @return  If a `MizerParams` object is passed in, the function returns a
+#'          2 dimensional array (refuge size bin x refuge density) with the 
+#'          new refuge densities for each size bin
+#'          
+#'          If a `MizerSim` object is passed in, the function returns a three
+#'          dimensional array (time step x refuge size bin x refuge density) 
+#'          with the refuge density calculated at every time step in the 
+#'          simulation. If \code{drop = TRUE} then the dimension of length 1 
+#'          will be removed from the returned array.
+#' 
+#' @export
+#' @concept degradation
+#' @family rate functions
+getDegrade <- function(object, n, n_pp, n_other,
+                       time_range, drop = TRUE, ...) {
+    
+    if (is(object, "MizerParams")) {
+        # params -----
+        params <- mizer::validParams(object)
+        if (missing(time_range)) time_range <- 0
+        t <- min(time_range)
+        if (missing(n)) n <- params@initial_n
+        if (missing(n_pp)) n_pp <- params@initial_n_pp
+        if (missing(n_other)) n_other <- params@initial_n_other
+        
+        dt <- params@other_params$dt
+        method_params <- params@other_params$method_params
+        old_rd <- method_params$refuge_density
+        
+        # calculate vulnerability
+        degrade <- reefDegrade(params, n = n, n_pp = n_pp,
+                               n_other = n_other, t = t)
+
+        return(degrade)
+        
+    } else {
+        # sim ----
+        sim <- object
+        if (missing(time_range)) {
+            time_range <- dimnames(sim@n)$time
+        }
+        par <- sim@params
+        dt <- par@other_params$dt
+        time_elements <- mizer::get_time_elements(sim, time_range)
+        deg_time <- plyr::aaply(which(time_elements), 1, function(x) {
+            # Necessary as we only want single time step but may only have 1
+            # species which makes using drop impossible
+            n <- array(sim@n[x, , ], dim = dim(sim@n)[2:3])
+            dimnames(n) <- dimnames(sim@n)[2:3]
+            n_other <- sim@n_other[x, ]
+            names(n_other) <- dimnames(sim@n_other)$component
+            t <- as.numeric(dimnames(sim@n)$time[[x]])
+            deg <- getDegrade(sim@params, n = n, n_pp = n_pp,
+                              n_other = n_other, time_range = t)
+            return(deg)
+        }, .drop = FALSE)
+        # Before we drop dimensions we want to set the time dimname
+        names(dimnames(deg_time))[[1]] <- "time"
+        degrade <- deg_time[, , , drop = drop]
+        return(degrade)
+    }
+}
+
+
+
+#' Get vulnerability level at in time range t
+#'
+#' Returns the proportion of fish at size \eqn{w} that are not hidden in
+#' predation refuge and thus vulnerable to being encountered by predators.
+#' 
+#' This function uses [reefVulnerable()] to calculate the vulnerability to 
+#' predation.
+#' 
+#' @inherit reefVulnerable
+#' 
+#' @param object A `MizerParams` object or a `MizerSim` object
+#' 
+#' @inheritParams reefRates
+#' 
+#' @inheritParams mizer::get_time_elements
+#' 
+#' @param drop  If `TRUE` then any dimension of length 1 will be removed
+#'              from the returned array.
+#'
 #' @return  If a `MizerParams` object is passed in, the function returns a two
 #'          dimensional array (prey species x prey size) based on the
 #'          abundances also passed in.
@@ -34,25 +118,33 @@ getVulnerable <- function(object, n, n_pp, n_other,
                           time_range, drop = TRUE, ...) {
     
     if (is(object, "MizerParams")) {
-        # if params -----
+        # params -----
         params <- mizer::validParams(object)
         if (missing(time_range)) time_range <- 0
         t <- min(time_range)
         if (missing(n)) n <- params@initial_n
         if (missing(n_pp)) n_pp <- params@initial_n_pp
         if (missing(n_other)) n_other <- params@initial_n_other
+        
+        dt <- params@other_params$dt
+        new_rd <- getDegrade(params, n = n, n_pp = n_pp,
+                             n_other = n_other, time_range = t)
+
         # calculate vulnerability
         vulnerable <- reefVulnerable(params, n = n, n_pp = n_pp, 
-                                     n_other = n_other, t = t)
+                                     n_other = n_other, t = t, 
+                                     new_rd = new_rd)
         dimnames(vulnerable) <- dimnames(params@metab)
         return(vulnerable)
         
     } else {
-        # if object ----
+        # sim ----
         sim <- object
         if (missing(time_range)) {
             time_range <- dimnames(sim@n)$time
         }
+        par <- sim@params
+        dt <- par@other_params$dt
         time_elements <- mizer::get_time_elements(sim, time_range)
         vul_time <- plyr::aaply(which(time_elements), 1, function(x) {
             # Necessary as we only want single time step but may only have 1
@@ -62,10 +154,14 @@ getVulnerable <- function(object, n, n_pp, n_other,
             n_other <- sim@n_other[x, ]
             names(n_other) <- dimnames(sim@n_other)$component
             t <- as.numeric(dimnames(sim@n)$time[[x]])
+            new_rd <- getDegrade(sim@params, n = n, 
+                                 n_pp = sim@n_pp[x, ],
+                                 n_other = n_other, time_range = t)
             vul <- getVulnerable(sim@params, n = n,
                                  n_pp = sim@n_pp[x, ],
                                  n_other = n_other,
-                                 time_range = t)
+                                 time_range = t,
+                                 new_rd = new_rd)
             return(vul)
         }, .drop = FALSE)
         # Before we drop dimensions we want to set the time dimname

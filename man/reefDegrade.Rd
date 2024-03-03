@@ -4,7 +4,7 @@
 \alias{reefDegrade}
 \title{Scales the refuge density by a given value at set times}
 \usage{
-reefDegrade(params, n, n_pp, n_other, t, dt = 0.1, ...)
+reefDegrade(params, n, n_pp, n_other, t, ...)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}

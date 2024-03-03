@@ -55,6 +55,10 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     consumption <- algae_consumption(params, n, rates)
     production <- sum(getAlgaeProduction(params))
     ka <- params@other_params$algae$capacity
+    
+    if(is.nan(consumption)){ 
+        warning("The algae consumption function is producing NaNs.")
+        }
 
     # If consumption is non-zero, return analytic solution
     if (consumption) {
@@ -108,7 +112,12 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
 
     consumption <- algae_consumption(params, n, rates)
-    production  <- sum(getAlgaeProduction(params))
+    production  <- sum(getAlgaeProduction(params))    
+    
+    if(is.nan(consumption)){ 
+        warning("The algae consumption function is producing NaNs.")
+    }
+    
 
     # If consumption is non-zero, return analytic solution
     if (consumption) {
@@ -155,8 +164,7 @@ algae_consumption <- function(params,
                               n = params@initial_n,
                               rates = getRates(params)) {
 
-    sum((params@other_params$algae$rho * n * 
-             (1 - rates$feeding_level)) %*% params@dw)
+    sum((params@other_params$algae$rho * n) %*% params@dw)
 }
 
 #' Get algae consumption rates
