@@ -2,7 +2,7 @@
 #'
 #' @section Adding unstructured resources:
 #'
-#'      mizerReef supports two resource spectra that are not size- structured.
+#'      mizerReef supports two resource spectra that are not size-structured.
 #'      Algae are consumed by herbivorous fish, while detritus is consumed by
 #'      herbivorous fish and benthic invertebrates. This function sets the 
 #'      interaction matrix for these resources as well as any default
@@ -10,56 +10,32 @@
 #'
 #'      The resource interaction matrix \eqn{\theta_{ki}} modifies the
 #'      interaction of each functional group \eqn{i} with each unstructured
-#'      resource \eqn{k} in the model. This can be used for example to allow 
+#'      resource \eqn{k} in the model. This can be used, for example, to allow 
 #'      for different diet preferences on each unstructured resource. 
-#'      
-#'      Note that interaction with size structured resources, such as
+#'      Note that interaction with size-structured resources, such as
 #'      plankton, is still set with the resource_interaction column of
 #'      the species parameters dataframe.
-#'      
+#'
+#'      Note: Some values (such as `initial_algae_growth` and `initial_d_external`)
+#'      are reset by [reefSteady()] to ensure steady state abundances match
+#'      observed or target values.
+#'
 #' @inheritSection getDetritusConsumption Detritus consumption
 #' @inheritSection getDetritusProduction Detritus production
 #' @inheritSection algae_consumption Algae consumption
 #'
-#' @param params MizerParams object
-#' @param UR_interaction Interaction matrix for unstructured resources
-#'                       (species x resource)
+#' @param params A `MizerParams` object.
+#' @param UR_interaction A matrix or data.frame (species x resource) giving the interaction strengths with algae and detritus. Columns must be named 'algae' and 'detritus'. Default is NULL (will use columns in `species_params` if present).
+#' @param initial_algae_growth Numeric. The initial growth rate of algae in grams/m^2/year. This value is reset by [reefSteady()]. Default is NULL.
+#' @param carry_capacity Logical. Whether to implement a carrying capacity for unstructured resources. Default is FALSE.
+#' @param algae_capacity Numeric. Carrying capacity for algae biomass in grams per year. Default is NULL.
+#' @param detritus_capacity Numeric. Carrying capacity for detritus biomass in grams per year. Default is NULL.
+#' @param sen_decomp Numeric. Proportion of decomposing mass from senescence mortality that becomes detritus. Default is NULL (typically 0.8).
+#' @param ext_decomp Numeric. Proportion of decomposing mass from external mortality that becomes detritus. Default is NULL (typically 0.2).
+#' @param initial_d_external Numeric. Rate at which detritus biomass sinks from the pelagic zone (grams per year). This value is reset by [reefSteady()]. Default is NULL.
 #'
-#' @param initial_algae_growth  The initial growth rate of algae in 
-#'                              grams/m^2/year. This value is reset to match
-#'                              consumption in the [reefSteady()]  function 
-#'                              so that steady state abundances match given 
-#'                              values.
-#'                              
-#' @param carry_capacity A boolean value that indicates whether the user wants
-#'                      to implement a carrying capacity for unstructured 
-#'                      resources. Default is FALSE
-#'                              
-#' @param algae_capacity    The carrying capacity of the system for algae
-#'                          biomass in grams per year.
-#'                          
-#' @param detritus_capacity The carrying capacity of the system for 
-#'                          detritus biomass in grams per year.          
-#'                      
-#' @param sen_decomp    The proportion of decomposing mass from senescence
-#'                      mortality that decomposes to become part of the 
-#'                      detritus pool. Defaults to 0.8.
-#'                      
-#' @param ext_decomp    The proportion of decomposing mass from external
-#'                      mortality that decomposes to  become part of the 
-#'                      detritus pool. Defaults to 0.2.
-#'                      
-#' @param initial_d_external    The rate at which detritus biomass sinks from 
-#'                              the pelagic zone and becomes part of the 
-#'                              detritus pool in grams per year. This value is 
-#'                              reset to make up any differences in consumption 
-#'                              and production in the [reefSteady()] function 
-#'                              so that steady state abundances match observed 
-#'                              values.
-#'
-#' @return `setURParams` MizerParams object with updated unstructured
-#'                       resource parameters
-#' @concept Uresources 
+#' @return A `MizerParams` object with updated unstructured resource parameters.
+#' @concept Uresources
 #' @export
 setURParams <- function(params,
                         # Preference for resource
@@ -269,7 +245,7 @@ setURParams <- function(params,
 #' @param params MizerParams object
 #'
 #' Optional parameters:
-#' @param ext_mort_params Named list containing desired mortality parameters
+#' @param ext_mort_params A named list or matrix with columns/names 'nat_mort', 'sen_prop', and 'sen_curve'. If NULL, defaults are used: nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3.
 #' @return MizerParams object with updated mortality parameters
 #' @concept extmort
 #' @export
@@ -450,44 +426,15 @@ setExtMortParams <- function(params,
 #' @param method    The desired method for setting up benthic refuge, can be 
 #'                  "sigmoidal", "binned", "competitive", or "noncomplex"
 #'                  
-#' @param method_params     A data frame containing values specific to each
-#'                          method for calculating refuge
-#'                          
-#' @param refuge_user   A vector of logical values indicating whether 
-#'                      each functional group uses refuge, TRUE indicates the 
-#'                      group uses refuge while false indicates that they do 
-#'                      not. Must be included here if not in the 
-#'                      `params@species_params` data frame.
-#'                      
-#' @param bad_pred  Optional. A vector of logical values indicating whether 
-#'                  hunting is inhibited by refuge for this functional group. 
-#'                  FALSE indicates that this species is able to encounter prey 
-#'                  within refuge (e.g. eels). Must be included here if not in 
-#'                  the `params@species_params` data frame.
-#'                  
-#' @param satiation Optional. A vector of logical values indicating whether 
-#'                  feeding level should be turned on for this functional group.
-#'                  Must be included here if not in the 
-#'                  `params@species_params` data frame.
-#'
-#' @param w_settle  Optional. The body weight (g) at which fish settle onto the 
-#'                  reef. Fish smaller than this are considered to be larval 
-#'                  and thus too small to use predation refuge. Defaults to 0.l 
-#'                  grams.
-#'                  
-#' @param max_protect   Optional. The maximum proportion of fish 
-#'                      (any size class) protected by refuge. Defaults to 0.98.
-#'                      
-#' @param tau   Optional. The proportion of fish with access to refuge that 
-#'              actually use it. Defaults to 1.
-#'              
-#' @param a_bar Optional. The average length to weight conversion value 
-#'              \eqn{\bar{a}} and \eqn{\bar{b}} describe the fish dummies used 
-#'              when counting refuge holes. \eqn{\bar{a}} defaults to 0.025.
-#'              
-#' @param b_bar Optional. The average length to weight conversion value 
-#'              \eqn{\bar{a}} and \eqn{\bar{b}} describe the fish dummies used 
-#'              when counting refuge holes. \eqn{\bar{b}} defaults to 3.
+#' @param method_params     A data frame or list specifying parameters required for the chosen method. For 'sigmoidal', must include 'L_refuge' and 'prop_protect'. For 'binned' and 'competitive', must include 'start_L', 'end_L', and 'prop_protect' (or 'refuge_density' for competitive).
+#' @param refuge_user   Logical vector (length = number of species). Indicates which groups use refuge. If not present in species_params, must be provided. Defaults to NULL.
+#' @param bad_pred  Logical vector (length = number of species). Indicates which groups are poor predators. If not present in species_params, must be provided. Defaults to NULL.
+#' @param satiation Logical vector (length = number of species). Indicates which groups are subject to satiation. If not present in species_params, must be provided. Defaults to NULL.
+#' @param a_bar Numeric. Length-weight conversion parameter. Default is 0.025. Used for dummy fish calculations.
+#' @param b_bar Numeric. Length-weight exponent. Default is 3. Used for dummy fish calculations.
+#' @param w_settle Numeric. Minimum weight of fish protected by refuges at measured scale. Default is 0.1 (grams).
+#' @param max_protect Numeric. Maximum proportion of fish protected by refuge. Must be between 0 and 1. Default is 0.98.
+#' @param tau Numeric. Proportion of fish with access to refuge that are expected to utilize it. Must be between 0 and 1. Default is 1.
 #' @param ... unused
 #'
 #' @return  A MizerParams object with updated refuge parameters
@@ -959,19 +906,15 @@ getRefuge <- function(params, ...) {
 #'                      provided, this defaults to the same method as is
 #'                      currently being used in the simulation. 
 #'                  
-#' @param new_method_params  A data frame containing values specific to each
-#'                          method for calculating refuge. Only necessary if 
-#'                          changing methods. 
+#' @param new_method_params  A data frame or list specifying parameters required for the chosen method. For 'sigmoidal', must include 'L_refuge' and 'prop_protect'. For 'binned' and 'competitive', must include 'start_L', 'end_L', and 'prop_protect' (or 'refuge_density' for competitive). Only necessary if changing methods.
+#' @param scale_bin To be used with the "binned" or "competitive" method only. A number or vector (length = number of bins) to multiply the `prop_protect` (binned) or `refuge_density` (competitive) values for each size bin. Changes the proportion of fish protected. If a single value is given, it is applied to all bins.
+#' @details At least one of the arguments new_method, new_method_params, new_L_refuge, new_prop_protect, or scale_bin must be provided. For 'binned' and 'competitive' methods, scale_bin must be a value or vector matching the number of bins.
 #'                          
 #' @param new_L_refuge  To be used with "sigmoidal" method only. The new value
 #'                      for the length at which refuge becomes scarce in cm.
 #'                      
 #' @param new_prop_protect  To be used with "sigmoidal" method only. The new 
 #'                          value for the maximum proportion of fish to protect.
-#'                          
-#' @param scale_bin To be use with the "binned" method only. A number or vector 
-#'                  of numbers to multiply the `prop_protect` values by for 
-#'                  each size bin. Changes the proportion of fish protected.
 #'                          
 #' @param ... Unused
 #'
@@ -988,7 +931,7 @@ newRefuge <- function(params, new_refuge = FALSE,
     
     # Check that the user provided at least one new input
         inputs <- list(new_method, new_method_params, 
-                       new_L_refuge, new_prop_protect,scale_bin)
+                       new_L_refuge, new_prop_protect, scale_bin)
         if (all(sapply(inputs, is.null))) {
             stop("Error: At least one input must be provided.")
         }
@@ -1111,34 +1054,88 @@ newRefuge <- function(params, new_refuge = FALSE,
 #' 
 #' @param params a mizer object
 #' 
-#' @param trajectory    The trajectory for degraded reefs. Options are 
-#'                      "rubble", "algae", or "recovery"                 
+#' @param trajectory    Optional character string naming the degradation scenario. 
+#'                      Used for documentation and identification. No functional 
+#'                      effect on the simulation.
 #'                      
-#' @param deg_scale     A 2 x 2 array (refuge size x years post bleaching) that
-#'                      gives the values for scaling the refuge density at each
-#'                      size bin. Default scaling matrices for 15 years with
-#'                      the "rubble", "algae", and "recovery" trajectories are 
-#'                      included as data objects in the package.
+#' @param deg_scale     A matrix (refuge bins x time) giving scaling factors for 
+#'                      refuge density. Column 1 represents the bleaching year 
+#'                      (initial impact), and subsequent columns represent years 
+#'                      1, 2, 3... post-bleaching. Values are multiplied by the 
+#'                      previous timestep's refuge density. Default scaling matrices 
+#'                      for 15 years with "rubble", "algae", and "recovery" 
+#'                      trajectories are included as data objects in the package.
 #'                      
 #' @param bleach_time   The year of the simulation to implement bleaching. 
-#'                      Defaults to year 2. 
+#'                      Defaults to year 2.
+#'                      
+#' @param algae_boost  Logical. Should algae growth and/or carrying capacity 
+#'                      be adjusted in response to bleaching? Default is FALSE.
+#'                      
+#' @param algae_growth_boost Numeric vector. Multipliers for algae growth rate 
+#'                      at bleaching (element 1) and during post-bleaching years 
+#'                      (subsequent elements). Only used if algae_boost = TRUE. 
+#'                      Vector length determines duration: length 4 means bleaching 
+#'                      year plus 3 post-bleaching years. Default is 
+#'                      c(1.11, 1.11, 1.11, 1.11) for 4 years of boosting.
+#'                      
+#' @param algae_capacity_boost Numeric vector. Multipliers for algae carrying 
+#'                      capacity at bleaching (element 1) and during post-bleaching 
+#'                      years (subsequent elements). Only used if algae_boost = TRUE. 
+#'                      If shorter than algae_growth_boost, will be padded with 1s 
+#'                      (no change). Default is c(2.0) (only boosts at bleaching year).
 #'                          
 #' @param ... Unused
 #'
-#' @return A mizer object with updated degradation parameters profiles
+#' @return A mizer object with updated degradation parameters
 #' @concept degradation
 #' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
-#'          [tune_UR_cc()], [reefDegrade()]
+#'          [tuneUR_cc()], [reefDegrade()]
 #' @export
-setDegradation <- function(params, trajectory, deg_scale,
-                           bleach_time = 2,...){
+setDegradation <- function(params, trajectory = NULL, deg_scale,
+                           bleach_time = 2,
+                           algae_boost = FALSE,
+                           algae_growth_boost = c(1.11, 1.11, 1.11, 1.11),
+                           algae_capacity_boost = c(2.0),
+                           ...){
+    
+    # Validate deg_scale
+    if (!is.matrix(deg_scale) && !is.data.frame(deg_scale)) {
+        stop("deg_scale must be a matrix or data frame.")
+    }
+    deg_scale <- as.matrix(deg_scale)
+    
+    if (ncol(deg_scale) < 1) {
+        stop("deg_scale must have at least one column (bleaching year impact).")
+    }
+    
+    # Validate algae parameters if adjustment is enabled
+    if (algae_boost) {
+        if (!is.numeric(algae_growth_boost) || any(algae_growth_boost <= 0)) {
+            stop("algae_growth_boost must be a positive numeric vector.")
+        }
+        if (!is.numeric(algae_capacity_boost) || any(algae_capacity_boost <= 0)) {
+            stop("algae_capacity_boost must be a positive numeric vector.")
+        }
+        # Pad capacity boost with 1s (no change) if shorter than growth boost
+        if (length(algae_capacity_boost) < length(algae_growth_boost)) {
+            algae_capacity_boost <- c(algae_capacity_boost, 
+                                      rep(1, length(algae_growth_boost) - length(algae_capacity_boost)))
+        }
+    }
     
     # Add new parameters to params object
     params@other_params$degrade        <- TRUE
-    # Convert bleaching year to bleaching time step
     params@other_params$t_bleach       <- bleach_time 
     params@other_params$trajectory     <- trajectory
-    params@other_params[['deg_scale']] <- as.matrix(deg_scale)
+    params@other_params[['deg_scale']] <- deg_scale
+    
+    # Store algae adjustment parameters
+    params@other_params$algae_boost <- algae_boost
+    if (algae_boost) {
+        params@other_params$algae_growth_boost   <- algae_growth_boost
+        params@other_params$algae_capacity_boost <- algae_capacity_boost
+    }
     
     # Save time parameters were modified
     params@time_modified <- lubridate::now()
@@ -1156,15 +1153,13 @@ setDegradation <- function(params, trajectory, deg_scale,
 #' See [algae_dynamics_cc()] and [detritus_dynamics_cc()] for additional detail.
 #' 
 #' @param params a \linkS4class{MizerParams} object
-#' @param cap   Value to scale the steady state biomass by. Defaults to 1.1,
-#'              setting the carrying capacity 10% higher than the current
-#'              standing biomass.
+#' @param cap   Numeric. Value to scale the steady state biomass by. Defaults to 1.5, setting the carrying capacity 50% higher than the current standing biomass.
 #' @param ... Unused
 #'
 #' @return A mizer object with updated degradation parameters profiles
 #' @concept Uresources 
 #' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
-#'          [tune_UR_cc()]
+#'          [tuneUR_cc()]
 #' @export
 setURcapacity <- function(params, cap = 1.5, ...){
     

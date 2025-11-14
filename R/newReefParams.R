@@ -60,6 +60,9 @@ newReefParams <- function(# Original mizer parameters
                           # Parameters for setting up degradation
                             degrade = FALSE, bleach_time = 2,
                             trajectory = NULL, deg_scale = 1,
+                            algae_boost = FALSE,
+                            algae_growth_boost = c(1.11, 1.11, 1.11, 1.11),
+                            algae_capacity_boost = c(2.0),
                           # Parameters for unstructured resources
                             UR_interaction,
                             carry_capacity = FALSE,
@@ -116,6 +119,15 @@ newReefParams <- function(# Original mizer parameters
     ### External mortality ----
     params <- setExtMortParams(params = params,
                                ext_mort_params = ext_mort_params)
+    
+    ### Degradation ----
+    params <- setDegradation(params, deg_scale = deg_scale, 
+                             bleach_time = bleach_time,
+                             trajectory = trajectory, 
+                             degrade = degrade,
+                             algae_boost = algae_boost,
+                             algae_growth_boost = algae_growth_boost,
+                             algae_capacity_boost = algae_capacity_boost)
     
     
     # Algae & Detritus ----
