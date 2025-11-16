@@ -5,14 +5,7 @@
 \title{Find the proportion of fish vulnerable to being encountered by predators
 at each time step}
 \usage{
-reefVulnerable(
-  params,
-  n,
-  n_pp,
-  n_other,
-  t,
-  new_rd = reefDegrade(params, n, n_pp, n_other, t, ...)
-)
+reefVulnerable(params, n, n_pp, n_other, t, new_rd = NULL, ...)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}

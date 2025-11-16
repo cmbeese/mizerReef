@@ -5,7 +5,7 @@
 \alias{step_tune}
 \title{Stepped refuge profile for tuning steady states}
 \format{
-dataframe
+data frame
 }
 \source{
 PhD Thesis
@@ -15,7 +15,7 @@ step_tune
 }
 \description{
 This is a 2-dimensional array containing start and end lengths for size bins
-and prop_protect decreasing from 30\% to 10\% over the ten bins.
+and \code{prop_protect} decreasing from 30\% to 10\% over the ten bins.
 }
 \details{
 This profile provides more protection to smaller size classes than larger
@@ -26,11 +26,11 @@ using the density-dependent competitive method. The tuning profile provides
 a constant proportion of refuges to all fish up to 50 cm in length.
 
 When creating a model using the competitive method, you should run
-\code{\link[=newReefParams]{newReefParams()}} with the "binned" method and thing tuning profile.
+\code{\link[=newReefParams]{newReefParams()}} with the "binned" method and this tuning profile.
 
 After species biomasses and growth rates have been calibrated to match
 empirical observations, use the \code{\link[=newRefuge]{newRefuge()}} function to implement your
-competitive refuge parameters. After using \code{\link[=newRefuge]{newRefuge()}},  make sure to
+competitive refuge parameters. After using \code{\link[=newRefuge]{newRefuge()}}, make sure to
 iterate through \code{\link[mizer:matchBiomasses]{mizer:: matchBiomasses()}}, \code{\link[=matchReefGrowth]{matchReefGrowth()}}, and
 \code{\link[=reefSteady]{reefSteady()}} again to regain the steady state.
 }

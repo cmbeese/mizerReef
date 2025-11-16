@@ -4,17 +4,7 @@
 \alias{reefPredMort}
 \title{Get total predation mortality rate needed to project mizer reef model}
 \usage{
-reefPredMort(
-  params,
-  n,
-  n_pp,
-  n_other,
-  t,
-  pred_rate,
-  vulnerable = reefVulnerable(params, n, n_pp, n_other, t, new_rd = reefDegrade(params,
-    n, n_pp, n_other, t)),
-  ...
-)
+reefPredMort(params, n, n_pp, n_other, t, pred_rate, vulnerable = NULL, ...)
 }
 \arguments{
 \item{params}{A \linkS4class{MizerParams} object}
@@ -51,7 +41,7 @@ of 1/year) on each prey species by prey size:
   \mu_{p.i}(w_p) = \sum_j pred_rate_j(w_p) V_{ji}(w_p) \theta_{ji}.}
 
 You would not usually call this function directly but instead
-use \code{\link[=getPredMort]{getPredMort()}}, which then calls this function.
+use \code{\link[mizer:getPredMort]{mizer::getPredMort()}}, which then calls this function.
 }
 \seealso{
 Other mizer rate functions: 

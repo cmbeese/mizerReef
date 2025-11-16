@@ -7,13 +7,13 @@
 algae_dynamics_cc(params, n, n_other, rates, dt, ...)
 }
 \arguments{
-\item{params}{A \link{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams]{mizer::MizerParams} object}
 
 \item{n}{A matrix of current species abundances (species x size)}
 
 \item{n_other}{Other dynamic components.}
 
-\item{rates}{A list of rates as returned by \code{\link[=getRates]{getRates()}}}
+\item{rates}{A list of rates as returned by \code{\link[mizer:getRates]{mizer::getRates()}}}
 
 \item{dt}{Time step size}
 

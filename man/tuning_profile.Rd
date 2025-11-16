@@ -5,7 +5,7 @@
 \alias{tuning_profile}
 \title{Constant refuge profile for tuning steady states}
 \format{
-dataframe
+data frame
 }
 \source{
 PhD Thesis
@@ -23,8 +23,7 @@ using the density-dependent competitive method. The tuning profile provides
 a constant proportion of refuges to all fish up to 50 cm in length.
 
 When creating a model using the competitive method, you should run
-\code{\link[=newReefParams]{newReefParams()}} with the "binned" method and a proportional
-tuning profile.
+\code{\link[=newReefParams]{newReefParams()}} with the "binned" method and a proportional tuning profile.
 
 After species biomasses and growth rates have been calibrated to match
 empirical observations, use the \code{\link[=newRefuge]{newRefuge()}} function to implement your

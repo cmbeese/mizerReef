@@ -3,9 +3,9 @@
 \docType{data}
 \name{bonaire_int}
 \alias{bonaire_int}
-\title{interaction matrix for for a simple, generic Caribbean reef}
+\title{interaction matrix for a simple, generic Caribbean reef}
 \format{
-dataframe
+data frame
 }
 \source{
 PhD Thesis
@@ -16,7 +16,9 @@ bonaire_int
 \description{
 Includes 3 species groups: predators, herbivores, and invertebrates.
 }
-\details{
-PhD Thesis chapter 3 vignettes
-}
+\keyword{3}
+\keyword{PhD}
+\keyword{Thesis}
+\keyword{chapter}
 \keyword{datasets}
+\keyword{vignettes}

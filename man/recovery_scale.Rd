@@ -17,8 +17,9 @@ recovery_scale
 This is a 2-dimensional array (refuge size x time post bleaching) containing
 scaling values for refuge density for 15 years following bleaching
 }
-\details{
-PhD Thesis chapter 5
-}
 \concept{degradation}
+\keyword{5}
+\keyword{PhD}
+\keyword{Thesis}
+\keyword{chapter}
 \keyword{datasets}

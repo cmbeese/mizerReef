@@ -5,7 +5,7 @@
 \alias{karpata_int}
 \title{Interaction matrix for a generic Caribbean reef}
 \format{
-dataframe
+data frame
 }
 \source{
 PhD Thesis
@@ -16,7 +16,8 @@ karpata_int
 \description{
 Includes 10 species groups.
 }
-\details{
-PhD Thesis chapter 4
-}
+\keyword{4}
+\keyword{PhD}
+\keyword{Thesis}
+\keyword{chapter}
 \keyword{datasets}

@@ -30,7 +30,7 @@ A two dimensional array (predator species x predator size) with the
 feeding level.
 }
 \description{
-This function replaces the usual \code{\link[=mizerFeedingLevel]{mizerFeedingLevel()}} function and returns
+This function replaces the usual \code{\link[mizer:mizerFeedingLevel]{mizer::mizerFeedingLevel()}} function and returns
 the a feeding level of 0 for piscivores.
 }
 \seealso{

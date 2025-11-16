@@ -16,7 +16,9 @@ bonaire_model
 \description{
 Includes 3 species groups: predators, herbivores, and invertebrates.
 }
-\details{
-PhD Thesis chapter 3 vignettes
-}
+\keyword{3}
+\keyword{PhD}
+\keyword{Thesis}
+\keyword{chapter}
 \keyword{datasets}
+\keyword{vignettes}

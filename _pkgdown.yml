@@ -1,4 +1,5 @@
 url: https://cmbeese.github.io/mizerReef/
+mathjax: true
 template:
   bootstrap: 5
   # bslib:
@@ -115,4 +116,23 @@ reference:
     # - test
     # - test_sp
     # - test_i
+- subtitle: Chapter 3 example
+  desc: >
+    Small example data used in the Getting Started vignette.
+  contents:
+    - bodyshape_methods_example
+    - bodyshape_methods_example_int
+articles:
+  - title: "General Model Description"
+    contents:
+      - reef-model_description
+  - title: "Example Model Description: Simple Trait-Based Steady State"
+    contents:
+      - c3_parameters
+  - title: "Example Model Description: Resolved Functional Group Steady State"
+    contents:
+      - c4_parameters
+  - title: "Getting started with MizerReef"
+    contents:
+      - getting_started
 

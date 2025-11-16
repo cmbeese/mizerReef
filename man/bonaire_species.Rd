@@ -5,7 +5,7 @@
 \alias{bonaire_species}
 \title{species_params dataframe for a simple, generic Caribbean reef}
 \format{
-dataframe
+data frame
 }
 \source{
 PhD Thesis
@@ -16,7 +16,9 @@ bonaire_species
 \description{
 Includes 3 species groups: predators, herbivores, and invertebrates.
 }
-\details{
-PhD Thesis chapter 3 vignettes
-}
+\keyword{3}
+\keyword{PhD}
+\keyword{Thesis}
+\keyword{chapter}
 \keyword{datasets}
+\keyword{vignettes}

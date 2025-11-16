@@ -48,7 +48,7 @@ When called with a \linkS4class{MizerParams} object the initial
 vulnerability is plotted. The complement of refuge.
 }
 \seealso{
-\link{plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotRefuge]{plotRefuge()}}
+\link[mizer:plotting_functions]{mizer::plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotRefuge]{plotRefuge()}}
 
 Other plotting functions: 
 \code{\link{plot2Productivity}()},

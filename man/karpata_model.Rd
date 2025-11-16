@@ -3,7 +3,7 @@
 \docType{data}
 \name{karpata_model}
 \alias{karpata_model}
-\title{\linkS4class{MizerParams} object for a multispecies generic reef}
+\title{\linkS4class{MizerParams} object for a multi-species coral reef model}
 \format{
 A MizerParams object
 }

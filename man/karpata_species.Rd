@@ -5,7 +5,7 @@
 \alias{karpata_species}
 \title{species_params dataframe for a generic Caribbean reef}
 \format{
-dataframe
+data frame
 }
 \source{
 PhD Thesis
@@ -17,7 +17,8 @@ karpata_species
 Includes 10 species groups with biomass estimates from Karpata Reef
 study site in the FORCE data set.
 }
-\details{
-PhD Thesis chapter 4
-}
+\keyword{4}
+\keyword{PhD}
+\keyword{Thesis}
+\keyword{chapter}
 \keyword{datasets}

@@ -41,21 +41,21 @@ By default this function returns a list with the following components:
 \item predation vulnerability from \code{\link[=reefVulnerable]{reefVulnerable()}}
 \item encounter from \code{\link[=reefEncounter]{reefEncounter()}}
 \item feeding level from \code{\link[=reefFeedingLevel]{reefFeedingLevel()}}
-\item e from \code{\link[=mizerEReproAndGrowth]{mizerEReproAndGrowth()}}
-\item e_repro from \code{\link[=mizerERepro]{mizerERepro()}}
-\item e_growth from \code{\link[=mizerEGrowth]{mizerEGrowth()}}
-\item pred_rate from \code{\link[=mizerPredRate]{mizerPredRate()}}
+\item e from \code{\link[mizer:mizerEReproAndGrowth]{mizer::mizerEReproAndGrowth()}}
+\item e_repro from \code{\link[mizer:mizerERepro]{mizer::mizerERepro()}}
+\item e_growth from \code{\link[mizer:mizerEGrowth]{mizer::mizerEGrowth()}}
+\item pred_rate from \code{\link[mizer:mizerPredRate]{mizer::mizerPredRate()}}
 \item pred_mort from \code{\link[=reefPredMort]{reefPredMort()}}
 \item sen_mort from \code{\link[=reefSenMort]{reefSenMort()}}
-\item f_mort from \code{\link[=mizerFMort]{mizerFMort()}}
+\item f_mort from \code{\link[mizer:mizerFMort]{mizer::mizerFMort()}}
 \item mort from \code{\link[=reefMort]{reefMort()}}
-\item rdi from \code{\link[=mizerRDI]{mizerRDI()}}
-\item rdd from \code{\link[=BevertonHoltRDD]{BevertonHoltRDD()}}
-\item resource_mort from \code{\link[=mizerResourceMort]{mizerResourceMort()}}
+\item rdi from \code{\link[mizer:mizerRDI]{mizer::mizerRDI()}}
+\item rdd from \code{\link[mizer:BevertonHoltRDD]{mizer::BevertonHoltRDD()}}
+\item resource_mort from \code{\link[mizer:mizerResourceMort]{mizer::mizerResourceMort()}}
 }
 
 However you can replace any of these rate functions by your own rate
-function if you wish, see \code{\link[=setRateFunction]{setRateFunction()}} for details.
+function if you wish, see \code{\link[mizer:setRateFunction]{mizer::setRateFunction()}} for details.
 }
 \seealso{
 Other mizer rate functions: 

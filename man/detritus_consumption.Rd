@@ -11,7 +11,7 @@ detritus_consumption(params, n = params@initial_n, rates = getRates(params))
 
 \item{n}{A matrix of current species abundances (species x size)}
 
-\item{rates}{A list of rates as returned by \code{\link[=getRates]{getRates()}}}
+\item{rates}{A list of rates as returned by \code{\link[mizer:getRates]{mizer::getRates()}}}
 }
 \value{
 The mass-specific consumption rate of detritus in grams per year.

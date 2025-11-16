@@ -11,7 +11,7 @@ setExtMortParams(params, ext_mort_params = NULL)
 
 Optional parameters:}
 
-\item{ext_mort_params}{Named list containing desired mortality parameters}
+\item{ext_mort_params}{A named list or matrix with columns/names 'nat_mort', 'sen_prop', and 'sen_curve'. If NULL, defaults are used: nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3.}
 }
 \value{
 MizerParams object with updated mortality parameters

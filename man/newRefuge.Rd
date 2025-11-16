@@ -29,9 +29,7 @@ profile. Options are "sigmoidal", "binned",
 provided, this defaults to the same method as is
 currently being used in the simulation.}
 
-\item{new_method_params}{A data frame containing values specific to each
-method for calculating refuge. Only necessary if
-changing methods.}
+\item{new_method_params}{A data frame or list specifying parameters required for the chosen method. For 'sigmoidal', must include 'L_refuge' and 'prop_protect'. For 'binned' and 'competitive', must include 'start_L', 'end_L', and 'prop_protect' (or 'refuge_density' for competitive). Only necessary if changing methods.}
 
 \item{new_L_refuge}{To be used with "sigmoidal" method only. The new value
 for the length at which refuge becomes scarce in cm.}
@@ -39,9 +37,7 @@ for the length at which refuge becomes scarce in cm.}
 \item{new_prop_protect}{To be used with "sigmoidal" method only. The new
 value for the maximum proportion of fish to protect.}
 
-\item{scale_bin}{To be use with the "binned" method only. A number or vector
-of numbers to multiply the \code{prop_protect} values by for
-each size bin. Changes the proportion of fish protected.}
+\item{scale_bin}{To be used with the "binned" or "competitive" method only. A number or vector (length = number of bins) to multiply the \code{prop_protect} (binned) or \code{refuge_density} (competitive) values for each size bin. Changes the proportion of fish protected. If a single value is given, it is applied to all bins.}
 
 \item{...}{Unused}
 }
@@ -53,6 +49,9 @@ This is a wrapper function for the \code{\link[=setRefuge]{setRefuge()}} and \co
 functions that allows users to easily change refuge parameters on an
 existing mizer model. This will take it out of steady state, and users
 should run \code{\link[=reefSteady]{reefSteady()}} after this function to return to steady state.
+}
+\details{
+At least one of the arguments new_method, new_method_params, new_L_refuge, new_prop_protect, or scale_bin must be provided. For 'binned' and 'competitive' methods, scale_bin must be a value or vector matching the number of bins.
 }
 \section{Setting the refuge profile}{
 

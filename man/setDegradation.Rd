@@ -4,27 +4,55 @@
 \alias{setDegradation}
 \title{Prepare a steady state model for projections with degradation}
 \usage{
-setDegradation(params, trajectory, deg_scale, bleach_time = 2, ...)
+setDegradation(
+  params,
+  trajectory = NULL,
+  deg_scale,
+  bleach_time = 2,
+  algae_boost = FALSE,
+  algae_growth_boost = c(1.11, 1.11, 1.11, 1.11),
+  algae_capacity_boost = c(2),
+  ...
+)
 }
 \arguments{
 \item{params}{a mizer object}
 
-\item{trajectory}{The trajectory for degraded reefs. Options are
-"rubble", "algae", or "recovery"}
+\item{trajectory}{Optional character string naming the degradation scenario.
+Used for documentation and identification. No functional
+effect on the simulation.}
 
-\item{deg_scale}{A 2 x 2 array (refuge size x years post bleaching) that
-gives the values for scaling the refuge density at each
-size bin. Default scaling matrices for 15 years with
-the "rubble", "algae", and "recovery" trajectories are
-included as data objects in the package.}
+\item{deg_scale}{A matrix (refuge bins x time) giving scaling factors for
+refuge density. Column 1 represents the bleaching year
+(initial impact), and subsequent columns represent years
+1, 2, 3... post-bleaching. Values are multiplied by the
+previous timestep's refuge density. Default scaling matrices
+for 15 years with "rubble", "algae", and "recovery"
+trajectories are included as data objects in the package.}
 
 \item{bleach_time}{The year of the simulation to implement bleaching.
 Defaults to year 2.}
 
+\item{algae_boost}{Logical. Should algae growth and/or carrying capacity
+be adjusted in response to bleaching? Default is FALSE.}
+
+\item{algae_growth_boost}{Numeric vector. Multipliers for algae growth rate
+at bleaching (element 1) and during post-bleaching years
+(subsequent elements). Only used if algae_boost = TRUE.
+Vector length determines duration: length 4 means bleaching
+year plus 3 post-bleaching years. Default is
+c(1.11, 1.11, 1.11, 1.11) for 4 years of boosting.}
+
+\item{algae_capacity_boost}{Numeric vector. Multipliers for algae carrying
+capacity at bleaching (element 1) and during post-bleaching
+years (subsequent elements). Only used if algae_boost = TRUE.
+If shorter than algae_growth_boost, will be padded with 1s
+(no change). Default is c(2.0) (only boosts at bleaching year).}
+
 \item{...}{Unused}
 }
 \value{
-A mizer object with updated degradation parameters profiles
+A mizer object with updated degradation parameters
 }
 \description{
 This function stores degradation parameters in the other_params slot of
@@ -32,6 +60,6 @@ the params object.
 }
 \seealso{
 \code{\link[=algae_dynamics_cc]{algae_dynamics_cc()}},\code{\link[=detritus_dynamics_cc]{detritus_dynamics_cc()}},
-\code{\link[=tune_UR_cc]{tune_UR_cc()}}, \code{\link[=reefDegrade]{reefDegrade()}}
+\code{\link[=tuneUR_cc]{tuneUR_cc()}}, \code{\link[=reefDegrade]{reefDegrade()}}
 }
 \concept{degradation}

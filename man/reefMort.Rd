@@ -33,7 +33,7 @@ A named two dimensional array (species x size) with the total
 mortality rates.
 }
 \description{
-This function replaces the usual \code{\link[=mizerMort]{mizerMort()}} function and returns the
+This function replaces the usual \code{\link[mizer:mizerMort]{mizer::mizerMort()}} function and returns the
 sum of the usual mortality and size-based external/ senescence mortality
 }
 \seealso{

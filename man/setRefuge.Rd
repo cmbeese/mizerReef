@@ -25,44 +25,23 @@ setRefuge(
 \item{method}{The desired method for setting up benthic refuge, can be
 "sigmoidal", "binned", "competitive", or "noncomplex"}
 
-\item{method_params}{A data frame containing values specific to each
-method for calculating refuge}
+\item{method_params}{A data frame or list specifying parameters required for the chosen method. For 'sigmoidal', must include 'L_refuge' and 'prop_protect'. For 'binned' and 'competitive', must include 'start_L', 'end_L', and 'prop_protect' (or 'refuge_density' for competitive).}
 
-\item{refuge_user}{A vector of logical values indicating whether
-each functional group uses refuge, TRUE indicates the
-group uses refuge while false indicates that they do
-not. Must be included here if not in the
-\code{params@species_params} data frame.}
+\item{refuge_user}{Logical vector (length = number of species). Indicates which groups use refuge. If not present in species_params, must be provided. Defaults to NULL.}
 
-\item{bad_pred}{Optional. A vector of logical values indicating whether
-hunting is inhibited by refuge for this functional group.
-FALSE indicates that this species is able to encounter prey
-within refuge (e.g. eels). Must be included here if not in
-the \code{params@species_params} data frame.}
+\item{bad_pred}{Logical vector (length = number of species). Indicates which groups are poor predators. If not present in species_params, must be provided. Defaults to NULL.}
 
-\item{satiation}{Optional. A vector of logical values indicating whether
-feeding level should be turned on for this functional group.
-Must be included here if not in the
-\code{params@species_params} data frame.}
+\item{satiation}{Logical vector (length = number of species). Indicates which groups are subject to satiation. If not present in species_params, must be provided. Defaults to NULL.}
 
-\item{a_bar}{Optional. The average length to weight conversion value
-\eqn{\bar{a}} and \eqn{\bar{b}} describe the fish dummies used
-when counting refuge holes. \eqn{\bar{a}} defaults to 0.025.}
+\item{a_bar}{Numeric. Length-weight conversion parameter. Default is 0.025. Used for dummy fish calculations.}
 
-\item{b_bar}{Optional. The average length to weight conversion value
-\eqn{\bar{a}} and \eqn{\bar{b}} describe the fish dummies used
-when counting refuge holes. \eqn{\bar{b}} defaults to 3.}
+\item{b_bar}{Numeric. Length-weight exponent. Default is 3. Used for dummy fish calculations.}
 
-\item{w_settle}{Optional. The body weight (g) at which fish settle onto the
-reef. Fish smaller than this are considered to be larval
-and thus too small to use predation refuge. Defaults to 0.l
-grams.}
+\item{w_settle}{Numeric. Minimum weight of fish protected by refuges at measured scale. Default is 0.1 (grams).}
 
-\item{max_protect}{Optional. The maximum proportion of fish
-(any size class) protected by refuge. Defaults to 0.98.}
+\item{max_protect}{Numeric. Maximum proportion of fish protected by refuge. Must be between 0 and 1. Default is 0.98.}
 
-\item{tau}{Optional. The proportion of fish with access to refuge that
-actually use it. Defaults to 1.}
+\item{tau}{Numeric. Proportion of fish with access to refuge that are expected to utilize it. Must be between 0 and 1. Default is 1.}
 
 \item{...}{unused}
 }

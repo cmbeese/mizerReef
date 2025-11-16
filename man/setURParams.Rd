@@ -17,46 +17,26 @@ setURParams(
 )
 }
 \arguments{
-\item{params}{MizerParams object}
+\item{params}{A \code{MizerParams} object.}
 
-\item{UR_interaction}{Interaction matrix for unstructured resources
-(species x resource)}
+\item{UR_interaction}{A matrix or data.frame (species x resource) giving the interaction strengths with algae and detritus. Columns must be named 'algae' and 'detritus'. Default is NULL (will use columns in \code{species_params} if present).}
 
-\item{initial_algae_growth}{The initial growth rate of algae in
-grams/m^2/year. This value is reset to match
-consumption in the \code{\link[=reefSteady]{reefSteady()}}  function
-so that steady state abundances match given
-values.}
+\item{initial_algae_growth}{Numeric. The initial growth rate of algae in grams/m^2/year. This value is reset by \code{\link[=reefSteady]{reefSteady()}}. Default is NULL.}
 
-\item{carry_capacity}{A boolean value that indicates whether the user wants
-to implement a carrying capacity for unstructured
-resources. Default is FALSE}
+\item{carry_capacity}{Logical. Whether to implement a carrying capacity for unstructured resources. Default is FALSE.}
 
-\item{algae_capacity}{The carrying capacity of the system for algae
-biomass in grams per year.}
+\item{algae_capacity}{Numeric. Carrying capacity for algae biomass in grams per year. Default is NULL.}
 
-\item{detritus_capacity}{The carrying capacity of the system for
-detritus biomass in grams per year.}
+\item{detritus_capacity}{Numeric. Carrying capacity for detritus biomass in grams per year. Default is NULL.}
 
-\item{sen_decomp}{The proportion of decomposing mass from senescence
-mortality that decomposes to become part of the
-detritus pool. Defaults to 0.8.}
+\item{sen_decomp}{Numeric. Proportion of decomposing mass from senescence mortality that becomes detritus. Default is NULL (typically 0.8).}
 
-\item{ext_decomp}{The proportion of decomposing mass from external
-mortality that decomposes to  become part of the
-detritus pool. Defaults to 0.2.}
+\item{ext_decomp}{Numeric. Proportion of decomposing mass from external mortality that becomes detritus. Default is NULL (typically 0.2).}
 
-\item{initial_d_external}{The rate at which detritus biomass sinks from
-the pelagic zone and becomes part of the
-detritus pool in grams per year. This value is
-reset to make up any differences in consumption
-and production in the \code{\link[=reefSteady]{reefSteady()}} function
-so that steady state abundances match observed
-values.}
+\item{initial_d_external}{Numeric. Rate at which detritus biomass sinks from the pelagic zone (grams per year). This value is reset by \code{\link[=reefSteady]{reefSteady()}}. Default is NULL.}
 }
 \value{
-\code{setURParams} MizerParams object with updated unstructured
-resource parameters
+A \code{MizerParams} object with updated unstructured resource parameters.
 }
 \description{
 Checks unstructured resource parameters and interaction matrix
@@ -64,7 +44,7 @@ Checks unstructured resource parameters and interaction matrix
 \section{Adding unstructured resources}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ mizerReef supports two resource spectra that are not size- structured.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ mizerReef supports two resource spectra that are not size-structured.
  Algae are consumed by herbivorous fish, while detritus is consumed by
  herbivorous fish and benthic invertebrates. This function sets the 
  interaction matrix for these resources as well as any default
@@ -72,12 +52,15 @@ Checks unstructured resource parameters and interaction matrix
 
  The resource interaction matrix \eqn{\theta_{ki}} modifies the
  interaction of each functional group \eqn{i} with each unstructured
- resource \eqn{k} in the model. This can be used for example to allow 
+ resource \eqn{k} in the model. This can be used, for example, to allow 
  for different diet preferences on each unstructured resource. 
- 
- Note that interaction with size structured resources, such as
+ Note that interaction with size-structured resources, such as
  plankton, is still set with the resource_interaction column of
  the species parameters dataframe.
+
+ Note: Some values (such as `initial_algae_growth` and `initial_d_external`)
+ are reset by [reefSteady()] to ensure steady state abundances match
+ observed or target values.
 }\if{html}{\out{</div>}}
 }
 

@@ -23,11 +23,22 @@ parameters.)}
 \item{...}{Unused}
 }
 \value{
-A new methods parameters data frame scaled by bleaching
+A numeric vector of scaled refuge densities for each size bin
 }
 \description{
-Allows for the degradation of coral reef habitat structure following an
+Allows for the gradual degradation of habitat structure following an
 acute disturbance by decreasing the availability of refuge over time.
+}
+\details{
+The degradation is controlled by a scaling matrix \code{deg_scale} where:
+\itemize{
+\item Column 1 represents the bleaching year (initial impact)
+\item Columns 2+ represent years 1, 2, 3... post-bleaching
+}
+
+At each timestep, the scaling factors are multiplied by the previous
+timestep's refuge density. Optional algae dynamics adjustments can be
+specified via \code{\link[=setDegradation]{setDegradation()}}.
 }
 \seealso{
 Other mizer rate functions: 

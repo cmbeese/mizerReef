@@ -56,10 +56,10 @@ percent change, given by \deqn{ 100*(N_2(w) - N_1(w)) / (N_1(w)).}
 If \code{diff_method} is given as \code{rel_diff} the difference is calculated
 relative to their average, so \deqn{2 (N_2(w) - N_1(w)) / (N_2(w) + N_1(w)).}
 
-The individual spectra are calculated by the \code{\link[=plotSpectra]{plotSpectra()}} function which
+The individual spectra are calculated by the \code{\link[mizer:plotSpectra]{mizer::plotSpectra()}} function which
 is passed all additional arguments you supply. So you can for example
 determine a size range over which to average the simulation results via the
-\code{time_range} argument. See \code{\link[=plotSpectra]{plotSpectra()}} for more options.
+\code{time_range} argument. See \code{\link[mizer:plotSpectra]{mizer::plotSpectra()}} for more options.
 
 Note that it does not matter whether the relative difference is calculated
 for the number density or the biomass density or the biomass density in log

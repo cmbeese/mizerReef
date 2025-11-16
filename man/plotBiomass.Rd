@@ -94,7 +94,7 @@ frame with the four variables 'Year', 'Biomass', 'Species',
 After running a projection, the biomass of each Species Group and each
 unstructured component can be plotted against time. The biomass is
 calculated within user defined size limits (min_w, max_w, min_l, max_l, see
-\code{\link[=get_size_range_array]{get_size_range_array()}}).
+\code{\link[mizer:get_size_range_array]{mizer::get_size_range_array()}}).
 }
 \seealso{
 \code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}}, \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},

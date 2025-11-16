@@ -26,6 +26,9 @@ newReefParams(
   bleach_time = 2,
   trajectory = NULL,
   deg_scale = 1,
+  algae_boost = FALSE,
+  algae_growth_boost = c(1.11, 1.11, 1.11, 1.11),
+  algae_capacity_boost = c(2),
   UR_interaction,
   carry_capacity = FALSE,
   initial_algae_growth = NULL,
@@ -60,93 +63,74 @@ observations in grams.}
 \item{method}{The desired method for setting up benthic refuge, can be
 "sigmoidal", "binned", "competitive", or "noncomplex"}
 
-\item{method_params}{A data frame containing values specific to each
-method for calculating refuge}
+\item{method_params}{A data frame or list specifying parameters required for the chosen method. For 'sigmoidal', must include 'L_refuge' and 'prop_protect'. For 'binned' and 'competitive', must include 'start_L', 'end_L', and 'prop_protect' (or 'refuge_density' for competitive).}
 
-\item{refuge_user}{A vector of logical values indicating whether
-each functional group uses refuge, TRUE indicates the
-group uses refuge while false indicates that they do
-not. Must be included here if not in the
-\code{params@species_params} data frame.}
+\item{refuge_user}{Logical vector (length = number of species). Indicates which groups use refuge. If not present in species_params, must be provided. Defaults to NULL.}
 
-\item{bad_pred}{Optional. A vector of logical values indicating whether
-hunting is inhibited by refuge for this functional group.
-FALSE indicates that this species is able to encounter prey
-within refuge (e.g. eels). Must be included here if not in
-the \code{params@species_params} data frame.}
+\item{bad_pred}{Logical vector (length = number of species). Indicates which groups are poor predators. If not present in species_params, must be provided. Defaults to NULL.}
 
-\item{satiation}{Optional. A vector of logical values indicating whether
-feeding level should be turned on for this functional group.
-Must be included here if not in the
-\code{params@species_params} data frame.}
+\item{satiation}{Logical vector (length = number of species). Indicates which groups are subject to satiation. If not present in species_params, must be provided. Defaults to NULL.}
 
-\item{a_bar}{Optional. The average length to weight conversion value
-\eqn{\bar{a}} and \eqn{\bar{b}} describe the fish dummies used
-when counting refuge holes. \eqn{\bar{a}} defaults to 0.025.}
+\item{a_bar}{Numeric. Length-weight conversion parameter. Default is 0.025. Used for dummy fish calculations.}
 
-\item{b_bar}{Optional. The average length to weight conversion value
-\eqn{\bar{a}} and \eqn{\bar{b}} describe the fish dummies used
-when counting refuge holes. \eqn{\bar{b}} defaults to 3.}
+\item{b_bar}{Numeric. Length-weight exponent. Default is 3. Used for dummy fish calculations.}
 
-\item{w_settle}{Optional. The body weight (g) at which fish settle onto the
-reef. Fish smaller than this are considered to be larval
-and thus too small to use predation refuge. Defaults to 0.l
-grams.}
+\item{w_settle}{Numeric. Minimum weight of fish protected by refuges at measured scale. Default is 0.1 (grams).}
 
-\item{max_protect}{Optional. The maximum proportion of fish
-(any size class) protected by refuge. Defaults to 0.98.}
+\item{max_protect}{Numeric. Maximum proportion of fish protected by refuge. Must be between 0 and 1. Default is 0.98.}
 
-\item{tau}{Optional. The proportion of fish with access to refuge that
-actually use it. Defaults to 1.}
+\item{tau}{Numeric. Proportion of fish with access to refuge that are expected to utilize it. Must be between 0 and 1. Default is 1.}
 
 \item{bleach_time}{The year of the simulation to implement bleaching.
 Defaults to year 2.}
 
-\item{trajectory}{The trajectory for degraded reefs. Options are
-"rubble", "algae", or "recovery"}
+\item{trajectory}{Optional character string naming the degradation scenario.
+Used for documentation and identification. No functional
+effect on the simulation.}
 
-\item{deg_scale}{A 2 x 2 array (refuge size x years post bleaching) that
-gives the values for scaling the refuge density at each
-size bin. Default scaling matrices for 15 years with
-the "rubble", "algae", and "recovery" trajectories are
-included as data objects in the package.}
+\item{deg_scale}{A matrix (refuge bins x time) giving scaling factors for
+refuge density. Column 1 represents the bleaching year
+(initial impact), and subsequent columns represent years
+1, 2, 3... post-bleaching. Values are multiplied by the
+previous timestep's refuge density. Default scaling matrices
+for 15 years with "rubble", "algae", and "recovery"
+trajectories are included as data objects in the package.}
 
-\item{UR_interaction}{Interaction matrix for unstructured resources
-(species x resource)}
+\item{algae_boost}{Logical. Should algae growth and/or carrying capacity
+be adjusted in response to bleaching? Default is FALSE.}
+
+\item{algae_growth_boost}{Numeric vector. Multipliers for algae growth rate
+at bleaching (element 1) and during post-bleaching years
+(subsequent elements). Only used if algae_boost = TRUE.
+Vector length determines duration: length 4 means bleaching
+year plus 3 post-bleaching years. Default is
+c(1.11, 1.11, 1.11, 1.11) for 4 years of boosting.}
+
+\item{algae_capacity_boost}{Numeric vector. Multipliers for algae carrying
+capacity at bleaching (element 1) and during post-bleaching
+years (subsequent elements). Only used if algae_boost = TRUE.
+If shorter than algae_growth_boost, will be padded with 1s
+(no change). Default is c(2.0) (only boosts at bleaching year).}
+
+\item{UR_interaction}{A matrix or data.frame (species x resource) giving the interaction strengths with algae and detritus. Columns must be named 'algae' and 'detritus'. Default is NULL (will use columns in \code{species_params} if present).}
 
 \item{carry_capacity}{A boolean value that indicates whether the user wants
 to implement a carrying capacity for unstructured
 resources. Defaults to FALSE.}
 
-\item{initial_algae_growth}{The initial growth rate of algae in
-grams/m^2/year. This value is reset to match
-consumption in the \code{\link[=reefSteady]{reefSteady()}}  function
-so that steady state abundances match given
-values.}
+\item{initial_algae_growth}{Numeric. The initial growth rate of algae in grams/m^2/year. This value is reset by \code{\link[=reefSteady]{reefSteady()}}. Default is NULL.}
 
-\item{algae_capacity}{The carrying capacity of the system for algae
-biomass in grams per year.}
+\item{algae_capacity}{Numeric. Carrying capacity for algae biomass in grams per year. Default is NULL.}
 
-\item{detritus_capacity}{The carrying capacity of the system for
-detritus biomass in grams per year.}
+\item{detritus_capacity}{Numeric. Carrying capacity for detritus biomass in grams per year. Default is NULL.}
 
-\item{sen_decomp}{The proportion of decomposing mass from senescence
-mortality that decomposes to become part of the
-detritus pool. Defaults to 0.8.}
+\item{sen_decomp}{Numeric. Proportion of decomposing mass from senescence mortality that becomes detritus. Default is NULL (typically 0.8).}
 
-\item{ext_decomp}{The proportion of decomposing mass from external
-mortality that decomposes to  become part of the
-detritus pool. Defaults to 0.2.}
+\item{ext_decomp}{Numeric. Proportion of decomposing mass from external mortality that becomes detritus. Default is NULL (typically 0.2).}
 
-\item{initial_d_external}{The rate at which detritus biomass sinks from
-the pelagic zone and becomes part of the
-detritus pool in grams per year. This value is
-reset to make up any differences in consumption
-and production in the \code{\link[=reefSteady]{reefSteady()}} function
-so that steady state abundances match observed
-values.}
+\item{initial_d_external}{Numeric. Rate at which detritus biomass sinks from the pelagic zone (grams per year). This value is reset by \code{\link[=reefSteady]{reefSteady()}}. Default is NULL.}
 
-\item{ext_mort_params}{Named list containing desired mortality parameters}
+\item{ext_mort_params}{A named list or matrix with columns/names 'nat_mort', 'sen_prop', and 'sen_curve'. If NULL, defaults are used: nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3.}
 
 \item{include_ext_mort}{A boolean value that indicates whether the user wants
 to use default external mortality. Defaults to TRUE.}
@@ -159,7 +143,7 @@ each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
 to 1-n where n is the given allometric scaling exponent and
 z0pre defaults to 0.2.}
 
-\item{...}{Extra parameters to be passed to \code{\link[=newMultispeciesParams]{newMultispeciesParams()}}}
+\item{...}{Extra parameters to be passed to \code{\link[mizer:newMultispeciesParams]{mizer::newMultispeciesParams()}}}
 }
 \value{
 An object of type \linkS4class{MizerParams}
@@ -171,7 +155,7 @@ resource components, senescence mortality, and predation refuge.
 \section{Adding unstructured resources}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ mizerReef supports two resource spectra that are not size- structured.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ mizerReef supports two resource spectra that are not size-structured.
  Algae are consumed by herbivorous fish, while detritus is consumed by
  herbivorous fish and benthic invertebrates. This function sets the 
  interaction matrix for these resources as well as any default
@@ -179,12 +163,15 @@ resource components, senescence mortality, and predation refuge.
 
  The resource interaction matrix \eqn{\theta_{ki}} modifies the
  interaction of each functional group \eqn{i} with each unstructured
- resource \eqn{k} in the model. This can be used for example to allow 
+ resource \eqn{k} in the model. This can be used, for example, to allow 
  for different diet preferences on each unstructured resource. 
- 
- Note that interaction with size structured resources, such as
+ Note that interaction with size-structured resources, such as
  plankton, is still set with the resource_interaction column of
  the species parameters dataframe.
+
+ Note: Some values (such as `initial_algae_growth` and `initial_d_external`)
+ are reset by [reefSteady()] to ensure steady state abundances match
+ observed or target values.
 }\if{html}{\out{</div>}}
 }
 

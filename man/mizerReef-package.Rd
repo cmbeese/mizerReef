@@ -4,8 +4,8 @@
 \name{mizerReef-package}
 \alias{mizerReef}
 \alias{mizerReef-package}
-\title{mizerReef: A mizer extension package for modelling tropical coral reefs.
-Includes benthic complexity through the provision of predation refuge.}
+\title{mizerReef: A mizer extension package for modelling structurally complex marine ecosystems.
+Captures the role of habitat complexity as predation refuge and add benthic coupling.}
 \description{
 This is an extension package for the mizer package
 (https://sizespectrum.org/mizer/) that makes it easy to set up a mizer model

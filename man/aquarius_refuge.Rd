@@ -5,7 +5,7 @@
 \alias{aquarius_refuge}
 \title{Competitive method refuge parameters for a generic Caribbean reef}
 \format{
-A MizerParams object
+Data frame
 }
 \source{
 PhD Thesis
@@ -19,7 +19,8 @@ and \code{prop_protect} for each size bin, which gives the refuge density per
 square meter for ten 5cm wide fish length bins ranging from 0 to 50 cm.
 Data from the Aquarius reef study site.
 }
-\details{
-PhD Thesis chapter 4
-}
+\keyword{4}
+\keyword{PhD}
+\keyword{Thesis}
+\keyword{chapter}
 \keyword{datasets}
