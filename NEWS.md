@@ -1,4 +1,4 @@
-   # mizerReef 2.0.0
+# mizerReef 2.0.0
 
 ## Major changes
 - New S4 classes: `MizerReefParams` and `MizerReefSim` for reef-specific modeling and simulation storage.
