@@ -101,7 +101,7 @@ reefSteady <- function(params, d_func = NULL,
     
     # algae and detritus ----
     if(params@other_params$new_refuge == FALSE){
-        cc <- params@other_params$carry_capacity
+        cc <- params@other_params$use_UR_cc
         if (cc == TRUE)  { params <- tuneUR_cc(params = params, ...) }
         if (cc == FALSE) { params <- tuneUR(params = params, ...) }
     }

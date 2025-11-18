@@ -281,3 +281,92 @@ plotlyRefuge <- function(object,
     ggplotly(do.call("plotRefuge", argg),
              tooltip = c("Functional Group", "w", "value"))
 }
+
+#' Plot refuge density through time
+#'
+#' Plots the refuge density at each size bin through time as colored lines,
+#' showing how refuge degrades over the course of a simulation. Uses viridis
+#' color scale to represent temporal succession.
+#'
+#' @param sim A \linkS4class{MizerSim} object
+#' @param return_data A boolean value that determines whether the formatted 
+#'                    data used for the plot is returned instead of the plot 
+#'                    itself. Default value is FALSE.
+#' @param ... Unused
+#' 
+#' @return A ggplot2 object, unless `return_data = TRUE`, in which case a data
+#'         frame with refuge density at each size and time
+#'
+#' @import ggplot2
+#' @importFrom plasma scale_color_viridis
+#' @export
+#' 
+#' @family plotting functions
+#' @concept refugePlots
+#' @seealso [plotting_functions], [setRefuge()], [reefDegrade()]
+plotDegradation <- function(sim, return_data = FALSE, ...) {
+    
+    # Input validation
+    assert_that(is(sim, "MizerSim"),
+                is.flag(return_data))
+    
+    params <- sim@params
+    times <- sim@params@time
+    n_times <- length(times)
+    
+    # Get refuge parameters
+    refuge_params <- params@refuge_params
+    
+    # Check if competitive method is used
+    if (is.null(refuge_params$method) || refuge_params$method != "competitive") {
+        stop("plotDegradation requires the 'competitive' refuge method.")
+    }
+    
+    method_params <- refuge_params$method_params
+    refuge_bins <- method_params$refuge_bins
+    n_bins <- length(refuge_bins)
+    
+    # Calculate refuge density at each time step
+    refuge_density_list <- list()
+    for (i in seq_along(times)) {
+        refuge_density_list[[i]] <- reefDegrade(
+            params = params,
+            n = sim@n[i, , ],
+            n_pp = sim@n_pp[i, ],
+            n_other = sim@n_other[i, ],
+            t = times[i]
+        )
+    }
+    
+    # Convert to data frame for plotting
+    plot_dat <- data.frame(
+        time = rep(times, each = n_bins),
+        size_bin = rep(refuge_bins, n_times),
+        refuge_density = unlist(refuge_density_list)
+    )
+    
+    # Return data if requested
+    if (return_data) return(plot_dat)
+    
+    # Create plot
+    p <- ggplot(plot_dat, aes(x = time, y = refuge_density, 
+                               group = factor(size_bin), 
+                               color = size_bin)) +
+        geom_line(linewidth = 0.8) +
+        scale_color_viridis(option = "plasma", name = "Size Bin (cm)") +
+        labs(x = "Time (years)", 
+             y = "Refuge Density",
+             title = "Refuge Density Through Time") +
+        theme_minimal() +
+        theme(legend.position = "right")
+    
+    return(p)
+}
+
+#' @rdname plotDegradation
+#' @export
+plotlyDegradation <- function(sim, ...) {
+    argg <- as.list(environment())
+    ggplotly(do.call("plotDegradation", argg),
+             tooltip = c("time", "size_bin", "refuge_density"))
+}

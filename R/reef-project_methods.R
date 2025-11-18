@@ -155,9 +155,9 @@ reefRates <- function(params, n, n_pp, n_other, t = 0, effort, rates_fns, ...) {
 #' @family mizer rate functions
 reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 
-	method_params <- params@other_params[['method_params']]
-	refuge_params <- params@other_params[['refuge_params']]
-	degrade <- params@other_params$degrade #true/false for whether to degrade
+	method_params <- params@refuge_params[['method_params']]
+	refuge_params <- params@refuge_params
+	degrade <- params@refuge_params$degrade #true/false for whether to degrade
 
 	# Save original refuge density
 	rd <- method_params$refuge_density
@@ -165,18 +165,16 @@ reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 	if (degrade == TRUE){
 		# If not competitive method, error
 		if (refuge_params$method != "competitive"){
-			stop("Degradation is only available for the competitive
-				 method.")
+			stop("Degradation is only available for the competitive method.")
 		}
 
 		# Pull times (years) for bleaching & scaling parameters
-		t_bleach    <- params@other_params$t_bleach         # year for bleaching to occur
-		deg_scale   <- params@other_params[['deg_scale']]   # matrix of refuge scaling parameters
+		t_bleach    <- params@refuge_params$t_bleach         # year for bleaching to occur
+		deg_scale   <- params@refuge_params$deg_scale   # matrix of refuge scaling parameters
 
 		# If before bleaching, return old method parameters
 		time <- t
-		
-        if(time < t_bleach) {return(rd)}
+		if(time < t_bleach) {return(rd)}
 
 		old_rd <- reefDegrade(params, n, n_pp, n_other, t = t-1)
 		# Bleaching time - at bleach year
@@ -184,23 +182,23 @@ reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 			# Pull initial bleaching impact from first column of deg_scale
 			scale_bin <- deg_scale[, 1]
 			new_rd <- scale_bin * old_rd
-			
+
 			# Apply algae dynamics if specified
-			if (params@other_params$algae_boost) {
-				growth_boosts <- params@other_params$algae_growth_boost
-				capacity_boosts <- params@other_params$algae_capacity_boost
-				
+			if (isTRUE(params@algae_params$algae_boost)) {
+				growth_boosts   <- params@algae_params$algae_growth_boost
+				capacity_boosts <- params@algae_params$algae_capacity_boost
+
 				# Apply first element of boost vectors (bleaching year = index 1)
-				if (length(growth_boosts) >= 1) {
-					a_growth <- params@other_params$algae$growth
-					params@other_params$algae$growth <- growth_boosts[1] * a_growth
+				if (length(growth_boosts) >= 1 && !is.null(params@algae_params$algae_growth_initial)) {
+					a_growth <- params@algae_params$algae_growth_initial
+					params@algae_params$algae_growth_initial <- growth_boosts[1] * a_growth
 				}
-				if (length(capacity_boosts) >= 1) {
-					a_capacity <- params@other_params$algae$capacity
-					params@other_params$algae$capacity <- capacity_boosts[1] * a_capacity
+				if (length(capacity_boosts) >= 1 && !is.null(params@algae_params$algae_capacity)) {
+					a_capacity <- params@algae_params$algae_capacity
+					params@algae_params$algae_capacity <- capacity_boosts[1] * a_capacity
 				}
 			}
-			
+
 			params@time_modified <- lubridate::now()
 			return(new_rd)
 		}
@@ -217,22 +215,22 @@ reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 				scale_bin <- deg_scale[, years_post + 1]
 				# multiply bins by scaling values
 				new_rd <- scale_bin * old_rd
-				
+
 				# Apply continued algae boost if within boost vector length
-				if (params@other_params$algae_boost) {
-					growth_boosts <- params@other_params$algae_growth_boost
-					capacity_boosts <- params@other_params$algae_capacity_boost
-					
+				if (isTRUE(params@algae_params$algae_boost)) {
+					growth_boosts <- params@algae_params$algae_growth_boost
+					capacity_boosts <- params@algae_params$algae_capacity_boost
+
 					# years_post = 1,2,3... maps to indices 2,3,4... in the boost vectors
 					boost_idx <- years_post + 1
-					
-					if (boost_idx <= length(growth_boosts)) {
-						a_growth <- params@other_params$algae$growth
-						params@other_params$algae$growth <- growth_boosts[boost_idx] * a_growth
+
+					if (boost_idx <= length(growth_boosts) && !is.null(params@algae_params$algae_growth_initial)) {
+						a_growth <- params@algae_params$algae_growth_initial
+						params@algae_params$algae_growth_initial <- growth_boosts[boost_idx] * a_growth
 					}
-					if (boost_idx <= length(capacity_boosts)) {
-						a_capacity <- params@other_params$algae$capacity
-						params@other_params$algae$capacity <- capacity_boosts[boost_idx] * a_capacity
+					if (boost_idx <= length(capacity_boosts) && !is.null(params@algae_params$algae_capacity)) {
+						a_capacity <- params@algae_params$algae_capacity
+						params@algae_params$algae_capacity <- capacity_boosts[boost_idx] * a_capacity
 					}
 				}
 				return(new_rd)
@@ -611,8 +609,6 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 	# Number of species, number of bins in resource spectrum and full
 	# size spectrum
 	no_sp <- nrow(params@species_params)
-	no_w <- length(params@w)
-	no_w_full <- length(params@w_full)
 
 	# Get index of species that have grown out of the resource spectrum
 	idx_sp <- (length(params@w_full) -

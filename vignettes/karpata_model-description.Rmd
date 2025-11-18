@@ -1,25 +1,19 @@
 ---
 title: "Functional Group Example"
 subtitle: "Karpata Reef Steady State Model Description"
-bibliography: references_sorted.bib
+author: ""
+bibliography: references.bib
 csl: ecology.csl
-format:
-  html:
+output:
+  bookdown::html_document2:
     toc: true
-    toc-depth: 4
-    code-fold: true
-    code-link: true
-  pdf:
-    toc: true
-    toc-depth: 3
-    number-sections: true
-    number-depth: 2
-header-includes:
-    - \usepackage{sectsty}
-    - \sectionfont{\color{blue}}
-editor: 
-  markdown: 
-    wrap: 72
+    code_folding: show
+    toc_depth: 4
+    fig_caption: true
+vignette: >
+  %\VignetteIndexEntry{Functional Group Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, echo = FALSE}

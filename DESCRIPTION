@@ -39,7 +39,8 @@ Imports:
     plyr,
     lifecycle,
     reshape2,
-    progress
+    progress,
+    viridis
 Suggests: 
     knitr,
     patchwork,

@@ -289,3 +289,110 @@ Branch: major_update
 - Ready for staging and commit.
 
 ===============================================================================
+
+===============================================================================
+mizerReef Review Session Summary - November 17, 2025
+Branch: major_update
+===============================================================================
+
+KEY REALIZATION: No Custom Simulation Class Needed
+--------------------------------------------------
+
+DISCOVERY
+---------
+During review of the MizerReefSim class implementation, realized that both 
+`reefDegrade()` and `reefVulnerable()` are rate functions that can calculate 
+their outputs based solely on:
+- Current abundances (n, n_pp, n_other)
+- Model parameters (params)
+- Current time (t)
+
+This means they can be calculated post-hoc from any standard MizerSim object.
+
+IMPLICATIONS
+------------
+1. NO NEED for custom MizerReefSim S4 class
+   - Don't need to store vulnerable profiles during simulation
+   - Don't need custom slots or extended simulation object
+   
+2. NO NEED for custom reefProject() function
+   - Can use standard mizer::project() with MizerReefParams
+   - Returns standard MizerSim object
+   - Simpler workflow for users
+
+3. SIMPLER ARCHITECTURE
+   - Less custom code to maintain
+   - Better compatibility with mizer ecosystem
+   - More memory efficient (calculate only what you need)
+   - Users can leverage all standard mizer functions
+
+IMPLEMENTATION APPROACH
+-----------------------
+Instead of storing refuge/vulnerable data during simulation, calculate them 
+on-demand when needed:
+
+```r
+# Calculate refuge density through time
+refuge_density_list <- list()
+for (i in seq_along(sim@params@time)) {
+    refuge_density_list[[i]] <- reefDegrade(
+        params = sim@params,
+        n = sim@n[i, , ],
+        n_pp = sim@n_pp[i, ],
+        n_other = sim@n_other[i, ],
+        t = sim@params@time[i]
+    )
+}
+
+# Calculate vulnerable biomass through time
+vulnerable_list <- list()
+for (i in seq_along(sim@params@time)) {
+    rd <- refuge_density_list[[i]]
+    vulnerable_list[[i]] <- reefVulnerable(
+        params = sim@params,
+        n = sim@n[i, , ],
+        n_pp = sim@n_pp[i, ],
+        n_other = sim@n_other[i, ],
+        t = sim@params@time[i],
+        new_rd = rd
+    )
+}
+```
+
+RECOMMENDED PACKAGE STRUCTURE
+------------------------------
+Keep:
+- MizerReefParams class (extends MizerParams)
+- Rate functions: reefDegrade(), reefVulnerable()
+- Helper/getter functions for convenient post-hoc calculation
+
+Remove/Don't implement:
+- MizerReefSim class
+- reefProject() function
+- Custom projection methods
+
+Add convenience functions:
+- getRefugeDensity(sim, time_range = NULL)
+- getVulnerable(sim, time_range = NULL)
+
+BENEFITS
+--------
+✓ Simpler package architecture
+✓ Full compatibility with mizer workflow
+✓ Memory efficient (lazy calculation)
+✓ Easier maintenance
+✓ Users can use familiar mizer::project()
+✓ Less custom code to test and document
+✓ Natural integration with mizer visualization tools
+
+ACTION ITEMS
+------------
+1. Remove/refactor any MizerReefSim class code
+2. Remove/refactor any reefProject() function code
+3. Ensure rate functions work with standard MizerSim objects
+4. Add convenience getter functions if helpful
+5. Update documentation to reflect simpler workflow
+6. Update vignettes to show standard project() usage
+
+===============================================================================
+

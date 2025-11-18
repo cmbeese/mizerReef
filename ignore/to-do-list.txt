@@ -1,0 +1,62 @@
+MizerReef Major Package Update To Do List - 18/11/2025
+
+** For Major Update **
+- check remaining current diffs and approve them for each file
+
+- check on algae growth and boosting mechanics to make sure they are actually implemented during simulations (because the params object doesn't get updated?)
+-- make sure the right algae parameters are being called and stored in tune_UR, tune_UR_cc, and all algae functions
+
+- fix all instances where params@other_params is called
+-- update all algae_component functions
+-- update all detritus_component functions
+-- update newReefParams
+-- update reef-rates functions and check if the calculations at each time step are the same as the steps in plotDegradation - then maybe rework the function to use getDegrade
+
+- update all data objects to reflect changes to parameters (new slots, new parameter names)
+-- deg_scales should have the first column be bleaching 
+-- species parameter data frames need to have bad_pred column renamed to blocked_pred
+
+
+- Set defaults for parameters that users must provide for MizerReef - no known currently
+- Add error messages - all current known handled
+
+- finish/ polish the vignettes and articles for Mizer Reef
+-- clean referencing, links, and document structure
+-- Getting-started vignette
+---- add descriptions of method_params variables for each method and show what data frames should look like before the example - separate section for the example
+---- clarify we are using the Multispecies mizer model and confirm params are right for that
+---- refine spelling, grammar, and language to be concise, precise, and easy to understand
+---- clarify in the steady state recipe summary that you only need to switch profiles if you plan to use the competitive method
+---- Add a few plots, maybe to check the initial spectra and diets, under the "exploring results" section
+---- Add the mizer steady state guide and links to the other mizerReef tutorials to the further reading section, as well as some of the basic mizer papers and maybe a link to my thesis from the VUW library: https://openaccess.wgtn.ac.nz/articles/thesis/Modelling_Coral_Reef_Futures_Exploring_the_role_of_structural_complexity_in_sustaining_ecosystem_services/26421523?file=48064144
+---- find a better place for the model description context?
+-- steady state recipe
+---- add more thorough descriptions of each step
+-- karpata and Bonaire model descriptions
+---- mimic mizer shelf model description structure, bring back in skips and stops
+---- add description for three group Bonaire model
+-- simulations with degradation
+---- add thorough description of all degradation parameters
+---- add section that goes over the nice new plotting functions for looking at simulations in mizerReef
+
+- new plotting functions
+-- translate code from degradation scale plot to a function plotDegScale to create heat plot for degradation scaling parameters
+-- check if plotRefugeDensity correctly plots each refuge size through time in simulations, comparing with getDegrade
+
+- write and run tests for all functions
+
+** Code updates for future (not necessary for next update) **
+- create versions of calibrateReef, calibrateReefYield, and CalibrateReefNumber that use scaleReefModel
+
+** Ideas for the future **
+- New refuge method - parabolic
+- New refuge method - exponential
+- New refuge method - refuge hole diameter with body width & depth?
+- Add data object with rabbitfish parameters/ Indo-Pacific parameters
+
+
+============================================================================
+COMPLETED
+-- 18/11 in matchReefGrowth, after age_mat values are set using set_species_defaults, if any age_mat = 0, needs to stop and provide an error that age_mat is zero for species i, this is impossible, needs to be non-zero
+-- 18/11 Add code to newReefParams() that sets satiation to false for all carnivores (any interaction>1) and true for resource consumers. The satiation response doesn't work well for predators that hunt prey in refuge. The code must give a warning that says something like "You have not specified whether species should have a satiation response. The default is FALSE for carnivores and TRUE for resource consumers."
+-- 18/11 Add code to setRefuge() that sets species_params a and b to a_bar and b_bar for any species where a and b are missing from species_params, and gives a warning to the user that average values are being used

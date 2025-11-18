@@ -507,9 +507,9 @@ setExtMortParams <- function(params,
 #'  `read.csv()`.
 #'
 #' @param params    MizerParams object
-#' @param method    Character. The method for setting up benthic refuge. 
-#'                  One of "sigmoidal", "binned", "competitive", or "noncomplex". 
-#'                  See Details. **Required.**
+#' @param method    Character. The method for setting up benthic refuge.
+#'                 One of "sigmoidal", "binned", "competitive", or
+#'                 "noncomplex". See Details. **Required.**
 #' @param method_params    Data frame or named list. Specifies parameters required for the chosen method:
 #'   - For "sigmoidal": must include `L_refuge` (numeric, length at which refuge becomes scarce, cm; **no default**) and `prop_protect` (numeric, max proportion protected, default: 0.98).
 #'   - For "binned": must include `start_L` (numeric, start length, cm; **no default**), `end_L` (numeric, end length, cm; **no default**), and `prop_protect` (numeric, proportion protected, default: 0.98).
@@ -530,11 +530,18 @@ setExtMortParams <- function(params,
 #' @param blocked_pred Optional. Logical vector (length = number of species). Indicates whether the predator is blocked by refuge for this species. TRUE means hunting is blocked by refuge; FALSE means the species can access prey within refuge (e.g. eels). Defaults to FALSE.
 #'
 #' @param satiation Logical vector (length = number of species). Indicates which groups are subject to
-#'                  satiation. Defaults to FALSE.
+#'                  satiation. If not provided, defaults are set automatically: FALSE for carnivores
+#'                  (species that eat other species, i.e. row sum of interaction matrix > 0), TRUE
+#'                  for pure resource consumers (species that do not eat other species but have
+#'                  positive resource interaction). A warning is issued if defaults are used.
 #'
 #' @param a_bar Numeric. Length-weight conversion parameter for dummy fish. **Default:** 0.025.
+#'              If any species is missing an 'a' parameter, the value of a_bar is used for that
+#'              species and a warning is issued.
 #'
 #' @param b_bar Numeric. Length-weight exponent for dummy fish. **Default:** 3.
+#'              If any species is missing a 'b' parameter, the value of b_bar
+#'              is used for that species and a warning is issued.
 #'
 #' @param w_settle Numeric. Minimum weight of fish protected by refuges at measured scale (grams). **Default:** 0.1.
 #'
@@ -560,141 +567,177 @@ setRefuge <- function(params, method, method_params = NULL,
                       species_specific_bins = FALSE,
                       ...) {
 
-    # object check 
-        # Check if given mizerParams object is valid
-        assert_that(is(params, "MizerParams"))
-    
-        # Check that a and b parameters are present for all species -
-        # needed for l2w conversion
-        if (any(!c("a", "b") %in% names(params@species_params))) {
-            stop("species_params slot must have columns 'a' and 'b' for ",
-                 "length-weight conversion")
-        }
-        if (anyNA(params@species_params[["a"]]) ||
-            anyNA(params@species_params[["b"]])) {
-            message("There are NAs in the species_params 
-                    columns 'a' and 'b'. You must provide these parameters if you want to use refuge.")
-        }
+    # Object validation
+    assert_that(is(params, "MizerParams"))
     
     # Find number of species for checks
     no_sp = nrow(params@species_params)
     
-    # species_params checks
-        # Check that refuge_user is logical and the right length
-        if(!('refuge_user' %in% colnames(params@species_params))){
-            if(is.null(refuge_user)){
-                warning("You have not provided values for refuge_user, so no species use refuge.")
-                refuge_user <- rep(FALSE, no_sp)
-            } else if (!is.logical(refuge_user)) {
-                stop("The refuge_user values should be logical.")
-            }
-            if(length(refuge_user) != no_sp) {
-                stop("refuge_user should have a value for every group.")
-            }
-            params@species_params$refuge_user <- refuge_user
-        }
-        
-        # Check that blocked_pred is logical and the right length
-        if(!('blocked_pred' %in% colnames(params@species_params))){
-            if(is.null(blocked_pred)){
-                warning("You have not provided values for blocked_pred, so all predators can access prey within refuge.")
-                blocked_pred <- rep(FALSE, no_sp)
-            } else if (!is.logical(blocked_pred)) {
-                stop("The blocked_pred values should be logical.")
-            }
-            if(length(blocked_pred) != no_sp) {
-                stop("blocked_pred should have a value for every group.")
-            }
-            params@species_params$blocked_pred <- blocked_pred
-        }
+    # === LENGTH-WEIGHT PARAMETER SETUP ===
+    # Set default a_bar and b_bar values first
+    if (is.null(a_bar)){
+        a_bar <- 0.025
+    } else {
+        if (!is.numeric(a_bar)) { stop("a_bar should be numeric.") }
+        if (a_bar < 0) { stop("a_bar must be non-negative.") }
+    }
     
-        # Check that satiation is logical and the right length
-        if(!('satiation' %in% colnames(params@species_params))){
-            if(is.null(satiation)){
-                stop("You need to provide values for satiation")
-            } else if (!is.logical(satiation)) {
-                stop("The satiation values should be logical.")
-            }
-            if(length(satiation) != no_sp) {
-                stop("satiation should have a value for every group.")
-            }
-            params@species_params$satiation <- satiation
-        }
+    if (is.null(b_bar)){
+        b_bar <- 3
+    } else {if (!is.numeric(b_bar)) { stop("b_bar should be numeric.") }
+        if (b_bar < 0) { stop("b_bar must be non-negative.") }
+    }
     
-    # refuge_params set up and checks 
-        # Check if the user provided one of the available refuge profile methods
-        method_options <- c('sigmoidal','binned','competitive','noncomplex')
-        if(is.null(method)) {
-            stop("You must provide the method to calculate the refuge profile.")
-        } else if(!is.element(method, method_options)) {
-            stop("Method must be 'sigmoidal','binned', 'competitive', 'noncomplex'.")
+    # Check and create a and b columns if missing, set defaults for NAs
+    missing_cols <- !c("a", "b") %in% names(params@species_params)
+    if (any(missing_cols)) {
+        if (missing_cols[1]) {  # 'a' column missing
+            params@species_params$a <- rep(NA_real_, nrow(params@species_params))
         }
-
-        # Set default values for parameters used by all methods
-
-        # Minimum weight of fish protected by refuges at measured scale
-        if(is.null(w_settle)){
-            w_settle <- 0.1
-        } else {
-            if(!is.numeric(w_settle)) {
-                stop("w_settle should be numeric.")
-            }
-            if(w_settle < 0) {
-            stop("w_settle must be non-negative.")
-            }
+        if (missing_cols[2]) {  # 'b' column missing
+            params@species_params$b <- rep(NA_real_, nrow(params@species_params))
         }
-
-        # Maximum proportion of fish protected by refuge
-        if(is.null(max_protect)){
-            max_protect <- 0.98
-        } else {
-            if(!is.numeric(max_protect)) { 
-                stop("max_protect should be numeric.") 
-            }
-            if(max_protect < 0 || max_protect > 1) {
-                stop("max_protect should be a proportion between 0 and 1")
-            }
+    }
+    
+    # Set defaults for missing a and b parameters using a_bar and b_bar
+    if (anyNA(params@species_params[["a"]]) || anyNA(params@species_params[["b"]])) {
+        missing_a <- is.na(params@species_params[["a"]])
+        missing_b <- is.na(params@species_params[["b"]])
+        
+        if (any(missing_a)) {
+            params@species_params[["a"]][missing_a] <- a_bar
         }
-
-        # Proportion of fish with access to refuge that are expected 
-        # to utilize it
-        if(is.null(tau)){
-            tau <- 1
-        } else {
-            if(!is.numeric(tau)) { stop("tau should be numeric.") }
-            if(tau < 0 || tau > 1) {
-                stop("tau should be a proportion between 0 and 1")
-            }
+        if (any(missing_b)) {
+            params@species_params[["b"]][missing_b] <- b_bar
         }
         
-        # a_bar for fish dummies
-        if(is.null(a_bar)){
-            a_bar <- 0.025
-        } else {
-            if(!is.numeric(a_bar)) { stop("a_bar should be numeric.") }
-            if(a_bar < 0) {
-                stop("a_bar must be non-negative.")
-            }
+        if (any(missing_a) || any(missing_b)) {
+            warning("Missing values in species_params columns 'a' and/or 'b' have been set to average values (a_bar = ", 
+                    a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters.")
         }
-        
-        # a_bar for fish dummies
-        if(is.null(b_bar)){
-            b_bar <- 3
-        } else {
-            if(!is.numeric(a_bar)) { stop("b_bar should be numeric.") }
-            if(a_bar < 0) {
-                stop("b_bar must be non-negative.")
-            }
+    }
+    
+    # === SPECIES PARAMETER CHECKS ===
+    # Check that refuge_user is logical and the right length
+    if(!('refuge_user' %in% colnames(params@species_params))){
+        if(is.null(refuge_user)){
+            warning("You have not provided values for refuge_user, so no species use refuge.")
+            refuge_user <- rep(FALSE, no_sp)
+        } else if (!is.logical(refuge_user)) {
+            stop("The refuge_user values should be logical.")
         }
-        
-        # Store all values directly in refuge_params slot
-        params@refuge_params$method <- method
-        params@refuge_params$a_bar <- a_bar
-        params@refuge_params$b_bar <- b_bar
-        params@refuge_params$w_settle <- w_settle
-        params@refuge_params$max_protect <- max_protect
-        params@refuge_params$tau <- tau
-        params@refuge_params$species_specific_bins <- species_specific_bins
+        if(length(refuge_user) != no_sp) {
+            stop("refuge_user should have a value for every group.")
+        }
+        params@species_params$refuge_user <- refuge_user
+    }
+    
+    # Check that blocked_pred is logical and the right length
+    if(!('blocked_pred' %in% colnames(params@species_params))){
+        if(is.null(blocked_pred)){
+            warning("You have not provided values for blocked_pred, so all predators can access prey within refuge.")
+            blocked_pred <- rep(FALSE, no_sp)
+        } else if (!is.logical(blocked_pred)) {
+            stop("The blocked_pred values should be logical.")
+        }
+        if(length(blocked_pred) != no_sp) {
+            stop("blocked_pred should have a value for every group.")
+        }
+        params@species_params$blocked_pred <- blocked_pred
+    }
+
+    # Check that satiation is logical and the right length
+    if(!('satiation' %in% colnames(params@species_params))){
+        if(is.null(satiation)){
+            # Calculate default satiation values based on feeding behavior
+            # FALSE for carnivores (species that eat other species)
+            # TRUE for resource consumers (only eat resources, not other species)
+            
+            # Check if species eat other species (row sums in interaction matrix > 0)
+            interaction_rowsums <- rowSums(params@interaction)
+            eats_other_species <- interaction_rowsums > 0
+            
+            # Check if species eat any resources
+            resource_cols <- c("resource_interaction", "interaction_algae", "interaction_detritus", "interaction_sponge", 
+                              "interaction_encrusting", "interaction_massive", "interaction_cryptic", "interaction_branching")
+
+                existing_resource_cols <- resource_cols[resource_cols %in% names(params@species_params)]
+                if(length(existing_resource_cols) > 0) {
+                    # Sum all resource interactions for each species (species are rows)
+                    resource_interaction_sums <- rowSums(params@species_params[, existing_resource_cols, drop = FALSE], na.rm = TRUE)
+                    eats_resources <- resource_interaction_sums > 0
+                } else {
+                    eats_resources <- rep(FALSE, no_sp)  # No resource interaction columns means no resource consumption
+                }
+            
+            # Set satiation: FALSE for carnivores, TRUE for pure resource consumers
+            satiation <- !eats_other_species & eats_resources
+            
+            warning("You have not specified whether species should have a satiation response. The default is FALSE for carnivores and TRUE for resource consumers.")
+        } else if (!is.logical(satiation)) {
+            stop("The satiation values should be logical.")
+        }
+        if(length(satiation) != no_sp) {
+            stop("satiation should have a value for every group.")
+        }
+        params@species_params$satiation <- satiation
+    }
+
+    # === REFUGE METHOD VALIDATION ===
+    # Check if the user provided one of the available refuge profile methods
+    method_options <- c('sigmoidal','binned','competitive','noncomplex')
+    if(is.null(method)) {
+        stop("You must provide the method to calculate the refuge profile.")
+    } else if(!is.element(method, method_options)) {
+        stop("Method must be 'sigmoidal','binned', 'competitive', 'noncomplex'.")
+    }
+
+    # === REFUGE PARAMETER SETUP ===
+    # Set default values for parameters used by all methods
+    
+    # Minimum weight of fish protected by refuges at measured scale
+    if(is.null(w_settle)){
+        w_settle <- 0.1
+    } else {
+        if(!is.numeric(w_settle)) {
+            stop("w_settle should be numeric.")
+        }
+        if(w_settle < 0) {
+        stop("w_settle must be non-negative.")
+        }
+    }
+
+    # Maximum proportion of fish protected by refuge
+    if(is.null(max_protect)){
+        max_protect <- 0.98
+    } else {
+        if(!is.numeric(max_protect)) { 
+            stop("max_protect should be numeric.") 
+        }
+        if(max_protect < 0 || max_protect > 1) {
+            stop("max_protect should be a proportion between 0 and 1")
+        }
+    }
+
+    # Proportion of fish with access to refuge that are expected 
+    # to utilize it
+    if(is.null(tau)){
+        tau <- 1
+    } else {
+        if(!is.numeric(tau)) { stop("tau should be numeric.") }
+        if(tau < 0 || tau > 1) {
+            stop("tau should be a proportion between 0 and 1")
+        }
+    }
+    
+    # Store all values directly in refuge_params slot
+    params@refuge_params$method <- method
+    params@refuge_params$a_bar <- a_bar
+    params@refuge_params$b_bar <- b_bar
+    params@refuge_params$w_settle <- w_settle
+    params@refuge_params$max_protect <- max_protect
+    params@refuge_params$tau <- tau
+    params@refuge_params$species_specific_bins <- species_specific_bins
     
     #  method_params set up and checks 
     if (method != "noncomplex"){
@@ -721,7 +764,7 @@ setRefuge <- function(params, method, method_params = NULL,
         cnames = colnames(method_params)
 
         ## Sigmoidal method 
-        if (refuge_params$method == "sigmoidal") {
+        if (method == "sigmoidal") {
             # Prop protect
             if(!("prop_protect" %in% cnames)) {
                 stop("The sigmoidal method parameters dataframe needs a 
@@ -742,7 +785,7 @@ setRefuge <- function(params, method, method_params = NULL,
         }
 
         # Binned method 
-        if (refuge_params$method == "binned") {
+        if (method == "binned") {
             if(!("start_L" %in% cnames)) {
                 stop("The binned method parameters dataframe needs a column called
                      'start_L' with the starting lengths (cm) for each size bin.")
@@ -765,7 +808,7 @@ setRefuge <- function(params, method, method_params = NULL,
         }
 
         # Competitive method 
-        if (refuge_params$method == "competitive") {
+        if (method == "competitive") {
             if(!("start_L" %in% cnames)) {
                 stop("The competitive method parameters dataframe needs a 
                 column called 'start_L' with the starting lengths (cm) for 

@@ -411,6 +411,12 @@ matchReefGrowth <- function(params, species = NULL,
         age_mat_vB <- age_mat_vB(params)
         sp <- mizer::set_species_param_default(sp, "age_mat", age_mat_vB)
     }
+
+        # Error check: age_mat must not be zero for any species
+        if (any(sp$age_mat == 0, na.rm = TRUE)) {
+            bad_species <- which(sp$age_mat == 0)
+            stop(paste0("Error: age_mat is zero for species ", paste(names(bad_species), collapse=", "), ", age_mat must be non-zero."))
+        }
     
     # Don't affect species where no age at maturity is available
     sel <- sel & !is.na(sp$age_mat)

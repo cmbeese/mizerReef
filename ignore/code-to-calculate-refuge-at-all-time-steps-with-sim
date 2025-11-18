@@ -1,0 +1,57 @@
+ sim@n[i, , ] <- n_list$n
+        sim@n_pp[i, ] <- n_list$n_pp
+        sim@n_other[i, ] <- unserialize(serialize(n_list$n_other, NULL))
+        # Store vulnerable profile for this time step
+        sim@vulnerable[[i]] <- reefVulnerable(params, n_list$n, n_list$n_pp, n_list$n_other, t)
+
+# Calculate vulnerable biomass at all time steps
+vulnerable_list <- list()
+for (i in seq_along(sim@params@time)) {
+    vulnerable_list[[i]] <- reefVulnerable(
+        params = sim@params,
+        n = sim@n[i, , ],
+        n_pp = sim@n_pp[i, ],
+        n_other = sim@n_other[i, ],
+        t = sim@params@time[i]
+    )
+}
+
+
+# Calculate refuge density at all time steps
+refuge_density_list <- list()
+for (i in seq_along(sim@params@time)) {
+    refuge_density_list[[i]] <- reefDegrade(
+        params = sim@params,
+        n = sim@n[i, , ],
+        n_pp = sim@n_pp[i, ],
+        n_other = sim@n_other[i, ],
+        t = sim@params@time[i]
+    )
+}
+
+
+# Calculate refuge density at all time steps
+refuge_density_list <- list()
+for (i in seq_along(sim@params@time)) {
+    refuge_density_list[[i]] <- reefDegrade(
+        params = sim@params,
+        n = sim@n[i, , ],
+        n_pp = sim@n_pp[i, ],
+        n_other = sim@n_other[i, ],
+        t = sim@params@time[i]
+    )
+}
+
+# And vulnerable biomass using the refuge density
+vulnerable_list <- list()
+for (i in seq_along(sim@params@time)) {
+    rd <- refuge_density_list[[i]]
+    vulnerable_list[[i]] <- reefVulnerable(
+        params = sim@params,
+        n = sim@n[i, , ],
+        n_pp = sim@n_pp[i, ],
+        n_other = sim@n_other[i, ],
+        t = sim@params@time[i],
+        new_rd = rd  # Pass the calculated refuge density
+    )
+}
