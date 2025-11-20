@@ -66,7 +66,7 @@ Use a recent version of R and RStudio for best results. For troubleshooting or m
  the [GitHub repository](https://github.com/cmbeese/mizerReef).
 
 
-## Setting up species parameters {.section-species-params}
+## Setting up Species Parameters {.section-species-params}
 
 ::: {.content-visible when-format="html"}
 [Skip to mizerReef parameters](#additional-species-parameters-needed-for-mizerreef)
@@ -173,25 +173,10 @@ so that the corresponding feature is disabled, and issue a warning. See
 [setRefuge()], [setAlgaeParams()] and [setDetritusParams()] for additional
 details.
 
-> 💡 **Tip:** When importing your species parameter table from a CSV, make sure that missing values are represented as NA or blank cells, not zeros.
-
-<details>
-<summary>Handling missing values</summary>
-
-You can load your species parameter data frame into R using standard functions
-like `read.csv()` or `readxl::read_excel()`, depending on your file format.
-Ensure that the column names in your data frame match those expected by MizerReef.
-Use `na.strings = ""` in `read.csv()` to ensure blanks are read as `NA` rather than `0`.
-
-```{r load-species-params, eval=FALSE, echo=TRUE}
-species_params <- read.csv("path/to/your/species_params.csv", na.strings = c("", " "))
-```
+> <details> <summary>💡 <strong>Tip:</strong> When importing your species parameter table from a CSV, make sure that missing values are represented as NA or blank cells, not zeros.</summary> You can load your species parameter data frame into R using standard functions like <code>read.csv()</code> or <code>readxl::read_excel()</code>, depending on your file format. Ensure that the column names in your data frame match those expected by MizerReef. Use <code>na.strings = c(""," ")</code> in <code>read.csv()</code> to ensure blanks are read as <code>NA</code> rather than <code>0</code>. </details>
 
 
-</details>
-
-
-### Example species parameters {.section-example-params}
+### Example mizerReef species parameters {.section-example-params}
 ::: {.content-visible when-format="html"}
 [Skip to Setting the refuge profile](#setting-the-refuge-profile)
 :::
@@ -215,7 +200,7 @@ knitr::kable(karpata_species[colnames(karpata_species) %in% c("species", "l_max"
 ```
 
 
-> 💡 **Tip:** *The Karpata species parameters also include optional columns like `w_mat`, `age_mat`, `k_vb`, and `ks`.Include as many parameters as you have data for to assist in the calibration process.*
+> 💡 **Tip:** The Karpata species parameters also include optional columns like `w_mat`, `age_mat`, `k_vb`, and `ks`. Include as many parameters as you have data for to assist in the calibration process.
 
 ## Setting the refuge profile {.section-refuge-profile}
 
