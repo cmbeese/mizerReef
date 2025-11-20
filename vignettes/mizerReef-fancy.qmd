@@ -1,22 +1,13 @@
 ---
 title: "Getting started with MizerReef"
-output:
-  rmarkdown::html_vignette:
-    toc: true
-    toc_depth: 2
-vignette: >
-  %\VignetteIndexEntry{Getting started with MizerReef}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+format: html
 ---
 ```{r plot-sizing, include=FALSE}
 knitr::opts_chunk$set(fig.width=6, fig.height=4, dpi=300)
 ```
 
-## Introduction {.section-intro}
-::: {.content-visible when-format="html"}
+## Introduction
 [Skip to Installing MizerReef](#installing-mizerreef)
-:::
 
 This guide details setting up a simple `MizerReef` model from the beginning, highlighting the package-specific parameters you must supply and some of the key functions you will use. It also includes code snippets to demonstrate how to modify refuge profiles and other settings.
 
@@ -25,18 +16,14 @@ This guide details setting up a simple `MizerReef` model from the beginning, hig
 
 For a complete explanation and references, see Chapter 3 of [Modelling Coral Reef Futures: Exploring the role of structural complexity in sustaining ecosystem services (PhD Thesis, VUW)](https://openaccess.wgtn.ac.nz/articles/thesis/Modelling_Coral_Reef_Futures_Exploring_the_role_of_structural_complexity_in_sustaining_ecosystem_services/26421523?file=48064144).
 
+
 <details>
-<summary>The  `MizerReef` package is extension of the `mizer`package and uses many of the same functions and parameters.</summary>
-If you need to brush up on the general `mizer` workflow, learn more about size spectrum modelling in general,
-or want to understand the base functions that `MizerReef` builds upon, visit the [mizer website](https://sizespectrum.org/mizer/).
- You may also want to refer to the [mizer course](https://mizer.course.nov22.sizespectrum.org/).
+<summary>Brushing up on mizer</summary>
+The  `mizerReef` package is extension of the `mizer`package and uses many of the same functions and parameters. If you need to brush up on the general `mizer` workflow, see the official [mizer getting started guide](https://sizespectrum.org/mizer/articles/mizer.html). You may also want to refer to the [mizer course](https://mizer.course.nov22.sizespectrum.org/).
 </details>
 
-## Installing MizerReef {.section-install}
-
-::: {.content-visible when-format="html"}
+## Installing MizerReef
 [Skip to Setting up species parameters](#setting-up-species-parameters)
-:::
 
 MizerReef is currently only available from GitHub. To install the latest
 version, use the `devtools` package:
@@ -50,33 +37,37 @@ already installed, R will prompt you to install them automatically.
 Without them, you will not be able to use all of the features in `mizerReef`.
 
 After installation, load Mizer, mizerExperimental, and MizerReef in each
- new R session:
+new R session:
 
-```{r loading-packages, warning = FALSE, message=FALSE}
+```{r loading-packages, warning = FALSE}
 library(mizer)
 library(mizerExperimental)
 library(mizerReef)
 ```
 
 
-> 💡 **Tip:** Be sure to **load mizerReef last**. Some of the functions in mizerReef override functions in mizer, so loading in this order ensures that correct versions are used.
+::: callout-tip
+**Load mizerReef last**. Some of the functions in `mizerReef` override functions in `mizer`, so loading `mizerReef` after `mizer` ensures that the correct versions are used.
+:::
 
-Use a recent version of R and RStudio for best results. For troubleshooting or more details, see the 
+For best results, use a recent version of R and RStudio.
+
+For troubleshooting or more details, see the 
 [MizerReef documentation](https://cmbeese.github.io/mizerReef/) or
  the [GitHub repository](https://github.com/cmbeese/mizerReef).
 
 
-## Setting up species parameters {.section-species-params}
-
-::: {.content-visible when-format="html"}
-[Skip to mizerReef parameters](#additional-species-parameters-needed-for-mizerreef)
-:::
+## Setting up species parameters
+[Skip to Additional species parameters](#additional-species-parameters-needed-for-mizerreef)
 
 The species parameter table is the foundation of any mizer or mizerReef
 model. It describes the biological and ecological traits of each species
 in your system. 
 
-> 💡 **Tip:** Many users prefer to create this table in a spreadsheet program (like Excel or Google Sheets) and then import it into R as a data frame.
+
+::: callout-tip
+Many users create this table in a spreadsheet program (like Excel or Google Sheets) and then import it into R as a data frame.
+:::
 
 ### Species parameters required by base mizer
 
@@ -86,12 +77,12 @@ in the species parameter data frame:
 - `species`: Name of the species or group
 - `w_max` or `l_max`: Maximum observed weight or length (if providing length, you must also provide length-weight conversion parameters `a` and `b`)
 
-<details>
-<summary>By default, mizerReef creates multispecies mizer models.</summary>
 
-mizerReef is not compatible with trait-based or community models at this time. See
-[multispecies mizer models](https://sizespectrum.org/mizer/articles/multispecies_model.html#overview)
-to learn more about the differences between the three model types in mizer.
+<details>
+<summary>Multispecies mizer vs. community or trait-based</summary>
+
+By default, mizerReef create [multispecies mizer models](https://sizespectrum.org/mizer/articles/multispecies_model.html#overview)
+and is not compatible with trait-based or community models at this time.
 </details>
 
 You can tune your model to a specific system using abundance data if you
@@ -101,12 +92,11 @@ also provide:
 - `biomass_cutoff`: Minimum weight of organisms caught by survey methods (helps with tuning)
 
 <details>
-<summary>The choice in units for your data is abitrary as long as you are consistent.</summary>
-
+<summary><strong>Units in mizerReef</strong></summary>
+The choice in units for your data is abitrary as long as you are consistent.
 Abundance data can be given as numbers per area, numbers per volume or
 total numbers for the entire study area. See [Units in Mizer](https://sizespectrum.org/mizer/reference/setParams.html#units-in-mizer)
 for more information.
-
 </details>
 
 Since MizerReef's vulnerability and refuge dynamics depend on size, it is
@@ -117,8 +107,12 @@ defaults, including:
 - `beta` & `sigma`: Lognormal predation kernel parameters (set for each species, can use other kernels)
 - Length-to-weight conversion parameters `a` and `b`
 
+It is also recommended to designate the interaction matrix, which specifies
+predator-prey relationships between species. 
+
+
 <details>
-<summary> You should also provid the interaction matrix, which specifies predator-prey relationships between species.</summary> 
+<summary><strong>The interaction matrix</strong></summary>
 
 Each value in the [interaction matrix](https://sizespectrum.org/mizer/reference/setParams.html#setting-interaction-matrix),
  ranging from 0 to 1, represents the strength of interaction
@@ -134,20 +128,18 @@ included with MizerReef, run:
 data("karpata_int")
 karpata_int
 ```
+
 </details>
 
 See [Setting Parameters in Mizer](https://sizespectrum.org/mizer/reference/setParams.html)
 for details on additional optional columns and their defaults.
 
 
-### Additional species parameters needed for mizerReef {.section-additional-params}
-
-::: {.content-visible when-format="html"}
+### Additional species parameters needed for mizerReef
 [Skip to Example species parameters](#example-species-parameters)
-:::
 
 mizerReef extends mizer by modeling reef-specific dynamics. To utilise the predation
-vulnerability and unstructured resource dynamics in MizerReef, add these
+vulnerability and unstructured resource dynamics in MizerReef, add the following
 columns to your species parameter data frame:
 
 ```{r reef-params-table, echo=FALSE}
@@ -173,31 +165,29 @@ so that the corresponding feature is disabled, and issue a warning. See
 [setRefuge()], [setAlgaeParams()] and [setDetritusParams()] for additional
 details.
 
-> 💡 **Tip:** When importing your species parameter table from a CSV, make sure that missing values are represented as NA or blank cells, not zeros.
-
-<details>
-<summary>Handling missing values</summary>
+::: details Loading your data and handling missing values
 
 You can load your species parameter data frame into R using standard functions
 like `read.csv()` or `readxl::read_excel()`, depending on your file format.
 Ensure that the column names in your data frame match those expected by MizerReef.
-Use `na.strings = ""` in `read.csv()` to ensure blanks are read as `NA` rather than `0`.
 
 ```{r load-species-params, eval=FALSE, echo=TRUE}
 species_params <- read.csv("path/to/your/species_params.csv", na.strings = c("", " "))
 ```
 
+When importing your species parameter table from a CSV, make sure that missing
+values are represented as blank cells, not zeros. Otherwise, this could cause
+errors down the line. In R, use `na.strings = ""` in `read.csv()` to ensure
+blanks are read as `NA` rather than `0`.
 
-</details>
-
-
-### Example species parameters {.section-example-params}
-::: {.content-visible when-format="html"}
-[Skip to Setting the refuge profile](#setting-the-refuge-profile)
 :::
 
+
+### Example species parameters
+[Skip to Setting the refuge profile](#setting-the-refuge-profile)
+
 MizerReef includes a example model parameters with package. See the [Model Description](karpata_model-description.html)
-for more details on these example data.
+ for more details on these example data.
 
 The included species parameter data frame (`karpata_species`) is based on fish
 assemblage data from Karpata Reef in Bonaire, a site in marine reserve with relatively
@@ -214,31 +204,30 @@ knitr::kable(karpata_species[colnames(karpata_species) %in% c("species", "l_max"
 
 ```
 
-
-> 💡 **Tip:** *The Karpata species parameters also include optional columns like `w_mat`, `age_mat`, `k_vb`, and `ks`.Include as many parameters as you have data for to assist in the calibration process.*
-
-## Setting the refuge profile {.section-refuge-profile}
-
-::: {.content-visible when-format="html"}
-[Skip to Creating your first model](#creating-your-first-model)
+::: callout-tip
+The Karpata species parameters also include additional optional columns like `w_mat`, `age_mat`, `k_vb`, and `ks`. Include as many parameters as you have data for to assist in the calibration process.
 :::
 
+## Setting the refuge profile
+[Skip to Creating your first model](#creating-your-first-model)
+
 The refuge profile defines how predation refuge availability varies with prey
-size (see Figure 1). This is a key feature of MizerReef that
+size (see @fig-refuge-profile). This is a key feature of MizerReef that
 allows you to represent the effects of habitat structure on predator-prey
 interactions.
 
-```{r fig-refuge-profile, echo=FALSE, fig.cap="Figure 1. Conceptual schematic of the refuge profile. The red fish represents the modelled fish spectrum. Individuals protected from predators by refuge are covered by the grey box. The remaining individuals are vulnerable to predation.", fig.alt="Schematic plot: x axis is log body size, y axis is proportion protected. Red fish icons show fish sizes, with many small fish and one large fish. Diagonal line shows decreasing protection with size. Transparent grey bars across size bins indicate proportion protected, representing protection across the predicted Sheldon spectrum.", out.width="70%"}
-knitr::include_graphics("figures/refuge_profile.png")
-```
+![Figure 1. Conceptual schematic of the refuge profile. The red fish represents the modelled fish spectrum. Individuals protected from predators by refuge are covered by the grey box. The remaining individuals are vulnerable to predation.](figures/refuge_profile.png){#fig-refuge-profile fig-alt="Schematic plot: x axis is log body size, y axis is proportion protected. Red fish icons show fish sizes, with many small fish and one large fish. Diagonal line shows decreasing protection with size. Transparent grey bars across size bins indicate proportion protected, representing protection across the predicted Sheldon spectrum." width=70%}
 
 `MizerReef` currently provides three methods to define how refuge availability
 varies with prey size:
 
-<details>
-  <summary>**Sigmoidal**: Good for data-poor reefs or when you want a simple, smooth profile.</summary>
+* Sigmoidal: a smooth declining function controlled by a threshold length
+  (L_refuge) and a maximum proportion protected. Good for data-poor reefs or
+  when you want a simple, smooth profile.
 
-  - a smooth declining function controlled by a threshold length (L_refuge) and a maximum proportion protected
+  <details>
+  <summary>Parameters to provide</summary>
+  
   - `method_params` should be a **list** with:
     - `L_refuge`: numeric, threshold length (cm) at which refuge protection starts to decline.
     - `max_protection`: numeric, maximum proportion of individuals protected by refuge (0–1).
@@ -249,11 +238,12 @@ varies with prey size:
   ```
   </details>
 
-<details>
-  <summary>**Binned**: Good for theoretical experiments or when you have coarse bin information.</summary>
+* Binned: user-specified length bins with a constant protection proportion
+  inside each bin. Good for theoretical experiments or when you have coarse
+  bin information.
+  <details>
+  <summary>Parameters to provide</summary>
 
-  - user-specified length bins with a constant protection proportion
-  inside each bin
   - `method_params` should be a **data frame** or **matrix** with two columns:
     - `length_bin`: numeric, the upper length (cm) of each bin.
     - `protection`: numeric, the proportion of individuals protected by refuge (0–1) within each length bin.
@@ -267,10 +257,12 @@ varies with prey size:
   ```
   </details>
 
-<details>
-  <summary>**Competitive**: divides refuges among similarly sized competitors. Use this when you have empirical refuge density data.</summary>
+* Competitive (density-dependent): uses refuge density (no./m^2) for each
+  length bin and divides refuges among competitors, so protection depends on
+  fish density. Use this when you have empirical refuge density data.
+  <details>
+  <summary>Parameters to provide</summary>
 
-  - uses refuge density (no./m^2) for each  length bin, protection depends on fish density within each bin (density-dependent)
   - `method_params` should be a **data frame** or **matrix** with two columns:
     - `length_bin`: numeric, the upper length (cm) of each bin.
     - `refuge_density`: numeric, the density of refuges (no./m^2) available for each length bin.
@@ -284,20 +276,31 @@ varies with prey size:
   ```
   </details>
 
-### Refuge profiles and body shape {.section-refuge-example}
+### Refuge profiles and body shape
 
-This plot shows example refuge profiles created using each method and how they differ based on species body shape characteristics. The same set of species groups can receive
-different protection based on their body shape, the chosen method, and method-specific parameters. 
+@fig-body-shape-example shows example refuge profiles created using each method and how they differ based on species body shape characteristics.
 
-```{r fig-body-shape-example-params, echo=FALSE, fig.cap="Figure 2. Example refuge profiles for three methods (sigmoidal, binned, competitive) applied to species with different body shapes (deep, compressed, elongate, fusiform).", fig.alt="Four-panel plot: each panel shows protection proportion across body size for a different species with distinct body shape, comparing three refuge profile methods. Panels illustrate how protection varies for deep, compressed, elongate, and fusiform species.", out.width="80%"}
-knitr::include_graphics("figures/body-shape-example.png")
+![Figure 2. Example refuge profiles for three methods (sigmoidal, binned, competitive) applied to species with different body shapes (deep, compressed, elongate, fusiform).](figures/body-shape-example.png){#fig-body-shape-example fig-alt="Four-panel plot: each panel shows protection proportion across body size for a different species with distinct body shape, comparing three refuge profile methods. Panels illustrate how protection varies for deep, compressed, elongate, and fusiform species." width=80%}
+
+These were the body shape parameters used for the example above:
+```{r body-shape-example-table, echo = FALSE, eval = FALSE}
+
+sp  <- body_shape_example_species_params
+
+knitr::kable(sp['a','b'])
+
 ```
 
+The three panels show how the same set of species groups can receive
+different protection based on their body shape, the chosen method, and the
+method-specific parameters. The binned and competitive methods allow fine
+control across size ranges; the sigmoidal method provides a smooth shape,
+controlled by the threshold length and maximum protection.
 
-<details>
-<summary> The package includes several example refuge profiles for tuning and demonstration. </summary>
+### Example refuge profiles
 
-The Karpata reef example model uses a competitive refuge profile based on field data. Use the code below to view the built-in Karpata refuge profile:
+The package includes several example refuge profiles for tuning and demonstration. The
+Karpata reef example model uses a competitive refuge profile based on field data.
 
 ```{r karpata-refuge-profile, echo=TRUE, eval=TRUE}
 data(karpata_refuge)
@@ -307,13 +310,8 @@ karpata_refuge
 See [example models](https://cmbeese.github.io/mizerReef/reference/index.html#example-models)
 for more details on built-in refuge profiles.
 
-</details>
-
-## Creating your first model {.section-create-model}
-
-::: {.content-visible when-format="html"}
+## Creating your first model
 [Skip to Tuning the steady state](#tuning-the-steady-state)
-:::
 
 Once you have your species parameters (with reef-specific columns) and
 interaction matrix ready, you can create a `MizerParams` object using
@@ -322,23 +320,25 @@ the `newReefParams()` function. This function extends `mizer`'s
 user-supplied parameters, and setting sensible defaults for any missing
 reef-specific values.
 
-> 💡 **Tip:** When creating a new `MizerReefParams` object, you can't use the competitive refuge method when calibrating biomasses because it is density-dependent.
 
-<details>
-<summary>Use a tuning profile instead.</summary>
+::: details The binned method for tuning
+
+When creating a new `MizerReefParams` object, you can't use the competitive
+refuge method when calibrating biomasses because it is density-dependent.
+
 The best practice if you have refuge density data is to first create a model
-using the binned method that approximates your refuge profile to reach
-an initial steady state and calibrate biomasses, then switch to the competitive method.
+using the binned method that approximates your refuge profile to tune to 
+a steady state and calibrate biomasses, then switch to the competitive method.
 The package includes example refuge profiles for tuning (`tuning_profile`)
 and a simple step function (`step_tune`) that can be used for this purpose.
-</details>
+:::
 
 ```{r create-params, eval = FALSE, echo = TRUE}
 
 karpata_model <- newReefParams(group_params = karpata_species,
                                interaction = karpata_int,
                                method = "binned",
-                               method_params = tuning_profile)
+                               method_params = tunning_profile)
 
 ```
 
@@ -347,10 +347,8 @@ sequence to calibrate biomasses and adjust reproduction, growth, and unstructure
 resource parameters to match observed data.
 
 
-## Tuning the steady state {.section-tuning-steady}
-::: {.content-visible when-format="html"}
+## Tuning the steady state
 [Skip to Exploring results](#exploring-results)
-:::
 
 Reaching a steady state that matches observed biomasses and growth rates is
 nontrivial and often unique for each system. The procedure developed here was
@@ -369,17 +367,34 @@ In brief, the tuning procedure is as follows:
 5. Tune the reproduction parameters according to the mizer blog recipe to reach
   the final steady state.
 
->💡 **Tip:** One of the most useful summary plots for steady state calibration is `plotBiomassObservedVsModel()`,  which shows the total biomass for each species in your model vs. observed values.
+One of the most useful summary plots for steady state calibration is `plotBiomassVsSpecies()`,
+ which shows the total biomass for each species in your model:
 
-> <details><summary>💡 **Tip:** There are many reasonable ways to reach a suitable steady state. This recipe only represents one approach. You may need to adjust the steps or order depending on your system and data.</summary> The tuning approach used for MizerReef is adapted from the [5-step recipe](https://blog.mizer.sizespectrum.org/posts/2021-08-20-a-5-step-recipe-for-tuning-the-model-steady-state/) described in the mizer blog. </details>
+```{r plot-biomass-vs-species, eval=FALSE}
+plotBiomassVsSpecies(karpata_model)
+```
 
-For more information on tuning MizerReef models, see the [MizerReef Steady State recipe](steady-state-recipe.html).
+This function is helpful for quickly checking whether your model produces realistic biomasses
+for each group. You can also use `plotBiomassVsSpecies(params)` to see the expected steady-state
+biomasses from your parameter set.
 
-## Exploring results {.section-exploring-results}
 
-::: {.content-visible when-format="html"}
-[Skip to Changing the refuge profile](#changing-the-refuge-profile)
+::: callout-note
+There are many possible ways to reach a suitable steady state,
+and this only represents one approach. You may need to adjust the
+steps or order depending on your system and data.
+
+The tuning approach used for MizerReef is adapted from the
+[5-step recipe](https://blog.mizer.sizespectrum.org/posts/2021-08-20-a-5-step-recipe-for-tuning-the-model-steady-state/)
+described in the mizer blog.
 :::
+
+For more details on tuning MizerReef models, see the
+[MizerReef Steady State recipe](steady-state-recipe.html).
+
+
+## Exploring results
+[Skip to Changing the refuge profile](#changing-the-refuge-profile)
 
 After reaching a steady state, you should explore the results to ensure they
 make ecological sense and match expectations for your system. MizerReef provides
@@ -403,8 +418,11 @@ several plotting functions to help you visualize and interpret your model output
   plotBiomass(params)
   ```
 
-> <details><summary>💡 **Tip:** MizerReef overrides mizer's version of the `plotBiomass()` function.</summary> If you get an error about object type, restart R and load `mizerReef` after `mizer`.</details>
+  ::: {.callout-caution}
 
+  The [plotBiomass()] function in MizerReef overrides mizer's version to plot steady-state biomasses. If you get an error about object type, ensure you loaded `mizerReef` after `mizer`.
+
+  ::
 
 - **Productivity by species:**  
   Use [plotProductivity()] to view total productivity for each species.
@@ -415,16 +433,12 @@ several plotting functions to help you visualize and interpret your model output
 For a full list of available summary and diagnostic plots, see [MizerReef summary plots](https://cmbeese.github.io/mizerReef/reference/index.html#summary-plots) and [mizer's plotting results reference page](https://sizespectrum.org/mizer/reference/index.html#plotting-results).
 
 
-## Changing the refuge profile {.section-change-refuge}
-
-::: {.content-visible when-format="html"}
+## Changing the refuge profile
 [Skip to Links and further reading](#links-and-further-reading)
-:::
 
 Changing the refuge profile allows you to explore how habitat structure affects model dynamics, such as biomass and productivity. This is useful for simulating habitat degradation or restoration scenarios.
 
 **Workflow:**
-
 1. Use `newRefuge()` to change the refuge profile in your model.
 2. Run `reefSteady()` several times to reach a new steady state.
 3. Compare results (e.g., biomass and productivity) using built-in plotting functions.
@@ -448,22 +462,22 @@ all_prod11 <- plot2Productivity(non_complex, karpata_model,
                                 stack = TRUE) 
 ```
 
-```{r fig-refuge-effects, echo=FALSE, fig.cap="Figure 4 The biomass (left) and productivity (right) for a model with no predation refuge (non-complex) and a model with predation refuge based on data from Karpata Reef in Bonaire (complex). Colours represent species groups.", fig.alt="Two-panel plot: left panel shows productivity for flat vs complex reef, right panel shows biomass for flat vs complex reef. Each panel compares model output for two habitat types.", out.width="80%"}
-knitr::include_graphics("figures/karpata_example.png")
-```
 
-As we can see in Figure 4, Removing refuge availability reduces both biomass and productivity across all species.
+![The biomass (left) and productivity (right) for a model with no predation refuge (non-complex) and a model with predation refuge based on data from Karpata Reef in Bonaire (complex). Colours represent species groups.](figures/karpata_example.png){#fig-refuge-effects fig-alt="Two-panel plot: left panel shows productivity for flat vs complex reef, right panel shows biomass for flat vs complex reef. Each panel compares model output for two habitat types." width=80%}
 
-> <details><summary>💡 **Tip:** If your results look odd after changing the refuge profile, run `reefSteady()`.</summary> It needs to run enough times to reach a new steady state To learn more about modifying refuge profiles and their parameters, see [setRefuge()].</details>
-
-For more information on the example data used in this vignette, see the [mizerReef model description vignette](karpata_model-description.html). To learn more about running simulations with mizerReef, see the [mizerReef degradation vignette](reef-degradation-simulations.html).
+Removing refuge availability reduces both biomass and productivity across all species (@fig-refuge-effects).
 
 
-## Links and further reading {.section-links}
-
-::: {.content-visible when-format="html"}
-[Skip to Model description context](#model-description-context)
+::: callout-tip
+If your results look odd after changing the refuge profile, make sure you have run `reefSteady()` enough times to reach a new steady state. Also check that your species parameters and interaction matrix are consistent.
 :::
+
+- To learn more about modifying refuge profiles and their parameters, see the [`setRefuge()` function documentation](https://cmbeese.github.io/mizerReef/reference/setRefuge.html).
+- For more information on running simulations and exploring results, see the [mizerReef model description vignette](karpata_model-description.html) and the [mizerReef degradation vignette](reef-degradation-simulations.html).
+
+
+## Links and further reading
+[Skip to Model description context](#model-description-context)
 
 
 **MizerReef documentation and tutorials:**
@@ -490,8 +504,9 @@ For more information on the example data used in this vignette, see the [mizerRe
 
 
 
-## Session info {.section-session-info}
+## Session info
 
-```{r session-info, echo = FALSE}
+```{r session-info}
+#| echo: false
 sessioninfo::session_info()
 ```
