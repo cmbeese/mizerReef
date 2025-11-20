@@ -5,6 +5,7 @@ MizerReef Major Package Update To Do List - 18/11/2025
 
 - check on algae growth and boosting mechanics to make sure they are actually implemented during simulations (because the params object doesn't get updated?)
 -- make sure the right algae parameters are being called and stored in tune_UR, tune_UR_cc, and all algae functions
+-- possibly move algae boosting to the algae growth function??
 
 - fix all instances where params@other_params is called
 -- update all algae_component functions
@@ -16,20 +17,11 @@ MizerReef Major Package Update To Do List - 18/11/2025
 -- deg_scales should have the first column be bleaching 
 -- species parameter data frames need to have bad_pred column renamed to blocked_pred
 
-
 - Set defaults for parameters that users must provide for MizerReef - no known currently
-- Add error messages - all current known handled
+- Add error messages
 
 - finish/ polish the vignettes and articles for Mizer Reef
 -- clean referencing, links, and document structure
--- Getting-started vignette
----- add descriptions of method_params variables for each method and show what data frames should look like before the example - separate section for the example
----- clarify we are using the Multispecies mizer model and confirm params are right for that
----- refine spelling, grammar, and language to be concise, precise, and easy to understand
----- clarify in the steady state recipe summary that you only need to switch profiles if you plan to use the competitive method
----- Add a few plots, maybe to check the initial spectra and diets, under the "exploring results" section
----- Add the mizer steady state guide and links to the other mizerReef tutorials to the further reading section, as well as some of the basic mizer papers and maybe a link to my thesis from the VUW library: https://openaccess.wgtn.ac.nz/articles/thesis/Modelling_Coral_Reef_Futures_Exploring_the_role_of_structural_complexity_in_sustaining_ecosystem_services/26421523?file=48064144
----- find a better place for the model description context?
 -- steady state recipe
 ---- add more thorough descriptions of each step
 -- karpata and Bonaire model descriptions
@@ -37,6 +29,7 @@ MizerReef Major Package Update To Do List - 18/11/2025
 ---- add description for three group Bonaire model
 -- simulations with degradation
 ---- add thorough description of all degradation parameters
+---- add descriptions of built-in degradation trajectories, with sources and plots
 ---- add section that goes over the nice new plotting functions for looking at simulations in mizerReef
 
 - new plotting functions
@@ -56,7 +49,30 @@ MizerReef Major Package Update To Do List - 18/11/2025
 
 
 ============================================================================
-COMPLETED
+COMPLETED TASKS:
+============================================================================
+
+-- 20/11 Getting-started vignette
+---- add descriptions of method_params variables for each method and show what data frames should look like before the example - separate section for the example
+---- clarify we are using the Multispecies mizer model and confirm params are right for that - only necessary w_max and species, but good to give
+------ `w_mat`,`beta`,`sigma`, biomasses, and improve all definitions
+---- refine spelling, grammar, and language to be concise, precise, and easy to understand
+---- clarify in the steady state recipe summary that you only need to switch profiles if you plan to use the competitive method
+---- Add a few plots, maybe to check the initial spectra and diets, under the "exploring results" section
+---- Add the mizer steady state guide and links to the other mizerReef tutorials to the further reading section, as well as some of the basic mizer papers and maybe a link to my thesis from the VUW library: https://openaccess.wgtn.ac.nz/articles/thesis/Modelling_Coral_Reef_Futures_Exploring_the_role_of_structural_complexity_in_sustaining_ecosystem_services/26421523?file=48064144
+---- find a better place for the model description context?
+---- Added descriptions of method_params variables for each refuge method, with example data frames and a separate example section
+---- Clarified use of Multispecies mizer model and confirmed required params (w_max, species), with improved definitions for w_mat, beta, sigma, biomasses
+---- Refined spelling, grammar, and language throughout for conciseness and clarity
+---- Clarified in the steady state recipe summary that switching profiles is only needed for the competitive method
+---- Added plot examples for initial spectra and diets in the "Exploring results" section
+---- Updated "Links and further reading" to include mizer steady state guide, other mizerReef tutorials, basic mizer papers, and thesis link
+---- Moved model description context to the Introduction for better flow
+
+-- 19/11 Add error message to matchReefGrowth if any species have age_mat = 0 after setting defaults
+-- 19/11 Add warning message to newReefParams if satiation is not specified in species_params
+-- 19/11 Add warning message to setRefuge if a or b are missing in species_params
+
 -- 18/11 in matchReefGrowth, after age_mat values are set using set_species_defaults, if any age_mat = 0, needs to stop and provide an error that age_mat is zero for species i, this is impossible, needs to be non-zero
 -- 18/11 Add code to newReefParams() that sets satiation to false for all carnivores (any interaction>1) and true for resource consumers. The satiation response doesn't work well for predators that hunt prey in refuge. The code must give a warning that says something like "You have not specified whether species should have a satiation response. The default is FALSE for carnivores and TRUE for resource consumers."
 -- 18/11 Add code to setRefuge() that sets species_params a and b to a_bar and b_bar for any species where a and b are missing from species_params, and gives a warning to the user that average values are being used
