@@ -612,7 +612,6 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
     dimnames(pm) <- dimnames(vulnerable)
     
     for (i in 1:no_sp){
-        i = 1
         # Vulnerability rate of all prey, including resource
         # (species by size) to predator i
         v <- vul[[i]]
