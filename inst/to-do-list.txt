@@ -58,6 +58,12 @@ MizerReef Major Package Update To Do List - 18/11/2025
 COMPLETED TASKS:
 ============================================================================
 
+-- 27/11 add include_repro tag to plotProductivity
+-- 27/11 change default w_pp_cutoff in newReefParams from 1.0 to 0.1 g
+-- 27/11 set a default for degrade (or check if it's already set)
+-- 27/11 Add @inheritParams getProductivity to plotProductivity documentation and remove redundant params
+-- 27/11 Add .gitignore rule to ignore base-mizer-files folder under ignore/ directory
+
 -- 20/11 Getting-started vignette
 ---- add descriptions of method_params variables for each method and show what data frames should look like before the example - separate section for the example
 ---- clarify we are using the Multispecies mizer model and confirm params are right for that - only necessary w_max and species, but good to give
@@ -82,9 +88,3 @@ COMPLETED TASKS:
 -- 18/11 in matchReefGrowth, after age_mat values are set using set_species_defaults, if any age_mat = 0, needs to stop and provide an error that age_mat is zero for species i, this is impossible, needs to be non-zero
 -- 18/11 Add code to newReefParams() that sets satiation to false for all carnivores (any interaction>1) and true for resource consumers. The satiation response doesn't work well for predators that hunt prey in refuge. The code must give a warning that says something like "You have not specified whether species should have a satiation response. The default is FALSE for carnivores and TRUE for resource consumers."
 -- 18/11 Add code to setRefuge() that sets species_params a and b to a_bar and b_bar for any species where a and b are missing from species_params, and gives a warning to the user that average values are being used
-
--- 27/11 add include_repro tag to plotProductivity
--- 27/11 change default w_pp_cutoff in newReefParams from 1.0 to 0.1 g
--- 27/11 set a default for degrade (or check if it's already set)
--- 27/11 Add @inheritParams getProductivity to plotProductivity documentation and remove redundant params
--- 27/11 Add .gitignore rule to ignore base-mizer-files folder under ignore/ directory
