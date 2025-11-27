@@ -2,30 +2,30 @@
 #'
 #' @section Algae as a non-structured resource:
 #'
-#'      mizerReef supports algae as a non-size-structured resource, 
-#'      consumed primarily by herbivorous fish. This function sets 
-#'      the initial growth rate, system carrying capacity, and 
-#'      interaction strengths for algae, allowing for flexible 
+#'      mizerReef supports algae as a non-size-structured resource,
+#'      consumed primarily by herbivorous fish. This function sets
+#'      the initial growth rate, system carrying capacity, and
+#'      interaction strengths for algae, allowing for flexible
 #'      diet preferences.
 #'
-#'      The interaction strength (\eqn{\theta_{i,algae}}) for each 
-#'      species \eqn{i} determines how strongly that group feeds on 
+#'      The interaction strength (\eqn{\theta_{i,algae}}) for each
+#'      species \eqn{i} determines how strongly that group feeds on
 #'      algae. This can be set via the `interaction_algae` column in
-#'      the species parameter data frame, or directly via the 
-#'      `UR_interaction` argument. If neither is provided, all 
+#'      the species parameter data frame, or directly via the
+#'      `UR_interaction` argument. If neither is provided, all
 #'      interaction strengths are set to zero and a warning is issued.
 #'
-#'      The initial growth rate (`algae_growth_initial`) and carrying 
-#'      capacity (`algae_capacity`) control the baseline production 
-#'      and maximum standing stock of algae, respectively. These values 
-#'      may be reset by [reefSteady()] to ensure steady state abundances 
+#'      The initial growth rate (`algae_growth_initial`) and carrying
+#'      capacity (`algae_capacity`) control the baseline production
+#'      and maximum standing stock of algae, respectively. These values
+#'      may be reset by [reefSteady()] to ensure steady state abundances
 #'      match observed or target values.
 #'
-#'      Carrying capacity can be toggled with `use_UR_cc`. When enabled, 
+#'      Carrying capacity can be toggled with `use_UR_cc`. When enabled,
 #'      algae biomass will be limited by the specified capacity.
 #'
 #'      Note: Interaction with size-structured resources, such as plankton,
-#'      is set with the resource_interaction column of the species parameters 
+#'      is set with the resource_interaction column of the species parameters
 #'      dataframe.
 #'
 #' @inheritSection algae_consumption Algae consumption
@@ -44,12 +44,12 @@
 #' @param use_UR_cc Logical. Whether to implement a carrying capacity for
 #'                  all unstructured resources. Default is FALSE. This flag
 #'                  is stored in the other_params slot.
-#' @param algae_colour Character. Colour to use for algae in plots. 
+#' @param algae_colour Character. Colour to use for algae in plots.
 #'                     Default is "darkseagreen3".
-#' @details All algae-related parameters (growth rate, capacity) are stored in 
-#'          the `algae_params` slot of the params object. Resource interaction 
-#'          strengths are set in the species_params data frame. This function 
-#'          supports flexible multi-resource interaction via the 
+#' @details All algae-related parameters (growth rate, capacity) are stored in
+#'          the `algae_params` slot of the params object. Resource interaction
+#'          strengths are set in the species_params data frame. This function
+#'          supports flexible multi-resource interaction via the
 #'          UR_interaction argument.
 #' @return A `MizerParams` object with updated algae parameters (in `algae_params` slot).
 #' @concept algae
@@ -126,33 +126,33 @@ setAlgaeParams <- function(params,
 #'
 #'      Detritus in mizerReef is modeled as a non-size-structured resource
 #'      produced by the decomposition of organic materials. Detritus is consumed
-#'      by detritivores and benthic invertebrates. This function sets the 
-#'      carrying capacity, decomposition proportions, and interaction strengths 
+#'      by detritivores and benthic invertebrates. This function sets the
+#'      carrying capacity, decomposition proportions, and interaction strengths
 #'      for detritus, supporting flexible diet preferences.
 #'
 #'      The interaction strength (\eqn{\theta_{i,detritus}}) for each species \eqn{i}
 #'      determines how strongly that group feeds on detritus. This can be set via the
 #'      `interaction_detritus` column in the species parameter data frame, or directly
-#'      via the `UR_interaction` argument. If neither is provided, all interaction 
+#'      via the `UR_interaction` argument. If neither is provided, all interaction
 #'      strengths are set to zero and a warning is issued.
 #'
-#'      The carrying capacity (`detritus_capacity`) limits the maximum standing 
-#'      stock of detritus. 
-#' 
-#'      The proportions of decomposing mass from senescence (`sen_decomp`) and 
-#'      external mortality (`ext_decomp`) that become detritus are set here, 
-#'      with typical defaults of 0.8 and 0.2, respectively. The rate at which 
-#'      detritus sinks from the pelagic zone (`d_external_initial`) is also set, 
-#'      controlling detritus input from external sources. These values may be 
-#'      reset by [reefSteady()] to ensure steady state abundances match observed 
+#'      The carrying capacity (`detritus_capacity`) limits the maximum standing
+#'      stock of detritus.
+#'
+#'      The proportions of decomposing mass from senescence (`sen_decomp`) and
+#'      external mortality (`ext_decomp`) that become detritus are set here,
+#'      with typical defaults of 0.8 and 0.2, respectively. The rate at which
+#'      detritus sinks from the pelagic zone (`d_external_initial`) is also set,
+#'      controlling detritus input from external sources. These values may be
+#'      reset by [reefSteady()] to ensure steady state abundances match observed
 #'      or target values.
 #'
-#'      Carrying capacity can be toggled with `use_UR_cc`. When enabled, detritus 
+#'      Carrying capacity can be toggled with `use_UR_cc`. When enabled, detritus
 #'      biomass will be limited by the specified capacity.
 #'
-#'      Note: Interaction with size-structured resources, such as plankton, is 
+#'      Note: Interaction with size-structured resources, such as plankton, is
 #'      set with the resource_interaction column of the species parameters dataframe.
-#' 
+#'
 #' @inheritSection getDetritusProduction Detritus production
 #' @inheritSection getDetritusConsumption Detritus consumption
 #'
@@ -172,7 +172,7 @@ setAlgaeParams <- function(params,
 #' @param use_UR_cc Logical. Whether to implement a carrying capacity for detritus. Default
 #'                  is FALSE. This flag is stored in the other_params slot.
 #' @param detritus_colour Character. Colour to use for detritus in plots. Default is "plum4".
-#' 
+#'
 #' @details All detritus-related parameters (capacity, decomposition rates, external input) are
 #'          stored in the `detritus_params` slot of the params object. Resource interaction
 #'          strengths are set in the species_params data frame. This function supports flexible
@@ -272,8 +272,8 @@ setDetritusParams <- function(params,
 #'      the rate and scaling of age-related death.
 #'
 #'      If no parameters are provided, defaults are used: nat_mort = 0.2,
-#'      sen_prop = 0.1, sen_curve = 0.3. All parameters must be numeric 
-#'      and non-negative. The function checks for required columns and 
+#'      sen_prop = 0.1, sen_curve = 0.3. All parameters must be numeric
+#'      and non-negative. The function checks for required columns and
 #'      valid values if a custom parameter set is provided.
 #'
 #' @section Residual natural mortality:
@@ -287,13 +287,13 @@ setDetritusParams <- function(params,
 #'           {\mu_{nat.i}(w) = \mu_{nat}\, w^{1-n}.}
 #'
 #'       Here \eqn{\mu_{nat}} is the residual natural mortality rate at size
-#'       1 g and \eqn{n} is the allometric scaling exponent. In mizerReef, 
+#'       1 g and \eqn{n} is the allometric scaling exponent. In mizerReef,
 #'       these default to \eqn{\mu_{nat} = 0.2} and \eqn{n = 0.75}.
 #'
 #' @section Senescence mortality:
 #'
 #'      Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
-#'      mortality caused by background sources such as illness or age. The 
+#'      mortality caused by background sources such as illness or age. The
 #'      rate of senescence mortality (in 1/year) is given by:
 #'
 #'      \deqn{\mu_{sen.i}(w) = k_{sen}\left(
@@ -307,7 +307,7 @@ setDetritusParams <- function(params,
 #'      size of group \eqn{i} in grams.
 #'
 #' @param params A `MizerParams` object.
-#' @param ext_mort_params Optional. A named list or matrix with columns/names 
+#' @param ext_mort_params Optional. A named list or matrix with columns/names
 #'                        'nat_mort', 'sen_prop', and 'sen_curve'. If NULL,
 #'                        defaults are used. All values must be numeric and
 #'                        non-negative.
@@ -317,48 +317,47 @@ setDetritusParams <- function(params,
 #' @export
 setExtMortParams <- function(params,
                              ext_mort_params = NULL) {
-
-    # object - Check if mizerParams is valid 
+    # object - Check if mizerParams is valid
     assert_that(is(params, "MizerParams"))
 
-    # mort_params - Check if user provided valid mortality parameters 
-    if(!is.null(ext_mort_params)) {
+    # mort_params - Check if user provided valid mortality parameters
+    if (!is.null(ext_mort_params)) {
         if (!all(sapply(ext_mort_params, is.numeric))) {
             stop("The external mortality parameters should be numeric.")
         }
-        if(!is.matrix(ext_mort_params)) {
+        if (!is.matrix(ext_mort_params)) {
             ext_mort_params <- as.matrix(ext_mort_params)
-            if(!all(ext_mort_params >= 0 )){
+            if (!all(ext_mort_params >= 0)) {
                 stop("The external mortality parameters should be
                      nonnegative")
             }
         }
-        if(!("nat_mort" %in% colnames(ext_mort_params))){
+        if (!("nat_mort" %in% colnames(ext_mort_params))) {
             stop("The external mortality parameters dataframe needs a column
                  called 'nat_mort' with the residual natural mortality rate.")
         }
-        if(!("sen_prop" %in% colnames(ext_mort_params))){
+        if (!("sen_prop" %in% colnames(ext_mort_params))) {
             stop("The external mortality parameters dataframe needs a column
                  called 'sen_prop' with the external mortality rate.")
         }
-        if(!("sen_curve" %in% colnames(ext_mort_params))){
+        if (!("sen_curve" %in% colnames(ext_mort_params))) {
             stop("The external mortality parameters dataframe needs a column
                  called 'sen_curve' with the exponent for the external
                  curve.")
         }
     } else {
-        ext_mort_params <- vector('list',3)
-        names(ext_mort_params) <- c('nat_mort','sen_prop','sen_curve')
+        ext_mort_params <- vector("list", 3)
+        names(ext_mort_params) <- c("nat_mort", "sen_prop", "sen_curve")
         # Residual natural mortality
-        ext_mort_params$nat_mort  <- 0.2
+        ext_mort_params$nat_mort <- 0.2
         # Senescence
-        ext_mort_params$sen_prop  <- 0.1
+        ext_mort_params$sen_prop <- 0.1
         ext_mort_params$sen_curve <- 0.3
     }
 
-    # Store in params 
-    params@other_params[['ext_mort_params']] <- ext_mort_params
-    
+    # Store in params
+    params@other_params[["ext_mort_params"]] <- ext_mort_params
+
     params@time_modified <- lubridate::now()
 
     return(params)
@@ -371,12 +370,12 @@ setExtMortParams <- function(params,
 #' Supports multiple methods for defining refuge profiles and options for
 #' calibrating bin boundaries using either species-specific or dummy fish
 #' length-weight parameters.
-#' 
+#'
 #' Refuge profiles account for the protective behavior of prey living in
 #' high-complexity environments (e.g. coral reefs) with access to predation
 #' refuge. The refuge profile defines the proportion of fish within user-defined
 #' length bins that are protected from being encountered by a predator.
-#' 
+#'
 #' A unique refuge profile is generated for each predator group × prey group ×
 #' prey size combination based on the given refuge profile parameters and four
 #' values from `params@species_params`: length-weight conversion values `a` and
@@ -402,66 +401,66 @@ setExtMortParams <- function(params,
 #'
 #'      The `species_specific_bins` argument controls how bin boundaries and
 #'      thresholds are calculated for all methods:
-#' 
+#'
 #'      - If TRUE, each species' own length-weight parameters (`a`, `b`) are used to
 #'      convert length bins to weights. This is appropriate when refuge hole entrances
 #'      were measured directly and should reflect the body shape of each species.
-#' 
+#'
 #'      - If FALSE (default), dummy fish parameters (`a_bar`, `b_bar`) are used for bin
 #'      conversion, and species-specific mapping is applied after. This is appropriate
 #'      when dummy fish were used to measure refuge capacity, and each refuge is defined
-#'      by the largest dummy fish that fits.   
+#'      by the largest dummy fish that fits.
 #'
 #'      This choice applies to all refuge methods (sigmoidal, binned, competitive)
 #'      and is stored in `params@refuge_params$species_specific_bins`. Select the
 #'      option that best matches your measurement approach and ecological realism.
-#'     
+#'
 #' @section Setting the refuge profile:
-#' 
+#'
 #'      The mizerReef package provides three methods to define the refuge profile.
-#'  
+#'
 #'      \itemize{
 #'
 #'      \item **Sigmoidal Method**: \cr
-#' 
+#'
 #'          This method is preferred for data-poor reefs or reefs where the refuge
 #'          distribution is unknown. It is also ideal for systems where only one
 #'          species is expected to be utilizing refuge. The sigmoidal method defines
 #'          a smooth transition in refuge availability around a threshold body size.
-#'     
+#'
 #'          The threshold for refuge can be set in two ways, depending on how your
 #'          refuge data was collected:
-#' 
+#'
 #'          - If `species_specific_bins = TRUE`, the threshold weight is calculated as:
 #'                  \deqn{ W_{i.refuge} = a_i \cdot L_{refuge}^{b_i} }
 #'           where \eqn{a_i} and \eqn{b_i} are the length-weight parameters for species i.
-#' 
+#'
 #'          - If `species_specific_bins = FALSE`, the weight threshold is:
-#' 
+#'
 #'                  \deqn{ W_{refuge} = a_{bar} \cdot L_{refuge}^{b_{bar}} }
-#'          
+#'
 #'           The proportion of fish with access to refuge is then given by:
 #'                  \deqn{ R_{j}(w_p) = \frac{r}{1 + e^{\Delta(w - W_{refuge})}} }
 #'          where $r$ is the maximum proportion protected, $\Delta$ is the slope,
 #'          $w$ is body weight, and $W_{refuge}$ is the threshold (species-specific or dummy fish)
-#' 
+#'
 #'          For this method, `method_params` should contain columns named
 #'          `prop_protect` and `L_refuge` that give the values for \eqn{r}
 #'          and the length at which refuge becomes scarce in cm.
 #'
 #'      \item **Binned Method**: \cr
-#' 
+#'
 #'          This method is appropriate for theoretical applications
 #'          and does not rely on empirical data. It sets refuge to a constant
 #'          proportion of fish within a given size range. The proportion of fish
 #'          in group \eqn{j} with access to refuge is given by
-#'  
+#'
 #'          \deqn{ R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }{
 #'               R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }
-#'       
+#'
 #'          where \eqn{r_k} is the proportion of fish with access to refuge in
 #'          size class \eqn{k}.
-#'  
+#'
 #'          For this method, `method_params` should contain columns named
 #'          `start_L` and `end_L` which contain the starting and ending lengths [cm]
 #'          of each size bin and `prop_protect`, the proportion of fish protected
@@ -469,16 +468,16 @@ setExtMortParams <- function(params,
 #'
 #'      \item **Competitive Method**: \cr
 #'          This method is appropriate when refuge density data is available for
-#'          the modelled reef. The refuge density describes the distribution of 
-#'          refuges \eqn{(no./m^2)} across predefined fish body size categories. 
-#'          The proportion of fish in size class \eqn{k} with access to refuge 
+#'          the modelled reef. The refuge density describes the distribution of
+#'          refuges \eqn{(no./m^2)} across predefined fish body size categories.
+#'          The proportion of fish in size class \eqn{k} with access to refuge
 #'          is given by
-#'  
+#'
 #'          \deqn{R_{j}(w_p) = \tau \cdot \frac{ \eta_{k} }
 #'                                             { \sum_i \int_{w_{k-1}}^{w-k} N_i(w) \, dw}}{
-#'               R_{j}(w_p) = \tau \eta_{k} / 
+#'               R_{j}(w_p) = \tau \eta_{k} /
 #'                           ( \sum_i \int_{w_{k-1}}^{w-k} N_i(w) \, dw ) }
-#'                            
+#'
 #'          where \eqn{ \tau } is the proportion of fish with access to refuge that
 #'          are expected to actually utilize  it, \eqn{ \eta_{k}} is the density of
 #'          refuges in size range \eqn{(w_{k-1}, w_k]} and
@@ -486,18 +485,18 @@ setExtMortParams <- function(params,
 #'          of fish from any group in size range \eqn{(w_{k-1}, w_k]}.
 #'          This represents the density of competitors for refuges in
 #'          size class \eqn{k}.
-#'  
+#'
 #'          For this method, `method_params` should contain columns named
 #'          `start_L`and `end_L` which contain the starting and ending lengths [cm]
 #'          of each size bin and `refuge_density`, the number of refuges available
 #'          in each size bin (no/m^2).
-#'      
+#'
 #'      }
 #'
 #'  Users can also set a noncomplex reef with no habitat refuge. This option is
 #'  convenient for finding steady state parameters and is the default when
-#'  no parameters are provided. 
-#'  
+#'  no parameters are provided.
+#'
 #'  This function checks that the supplied refuge parameters are valid, adds
 #'  relevant columns to the `species_params` data frame, and stores refuge
 #'  parameters in the `refuge_params` slot of the `params` object.
@@ -515,7 +514,7 @@ setExtMortParams <- function(params,
 #'   - For "binned": must include `start_L` (numeric, start length, cm; **no default**), `end_L` (numeric, end length, cm; **no default**), and `prop_protect` (numeric, proportion protected, default: 0.98).
 #'   - For "competitive": must include `start_L`, `end_L` (as above), and `refuge_density` (numeric, refuges per size bin, no/m^2; **no default**).
 #'   - For "noncomplex": no parameters required.
-#' 
+#'
 ## Choice of refuge bin calibration
 #'
 #' @param species_specific_bins Logical. Controls how refuge bin boundaries and thresholds are calculated for sigmoidal and binned methods:
@@ -524,9 +523,9 @@ setExtMortParams <- function(params,
 #'   Set according to your data collection method. The setting is stored in
 #'   `params@refuge_params$species_specific_bins` and used by [getRefuge()].
 #'
-#' @param refuge_user   Logical vector (length = number of species). Indicates which groups use refuge. 
+#' @param refuge_user   Logical vector (length = number of species). Indicates which groups use refuge.
 #'                      If not present in `species_params`, must be provided. Defaults to FALSE.
-#' 
+#'
 #' @param blocked_pred Optional. Logical vector (length = number of species). Indicates whether the predator is blocked by refuge for this species. TRUE means hunting is blocked by refuge; FALSE means the species can access prey within refuge (e.g. eels). Defaults to FALSE.
 #'
 #' @param satiation Logical vector (length = number of species). Indicates which groups are subject to
@@ -559,125 +558,137 @@ setExtMortParams <- function(params,
 #' @export
 setRefuge <- function(params, method, method_params = NULL,
                       # Parameters specific to each group
-                      refuge_user = NULL, blocked_pred = NULL, 
+                      refuge_user = NULL, blocked_pred = NULL,
                       satiation = NULL,
                       # Parameters used by all methods
                       a_bar = NULL, b_bar = NULL,
                       w_settle = NULL, max_protect = NULL, tau = NULL,
                       species_specific_bins = FALSE,
                       ...) {
-
     # Object validation
     assert_that(is(params, "MizerParams"))
-    
+
     # Find number of species for checks
-    no_sp = nrow(params@species_params)
-    
+    no_sp <- nrow(params@species_params)
+
     # === LENGTH-WEIGHT PARAMETER SETUP ===
     # Set default a_bar and b_bar values first
-    if (is.null(a_bar)){
+    if (is.null(a_bar)) {
         a_bar <- 0.025
     } else {
-        if (!is.numeric(a_bar)) { stop("a_bar should be numeric.") }
-        if (a_bar < 0) { stop("a_bar must be non-negative.") }
+        if (!is.numeric(a_bar)) {
+            stop("a_bar should be numeric.")
+        }
+        if (a_bar < 0) {
+            stop("a_bar must be non-negative.")
+        }
     }
-    
-    if (is.null(b_bar)){
+
+    if (is.null(b_bar)) {
         b_bar <- 3
-    } else {if (!is.numeric(b_bar)) { stop("b_bar should be numeric.") }
-        if (b_bar < 0) { stop("b_bar must be non-negative.") }
+    } else {
+        if (!is.numeric(b_bar)) {
+            stop("b_bar should be numeric.")
+        }
+        if (b_bar < 0) {
+            stop("b_bar must be non-negative.")
+        }
     }
-    
+
     # Check and create a and b columns if missing, set defaults for NAs
     missing_cols <- !c("a", "b") %in% names(params@species_params)
     if (any(missing_cols)) {
-        if (missing_cols[1]) {  # 'a' column missing
+        if (missing_cols[1]) { # 'a' column missing
             params@species_params$a <- rep(NA_real_, nrow(params@species_params))
         }
-        if (missing_cols[2]) {  # 'b' column missing
+        if (missing_cols[2]) { # 'b' column missing
             params@species_params$b <- rep(NA_real_, nrow(params@species_params))
         }
     }
-    
+
     # Set defaults for missing a and b parameters using a_bar and b_bar
     if (anyNA(params@species_params[["a"]]) || anyNA(params@species_params[["b"]])) {
         missing_a <- is.na(params@species_params[["a"]])
         missing_b <- is.na(params@species_params[["b"]])
-        
+
         if (any(missing_a)) {
             params@species_params[["a"]][missing_a] <- a_bar
         }
         if (any(missing_b)) {
             params@species_params[["b"]][missing_b] <- b_bar
         }
-        
+
         if (any(missing_a) || any(missing_b)) {
-            warning("Missing values in species_params columns 'a' and/or 'b' have been set to average values (a_bar = ", 
-                    a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters.")
+            warning(
+                "Missing values in species_params columns 'a' and/or 'b' have been set to average values (a_bar = ",
+                a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters."
+            )
         }
     }
-    
+
     # === SPECIES PARAMETER CHECKS ===
     # Check that refuge_user is logical and the right length
-    if(!('refuge_user' %in% colnames(params@species_params))){
-        if(is.null(refuge_user)){
+    if (!("refuge_user" %in% colnames(params@species_params))) {
+        if (is.null(refuge_user)) {
             warning("You have not provided values for refuge_user, so no species use refuge.")
             refuge_user <- rep(FALSE, no_sp)
         } else if (!is.logical(refuge_user)) {
             stop("The refuge_user values should be logical.")
         }
-        if(length(refuge_user) != no_sp) {
+        if (length(refuge_user) != no_sp) {
             stop("refuge_user should have a value for every group.")
         }
         params@species_params$refuge_user <- refuge_user
     }
-    
+
     # Check that blocked_pred is logical and the right length
-    if(!('blocked_pred' %in% colnames(params@species_params))){
-        if(is.null(blocked_pred)){
+    if (!("blocked_pred" %in% colnames(params@species_params))) {
+        if (is.null(blocked_pred)) {
             warning("You have not provided values for blocked_pred, so all predators can access prey within refuge.")
             blocked_pred <- rep(FALSE, no_sp)
         } else if (!is.logical(blocked_pred)) {
             stop("The blocked_pred values should be logical.")
         }
-        if(length(blocked_pred) != no_sp) {
+        if (length(blocked_pred) != no_sp) {
             stop("blocked_pred should have a value for every group.")
         }
         params@species_params$blocked_pred <- blocked_pred
     }
 
     # Check that satiation is logical and the right length
-    if(!('satiation' %in% colnames(params@species_params))){
-        if(is.null(satiation)){
+    if (!("satiation" %in% colnames(params@species_params))) {
+        if (is.null(satiation)) {
             # Calculate default satiation values based on feeding behavior
             # FALSE for carnivores (species that eat other species)
             # TRUE for resource consumers (only eat resources, not other species)
-            
+
             # Check if species eat other species (row sums in interaction matrix > 0)
             interaction_rowsums <- rowSums(params@interaction)
             eats_other_species <- interaction_rowsums > 0
-            
-            # Check if species eat any resources
-            resource_cols <- c("resource_interaction", "interaction_algae", "interaction_detritus", "interaction_sponge", 
-                              "interaction_encrusting", "interaction_massive", "interaction_cryptic", "interaction_branching")
 
-                existing_resource_cols <- resource_cols[resource_cols %in% names(params@species_params)]
-                if(length(existing_resource_cols) > 0) {
-                    # Sum all resource interactions for each species (species are rows)
-                    resource_interaction_sums <- rowSums(params@species_params[, existing_resource_cols, drop = FALSE], na.rm = TRUE)
-                    eats_resources <- resource_interaction_sums > 0
-                } else {
-                    eats_resources <- rep(FALSE, no_sp)  # No resource interaction columns means no resource consumption
-                }
-            
+            # Check if species eat any resources
+            resource_cols <- c(
+                "resource_interaction", "interaction_algae", "interaction_detritus", "interaction_sponge",
+                "interaction_encrusting", "interaction_massive", "interaction_cryptic", "interaction_branching"
+            )
+
+            existing_resource_cols <- resource_cols[resource_cols %in% names(params@species_params)]
+            if (length(existing_resource_cols) > 0) {
+                # Sum all resource interactions for each species (species are rows)
+                resource_interaction_sums <- rowSums(params@species_params[, existing_resource_cols, drop = FALSE], na.rm = TRUE)
+                eats_resources <- resource_interaction_sums > 0
+            } else {
+                eats_resources <- rep(FALSE, no_sp) # No resource interaction columns means no resource consumption
+            }
+
             # Set satiation: FALSE for carnivores, TRUE for pure resource consumers
             satiation <- !eats_other_species & eats_resources
-            
+
             warning("You have not specified whether species should have a satiation response. The default is FALSE for carnivores and TRUE for resource consumers.")
         } else if (!is.logical(satiation)) {
             stop("The satiation values should be logical.")
         }
-        if(length(satiation) != no_sp) {
+        if (length(satiation) != no_sp) {
             stop("satiation should have a value for every group.")
         }
         params@species_params$satiation <- satiation
@@ -685,51 +696,53 @@ setRefuge <- function(params, method, method_params = NULL,
 
     # === REFUGE METHOD VALIDATION ===
     # Check if the user provided one of the available refuge profile methods
-    method_options <- c('sigmoidal','binned','competitive','noncomplex')
-    if(is.null(method)) {
+    method_options <- c("sigmoidal", "binned", "competitive", "noncomplex")
+    if (is.null(method)) {
         stop("You must provide the method to calculate the refuge profile.")
-    } else if(!is.element(method, method_options)) {
+    } else if (!is.element(method, method_options)) {
         stop("Method must be 'sigmoidal','binned', 'competitive', 'noncomplex'.")
     }
 
     # === REFUGE PARAMETER SETUP ===
     # Set default values for parameters used by all methods
-    
+
     # Minimum weight of fish protected by refuges at measured scale
-    if(is.null(w_settle)){
+    if (is.null(w_settle)) {
         w_settle <- 0.1
     } else {
-        if(!is.numeric(w_settle)) {
+        if (!is.numeric(w_settle)) {
             stop("w_settle should be numeric.")
         }
-        if(w_settle < 0) {
-        stop("w_settle must be non-negative.")
+        if (w_settle < 0) {
+            stop("w_settle must be non-negative.")
         }
     }
 
     # Maximum proportion of fish protected by refuge
-    if(is.null(max_protect)){
+    if (is.null(max_protect)) {
         max_protect <- 0.98
     } else {
-        if(!is.numeric(max_protect)) { 
-            stop("max_protect should be numeric.") 
+        if (!is.numeric(max_protect)) {
+            stop("max_protect should be numeric.")
         }
-        if(max_protect < 0 || max_protect > 1) {
+        if (max_protect < 0 || max_protect > 1) {
             stop("max_protect should be a proportion between 0 and 1")
         }
     }
 
-    # Proportion of fish with access to refuge that are expected 
+    # Proportion of fish with access to refuge that are expected
     # to utilize it
-    if(is.null(tau)){
+    if (is.null(tau)) {
         tau <- 1
     } else {
-        if(!is.numeric(tau)) { stop("tau should be numeric.") }
-        if(tau < 0 || tau > 1) {
+        if (!is.numeric(tau)) {
+            stop("tau should be numeric.")
+        }
+        if (tau < 0 || tau > 1) {
             stop("tau should be a proportion between 0 and 1")
         }
     }
-    
+
     # Store all values directly in refuge_params slot
     params@refuge_params$method <- method
     params@refuge_params$a_bar <- a_bar
@@ -738,15 +751,14 @@ setRefuge <- function(params, method, method_params = NULL,
     params@refuge_params$max_protect <- max_protect
     params@refuge_params$tau <- tau
     params@refuge_params$species_specific_bins <- species_specific_bins
-    
-    #  method_params set up and checks 
-    if (method != "noncomplex"){
-    
+
+    #  method_params set up and checks
+    if (method != "noncomplex") {
         # check if method_params provided
         if (is.null(method_params)) {
             stop("You must provide method specific parameters.")
         }
-        
+
         # check if method_params values are positive and numeric
         if (!is.matrix(method_params)) {
             mp <- as.matrix(method_params)
@@ -759,47 +771,49 @@ setRefuge <- function(params, method, method_params = NULL,
                 stop("The method parameters must be non-negative.")
             }
         }
-        
-        # Store column names of method_params for checking
-        cnames = colnames(method_params)
 
-        ## Sigmoidal method 
+        # Store column names of method_params for checking
+        cnames <- colnames(method_params)
+
+        ## Sigmoidal method
         if (method == "sigmoidal") {
             # Prop protect
-            if(!("prop_protect" %in% cnames)) {
-                stop("The sigmoidal method parameters dataframe needs a 
-                column called 'prop_protect' with the maximum proportion of 
+            if (!("prop_protect" %in% cnames)) {
+                stop("The sigmoidal method parameters dataframe needs a
+                column called 'prop_protect' with the maximum proportion of
                 fish to be protected.")
-            } else if(method_params$prop_protect < 0 ||
-                      method_params$prop_protect > 1) {
-                        stop("prop_protect should be a proportion between 0 and 1.")
+            } else if (method_params$prop_protect < 0 ||
+                method_params$prop_protect > 1) {
+                stop("prop_protect should be a proportion between 0 and 1.")
             }
             # L_refuge
-            if(!("L_refuge" %in% cnames)) {
-                stop("The sigmoidal method parameters dataframe needs a column 
-                called 'L_refuge' with the threshhold length (cm) for protected 
+            if (!("L_refuge" %in% cnames)) {
+                stop("The sigmoidal method parameters dataframe needs a column
+                called 'L_refuge' with the threshhold length (cm) for protected
                 fish.")
             }
             # Slope
-            if (is.null(method_params$slope)){ method_params$slope <- 100 } 
+            if (is.null(method_params$slope)) {
+                method_params$slope <- 100
+            }
         }
 
-        # Binned method 
+        # Binned method
         if (method == "binned") {
-            if(!("start_L" %in% cnames)) {
+            if (!("start_L" %in% cnames)) {
                 stop("The binned method parameters dataframe needs a column called
                      'start_L' with the starting lengths (cm) for each size bin.")
             }
-            if(!("end_L" %in% cnames)) {
+            if (!("end_L" %in% cnames)) {
                 stop("The binned method parameters dataframe needs a column called
                      'end_L' with the end lengths (cm) for each size bin.")
             }
-            if(!("prop_protect" %in% cnames)) {
+            if (!("prop_protect" %in% cnames)) {
                 stop("The binned method parameters dataframe needs a column called
                      'prop_protect' with the proportion of fish protected
                      for each length bin.")
-            } else if(any(method_params$prop_protect < 0) ||
-                      any(method_params$prop_protect > 1)) {
+            } else if (any(method_params$prop_protect < 0) ||
+                any(method_params$prop_protect > 1)) {
                 stop("prop_protect should be a proportion between 0 and 1")
             }
             if (!all(method_params$start_L < method_params$end_L)) {
@@ -807,21 +821,21 @@ setRefuge <- function(params, method, method_params = NULL,
             }
         }
 
-        # Competitive method 
+        # Competitive method
         if (method == "competitive") {
-            if(!("start_L" %in% cnames)) {
-                stop("The competitive method parameters dataframe needs a 
-                column called 'start_L' with the starting lengths (cm) for 
+            if (!("start_L" %in% cnames)) {
+                stop("The competitive method parameters dataframe needs a
+                column called 'start_L' with the starting lengths (cm) for
                 each size bin.")
             }
-            if(!("end_L" %in% cnames)) {
-                stop("The competitive method parameters dataframe needs a 
+            if (!("end_L" %in% cnames)) {
+                stop("The competitive method parameters dataframe needs a
                 column called 'end_L' with the end lengths (cm) for
                 each size bin.")
             }
-            if(!("refuge_density" %in% cnames)) {
-                stop("The competitive method parameters dataframe needs a 
-                column called 'refuge_density' with the density of refuges in 
+            if (!("refuge_density" %in% cnames)) {
+                stop("The competitive method parameters dataframe needs a
+                column called 'refuge_density' with the density of refuges in
                 each bin in no./square meter.")
             }
             if (!all(method_params$start_L < method_params$end_L)) {
@@ -831,10 +845,10 @@ setRefuge <- function(params, method, method_params = NULL,
     } else {
         method_params <- as.data.frame(method)
     }
-    
-    
+
+
     # Store method_params in params object
-    params@refuge_params[['method_params']] <- as.data.frame(method_params)
+    params@refuge_params[["method_params"]] <- as.data.frame(method_params)
 
     params@time_modified <- lubridate::now()
 
@@ -844,16 +858,16 @@ setRefuge <- function(params, method, method_params = NULL,
 ## Finds the refuge length bins by species and stores them in params
 #'
 #' This function is designed to be used after refuge parameters are set by the
-#'  [setRefuge()] function. It calculates the proportion of fish 
-#' that are in predation refuge for the density-independent sigmoidal and 
+#'  [setRefuge()] function. It calculates the proportion of fish
+#' that are in predation refuge for the density-independent sigmoidal and
 #' binned methods. For the competitive method, it finds the indices of fish
 #' within the prescribed size bins. These values are used by [reefVulnerable()]
 #' to set the vulnerability to predation at each time step.
 #'
 #' For all methods, this function calculates the starting and ending body
 #' lengths which have access to refuge k. These are calculated with the `a`
-#' and `b` parameters specific to each functional group. The lengths are 
-#' stored in a data frame called `refuge_lengths` in the `refuge_params` slot 
+#' and `b` parameters specific to each functional group. The lengths are
+#' stored in a data frame called `refuge_lengths` in the `refuge_params` slot
 #' of the `params` object.
 #'
 #' @inheritSection setRefuge Setting the refuge profile
@@ -868,7 +882,7 @@ setRefuge <- function(params, method, method_params = NULL,
 #'                              If not provided, uses value from
 #'                              `params@refuge_params$species_specific_bins`.
 #'                              See [setRefuge()] for details.
-#' 
+#'
 #' @param ... Unused
 #'
 #' @return A mizer params object with updated refuge profiles
@@ -876,46 +890,45 @@ setRefuge <- function(params, method, method_params = NULL,
 #' @seealso [setRefuge()], [reefVulnerable()]
 #' @export
 getRefuge <- function(params, species_specific_bins = NULL, ...) {
-    
-    # object - Check if mizerParams is valid 
+    # object - Check if mizerParams is valid
     assert_that(is(params, "MizerParams"))
-    
+
     # Extract relevant data from params
     refuge_params <- params@refuge_params
-    method_params <- params@refuge_params[['method_params']]
+    method_params <- params@refuge_params[["method_params"]]
 
     # Use value from params if not explicitly provided
     if (is.null(species_specific_bins)) {
         species_specific_bins <- isTRUE(refuge_params$species_specific_bins)
     }
-    
+
     # Pull values from params
     w <- params@w
     sp <- params@species_params
     no_w <- length(params@w)
     no_sp <- dim(params@interaction)[1]
-    
+
     # Set parameters used with all methods
-    a_bar       <- refuge_params$a_bar
-    b_bar       <- refuge_params$b_bar
-    w_settle    <- refuge_params$w_settle
+    a_bar <- refuge_params$a_bar
+    b_bar <- refuge_params$b_bar
+    w_settle <- refuge_params$w_settle
     max_protect <- refuge_params$max_protect
-    tau         <- refuge_params$tau
-    
+    tau <- refuge_params$tau
+
     # Store which functional groups use refuge
     refuge_user <- sp$refuge_user
-    
+
     # Noncomplex reef ----------------------------------------------------------
-    if (refuge_params$method == "noncomplex"){
+    if (refuge_params$method == "noncomplex") {
         # Create matrix to store proportions for each species
         refuge <- matrix(0, nrow = no_sp, ncol = no_w)
         rownames(refuge) <- rownames(params@initial_n)
         colnames(refuge) <- colnames(params@initial_n)
         # store refuge and bin indices in params object
         params@refuge_params$refuge <- refuge
-        
-    # Sigmoidal method ---------------------------------------------------------
-    } else if (refuge_params$method == "sigmoidal"){
+
+        # Sigmoidal method ---------------------------------------------------------
+    } else if (refuge_params$method == "sigmoidal") {
         # Pull slope and proportion of fish to be protected from method_params
         prop_protect <- method_params$prop_protect
         slope <- method_params$slope
@@ -926,19 +939,19 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
         if (species_specific_bins) {
             # Species-specific threshold: use each species' a and b
             for (i in 1:no_sp) {
-                W_refuge_i <- sp[["a"]][i] * method_params$L_refuge ^ sp[["b"]][i]
+                W_refuge_i <- sp[["a"]][i] * method_params$L_refuge^sp[["b"]][i]
                 denom <- 1 + exp(slope * (w - W_refuge_i))
                 ref <- ifelse(w > w_settle, prop_protect / denom, 0)
-                ref[ref > max_protect] = max_protect
+                ref[ref > max_protect] <- max_protect
                 refuge[i, ] <- refuge_user[i] * ref
             }
             refuge_lengths <- data.frame(species = sp$species, L_refuge = method_params$L_refuge)
         } else {
             # Dummy fish threshold: use a_bar and b_bar
-            W_refuge <- a_bar * method_params$L_refuge ^ b_bar
+            W_refuge <- a_bar * method_params$L_refuge^b_bar
             denom <- 1 + exp(slope * (w - W_refuge))
             ref <- ifelse(w > w_settle, prop_protect / denom, 0)
-            ref[ref > max_protect] = max_protect
+            ref[ref > max_protect] <- max_protect
             for (i in 1:no_sp) {
                 refuge[i, ] <- refuge_user[i] * ref
             }
@@ -949,42 +962,42 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
         params@refuge_params$refuge_lengths <- refuge_lengths
         params@time_modified <- lubridate::now()
 
-    # Binned method ------------------------------------------------------------
+        # Binned method ------------------------------------------------------------
     } else if (refuge_params$method == "binned") {
         # Initialize storage
-        ref       <- rep(0, no_w)
+        ref <- rep(0, no_w)
         start_l.i <- list(1)
-        end_l.i   <- list(1)
-        bin.id   <- list (1)
-        no_bins   <- nrow(method_params)
+        end_l.i <- list(1)
+        bin.id <- list(1)
+        no_bins <- nrow(method_params)
         if (species_specific_bins) {
             # Species-specific bin boundaries
             for (k in 1:no_bins) {
                 for (i in 1:no_sp) {
-                    start_w <- sp[["a"]][i] * method_params$start_L[[k]] ^ sp[["b"]][i]
-                    end_w <- sp[["a"]][i] * method_params$end_L[[k]] ^ sp[["b"]][i]
+                    start_w <- sp[["a"]][i] * method_params$start_L[[k]]^sp[["b"]][i]
+                    end_w <- sp[["a"]][i] * method_params$end_L[[k]]^sp[["b"]][i]
                     start_w[start_w < w_settle] <- w_settle
-                    bin.id[[paste0("sp",i,"_bin",k)]] <- which(w >= start_w & w <= end_w)
+                    bin.id[[paste0("sp", i, "_bin", k)]] <- which(w >= start_w & w <= end_w)
                     # Assign prop_protect for this bin/species
-                    ref[bin.id[[paste0("sp",i,"_bin",k)]]] = method_params$prop_protect[k]
+                    ref[bin.id[[paste0("sp", i, "_bin", k)]]] <- method_params$prop_protect[k]
                     # Calculate length bins for each species
-                    start_l.i[[paste0("sp",i,"_bin",k)]] <- (start_w / sp[["a"]][i])^(1 / sp[["b"]][i])
-                    end_l.i[[paste0("sp",i,"_bin",k)]]   <- (end_w   / sp[["a"]][i])^(1 / sp[["b"]][i])
+                    start_l.i[[paste0("sp", i, "_bin", k)]] <- (start_w / sp[["a"]][i])^(1 / sp[["b"]][i])
+                    end_l.i[[paste0("sp", i, "_bin", k)]] <- (end_w / sp[["a"]][i])^(1 / sp[["b"]][i])
                 }
             }
         } else {
             # Dummy fish bin boundaries
             for (k in 1:no_bins) {
-                start_w <- a_bar * method_params$start_L[[k]] ^ b_bar
-                end_w <- a_bar * method_params$end_L[[k]] ^ b_bar
+                start_w <- a_bar * method_params$start_L[[k]]^b_bar
+                end_w <- a_bar * method_params$end_L[[k]]^b_bar
                 start_w[start_w < w_settle] <- w_settle
                 bin.id[[k]] <- which(w >= start_w & w <= end_w)
-                ref[bin.id[[k]]] = method_params$prop_protect[k]
+                ref[bin.id[[k]]] <- method_params$prop_protect[k]
                 # Calculate length bins for each species
                 start_l.i[[k]] <- (start_w / sp[["a"]])^(1 / sp[["b"]])
-                names(start_l.i)[[k]] <- c(paste("start",k,sep = ""))
-                end_l.i[[k]]   <- (end_w   / sp[["a"]])^(1 / sp[["b"]])
-                names(end_l.i)[[k]] <- c(paste("end",k,sep = ""))
+                names(start_l.i)[[k]] <- c(paste("start", k, sep = ""))
+                end_l.i[[k]] <- (end_w / sp[["a"]])^(1 / sp[["b"]])
+                names(end_l.i)[[k]] <- c(paste("end", k, sep = ""))
             }
         }
         # Create matrix to store proportions for each species
@@ -992,90 +1005,90 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
         rownames(refuge) <- rownames(params@initial_n)
         colnames(refuge) <- colnames(params@initial_n)
         # Make sure none of the values are higher than maximum protection allowed
-        refuge[refuge > max_protect] = max_protect
+        refuge[refuge > max_protect] <- max_protect
         # Account for species that don't utilize refuge
-        refuge <- refuge_user*refuge
+        refuge <- refuge_user * refuge
         # store refuge and bin indices in params object
         params@refuge_params$refuge <- refuge
         params@refuge_params$bin.id <- bin.id
         # store length bins by functional group in params object
         start_l.i <- t(do.call(rbind, start_l.i))
-        end_l.i  <- t(do.call(rbind, end_l.i))
+        end_l.i <- t(do.call(rbind, end_l.i))
         refuge_lengths <- cbind(start_l.i, end_l.i)
         row.names(refuge_lengths) <- sp$species
         params@refuge_params$refuge_lengths <- refuge_lengths
         params@time_modified <- lubridate::now()
-        
-    ## Competitive method ------------------------------------------------------
-        } else if (refuge_params$method == "competitive") {
-            # Initialize empty list to hold number of competitors for each bin
-            competitor_density = numeric(nrow(method_params))
-            bin.id = list(1)
-            start_l.i <- list(1)
-            end_l.i   <- list(1)
-            no_bins <- nrow(method_params)
-            if (species_specific_bins) {
-                # Use species-specific a/b to convert length bins to weights
-                for (k in 1:no_bins) {
-                    for (i in 1:no_sp) {
-                        start_w <- sp[["a"]][i] * method_params$start_L[[k]] ^ sp[["b"]][i]
-                        end_w <- sp[["a"]][i] * method_params$end_L[[k]] ^ sp[["b"]][i]
-                        start_w[start_w < w_settle] <- w_settle
-                        bin.id[[paste0("sp",i,"_bin",k)]] <- which(params@w >= start_w & params@w <= end_w)
-                        # Calculate length bins for each species
-                        start_l.i[[paste0("sp",i,"_bin",k)]] <- (start_w / sp[["a"]][i])^(1 / sp[["b"]][i])
-                        end_l.i[[paste0("sp",i,"_bin",k)]]   <- (end_w   / sp[["a"]][i])^(1 / sp[["b"]][i])
-                    }
-                }
-            } else {
-                # Use dummy fish parameters to convert length bins to weights, then convert to species-specific lengths
-                for (k in 1:no_bins) {
-                    start_w <- a_bar * method_params$start_L[[k]] ^ b_bar
-                    end_w <- a_bar * method_params$end_L[[k]] ^ b_bar
+
+        ## Competitive method ------------------------------------------------------
+    } else if (refuge_params$method == "competitive") {
+        # Initialize empty list to hold number of competitors for each bin
+        competitor_density <- numeric(nrow(method_params))
+        bin.id <- list(1)
+        start_l.i <- list(1)
+        end_l.i <- list(1)
+        no_bins <- nrow(method_params)
+        if (species_specific_bins) {
+            # Use species-specific a/b to convert length bins to weights
+            for (k in 1:no_bins) {
+                for (i in 1:no_sp) {
+                    start_w <- sp[["a"]][i] * method_params$start_L[[k]]^sp[["b"]][i]
+                    end_w <- sp[["a"]][i] * method_params$end_L[[k]]^sp[["b"]][i]
                     start_w[start_w < w_settle] <- w_settle
-                    bin.id[[k]] <- which(params@w >= start_w & params@w <= end_w)
+                    bin.id[[paste0("sp", i, "_bin", k)]] <- which(params@w >= start_w & params@w <= end_w)
                     # Calculate length bins for each species
-                    start_l.i[[k]] <- (start_w / sp[["a"]])^(1 / sp[["b"]])
-                    names(start_l.i)[[k]] <- c(paste("start",k,sep = ""))
-                    end_l.i[[k]]   <- (end_w   / sp[["a"]])^(1 / sp[["b"]])
-                    names(end_l.i)[[k]] <- c(paste("end",k,sep = ""))
+                    start_l.i[[paste0("sp", i, "_bin", k)]] <- (start_w / sp[["a"]][i])^(1 / sp[["b"]][i])
+                    end_l.i[[paste0("sp", i, "_bin", k)]] <- (end_w / sp[["a"]][i])^(1 / sp[["b"]][i])
                 }
             }
-            # Store indices of each bin
-            params@refuge_params$bin.id <- bin.id
-            # Store length bins by species group in a data frame
-            start_l.i <- t(do.call(rbind, start_l.i))
-            end_l.i  <- t(do.call(rbind, end_l.i))
-            refuge_lengths <- cbind(start_l.i, end_l.i)
-            row.names(refuge_lengths) <- sp$species
-            params@refuge_params$refuge_lengths <- refuge_lengths
-            params@time_modified <- lubridate::now()
+        } else {
+            # Use dummy fish parameters to convert length bins to weights, then convert to species-specific lengths
+            for (k in 1:no_bins) {
+                start_w <- a_bar * method_params$start_L[[k]]^b_bar
+                end_w <- a_bar * method_params$end_L[[k]]^b_bar
+                start_w[start_w < w_settle] <- w_settle
+                bin.id[[k]] <- which(params@w >= start_w & params@w <= end_w)
+                # Calculate length bins for each species
+                start_l.i[[k]] <- (start_w / sp[["a"]])^(1 / sp[["b"]])
+                names(start_l.i)[[k]] <- c(paste("start", k, sep = ""))
+                end_l.i[[k]] <- (end_w / sp[["a"]])^(1 / sp[["b"]])
+                names(end_l.i)[[k]] <- c(paste("end", k, sep = ""))
+            }
+        }
+        # Store indices of each bin
+        params@refuge_params$bin.id <- bin.id
+        # Store length bins by species group in a data frame
+        start_l.i <- t(do.call(rbind, start_l.i))
+        end_l.i <- t(do.call(rbind, end_l.i))
+        refuge_lengths <- cbind(start_l.i, end_l.i)
+        row.names(refuge_lengths) <- sp$species
+        params@refuge_params$refuge_lengths <- refuge_lengths
+        params@time_modified <- lubridate::now()
     }
     return(params)
 }
 
 #' Change the refuge parameters for a model
 #'
-#' This is a wrapper function for the [setRefuge()] and [getRefuge()] 
+#' This is a wrapper function for the [setRefuge()] and [getRefuge()]
 #' functions that allows users to easily change refuge parameters on an
 #' existing mizer model. This will take it out of steady state, and users
-#' should run [reefSteady()] after this function to return to steady state. 
-#' 
+#' should run [reefSteady()] after this function to return to steady state.
+#'
 #' @inheritSection setRefuge Setting the refuge profile
-#' 
+#'
 #' @param params a mizer object
-#' 
-#' @param new_refuge    A boolean value that states whether this new refuge 
+#'
+#' @param new_refuge    A boolean value that states whether this new refuge
 #'                      profile is being used for simulation. Determines
 #'                      whether algae and detritus production are tuned when
 #'                      the model is run to steady state. Defaults to FALSE.
-#' 
-#' @param new_method    The new method to be used for setting the refuge 
-#'                      profile. Options are "sigmoidal", "binned", 
+#'
+#' @param new_method    The new method to be used for setting the refuge
+#'                      profile. Options are "sigmoidal", "binned",
 #'                      "competitive", or "noncomplex". If no method is
 #'                      provided, this defaults to the same method as is
-#'                      currently being used in the simulation. 
-#'                  
+#'                      currently being used in the simulation.
+#'
 #' @param new_method_params  A data frame or list specifying parameters required for
 #'                           the chosen method. For 'sigmoidal', must include 'L_refuge'
 #'                           and 'prop_protect'. For 'binned' and 'competitive', must
@@ -1090,13 +1103,13 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
 #' @details At least one of the arguments new_method, new_method_params, new_L_refuge,
 #'          new_prop_protect, or scale_bin must be provided. For 'binned' and 'competitive'
 #'          methods, scale_bin must be a value or vector matching the number of bins.
-#'                          
+#'
 #' @param new_L_refuge  To be used with "sigmoidal" method only. The new value
 #'                      for the length at which refuge becomes scarce in cm.
-#'                      
-#' @param new_prop_protect  To be used with "sigmoidal" method only. The new 
+#'
+#' @param new_prop_protect  To be used with "sigmoidal" method only. The new
 #'                          value for the maximum proportion of fish to protect.
-#'                          
+#'
 #' @param ... Unused
 #'
 #' @return A mizer object with updated refuge profiles
@@ -1107,165 +1120,172 @@ newRefuge <- function(params, new_refuge = FALSE,
                       new_method = NULL, new_method_params = NULL,
                       # Sigmoidal - changing refuge length prop protect
                       new_L_refuge = NULL, new_prop_protect = NULL,
-                      # Binned - scaling bin prop 
+                      # Binned - scaling bin prop
                       scale_bin = NULL, ...) {
-    
     # Check that the user provided at least one new input
-        inputs <- list(new_method, new_method_params, 
-                       new_L_refuge, new_prop_protect, scale_bin)
-        if (all(sapply(inputs, is.null))) {
-            stop("Error: At least one input must be provided.")
-        }
-        
+    inputs <- list(
+        new_method, new_method_params,
+        new_L_refuge, new_prop_protect, scale_bin
+    )
+    if (all(sapply(inputs, is.null))) {
+        stop("Error: At least one input must be provided.")
+    }
+
     # Save new refuge flag
-        params@other_params$new_refuge <- new_refuge
-    
-      # object check 
-        # Check if given mizerParams object is valid
-        assert_that(is(params, "MizerParams"))
-        
-        # Extract relevant data from params
-        refuge_params <- params@refuge_params
-        method_params <- params@refuge_params[['method_params']]
-    
-    # method checks 
-        # Check if the user provided one of the available refuge profile methods
-        m_opt <- c('sigmoidal','binned','competitive','noncomplex')
-        if(is.null(new_method)) {
-            warning("Since you did not provide a new method to set 
-                    the refuge profile, I will use the one currently stored in 
+    params@other_params$new_refuge <- new_refuge
+
+    # object check
+    # Check if given mizerParams object is valid
+    assert_that(is(params, "MizerParams"))
+
+    # Extract relevant data from params
+    refuge_params <- params@refuge_params
+    method_params <- params@refuge_params[["method_params"]]
+
+    # method checks
+    # Check if the user provided one of the available refuge profile methods
+    m_opt <- c("sigmoidal", "binned", "competitive", "noncomplex")
+    if (is.null(new_method)) {
+        warning("Since you did not provide a new method to set
+                    the refuge profile, I will use the one currently stored in
                     params@other_params$refuge_params$method.")
-            # If user did not provide a method, use old one
-            new_method <- refuge_params$method
+        # If user did not provide a method, use old one
+        new_method <- refuge_params$method
         # If user did provide a method, check that it's one of the options
-        } else if(!is.element(new_method, m_opt)) {
-            stop("Method must be 'sigmoidal','binned', 'competitive', 'noncomplex'.")
-        }
-    
-    #  method_params checks 
-        if (new_method != "noncomplex"){
-            # check if method_params provided
-            if (is.null(new_method_params)) {
-                # Return an error if they are trying to switch to methods
-                if(refuge_params$method != new_method){
-                    stop("You must provide a new method_params data frame to
-                         switch methods.") 
+    } else if (!is.element(new_method, m_opt)) {
+        stop("Method must be 'sigmoidal','binned', 'competitive', 'noncomplex'.")
+    }
+
+    #  method_params checks
+    if (new_method != "noncomplex") {
+        # check if method_params provided
+        if (is.null(new_method_params)) {
+            # Return an error if they are trying to switch to methods
+            if (refuge_params$method != new_method) {
+                stop("You must provide a new method_params data frame to
+                         switch methods.")
+            }
+            # Check method
+            ## Sigmoidal
+            if (new_method == "sigmoidal") {
+                # Check if new L or new_prop given
+                if (all(is.null(new_L_refuge), is.null(new_prop_protect))) {
+                    stop("You must provide either a new L_refuge, a new
+                             prop_protect, or a new method_params data frame.")
                 }
-                # Check method 
-                ## Sigmoidal 
-                if (new_method == "sigmoidal") {
-                    # Check if new L or new_prop given
-                    if (all(is.null(new_L_refuge), is.null(new_prop_protect))){
-                       stop("You must provide either a new L_refuge, a new
-                             prop_protect, or a new method_params data frame.") 
+                # If new L_refuge given, check that it's positive
+                if (!is.null(new_L_refuge)) {
+                    if (new_L_refuge < 0) {
+                        stop("new_L_refuge must be non-negative.")
                     }
-                    # If new L_refuge given, check that it's positive
-                    if(!is.null(new_L_refuge)){
-                        if(new_L_refuge < 0) {
-                            stop("new_L_refuge must be non-negative.")
-                        }
                     # If it's not given, use the old one
-                    } else { new_L_refuge <- method_params$L_refuge }
-                    # If new prop_protect given, check that it's between 0 and 1
-                    if(!is.null(new_prop_protect)){
-                        if(method_params$prop_protect < 0 ||
-                           method_params$prop_protect > 1) {
+                } else {
+                    new_L_refuge <- method_params$L_refuge
+                }
+                # If new prop_protect given, check that it's between 0 and 1
+                if (!is.null(new_prop_protect)) {
+                    if (method_params$prop_protect < 0 ||
+                        method_params$prop_protect > 1) {
                         stop("prop_protect should be a proportion between 0 and 1.")
-                        }
+                    }
                     # If it's not given, use the old one
-                    } else { new_prop_protect <- method_params$prop_protect }
-                    
-                    new_mp <- method_params
-                    new_mp$L_refuge <- new_L_refuge
-                    new_mp$prop_protect <- new_prop_protect
-                    
-                    ## Binned or Competitive 
-                } else if (new_method == "binned" || new_method == "competitive") {
-                    # Find number of bins used in old method
-                    no_bins <- length(method_params)
-                    if(is.null(scale_bin)){
-                        stop("You must provide either a value or vector of values
-                             for scale_bin or a new method_params data frame.") 
-                    }
-                    # Make sure scaling vector is the right length
-                    if(!(length(scale_bin) == 1) || 
-                       !(length(scale_bin) == no_bins)){
-                        stop("scale_bin must have length 1 or have an value
-                             for every bin.")
-                    }
-                    # Check that scale_bin_prop is positive
-                    if(scale_bin < 0) {
-                        stop("scale_bin must be non-negative.")
-                    }
-                    # Calculate new bins
-                    if (new_method == "binned"){ 
-                        new_mp <- method_params
-                        new_mp$prop_protect <- scale_bin * new_mp$prop_protect
-                        
-                    } else {
-                        new_mp <- method_params
-                        new_mp$refuge_density <- scale_bin * new_mp$refuge_density
-                    }
+                } else {
+                    new_prop_protect <- method_params$prop_protect
                 }
-            } else { new_mp <- new_method_params }
+
+                new_mp <- method_params
+                new_mp$L_refuge <- new_L_refuge
+                new_mp$prop_protect <- new_prop_protect
+
+                ## Binned or Competitive
+            } else if (new_method == "binned" || new_method == "competitive") {
+                # Find number of bins used in old method
+                no_bins <- length(method_params)
+                if (is.null(scale_bin)) {
+                    stop("You must provide either a value or vector of values
+                             for scale_bin or a new method_params data frame.")
+                }
+                # Make sure scaling vector is the right length
+                if (!(length(scale_bin) == 1) ||
+                    !(length(scale_bin) == no_bins)) {
+                    stop("scale_bin must have length 1 or have an value
+                             for every bin.")
+                }
+                # Check that scale_bin_prop is positive
+                if (scale_bin < 0) {
+                    stop("scale_bin must be non-negative.")
+                }
+                # Calculate new bins
+                if (new_method == "binned") {
+                    new_mp <- method_params
+                    new_mp$prop_protect <- scale_bin * new_mp$prop_protect
+                } else {
+                    new_mp <- method_params
+                    new_mp$refuge_density <- scale_bin * new_mp$refuge_density
+                }
+            }
+        } else {
+            new_mp <- new_method_params
         }
-        
-    # Update parameters 
-        # Store new parameters
-        params <- setRefuge(params = params, 
-                            method = new_method,
-                            method_params = new_mp)
-    
-        # Find new refuge profile   
-        params <- getRefuge(params = params)
-        
-        # Save time parameters were modified
-        params@time_modified <- lubridate::now()
-    
-    # Return mizer params object    
+    }
+
+    # Update parameters
+    # Store new parameters
+    params <- setRefuge(
+        params = params,
+        method = new_method,
+        method_params = new_mp
+    )
+
+    # Find new refuge profile
+    params <- getRefuge(params = params)
+
+    # Save time parameters were modified
+    params@time_modified <- lubridate::now()
+
+    # Return mizer params object
     return(params)
-        
 }
 
 
 #' Prepare a steady state model for projections with degradation
-#' 
-#' This function stores degradation parameters in the `refuge_params` slot of 
+#'
+#' This function stores degradation parameters in the `refuge_params` slot of
 #' the params object, and algae adjustment parameters in the `algae_params` slot.
-#' 
+#'
 #' @param params a mizer object
-#' 
-#' @param trajectory    Optional character string naming the degradation scenario. 
-#'                      Used for documentation and identification. No functional 
+#'
+#' @param trajectory    Optional character string naming the degradation scenario.
+#'                      Used for documentation and identification. No functional
 #'                      effect on the simulation.
-#'                      
-#' @param deg_scale     A matrix (refuge bins x time) giving scaling factors for 
-#'                      refuge density. Column 1 represents the bleaching year 
-#'                      (initial impact), and subsequent columns represent years 
-#'                      1, 2, 3... post-bleaching. Values are multiplied by the 
-#'                      previous timestep's refuge density. Default scaling matrices 
-#'                      for 15 years with "rubble", "algae", and "recovery" 
+#'
+#' @param deg_scale     A matrix (refuge bins x time) giving scaling factors for
+#'                      refuge density. Column 1 represents the bleaching year
+#'                      (initial impact), and subsequent columns represent years
+#'                      1, 2, 3... post-bleaching. Values are multiplied by the
+#'                      previous timestep's refuge density. Default scaling matrices
+#'                      for 15 years with "rubble", "algae", and "recovery"
 #'                      trajectories are included as data objects in the package.
-#'                      
-#' @param bleach_time   The year of the simulation to implement bleaching. 
+#'
+#' @param bleach_time   The year of the simulation to implement bleaching.
 #'                      Defaults to year 2.
-#'                      
-#' @param algae_boost  Logical. Should algae growth and/or carrying capacity 
+#'
+#' @param algae_boost  Logical. Should algae growth and/or carrying capacity
 #'                      be adjusted in response to bleaching? Default is FALSE.
-#'                      
-#' @param algae_growth_boost Numeric vector. Multipliers for algae growth rate 
-#'                      at bleaching (element 1) and during post-bleaching years 
-#'                      (subsequent elements). Only used if algae_boost = TRUE. 
-#'                      Vector length determines duration: length 4 means bleaching 
-#'                      year plus 3 post-bleaching years. Default is 
+#'
+#' @param algae_growth_boost Numeric vector. Multipliers for algae growth rate
+#'                      at bleaching (element 1) and during post-bleaching years
+#'                      (subsequent elements). Only used if algae_boost = TRUE.
+#'                      Vector length determines duration: length 4 means bleaching
+#'                      year plus 3 post-bleaching years. Default is
 #'                      c(1.11, 1.11, 1.11, 1.11) for 4 years of boosting.
-#'                      
-#' @param algae_capacity_boost Numeric vector. Multipliers for algae carrying 
-#'                      capacity at bleaching (element 1) and during post-bleaching 
-#'                      years (subsequent elements). Only used if algae_boost = TRUE. 
-#'                      If shorter than algae_growth_boost, will be padded with 1s 
+#'
+#' @param algae_capacity_boost Numeric vector. Multipliers for algae carrying
+#'                      capacity at bleaching (element 1) and during post-bleaching
+#'                      years (subsequent elements). Only used if algae_boost = TRUE.
+#'                      If shorter than algae_growth_boost, will be padded with 1s
 #'                      (no change). Default is c(2.0) (only boosts at bleaching year).
-#'                          
+#'
 #' @param ... Unused
 #'
 #' @return A mizer object with updated degradation parameters stored in `refuge_params`
@@ -1276,21 +1296,21 @@ newRefuge <- function(params, new_refuge = FALSE,
 #' @export
 setDegradation <- function(params, trajectory = NULL, deg_scale,
                            bleach_time = 2,
+                           degrade = FALSE,
                            algae_boost = FALSE,
                            algae_growth_boost = c(1.11, 1.11, 1.11, 1.11),
                            algae_capacity_boost = c(2.0),
-                           ...){
-    
+                           ...) {
     # Validate deg_scale
     if (!is.matrix(deg_scale) && !is.data.frame(deg_scale)) {
         stop("deg_scale must be a matrix or data frame.")
     }
     deg_scale <- as.matrix(deg_scale)
-    
+
     if (ncol(deg_scale) < 1) {
         stop("deg_scale must have at least one column (bleaching year impact).")
     }
-    
+
     # Validate algae parameters if adjustment is enabled
     if (algae_boost) {
         if (!is.numeric(algae_growth_boost) || any(algae_growth_boost <= 0)) {
@@ -1301,73 +1321,74 @@ setDegradation <- function(params, trajectory = NULL, deg_scale,
         }
         # Pad capacity boost with 1s (no change) if shorter than growth boost
         if (length(algae_capacity_boost) < length(algae_growth_boost)) {
-            algae_capacity_boost <- c(algae_capacity_boost, 
-                                      rep(1, length(algae_growth_boost) - length(algae_capacity_boost)))
+            algae_capacity_boost <- c(
+                algae_capacity_boost,
+                rep(1, length(algae_growth_boost) - length(algae_capacity_boost))
+            )
         }
     }
-    
+
     # Add new parameters to params object
-    params@refuge_params$degrade        <- TRUE
-    params@refuge_params$t_bleach       <- bleach_time 
-    params@refuge_params$trajectory     <- trajectory
-    params@refuge_params[['deg_scale']] <- deg_scale
+    params@refuge_params$degrade <- degrade
+    params@refuge_params$t_bleach <- bleach_time
+    params@refuge_params$trajectory <- trajectory
+    params@refuge_params[["deg_scale"]] <- deg_scale
 
     # Store algae adjustment parameters
     params@algae_params$algae_boost <- algae_boost
     if (algae_boost) {
-        params@algae_params$algae_growth_boost   <- algae_growth_boost
+        params@algae_params$algae_growth_boost <- algae_growth_boost
         params@algae_params$algae_capacity_boost <- algae_capacity_boost
     }
-    
+
     # Save time parameters were modified
     params@time_modified <- lubridate::now()
-    
+
     return(params)
 }
 
 #' Switch to unstructured resource dynamics with carrying capacities
-#' 
+#'
 #' This function calculates new carrying capacities for algae and detritus
 #' resources and switches the resource dynamics from the standard linear
-#' dynamics to fluxes with a carrying capacity. The carrying capacity is set 
-#' at two times the current steady state biomass of the resource. 
-#' 
+#' dynamics to fluxes with a carrying capacity. The carrying capacity is set
+#' at two times the current steady state biomass of the resource.
+#'
 #' See [algae_dynamics_cc()] and [detritus_dynamics_cc()] for additional detail.
-#' 
+#'
 #' @param params a \linkS4class{MizerParams} object
-#' @param cap   Numeric. Value to scale the steady state biomass by. Defaults to 
-#'              1.5, setting the carrying capacity 50% higher than the current 
+#' @param cap   Numeric. Value to scale the steady state biomass by. Defaults to
+#'              1.5, setting the carrying capacity 50% higher than the current
 #'              standing biomass.
 #' @param ... Unused
 #'
 #' @return A mizer object with updated degradation parameters profiles
-#' @concept Uresources 
+#' @concept Uresources
 #' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
 #'          [tuneUR_cc()]
 #' @export
-setURcapacity <- function(params, cap = 1.5, ...){
-    
+setURcapacity <- function(params, cap = 1.5, ...) {
     # Change capacity boolean to true
     params@other_params$use_UR_cc <- TRUE
-    
+
     # Calculate algae and detritus carrying capacities
     # from steady state biomasses
     # Algae
     ba <- algae_biomass(params)
-    new_a_carry <- cap*ba
+    new_a_carry <- cap * ba
     params@algae_params$algae_capacity <- new_a_carry
     # Detritus
     bd <- detritus_biomass(params)
-    new_d_carry <- cap*bd
+    new_d_carry <- cap * bd
     params@detritus_params$detritus_capacity <- new_d_carry
-    
+
     # Switch to carrying capacity dynamics
     params@other_dynamics$algae <- "algae_dynamics_cc"
     params@other_dynamics$detritus <- "detritus_dynamics_cc"
-    
+
     # Save time parameters were modified
     params@time_modified <- lubridate::now()
-    
+
     return(params)
 }
 
@@ -1375,7 +1396,7 @@ setURcapacity <- function(params, cap = 1.5, ...){
 #'
 #' @section Sponges as unstructured resources:
 #'
-#'      mizerReef supports four sponge morphologies: 
+#'      mizerReef supports four sponge morphologies:
 #'      encrusting, massive, cryptic, and branching. This function
 #'      sets the initial abundance at size, interaction strengths,
 #'      and placeholder parameters for growth and scaling for each
@@ -1421,9 +1442,8 @@ setSpongeParams <- function(params,
                             cryptic_growth = NULL,
                             cryptic_scaling = NULL,
                             branching_growth = NULL,
-                            branching_scaling = NULL, 
+                            branching_scaling = NULL,
                             sponge_colour = "#56B4E9") {
-
     assert_that(is(params, "MizerParams"))
     no_sp <- nrow(params@species_params)
     if (is.null(params@sponge_params)) params@sponge_params <- list()

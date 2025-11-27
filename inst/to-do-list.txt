@@ -1,11 +1,19 @@
 MizerReef Major Package Update To Do List - 18/11/2025
 
-** For Major Update **
+** For Major Update  - Manuscript version**
 - check remaining current diffs and approve them for each file
+
+- implement new logo, files inst folder. R logo should be R logo, website should have full logo, and just the circle should be on pdfs and cheat sheets
+
+- create a new private branch for sponge params and move the function to there
 
 - check on algae growth and boosting mechanics to make sure they are actually implemented during simulations (because the params object doesn't get updated?)
 -- make sure the right algae parameters are being called and stored in tune_UR, tune_UR_cc, and all algae functions
 -- possibly move algae boosting to the algae growth function??
+
+- new plotting functions
+-- translate code from degradation scale plot to a function plotDegScale to create heat plot for degradation scaling parameters
+-- check if plotRefugeDensity correctly plots each refuge size through time in simulations, comparing with getDegrade
 
 - fix all instances where params@other_params is called
 -- update all algae_component functions
@@ -17,8 +25,8 @@ MizerReef Major Package Update To Do List - 18/11/2025
 -- deg_scales should have the first column be bleaching 
 -- species parameter data frames need to have bad_pred column renamed to blocked_pred
 
-- Set defaults for parameters that users must provide for MizerReef - no known currently
-- Add error messages
+- Documentation
+-- add a page to the top of all plotting scripts like mizers https://sizespectrum.org/mizer/reference/plotting_functions.html
 
 - finish/ polish the vignettes and articles for Mizer Reef
 -- clean referencing, links, and document structure
@@ -32,13 +40,11 @@ MizerReef Major Package Update To Do List - 18/11/2025
 ---- add descriptions of built-in degradation trajectories, with sources and plots
 ---- add section that goes over the nice new plotting functions for looking at simulations in mizerReef
 
-- new plotting functions
--- translate code from degradation scale plot to a function plotDegScale to create heat plot for degradation scaling parameters
--- check if plotRefugeDensity correctly plots each refuge size through time in simulations, comparing with getDegrade
 
-- write and run tests for all functions
+** Code updates for future (not necessary for manuscript submission/ next update) **
+- Set defaults for parameters that users must provide for MizerReef - no known currently
+- Add error messages
 
-** Code updates for future (not necessary for next update) **
 - create versions of calibrateReef, calibrateReefYield, and CalibrateReefNumber that use scaleReefModel
 
 ** Ideas for the future **
@@ -76,3 +82,9 @@ COMPLETED TASKS:
 -- 18/11 in matchReefGrowth, after age_mat values are set using set_species_defaults, if any age_mat = 0, needs to stop and provide an error that age_mat is zero for species i, this is impossible, needs to be non-zero
 -- 18/11 Add code to newReefParams() that sets satiation to false for all carnivores (any interaction>1) and true for resource consumers. The satiation response doesn't work well for predators that hunt prey in refuge. The code must give a warning that says something like "You have not specified whether species should have a satiation response. The default is FALSE for carnivores and TRUE for resource consumers."
 -- 18/11 Add code to setRefuge() that sets species_params a and b to a_bar and b_bar for any species where a and b are missing from species_params, and gives a warning to the user that average values are being used
+
+-- 27/11 add include_repro tag to plotProductivity
+-- 27/11 change default w_pp_cutoff in newReefParams from 1.0 to 0.1 g
+-- 27/11 set a default for degrade (or check if it's already set)
+-- 27/11 Add @inheritParams getProductivity to plotProductivity documentation and remove redundant params
+-- 27/11 Add .gitignore rule to ignore base-mizer-files folder under ignore/ directory

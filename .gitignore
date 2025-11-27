@@ -1,3 +1,6 @@
+# Ignore base-mizer-files folder under ignore/
+ignore/base-mizer-files/
+
 # History files
 .Rhistory
 .Rapp.history
