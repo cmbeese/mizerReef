@@ -5,16 +5,6 @@ MizerReef Major Package Update To Do List - 18/11/2025
 
 - implement new logo, files inst folder. R logo should be R logo, website should have full logo, and just the circle should be on pdfs and cheat sheets
 
-- check on algae growth and boosting mechanics to make sure they are actually implemented during simulations (because the params object doesn't get updated?)
--- make sure the right algae parameters are being called and stored in tune_UR, tune_UR_cc, and all algae functions
--- possibly move algae boosting to the algae growth function??
-
-- fix all instances where params@other_params is called
--- update all algae_component functions
--- update all detritus_component functions
--- update newReefParams
--- update reef-rates functions and check if the calculations at each time step are the same as the steps in plotDegradation - then maybe rework the function to use getDegrade
-
 - update all data objects to reflect changes to parameters (new slots, new parameter names)
 -- deg_scales should have the first column be bleaching 
 -- species parameter data frames need to have bad_pred column renamed to blocked_pred
@@ -38,6 +28,10 @@ MizerReef Major Package Update To Do List - 18/11/2025
 
 - create versions of calibrateReef, calibrateReefYield, and CalibrateReefNumber that use scaleReefModel
 
+- check on algae growth and boosting mechanics to make sure they are actually implemented during simulations (because the params object doesn't get updated?)
+-- make sure the right algae parameters are being called and stored in tune_UR, tune_UR_cc, and all algae functions
+-- possibly move algae boosting to the algae growth function??
+
 ** Ideas for the future **
 - New refuge method - parabolic
 - New refuge method - exponential
@@ -49,7 +43,13 @@ MizerReef Major Package Update To Do List - 18/11/2025
 COMPLETED TASKS:
 ============================================================================
 
-
+- 27/11 Clarified and improved documentation for use_dummy_fish_bins argument in refuge binning logic; ensured description is accurate, precise, and linter-compliant
+- 27/11 fix all instances where params@other_params is called
+-- update all algae_component functions
+-- update all detritus_component functions
+-- update newReefParams
+-- update reef-rates functions
+-- 27/11 check if the calculations at each time step are the same as the steps in plotDegradation - then maybe rework the function to use getDegrade
 -- 27/11 add a page to the top of all plotting scripts like mizers https://sizespectrum.org/mizer/reference/plotting_functions.html
 - 27/11 new plotting functions
 -- 27/11 translate code from degradation scale plot to a function plotDegScale to create heat plot for degradation scaling parameters

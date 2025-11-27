@@ -155,8 +155,7 @@ reefRates <- function(params, n, n_pp, n_other, t = 0, effort, rates_fns, ...) {
 #' @family mizer rate functions
 reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 
-	method_params <- params@refuge_params[['method_params']]
-	refuge_params <- params@refuge_params
+	method_params <- params@refuge_params$method_params
 	degrade <- params@refuge_params$degrade #true/false for whether to degrade
 
 	# Save original refuge density
@@ -164,7 +163,7 @@ reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 
 	if (degrade == TRUE){
 		# If not competitive method, error
-		if (refuge_params$method != "competitive"){
+		if (params@refuge_params$method != "competitive"){
 			stop("Degradation is only available for the competitive method.")
 		}
 
@@ -189,9 +188,9 @@ reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 				capacity_boosts <- params@algae_params$algae_capacity_boost
 
 				# Apply first element of boost vectors (bleaching year = index 1)
-				if (length(growth_boosts) >= 1 && !is.null(params@algae_params$algae_growth_initial)) {
-					a_growth <- params@algae_params$algae_growth_initial
-					params@algae_params$algae_growth_initial <- growth_boosts[1] * a_growth
+				if (length(growth_boosts) >= 1 && !is.null(params@algae_params$algae_growth)) {
+					a_growth <- params@algae_params$algae_growth
+					params@algae_params$algae_growth <- growth_boosts[1] * a_growth
 				}
 				if (length(capacity_boosts) >= 1 && !is.null(params@algae_params$algae_capacity)) {
 					a_capacity <- params@algae_params$algae_capacity
@@ -224,9 +223,9 @@ reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 					# years_post = 1,2,3... maps to indices 2,3,4... in the boost vectors
 					boost_idx <- years_post + 1
 
-					if (boost_idx <= length(growth_boosts) && !is.null(params@algae_params$algae_growth_initial)) {
-						a_growth <- params@algae_params$algae_growth_initial
-						params@algae_params$algae_growth_initial <- growth_boosts[boost_idx] * a_growth
+					if (boost_idx <= length(growth_boosts) && !is.null(params@algae_params$algae_growth)) {
+						a_growth <- params@algae_params$algae_growth
+						params@algae_params$algae_growth <- growth_boosts[boost_idx] * a_growth
 					}
 					if (boost_idx <= length(capacity_boosts) && !is.null(params@algae_params$algae_capacity)) {
 						a_capacity <- params@algae_params$algae_capacity
@@ -262,9 +261,8 @@ reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
 
 	# Extract relevant data from params
-	refuge_params <- params@other_params[['refuge_params']]
-	method_params <- params@other_params[['method_params']]
-    degrade <- params@other_params$degrade
+	method_params <- params@refuge_params$method_params
+	degrade <- params@refuge_params$degrade
 
     # If degradation is being implemented, calculate new refuge density
 	if(degrade == TRUE) {
@@ -276,8 +274,8 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
     }
 
 	# Set parameters used with all methods
-	max_protect <- refuge_params$max_protect
-	tau         <- refuge_params$tau
+	max_protect <- params@refuge_params$max_protect
+	tau         <- params@refuge_params$tau
 
 	# Pull no of species and size bins
 	no_w <- length(params@w)
@@ -289,52 +287,70 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
 	# Static methods -----------------------------------------------------------
 	static = c("sigmoidal", "binned", "noncomplex")
 
-	if (is.element(refuge_params$method, static)){
-
-		refuge <- params@other_params$refuge
+	if (params@refuge_params$method %in% static){
+		refuge <- params@refuge_params$refuge
 		vulnerable <- 1 - refuge
 
 	# Competitive method -------------------------------------------------------
-	} else if (refuge_params$method == "competitive") {
-
-		# Initialize empty list to hold number of competitors for each bin
-		competitor_density = numeric(length(new_rd))
+	} else if (params@refuge_params$method == "competitive") {
+		# Determine bin.id structure
+		bin_id_list <- params@refuge_params$bin.id
+		# Check if bin.id uses character keys (species-specific bins)
+		bin_names <- names(bin_id_list)
+		use_dummy_fish_bins <- !is.null(bin_names) && !any(grepl("sp", bin_names))
 
 		# Initialize storage for the array of refuge proportions
 		refuge <- matrix(0, nrow = no_sp, ncol = no_w)
 		rownames(refuge) <- rownames(params@initial_n)
 		colnames(refuge) <- colnames(params@initial_n)
 
-		# Loop through each refuge bin
-        for (k in seq_len(nrow(new_rd))) {
-			# Get indices of fish in size bin k
-			bin.id <- params@other_params$bin.id[[k]]
-
-			# Create logical vector and use to get abundances in size bin
-			bin_fish <- 1:no_w %in% bin.id
-			bin_fish <- sweep(n, 2, bin_fish, "*")
-
-			# Calculate number of competitors from each species group in bin k
-			competitors <- bin_fish %*% params@dw
-
-			# Remove species that don't use refuge
-			sp <- params@species_params$species
-			sp <- sp[params@species_params$refuge_user ==TRUE]
-			competitors <- competitors[sp,]
-
-			# sum competitors from all species groups for refuge bin k
-			competitor_density[k] <- sum(competitors)
-
-			# Set vulnerability for fish in size bin based on the number of
-			# available refuges and the number of competitors
-			refuge[,bin.id] <- ifelse(competitor_density[k] == 0,
-				max_protect,
-				tau * new_rd[k]/competitor_density[k])
+		if (!use_dummy_fish_bins) {
+			# Handle species-specific bins
+			competitor_density <- numeric(length(bin_id_list))
+			bin_keys <- bin_names
+			for (idx in seq_along(bin_keys)) {
+				key <- bin_keys[idx]
+				# Parse species and bin from key
+				sp_match <- regmatches(key, regexec("sp([0-9]+)_bin([0-9]+)", key))[[1]]
+				if (length(sp_match) == 3) {
+					i <- as.integer(sp_match[2])
+					k <- as.integer(sp_match[3])
+					bin.id <- bin_id_list[[key]]
+					# Create logical vector and use to get abundances in size bin
+					bin_fish <- 1:no_w %in% bin.id
+					bin_fish <- sweep(n, 2, bin_fish, "*")
+					# Calculate number of competitors from all refuge users in bin k
+					refuge_user_idx <- which(params@species_params$refuge_user == TRUE)
+					competitors <- bin_fish[refuge_user_idx, , drop = FALSE] %*% params@dw
+					competitor_density[idx] <- sum(competitors)
+					# Set vulnerability for fish in size bin for this species
+					refuge[i, bin.id] <- ifelse(competitor_density[idx] == 0,
+						max_protect,
+						tau * new_rd[k]/competitor_density[idx])
+				}
+			}
+		} else if (use_dummy_fish_bins) {
+			# Handle non-species-specific bins
+			competitor_density <- numeric(length(new_rd))
+			for (k in seq_len(nrow(new_rd))) {
+				bin.id <- bin_id_list[[k]]
+				bin_fish <- 1:no_w %in% bin.id
+				bin_fish <- sweep(n, 2, bin_fish, "*")
+				competitors <- bin_fish %*% params@dw
+				# Remove species that don't use refuge
+				sp <- params@species_params$species
+				sp <- sp[params@species_params$refuge_user == TRUE]
+				competitors <- competitors[sp,]
+				competitor_density[k] <- sum(competitors)
+				refuge[, bin.id] <- ifelse(competitor_density[k] == 0,
+					max_protect,
+					tau * new_rd[k]/competitor_density[k])
+			}
 		}
 		# Make sure none of the values are higher than max_protect
 		refuge[refuge > max_protect] <- max_protect
 		# Account for vulnerability of species that don't utilize refuge
-		vulnerable <- 1 - (refuge_user*refuge)
+		vulnerable <- 1 - (refuge_user * refuge)
 	}
 
 	return(vulnerable)
@@ -704,7 +720,7 @@ reefSenMort <- function(params,...) {
 	log_w  <- log10(params@w)
 
 	# Loop through species
-	for (i in 1:length(sen_weight)){
+	for (i in seq_along(sen_weight)){
 		sen <- sen_prop * ( log_w / log_sw[i] )
 		sen[sen < 0] <- 0
 		sen_mort[i,] <- sen ^ sen_curve

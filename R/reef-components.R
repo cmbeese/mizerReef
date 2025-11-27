@@ -20,7 +20,13 @@
 #' @concept Uresources
 encounter_contribution <- function(params, n_other, component, ...) {
     
-    params@other_params[[component]]$rho * n_other[[component]]
+    if (component == "algae") {
+        params@algae_params$rho * n_other[[component]]
+    } else if (component == "detritus") {
+        params@detritus_params$rho * n_other[[component]]
+    } else {
+        params@other_params[[component]]$rho * n_other[[component]]
+    }
 }
 
 #' Rescale algae and detritus biomass without changing anything else
@@ -93,20 +99,20 @@ tuneUR_cc <- function(params,...) {
     
     # algae
     ba <- algae_biomass(params)
-    ka <- params@other_params$algae$capacity
+    ka <- params@algae_params$algae_capacity
     aout <- sum(getAlgaeConsumption(params))
-    params@other_params$algae$growth <- (aout*ba)/(1-ba/ka)
-    
+    params@algae_params$algae_growth <- (aout*ba)/(1-ba/ka)
+
     # detritus
-    params@other_params$detritus$external <- 0
+    params@detritus_params$external <- 0
     bd <- detritus_biomass(params)
-    kd <- params@other_params$detritus$capacity
+    kd <- params@detritus_params$detritus_capacity
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
         warning("The flux of external detritus is negative.")
     }
-    params@other_params$detritus$external <- ((dout*bd)/(1-bd/kd)) - din
+    params@detritus_params$external <- ((dout*bd)/(1-bd/kd)) - din
     
     params
 }
@@ -128,16 +134,16 @@ tuneUR <- function(params,...) {
 
     # algae
     aout <- sum(getAlgaeConsumption(params))
-    params@other_params$algae$growth <- aout
+    params@algae_params$algae_growth <- aout
 
     # detritus
-    params@other_params$detritus$external <- 0
+    params@detritus_params$external <- 0
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
         warning("The flux of external detritus is negative.")
     }
-    params@other_params$detritus$external <- dout - din
+    params@detritus_params$external <- dout - din
 
     params
 }
@@ -201,20 +207,14 @@ scaleReefAbundance <- function(params, factor) {
 scaleReefModel <- function(params, factor) {
 
     # Algae
-    params@other_params[["algae"]]$rho <-
-        params@other_params[["algae"]]$rho / factor
-    params@species_params$rho_algae <-
-        params@species_params$rho_algae / factor
-    params@other_params$algae$growth <-
-        params@other_params$algae$growth * factor
+    params@algae_params$rho <- params@algae_params$rho / factor
+    params@species_params$rho_algae <- params@species_params$rho_algae / factor
+    params@algae_params$algae_growth <- params@algae_params$algae_growth * factor
 
     # Detritus
-    params@other_params[["detritus"]]$rho <-
-        params@other_params[["detritus"]]$rho / factor
-    params@species_params$rho_detritus <-
-        params@species_params$rho_detritus / factor
-    params@other_params$detritus$external <-
-        params@other_params$detritus$external * factor
+    params@detritus_params$rho <- params@detritus_params$rho / factor
+    params@species_params$rho_detritus <- params@species_params$rho_detritus / factor
+    params@detritus_params$external <- params@detritus_params$external * factor
     
     # now comes the code of mizer's standard scaleModel()
     params <- validParams(params)
@@ -437,15 +437,11 @@ matchReefGrowth <- function(params, species = NULL,
     
     # rescale consumption of algae and detritus
     
-    params@other_params$algae$rho[sel, ] <- 
-        params@other_params$algae$rho[sel, ] * factor
-    params@species_params$rho_algae[sel] <-
-        params@species_params$rho_algae[sel] * factor
-    
-    params@other_params$detritus$rho[sel, ] <- 
-        params@other_params$detritus$rho[sel, ] * factor
-    params@species_params$rho_detritus[sel] <-
-        params@species_params$rho_detritus[sel] * factor
+    params@algae_params$rho[sel, ] <- params@algae_params$rho[sel, ] * factor
+    params@species_params$rho_algae[sel] <- params@species_params$rho_algae[sel] * factor
+
+    params@detritus_params$rho[sel, ] <- params@detritus_params$rho[sel, ] * factor
+    params@species_params$rho_detritus[sel] <- params@species_params$rho_detritus[sel] * factor
     
     params <- steadySingleSpecies(params, species = sel)
     

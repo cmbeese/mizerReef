@@ -92,11 +92,11 @@ setAlgaeParams <- function(params,
     # Store algae params in slot with checks
     # algae_growth_initial check
     if (is.null(algae_growth_initial)) {
-        params@algae_params$algae_growth_initial <- 2e3
+        params@algae_params$algae_growth <- 2e3
     } else {
-        if (!is.numeric(algae_growth_initial)) stop("algae_growth_initial should be a numerical value.")
-        if (algae_growth_initial < 0) stop("algae_growth_initial must be non-negative.")
-        params@algae_params$algae_growth_initial <- algae_growth_initial
+        if (!is.numeric(algae_growth_initial)) stop("algae_growth should be a numerical value.")
+        if (algae_growth_initial < 0) stop("algae_growth must be non-negative.")
+        params@algae_params$algae_growth <- algae_growth_initial
     }
 
     # algae_capacity check
@@ -163,8 +163,8 @@ setAlgaeParams <- function(params,
 #'                   that becomes detritus. Default is 0.8.
 #' @param ext_decomp Numeric. Proportion of decomposing mass from external mortality
 #'                   that becomes detritus. Default is 0.2.
-#' @param d_external_initial Numeric. Rate at which detritus biomass sinks from the pelagic
-#'                           zone (grams per year). Default is 1.
+#' @param external Numeric. Rate at which detritus biomass sinks from the pelagic
+#'                 zone (grams per year). Default is 1.
 #' @param UR_interaction Optional. A named list or array with one or more resource interaction
 #'                       vectors (e.g. interaction_algae, interaction_detritus, interaction_sponge),
 #'                       each of length equal to the number of species. If NULL, will use columns
@@ -184,7 +184,7 @@ setDetritusParams <- function(params,
                               detritus_capacity = NULL,
                               sen_decomp = NULL,
                               ext_decomp = NULL,
-                              d_external_initial = NULL,
+                              external = NULL,
                               UR_interaction = NULL,
                               use_UR_cc = FALSE,
                               detritus_colour = "plum4") {
@@ -242,7 +242,7 @@ setDetritusParams <- function(params,
         params@detritus_params$ext_decomp <- ext_decomp
     }
 
-    params@detritus_params$d_external_initial <- ifelse(is.null(d_external_initial), 1, d_external_initial)
+    params@detritus_params$external <- ifelse(is.null(external), 1, external)
 
     # Colour check (for detritus_colour)
     if (!is.null(detritus_colour)) {
@@ -399,21 +399,27 @@ setExtMortParams <- function(params,
 #'      ways to measure and define predation refuge on reefs. The way you parameterise
 #'      the model should reflect your data collection method and ecological context.
 #'
-#'      The `species_specific_bins` argument controls how bin boundaries and
-#'      thresholds are calculated for all methods:
+#'      The `use_dummy_fish_bins` argument determines how refuge bin boundaries are
+#'      set:
 #'
-#'      - If TRUE, each species' own length-weight parameters (`a`, `b`) are used to
-#'      convert length bins to weights. This is appropriate when refuge hole entrances
-#'      were measured directly and should reflect the body shape of each species.
+#'      - If TRUE (default), bin boundaries are determined by weight, calculated
+#'        using dummy fish length-weight parameters (`a_bar`, `b_bar`). All species
+#'        share the same weight boundaries for bins, but the lengths of fish in each
+#'        bin are calculated for each species using their own length-weight
+#'        parameters (`a`, `b`). This means fish in the same bin may be of very
+#'        different lengths depending on species. This is appropriate when refuge
+#'        capacity is measured using dummy fish of known size and is the
+#'        preferred method.
 #'
-#'      - If FALSE (default), dummy fish parameters (`a_bar`, `b_bar`) are used for bin
-#'      conversion, and species-specific mapping is applied after. This is appropriate
-#'      when dummy fish were used to measure refuge capacity, and each refuge is defined
-#'      by the largest dummy fish that fits.
+#'      - If FALSE, bin boundaries are determined by length, so all species in a bin
+#'        have the same length, but their weights are calculated using their own
+#'        length-weight parameters (`a`, `b`). This means fish in the same bin may
+#'        have very different weights depending on species. This is appropriate when
+#'        refuge hole entrances are measured for each species.
 #'
-#'      This choice applies to all refuge methods (sigmoidal, binned, competitive)
-#'      and is stored in `params@refuge_params$species_specific_bins`. Select the
-#'      option that best matches your measurement approach and ecological realism.
+#'  This choice applies to all refuge methods (sigmoidal, binned, competitive)
+#'  and is stored in `params@refuge_params$use_dummy_fish_bins`. Select the
+#'  option that matches your measurement approach and ecological realism.
 #'
 #' @section Setting the refuge profile:
 #'
@@ -431,11 +437,11 @@ setExtMortParams <- function(params,
 #'          The threshold for refuge can be set in two ways, depending on how your
 #'          refuge data was collected:
 #'
-#'          - If `species_specific_bins = TRUE`, the threshold weight is calculated as:
+#'          - If `use_dummy_fish_bins = FALSE`, the threshold weight is calculated as:
 #'                  \deqn{ W_{i.refuge} = a_i \cdot L_{refuge}^{b_i} }
 #'           where \eqn{a_i} and \eqn{b_i} are the length-weight parameters for species i.
 #'
-#'          - If `species_specific_bins = FALSE`, the weight threshold is:
+#'          - If `use_dummy_fish_bins = TRUE`, the weight threshold is:
 #'
 #'                  \deqn{ W_{refuge} = a_{bar} \cdot L_{refuge}^{b_{bar}} }
 #'
@@ -517,11 +523,11 @@ setExtMortParams <- function(params,
 #'
 ## Choice of refuge bin calibration
 #'
-#' @param species_specific_bins Logical. Controls how refuge bin boundaries and thresholds are calculated for sigmoidal and binned methods:
+#' @param use_dummy_fish_bins Logical. Controls how refuge bin boundaries and thresholds are calculated for sigmoidal and binned methods:
 #'   - TRUE: Use each species' own length-weight parameters (`a`, `b`).
 #'   - FALSE (default): Use dummy fish parameters (`a_bar`, `b_bar`).
 #'   Set according to your data collection method. The setting is stored in
-#'   `params@refuge_params$species_specific_bins` and used by [getRefuge()].
+#'   `params@refuge_params$use_dummy_fish_bins` and used by [getRefuge()].
 #'
 #' @param refuge_user   Logical vector (length = number of species). Indicates which groups use refuge.
 #'                      If not present in `species_params`, must be provided. Defaults to FALSE.
@@ -563,7 +569,7 @@ setRefuge <- function(params, method, method_params = NULL,
                       # Parameters used by all methods
                       a_bar = NULL, b_bar = NULL,
                       w_settle = NULL, max_protect = NULL, tau = NULL,
-                      species_specific_bins = FALSE,
+                      use_dummy_fish_bins = TRUE,
                       ...) {
     # Object validation
     assert_that(is(params, "MizerParams"))
@@ -750,7 +756,7 @@ setRefuge <- function(params, method, method_params = NULL,
     params@refuge_params$w_settle <- w_settle
     params@refuge_params$max_protect <- max_protect
     params@refuge_params$tau <- tau
-    params@refuge_params$species_specific_bins <- species_specific_bins
+    params@refuge_params$use_dummy_fish_bins <- use_dummy_fish_bins
 
     #  method_params set up and checks
     if (method != "noncomplex") {
@@ -889,7 +895,7 @@ setRefuge <- function(params, method, method_params = NULL,
 #' @concept refugeParams
 #' @seealso [setRefuge()], [reefVulnerable()]
 #' @export
-getRefuge <- function(params, species_specific_bins = NULL, ...) {
+getRefuge <- function(params, use_dummy_fish_bins = NULL, ...) {
     # object - Check if mizerParams is valid
     assert_that(is(params, "MizerParams"))
 
@@ -898,8 +904,8 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
     method_params <- params@refuge_params[["method_params"]]
 
     # Use value from params if not explicitly provided
-    if (is.null(species_specific_bins)) {
-        species_specific_bins <- isTRUE(refuge_params$species_specific_bins)
+    if (is.null(use_dummy_fish_bins)) {
+        use_dummy_fish_bins <- isTRUE(refuge_params$use_dummy_fish_bins)
     }
 
     # Pull values from params
@@ -913,7 +919,6 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
     b_bar <- refuge_params$b_bar
     w_settle <- refuge_params$w_settle
     max_protect <- refuge_params$max_protect
-    tau <- refuge_params$tau
 
     # Store which functional groups use refuge
     refuge_user <- sp$refuge_user
@@ -936,7 +941,7 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
         refuge <- matrix(0, nrow = no_sp, ncol = no_w)
         rownames(refuge) <- rownames(params@initial_n)
         colnames(refuge) <- colnames(params@initial_n)
-        if (species_specific_bins) {
+        if (!use_dummy_fish_bins) {
             # Species-specific threshold: use each species' a and b
             for (i in 1:no_sp) {
                 W_refuge_i <- sp[["a"]][i] * method_params$L_refuge^sp[["b"]][i]
@@ -946,7 +951,7 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
                 refuge[i, ] <- refuge_user[i] * ref
             }
             refuge_lengths <- data.frame(species = sp$species, L_refuge = method_params$L_refuge)
-        } else {
+        } else if (use_dummy_fish_bins) {
             # Dummy fish threshold: use a_bar and b_bar
             W_refuge <- a_bar * method_params$L_refuge^b_bar
             denom <- 1 + exp(slope * (w - W_refuge))
@@ -1027,7 +1032,7 @@ getRefuge <- function(params, species_specific_bins = NULL, ...) {
         start_l.i <- list(1)
         end_l.i <- list(1)
         no_bins <- nrow(method_params)
-        if (species_specific_bins) {
+        if (isTRUE(species_specific_bins)) {
             # Use species-specific a/b to convert length bins to weights
             for (k in 1:no_bins) {
                 for (i in 1:no_sp) {
@@ -1146,9 +1151,8 @@ newRefuge <- function(params, new_refuge = FALSE,
     # Check if the user provided one of the available refuge profile methods
     m_opt <- c("sigmoidal", "binned", "competitive", "noncomplex")
     if (is.null(new_method)) {
-        warning("Since you did not provide a new method to set
-                    the refuge profile, I will use the one currently stored in
-                    params@other_params$refuge_params$method.")
+        warning("Since you did not provide a new method to set the refuge profile,
+                    I will use the one currently stored in params@refuge_params$method.")
         # If user did not provide a method, use old one
         new_method <- refuge_params$method
         # If user did provide a method, check that it's one of the options
