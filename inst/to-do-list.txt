@@ -5,15 +5,9 @@ MizerReef Major Package Update To Do List - 18/11/2025
 
 - implement new logo, files inst folder. R logo should be R logo, website should have full logo, and just the circle should be on pdfs and cheat sheets
 
-- create a new private branch for sponge params and move the function to there
-
 - check on algae growth and boosting mechanics to make sure they are actually implemented during simulations (because the params object doesn't get updated?)
 -- make sure the right algae parameters are being called and stored in tune_UR, tune_UR_cc, and all algae functions
 -- possibly move algae boosting to the algae growth function??
-
-- new plotting functions
--- translate code from degradation scale plot to a function plotDegScale to create heat plot for degradation scaling parameters
--- check if plotRefugeDensity correctly plots each refuge size through time in simulations, comparing with getDegrade
 
 - fix all instances where params@other_params is called
 -- update all algae_component functions
@@ -24,9 +18,6 @@ MizerReef Major Package Update To Do List - 18/11/2025
 - update all data objects to reflect changes to parameters (new slots, new parameter names)
 -- deg_scales should have the first column be bleaching 
 -- species parameter data frames need to have bad_pred column renamed to blocked_pred
-
-- Documentation
--- add a page to the top of all plotting scripts like mizers https://sizespectrum.org/mizer/reference/plotting_functions.html
 
 - finish/ polish the vignettes and articles for Mizer Reef
 -- clean referencing, links, and document structure
@@ -52,12 +43,18 @@ MizerReef Major Package Update To Do List - 18/11/2025
 - New refuge method - exponential
 - New refuge method - refuge hole diameter with body width & depth?
 - Add data object with rabbitfish parameters/ Indo-Pacific parameters
-
+- new plotting functions
 
 ============================================================================
 COMPLETED TASKS:
 ============================================================================
 
+
+-- 27/11 add a page to the top of all plotting scripts like mizers https://sizespectrum.org/mizer/reference/plotting_functions.html
+- 27/11 new plotting functions
+-- 27/11 translate code from degradation scale plot to a function plotDegScale to create heat plot for degradation scaling parameters
+-- 27/11 check if plotRefugeDensity correctly plots each refuge size through time in simulations, comparing with getDegrade
+- 27/11 create a new private branch for sponge params and move the function to there
 -- 27/11 add include_repro tag to plotProductivity
 -- 27/11 change default w_pp_cutoff in newReefParams from 1.0 to 0.1 g
 -- 27/11 set a default for degrade (or check if it's already set)

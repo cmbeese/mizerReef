@@ -1,8 +1,4 @@
-library(ggplot2)
-library(plotly)
-# library(dplyr)
-
-# Set global variables -
+# Set global variables to avoid R CMD check notes
 # Variables used - ggplot2 - known bug
 # Hackiness to get past the 'no visible binding ... ' warning when running check
 utils::globalVariables(c(
@@ -10,8 +6,65 @@ utils::globalVariables(c(
     "value.y", "value.x", "rel_diff", "l",
     "y_ticks", "highlight", "Metric",
     # variables used by ggplot for detritus and algae
-    "Rate", "Source", "Consumer"
+    "Rate", "Source", "Consumer", "Year",
+    "refuge_density", "size_bin", "scale_color_viridis"
 ))
+
+#' Reef Model Simulation & Results Plotting Functions
+#'
+#' This file contains plotting functions for visualizing results of
+#' steady-state and dynamic simulations in mizerReef models. These
+#' functions help users interpret model outputs, compare scenarios, and
+#' analyze effects of parameter changes or management interventions.
+#' Plots in this file focus on simulation results, time series, and
+#' comparative analyses—not input parameter verification.
+#'
+#' Functions in this file:
+#'   - plotBiomass: Biomass of species groups and unstructured components
+#'     through time.
+#'   - plotSpectra2: Two size spectra (e.g., models or scenarios) in one plot.
+#'   - plotSpectraRelative: Relative or percent change between two spectra.
+#'   - plotProductivity: Total productivity for each species group through
+#'     time or at steady state.
+#'   - plotProductivityRelative: Relative or percent change in productivity
+#'     between two models or scenarios.
+#'   - plot2Productivity: Productivity of two models or two size ranges in
+#'     one plot.
+#'   - plotTotalAbundance: Total abundance for each species group at steady
+#'     state.
+#'   - plotTotalBiomass: Total fishable biomass for each species group at
+#'     steady state.
+#'   - plot2TotalBiomass: Total biomass of two models or two size ranges in
+#'     one plot.
+#'   - plotTotalBiomassRelative: Relative change in total biomass between
+#'     two models or scenarios.
+#'   - plotRelativeContribution: Relative contribution of each species group
+#'     to total abundance, biomass, and productivity.
+#'   - plotRefugeDensity: Density of refuge through time for each group
+#'     (simulation output).
+#'
+#' For each plot type, an interactive plotly version exists (e.g.,
+#' plotlyBiomass, plotlyProductivity).
+#'
+#' These tools are especially useful for:
+#'   - Visualizing simulation results and time series
+#'   - Comparing model scenarios, interventions, or parameter sets
+#'   - Diagnosing unexpected model behavior or trends
+#'   - Communicating model outcomes to stakeholders
+#'
+#' For input parameter checking and setup, see plotting functions in
+#' `reef-plots.R`.
+#'
+#' @section Usage:
+#' Call these functions with a `MizerSim` or `MizerParams` object
+#' containing simulation results. See individual function documentation
+#' for details and examples.
+#'
+#' @author cmbeese
+#' @concept sumplots
+#' @family plotting functions
+#' @seealso [reef-plots.R], [MizerSim], [MizerParams]
+NULL
 
 #' Plot the biomass of Species Groups and unstructured components through
 #' time
@@ -154,6 +207,8 @@ plotBiomass <- function(sim, species = NULL,
         highlight = highlight,
         legend_var = "Legend"
     )
+
+    return(p)
 }
 
 
@@ -495,10 +550,6 @@ plotProductivity <- function(object,
             is(params, "MizerParams"),
             is.flag(return_data)
         )
-
-        ### values from object
-        sp <- params@species_params
-        no_sp <- dim(params@interaction)[1]
 
         ### group names
         if (is.null(params@species_params$group_names)) {
@@ -964,10 +1015,6 @@ plotTotalAbundance <- function(object, stack = FALSE,
     }
 
     # create plot_dat -
-    ## values from object -
-    sp <- params@species_params
-    no_sp <- dim(params@interaction)[1]
-
     ## group names -
     if (is.null(params@species_params$group_names)) {
         group_names <- params@species_params$species
@@ -1089,9 +1136,6 @@ plotTotalBiomass <- function(object,
     }
 
     # create plot_dat -
-    ## values from object -
-    sp <- params@species_params
-    no_sp <- dim(params@interaction)[1]
 
     ## group names -
     if (is.null(params@species_params$group_names)) {
@@ -1505,4 +1549,74 @@ plotRelativeContribution <- function(object,
             labels = group_names[legend_levels]
         ) +
         labs(x = "Relative Contribution", y = "Metric", fill = "")
+}
+
+#' Plot refuge density through time
+#'
+#' Plots the refuge density at each size bin through time as colored lines,
+#' showing how refuge degrades over the course of a simulation. Uses viridis
+#' color scale to represent temporal succession.
+#'
+#' @param sim A \linkS4class{MizerSim} object
+#' @param return_data A boolean value that determines whether the formatted
+#'                    data used for the plot is returned instead of the plot
+#'                    itself. Default value is FALSE.
+#' @param ... Unused
+#'
+#' @return A ggplot2 object, unless `return_data = TRUE`, in which case a data
+#'         frame with refuge density at each size and time
+#'
+#' @import ggplot2
+#' @importFrom plasma scale_color_viridis
+#' @export
+#'
+#' @family plotting functions
+#' @concept refugePlots
+#' @seealso [plotting_functions], [setRefuge()], [reefDegrade()]
+plotRefugeDensity <- function(sim, return_data = FALSE, ...) {
+    # Input validation
+    assertthat::assert_that(
+        inherits(sim, "MizerSim"),
+        is.logical(return_data),
+        length(return_data) == 1
+    )
+
+    # Use getDegrade to get refuge density array (time x size_bin)
+    degrade <- getDegrade(sim)
+    plot_dat <- as.data.frame(as.table(degrade))
+    colnames(plot_dat) <- c("time", "size_bin", "refuge_density")
+    plot_dat$time <- as.numeric(as.character(plot_dat$time))
+    plot_dat$size_bin <- as.numeric(as.character(plot_dat$size_bin))
+
+    # Return data if requested
+    if (isTRUE(return_data)) {
+        return(plot_dat)
+    }
+
+    # Create plot
+    p <- ggplot(plot_dat, aes(
+        x = time, y = refuge_density,
+        group = factor(size_bin),
+        color = factor(size_bin)
+    )) +
+        geom_line(linewidth = 0.8) +
+        scale_color_viridis(option = "plasma", name = "Size Bin (cm)") +
+        labs(
+            x = "Time (years)",
+            y = "Refuge Density",
+            title = "Refuge Density Through Time"
+        ) +
+        theme_minimal() +
+        theme(legend.position = "right")
+
+    return(p)
+}
+
+#' @rdname plotRefugeDensity
+#' @export
+plotlyRefugeDensity <- function(sim, ...) {
+    argg <- as.list(environment())
+    ggplotly(do.call("plotRefugeDensity", argg),
+        tooltip = c("time", "size_bin", "refuge_density")
+    )
 }
