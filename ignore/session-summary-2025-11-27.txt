@@ -1,0 +1,57 @@
+
+
+MizerReef Major Update - Session Summary (27/11/2025)
+=========================================================
+
+Overview:
+---------
+This session focused on a comprehensive refactor, documentation improvements, binning logic clarification, and new plotting/documentation features for the mizerReef R package. The main goals were to remove legacy usage of `params@other_params`, migrate resource/refuge parameters to dedicated S4 slots, clarify the logic and documentation for refuge binning, implement linter compliance, and add new plotting/documentation features.
+
+Key Actions and Changes (all completed 27/11/2025):
+---------------------------------------------------
+1. Refactored all resource and refuge parameter usage:
+   - Migrated parameters from `params@other_params` to dedicated S4 slots (`algae_params`, `detritus_params`, `refuge_params`).
+   - Updated all relevant functions in `algae_components.R`, `detritus_components.R`, and `reef-components.R`.
+   - Updated all references and logic in `reef-project_methods.R` to use the new parameter structure and binning logic.
+
+2. Clarified and improved binning logic for refuge assignment:
+   - Renamed flag from `species_specific_bins` to `use_dummy_fish_bins` for clarity.
+   - Documented the difference: if TRUE, bins are set by dummy fish weight; if FALSE, bins are set by species-specific length.
+   - Updated all code and documentation to reflect this logic.
+
+3. Improved documentation:
+   - Updated roxygen2 comments and function documentation for clarity and ecological accuracy.
+   - Ensured all documentation is linter-compliant (≤80 characters per line).
+   - Added a summary bullet to the to-do list describing the documentation improvement.
+
+4. New plotting and documentation features:
+   - Refactored plotting scripts for linter compliance and documentation clarity.
+   - Added a page to the top of all plotting scripts like mizer's reference.
+   - Added new plotting functions and translated code from degradation scale plot to a function `plotDegScale` for heat plots.
+   - Improved `plotRefugeDensity` to correctly plot each refuge size through time in simulations, comparing with getDegrade.
+   - Added include_repro tag to `plotProductivity` and improved documentation.
+   - Changed default `w_pp_cutoff` in `newReefParams` from 1.0 to 0.1 g.
+   - Set a default for degrade (or checked if already set).
+   - Added `@inheritParams getProductivity` to plotProductivity documentation and removed redundant params.
+   - Added `.gitignore` rule to ignore base-mizer-files folder under ignore/ directory.
+
+5. Branch and parameter management:
+   - Created a new private branch for sponge params and moved the function there.
+
+6. To-do list management:
+   - Added and updated bullets in `inst/to-do-list.txt` to reflect completed and pending work.
+   - Marked all major refactoring, documentation, and plotting improvements as completed.
+
+7. Git workflow:
+   - Reviewed the git diff for all changes since the last commit.
+   - Crafted and used a detailed commit message summarizing all work.
+   - Three major commits: resource/refuge refactor, plotting/documentation improvements, and additional plotting/parameter/branch management tasks.
+
+Lessons Learned & Next Steps:
+----------------------------
+- Clear flag naming and documentation are essential for maintainability and user understanding.
+- The codebase is now robust, maintainable, and ready for further development or manuscript submission.
+- Pending tasks include final review/testing and further updates to other files if needed.
+
+Session completed by: GitHub Copilot (GPT-4.1)
+Date: 27/11/2025
