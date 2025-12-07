@@ -56,10 +56,10 @@ birds. Thus, only a proportion \code{prop_decomp} of this material
 decomposes to detritus. The detritus production from decomposing
 dead organisms is given by:
 
-\deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+\deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
                  \mathtt{prop\_decomp}\,
                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
-     p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+     p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
                  \mathtt{prop\_decomp}\,
                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
 

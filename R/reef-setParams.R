@@ -1,6 +1,6 @@
 #' Set algae parameters for mizerReef
 #'
-#' @section Algae as a non-structured resource:
+#' @section Algae as an unstructured resource:
 #'
 #'      mizerReef supports algae as a non-size-structured resource,
 #'      consumed primarily by herbivorous fish. This function sets
@@ -557,7 +557,7 @@ setExtMortParams <- function(params,
 #' @param ... Unused.
 #'
 #' @seealso
-#'   [reefEncounter()], [reefPredMort()], [setAlgaeParams()], [setDetritusParams()], [setSpongeParams()]
+#'   [reefEncounter()], [reefPredMort()], [setAlgaeParams()], [setDetritusParams()]
 #'
 #' @return  A MizerParams object with updated refuge parameters
 #' @concept refugeParams
@@ -975,7 +975,7 @@ getRefuge <- function(params, use_dummy_fish_bins = NULL, ...) {
         end_l.i <- list(1)
         bin.id <- list(1)
         no_bins <- nrow(method_params)
-        if (species_specific_bins) {
+        if (isFALSE(use_dummy_fish_bins)) {
             # Species-specific bin boundaries
             for (k in 1:no_bins) {
                 for (i in 1:no_sp) {
@@ -1032,7 +1032,7 @@ getRefuge <- function(params, use_dummy_fish_bins = NULL, ...) {
         start_l.i <- list(1)
         end_l.i <- list(1)
         no_bins <- nrow(method_params)
-        if (isTRUE(species_specific_bins)) {
+        if (isFALSE(use_dummy_fish_bins)) {
             # Use species-specific a/b to convert length bins to weights
             for (k in 1:no_bins) {
                 for (i in 1:no_sp) {

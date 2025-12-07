@@ -9,7 +9,9 @@ setURcapacity(params, cap = 1.5, ...)
 \arguments{
 \item{params}{a \linkS4class{MizerParams} object}
 
-\item{cap}{Numeric. Value to scale the steady state biomass by. Defaults to 1.5, setting the carrying capacity 50\% higher than the current standing biomass.}
+\item{cap}{Numeric. Value to scale the steady state biomass by. Defaults to
+1.5, setting the carrying capacity 50\% higher than the current
+standing biomass.}
 
 \item{...}{Unused}
 }

@@ -3,12 +3,14 @@
 #' Sets up a multi-species size spectrum model with additional unstructured
 #' resource components, senescence mortality, and predation refuge.
 #'
-#' @inheritSection setURParams Adding unstructured resources
+#' @inheritSection setAlgaeParams Algae as an unstructured resource
+#' @inheritSection setDetritusParams Detritus as an unstructured resource
 #' @inheritSection setExtMortParams Senescence mortality
 #' @inheritSection setRefuge Setting the refuge profile
 #'
 #' @export
-#' @inheritParams setURParams
+#' @inheritParams setAlgaeParams
+#' @inheritParams setDetritusParams
 #' @inheritParams setExtMortParams
 #' @inheritParams setRefuge
 #' @inheritParams setDegradation
@@ -18,10 +20,6 @@
 #'                      observed abundances, and the cut-off size for
 #'                      observations in grams.
 #' @param interaction The group specific interaction matrix, \eqn{\theta_{ij}}
-#'
-#' @param carry_capacity A boolean value that indicates whether the user wants
-#'                      to implement a carrying capacity for unstructured
-#'                      resources. Defaults to FALSE.
 #'
 #' @param include_ext_mort A boolean value that indicates whether the user wants
 #'                         to use default external mortality. Defaults to TRUE.
@@ -65,7 +63,7 @@ newReefParams <- function( # Original mizer parameters
                           algae_capacity_boost = c(2.0),
                           # Parameters for unstructured resources
                           UR_interaction,
-                          carry_capacity = FALSE,
+                          use_UR_cc = FALSE,
                           initial_algae_growth = NULL,
                           algae_capacity = NULL,
                           detritus_capacity = NULL,
@@ -109,16 +107,24 @@ newReefParams <- function( # Original mizer parameters
     params <- getRefuge(params, ...)
 
     ### Unstructured resources ----
-    params <- setURParams(
+    #### Algae ----
+    params <- setAlgaeParams(
         params = params,
-        UR_interaction = UR_interaction,
-        initial_algae_growth = initial_algae_growth,
-        carry_capacity = carry_capacity,
+        algae_growth_initial = initial_algae_growth,
         algae_capacity = algae_capacity,
+        UR_interaction = UR_interaction,
+        use_UR_cc = carry_capacity
+    )
+
+    #### Detritus ----
+    params <- setDetritusParams(
+        params = params,
         detritus_capacity = detritus_capacity,
         sen_decomp = sen_decomp,
         ext_decomp = ext_decomp,
-        initial_d_external = initial_d_external
+        external = external,
+        UR_interaction = UR_interaction,
+        use_UR_cc = carry_capacity
     )
 
     ### External mortality ----

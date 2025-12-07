@@ -29,7 +29,7 @@ detritus biomass
 \details{
 The time evolution of the detritus biomass \eqn{B} is described by
 
-\deqn{ \frac{dB_D}{dt} = P_D\left( 1 - 
+\deqn{ \frac{dB_D}{dt} = P_D\left( 1 -
                          \frac{B_D}{K_D} \right) - c_D \, B_D }{
                 dB_D/dt = P_D * (1 - B_D/ K_D) - c_D * B_D}
 
@@ -44,7 +44,7 @@ The dynamical equation is solved analytically to
                        + \frac{K_D \, P_D}{P_D+ K_D \, c_D} \left(1-
                        e^{-\frac{dt}{K_D}(P_D+ K_D \, c_D)}\right) }{
         B_D(t + dt) = B_D(t) exp^(-dt/K_D * (P_D+ K_D*c_D)) +
-                       (K_D*P_D) / (P_D + K_D*c_D) *(1 - e^(-dt/K_D * 
+                       (K_D*P_D) / (P_D + K_D*c_D) *(1 - e^(-dt/K_D *
                        (P_D + K_D*c_D)) }
 }
 \seealso{

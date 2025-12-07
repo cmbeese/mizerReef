@@ -39,9 +39,7 @@ Imports:
     dplyr,
     plyr,
     lifecycle,
-    reshape2,
-    progress,
-    viridis
+    reshape2
 Suggests: 
     knitr,
     patchwork,

@@ -4,6 +4,11 @@ MizerReef Major Package Update To Do List - 18/11/2025
 - check remaining current diffs and approve them for each file
 
 - write tests for all new and updated functions
+- Fix all failing tests by ensuring newReefParams and related functions are called with all required arguments
+- Update or remove non-portable file names (e.g., in ignore/) for CRAN compliance
+- Add VignetteBuilder field to DESCRIPTION if vignettes are to be included
+- Ensure all S4 classes and methods are fully documented (especially MizerReefParams)
+- Clean up any remaining Rd cross-reference notes (add package anchors for external links)
 
 - update all data objects to reflect changes to parameters (new slots, new parameter names)
 -- deg_scales should have the first column be bleaching 
@@ -40,10 +45,18 @@ MizerReef Major Package Update To Do List - 18/11/2025
 - Add data object with rabbitfish parameters/ Indo-Pacific parameters
 - new plotting functions
 
+
 ============================================================================
 COMPLETED TASKS:
 ============================================================================
 
+- 7/12 Systematically updated all roxygen2 documentation blocks for exported functions
+- 7/12 Fixed all unresolved @seealso and cross-reference tags
+- 7/12 Added missing argument documentation for all functions flagged by R CMD check
+- 7/12 Updated LICENSE, logo, and CITATION files to inst/ as per best practice
+- 7/12 Cleaned up NAMESPACE and imports to match actual usage
+- 7/12 Addressed all global variable binding notes flagged by R CMD check
+- 7/12 Confirmed that all exported functions have minimal test coverage
 - 7/12 updated news
 - 7/12 implement new logo, files inst folder. R logo should be R logo, website should have full logo, and just the circle should be on pdfs and cheat sheets
 - 7/12 Updated README for clarity, citation, and usability.

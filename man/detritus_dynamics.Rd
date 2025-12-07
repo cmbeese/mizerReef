@@ -42,7 +42,7 @@ The dynamical equation is solved analytically to
 \deqn{B_D(t+dt) = B(t)\exp(-c_D \cdot dt)
               + \frac{P_D}{c_D}
                 (1-\exp(-c_D \cdot dt)).}{
-      B_D(t+dt) = B(t) exp(-c_D * dt) 
+      B_D(t+dt) = B(t) exp(-c_D * dt)
               + P_D/c_D * (1 - exp(-c_D * dt)).}
 
 This avoids the stability problems that would arise if we used the Euler

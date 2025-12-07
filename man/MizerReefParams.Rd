@@ -9,8 +9,7 @@ MizerReefParams(
   ...,
   refuge_params = list(),
   algae_params = list(),
-  detritus_params = list(),
-  sponge_params = list()
+  detritus_params = list()
 )
 }
 \arguments{
@@ -21,18 +20,16 @@ MizerReefParams(
 \item{algae_params}{List for algae parameters}
 
 \item{detritus_params}{List for detritus parameters}
-
-\item{sponge_params}{List for sponge parameters}
 }
 \value{
 A \code{MizerReefParams} object
 }
 \description{
 Stores reef-specific parameters, including predation refuge,
-algae, detritus, and sponge resources.
+and algae and detritus resources.
 
 Creates a \code{MizerReefParams} object with slots for reef-specific parameters,
-including predation refuge, algae, detritus, and sponge resources.
+including predation refuge and algae and detritus resources.
 }
 \section{Slots}{
 
@@ -42,8 +39,6 @@ including predation refuge, algae, detritus, and sponge resources.
 \item{\code{algae_params}}{List for algae resource parameters}
 
 \item{\code{detritus_params}}{List for detritus resource parameters}
-
-\item{\code{sponge_params}}{List for sponge resource parameters}
 }}
 
 \examples{
@@ -53,8 +48,7 @@ params <- MizerReefParams(
   species_params = karpata_species,
   refuge_params = list(),
   algae_params = list(),
-  detritus_params = list(),
-  sponge_params = list()
+  detritus_params = list()
 )
 }
 \seealso{

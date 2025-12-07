@@ -33,9 +33,9 @@ functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding
 level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
 rate:
 
-\deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+\deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}}
              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
-       c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+       c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}}
              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
 }
 

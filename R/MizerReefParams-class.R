@@ -28,7 +28,7 @@ setClass(
   slots = c(
     refuge_params = "list",
     algae_params = "list",
-    detritus_params = "list",
+    detritus_params = "list"
   )
 )
 

@@ -1,15 +1,3 @@
-# Set global variables to avoid R CMD check notes
-# Variables used - ggplot2 - known bug
-# Hackiness to get past the 'no visible binding ... ' warning when running check
-utils::globalVariables(c(
-    "Species", "value", "Model", "Legend",
-    "value.y", "value.x", "rel_diff", "l",
-    "y_ticks", "highlight", "Metric",
-    # variables used by ggplot for detritus and algae
-    "Rate", "Source", "Consumer", "Year",
-    "refuge_density", "size_bin", "scale_color_viridis"
-))
-
 #' Reef Model Simulation & Results Plotting Functions
 #'
 #' This file contains plotting functions for visualizing results of
@@ -53,7 +41,7 @@ utils::globalVariables(c(
 #'   - Communicating model outcomes to stakeholders
 #'
 #' For input parameter checking and setup, see plotting functions in
-#' `reef-plots.R`.
+#' `reef-parameter-plots.R`.
 #'
 #' @section Usage:
 #' Call these functions with a `MizerSim` or `MizerParams` object
@@ -63,10 +51,23 @@ utils::globalVariables(c(
 #' @author cmbeese
 #' @concept sumplots
 #' @family plotting functions
-#' @seealso [reef-plots.R], [MizerSim], [MizerParams]
+#' @seealso [reef-parameter_plots], [MizerSim], [MizerParams]
+#' @name reef-analysis_plots
 NULL
 
-#' Plot the biomass of Species Groups and unstructured components through
+# Set global variables to avoid R CMD check notes
+# Variables used - ggplot2 - known bug
+# Hackiness to get past the 'no visible binding ... ' warning when running check
+utils::globalVariables(c(
+    "Species", "value", "Model", "Legend",
+    "value.y", "value.x", "rel_diff", "l",
+    "y_ticks", "highlight", "Metric",
+    # variables used by ggplot for detritus and algae
+    "Rate", "Source", "Consumer", "Year",
+    "refuge_density", "size_bin", "scale_color_viridis"
+))
+
+#' Plot the biomass of species Groups and unstructured components through
 #' time
 #'
 #' After running a projection, the biomass of each Species Group and each
@@ -119,9 +120,10 @@ NULL
 #' @importFrom reshape2 melt
 #' @export
 #'
+#' @title Plot the biomass of species and unstructured components through time
+#' @name plotBiomass
 #' @concept sumplots
 #' @family plotting functions
-#'
 #' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
 #'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
 plotBiomass <- function(sim, species = NULL,
@@ -1567,9 +1569,7 @@ plotRelativeContribution <- function(object,
 #'         frame with refuge density at each size and time
 #'
 #' @import ggplot2
-#' @importFrom plasma scale_color_viridis
 #' @export
-#'
 #' @family plotting functions
 #' @concept refugePlots
 #' @seealso [plotting_functions], [setRefuge()], [reefDegrade()]
@@ -1600,7 +1600,10 @@ plotRefugeDensity <- function(sim, return_data = FALSE, ...) {
         color = factor(size_bin)
     )) +
         geom_line(linewidth = 0.8) +
-        scale_color_viridis(option = "plasma", name = "Size Bin (cm)") +
+        scale_color_brewer(
+            name = "Size Bin (cm)",
+            palette = "Spectral"
+        ) +
         labs(
             x = "Time (years)",
             y = "Refuge Density",

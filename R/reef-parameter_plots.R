@@ -1,5 +1,3 @@
-utils::globalVariables(c("Year"))
-
 #' Reef Model Parameter Plotting Functions
 #'
 #' This file contains plotting functions to help users verify and visualize
@@ -25,7 +23,7 @@ utils::globalVariables(c("Year"))
 #'   - Comparing parameter sets before running simulations
 #'
 #' For plots of simulation results and time series, see the summary plotting
-#' functions in `reef-summary_plots.R`.
+#' functions in `reef-analysis_plots.R`.
 #'
 #' @section Usage:
 #' Call these functions with a `MizerReefParams` object or relevant parameter
@@ -34,9 +32,12 @@ utils::globalVariables(c("Year"))
 #' @author cmbeese
 #' @concept parameterPlots
 #' @family plotting functions
-#' @seealso [reef-summary_plots.R], [MizerReefParams], [setRefuge()],
+#' @seealso [reef-analysis_plots], [MizerReefParams], [setRefuge()],
 #'   [setDegradation()]
+#' @name reef-parameter_plots
 NULL
+
+utils::globalVariables(c("Year"))
 
 #' Plot the vulnerability to predation of species by weight
 #'
@@ -67,6 +68,8 @@ NULL
 #' @importFrom dplyr mutate filter select arrange rename summarise
 #' @export
 #'
+#' @title Plot the vulnerability to predation of species by weight
+#' @name plotVulnerable
 #' @family plotting functions
 #' @concept refugePlots
 #' @seealso [plotting_functions], [setRefuge()], [plotRefuge()]
@@ -375,6 +378,8 @@ plotlyRefuge <- function(object,
 #'
 #' @return ggplot2 object (heatmap), or data frame if return_data = TRUE.
 #' @importFrom reshape2 melt
+#' @importFrom utils data
+#' @importFrom utils read.csv
 #' @export
 #' @family plotting functions
 #' @concept parameterPlots
