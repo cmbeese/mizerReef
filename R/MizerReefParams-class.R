@@ -1,12 +1,11 @@
 #' Extension of MizerParams for reef-specific model parameters
 #'
-#' Stores reef-specific parameters, including predation refuge, 
-#' algae, detritus, and sponge resources.
+#' Stores reef-specific parameters, including predation refuge,
+#' and algae and detritus resources.
 #'
 #' @slot refuge_params List for predation refuge parameters
 #' @slot algae_params List for algae resource parameters
 #' @slot detritus_params List for detritus resource parameters
-#' @slot sponge_params List for sponge resource parameters
 #' @seealso [MizerParams]
 #' @examples
 #' # Example usage:
@@ -15,8 +14,7 @@
 #'   species_params = karpata_species,
 #'   refuge_params = list(),
 #'   algae_params = list(),
-#'   detritus_params = list(),
-#'   sponge_params = list()
+#'   detritus_params = list()
 #' )
 #' @export
 #' @docType class
@@ -31,7 +29,6 @@ setClass(
     refuge_params = "list",
     algae_params = "list",
     detritus_params = "list",
-    sponge_params = "list"
   )
 )
 
@@ -39,26 +36,24 @@ setClass(
 #'
 #' @description
 #' Creates a `MizerReefParams` object with slots for reef-specific parameters,
-#' including predation refuge, algae, detritus, and sponge resources.
+#' including predation refuge and algae and detritus resources.
 #'
 #' @param ... Arguments for `MizerParams`
 #' @param refuge_params List for refuge parameters
 #' @param algae_params List for algae parameters
 #' @param detritus_params List for detritus parameters
-#' @param sponge_params List for sponge parameters
 #' @return A `MizerReefParams` object
 #' @seealso [MizerParams]
 #' @export
 MizerReefParams <- function(...,
                             refuge_params = list(),
                             algae_params = list(),
-                            detritus_params = list(),
-                            sponge_params = list()) {
+                            detritus_params = list()) {
   params <- MizerParams(...)
   new("MizerReefParams",
     params,
     refuge_params = refuge_params,
     algae_params = algae_params,
-    detritus_params = detritus_params,
-    sponge_params = sponge_params)
+    detritus_params = detritus_params
+  )
 }

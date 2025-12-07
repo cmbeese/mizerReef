@@ -3,7 +3,7 @@ MizerReef Major Package Update To Do List - 18/11/2025
 ** For Major Update  - Manuscript version**
 - check remaining current diffs and approve them for each file
 
-- implement new logo, files inst folder. R logo should be R logo, website should have full logo, and just the circle should be on pdfs and cheat sheets
+- write tests for all new and updated functions
 
 - update all data objects to reflect changes to parameters (new slots, new parameter names)
 -- deg_scales should have the first column be bleaching 
@@ -21,7 +21,7 @@ MizerReef Major Package Update To Do List - 18/11/2025
 ---- add descriptions of built-in degradation trajectories, with sources and plots
 ---- add section that goes over the nice new plotting functions for looking at simulations in mizerReef
 
-
+######################################################################################
 ** Code updates for future (not necessary for manuscript submission/ next update) **
 - Set defaults for parameters that users must provide for MizerReef - no known currently
 - Add error messages
@@ -32,6 +32,7 @@ MizerReef Major Package Update To Do List - 18/11/2025
 -- make sure the right algae parameters are being called and stored in tune_UR, tune_UR_cc, and all algae functions
 -- possibly move algae boosting to the algae growth function??
 
+###########################################################################################
 ** Ideas for the future **
 - New refuge method - parabolic
 - New refuge method - exponential
@@ -42,6 +43,12 @@ MizerReef Major Package Update To Do List - 18/11/2025
 ============================================================================
 COMPLETED TASKS:
 ============================================================================
+
+- 7/12 updated news
+- 7/12 implement new logo, files inst folder. R logo should be R logo, website should have full logo, and just the circle should be on pdfs and cheat sheets
+- 7/12 Updated README for clarity, citation, and usability.
+- 7/12 Added LICENSE and CITATION files.
+- 7/12 Updated DESCRIPTION and Collate field.
 
 - 27/11 Clarified and improved documentation for use_dummy_fish_bins argument in refuge binning logic; ensured description is accurate, precise, and linter-compliant
 - 27/11 fix all instances where params@other_params is called
