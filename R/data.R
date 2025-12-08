@@ -77,25 +77,16 @@
 #'
 #' This data frame provides a constant refuge profile for model calibration and
 #' steady-state tuning. It contains start and end lengths for size bins and sets
-#' `prop_protect` to 20% for all bins up to 50 cm in length.
+#' `prop_protect` to 60% for all bins up to 50 cm in length.
 #'
-#' These parameters are intended for use with the density-dependent competitive
-#' method in mizerReef. For calibration, run [newReefParams()] with the "binned"
-#' method and a proportional tuning profile. After calibrating species biomasses
-#' and growth rates to match empirical observations (see FORCE dataset:
-#' http://theses.ncl.ac.uk/jspui/handle/10443/3574), use [newRefuge()] to
-#' implement competitive
-#' refuge parameters. After updating, iterate through [mizer::matchBiomasses()],
-#' [matchReefGrowth()], and [reefSteady()] to regain steady state.
-#'
-#' For full details on calibration and model setup, see Chapter 3 of the PhD
-#' Thesis:
-#' Beese, C. (2025). "Reef fish community dynamics and refuge availability: a
-#' trait-based modeling approach." Victoria University of Wellington.
-#' [https://doi.org/10.26686/thesis.123456](https://doi.org/10.26686/thesis.123456)
+#' These parameters are intended to be used with the "binned" method, which
+#' is independent of density. The tuning profile should be used while
+#' calibrating biomass and growth rates before switching to the competitive
+#' method. See the "Getting Started" vignette for more details.
 #'
 #' @keywords datasets
 #' @concept calibration
+#' @seealso \linkVignette{Getting Started}
 #' @references FORCE dataset: http://theses.ncl.ac.uk/jspui/handle/10443/3574
 #' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington. [https://doi.org/10.26686/thesis.123456](https://doi.org/10.26686/thesis.123456)
 #' @format data frame
