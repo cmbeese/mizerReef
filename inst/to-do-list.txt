@@ -3,16 +3,14 @@ MizerReef Major Package Update To Do List - 18/11/2025
 ** For Major Update  - Manuscript version**
 - check remaining current diffs and approve them for each file
 
+- update remaining data files and documentation
+
 - write tests for all new and updated functions
 - Fix all failing tests by ensuring newReefParams and related functions are called with all required arguments
 - Update or remove non-portable file names (e.g., in ignore/) for CRAN compliance
 - Add VignetteBuilder field to DESCRIPTION if vignettes are to be included
 - Ensure all S4 classes and methods are fully documented (especially MizerReefParams)
 - Clean up any remaining Rd cross-reference notes (add package anchors for external links)
-
-- update all data objects to reflect changes to parameters (new slots, new parameter names)
--- deg_scales should have the first column be bleaching 
--- species parameter data frames need to have bad_pred column renamed to blocked_pred
 
 - finish/ polish the vignettes and articles for Mizer Reef
 -- clean referencing, links, and document structure
@@ -49,6 +47,12 @@ MizerReef Major Package Update To Do List - 18/11/2025
 ============================================================================
 COMPLETED TASKS:
 ============================================================================
+
+- 8/12 fixed plotDegradation plot to match thesis
+- 8/12 added CSVs for built-in degradation trajectories to inst/data-csvs
+- 8/12 updated data objects to match new parameter names and slots
+-- deg_scales should have the first column be bleaching 
+-- species parameter data frames need to have bad_pred column renamed to blocked_pred
 
 - 7/12 Systematically updated all roxygen2 documentation blocks for exported functions
 - 7/12 Fixed all unresolved @seealso and cross-reference tags

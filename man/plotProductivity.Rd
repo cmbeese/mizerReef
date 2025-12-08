@@ -98,7 +98,7 @@ Other plotting functions:
 \code{\link{plot2Productivity}()},
 \code{\link{plot2TotalBiomass}()},
 \code{\link{plotBiomass}()},
-\code{\link{plotDegScale}()},
+\code{\link{plotDegradationScale}()},
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},

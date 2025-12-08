@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build R package",
+			"type": "shell",
+			"command": "R CMD build ."
+		}
+	]
+}

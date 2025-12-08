@@ -11,8 +11,8 @@ library(assertthat)
 library(here)
 
 ## Load parameters -----------------------------------
-karpata_10plus  <- read.csv(here("inst/karpata_10plus.csv"))
-karpata_int     <- read.csv(here("inst/cbn_interaction.csv"),  
+karpata_10plus  <- read.csv(here("inst/data-csvs/karpata_10plus.csv"))
+karpata_int     <- read.csv(here("inst/data-csvs/cbn_interaction.csv"),  
                             row.names = 1)
 karpata_refuge  <- karpata_refuge
 tuning_profile  <- tuning_profile
@@ -25,7 +25,7 @@ tuning_profile  <- tuning_profile
 ## Set model ----------------------------------------
 params <- newReefParams(group_params = karpata_10plus,
                         interaction = karpata_int,
-                        w_pp_cutoff = 1,
+                        #w_pp_cutoff = 1,
                         method = "binned",
                         method_params = tuning_profile)
 

@@ -15,10 +15,10 @@
 #' @inheritParams setRefuge
 #' @inheritParams setDegradation
 #'
-#' @param group_params  A functional group parameter data frame containing at
-#'                      least the name of each functional group, their
-#'                      observed abundances, and the cut-off size for
-#'                      observations in grams.
+#' @param species_params A species parameter data frame containing at
+#'                       least the name of each species or group, their
+#'                       observed abundances, and their maximum size.
+#'
 #' @param interaction The group specific interaction matrix, \eqn{\theta_{ij}}
 #'
 #' @param include_ext_mort A boolean value that indicates whether the user wants
@@ -32,7 +32,7 @@
 #'              to 1-n where n is the given allometric scaling exponent and
 #'              z0pre defaults to 0.2.
 #'
-#' @param min_w_pp Minimum size of plankton in grams
+#' @param min_w_pp Minimum size of plankton in grams, default to 0.1 g
 #' @param w_pp_cutoff Maximum size of plankton in grams
 #' @param n Growth exponent (also used as metabolic exponent p)
 #' @param crit_feed Critical feeding level
@@ -43,7 +43,7 @@
 #' @concept setup
 #' @return An object of type \linkS4class{MizerParams}
 newReefParams <- function( # Original mizer parameters
-                          group_params, interaction = NULL,
+                          species_params, interaction = NULL,
                           crit_feed = NULL,
                           min_w_pp = NA, w_pp_cutoff = 0.1,
                           n = 0.75,

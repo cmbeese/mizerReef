@@ -57,7 +57,7 @@ Language: en-GB
 Collate:
     'MizerReefParams-class.R'
     'algae_components.R'
-    'data.R'
+    'data.r'
     'detritus_components.R'
     'mizerReef-package.R'
     'newReefParams.R'

@@ -367,8 +367,7 @@ plotlyRefuge <- function(object,
 #' data should have the first column as bleaching year, and the remaining
 #' columns as refuge size bins.
 #'
-#' @param trajectory Character string: one of "rubble", "algae", "recovery",
-#'                   "constant". Determines which built-in trajectory to plot.
+#' @param trajectory Either a character string ("rubble", "algae", "recovery", "constant") to use built-in data, OR a user-provided numeric matrix/data.frame with the correct format (bleaching year in first column, remaining columns as refuge size bins).
 #'
 #' @param file Optional. Path to CSV file to use. If NULL, uses built-in
 #'             data from inst/.
@@ -384,50 +383,59 @@ plotlyRefuge <- function(object,
 #' @family plotting functions
 #' @concept parameterPlots
 #' @seealso [plotting_functions], [setDegradation()], [reefDegrade()]
-plotDegScale <- function(trajectory = NULL,
-                         file = NULL,
-                         return_data = FALSE) {
-    # Validate trajectory
+plotDegradationScale <- function(trajectory = NULL,
+                                 file = NULL,
+                                 return_data = FALSE) {
     valid_trajectories <- c("rubble", "algae", "recovery")
-    # If trajectory is missing, default to 'rubble'
-    if (is.null(trajectory)) {
-        trajectory <- "rubble"
-    }
-    # If trajectory is a vector, use the first value
-    if (length(trajectory) > 1) {
-        trajectory <- trajectory[1]
-    }
-    if (!trajectory %in% valid_trajectories) {
-        stop(paste0("Invalid trajectory: '", trajectory, "'. Valid options are: ", paste(valid_trajectories, collapse = ", ")))
-    }
-    # Use built-in R data object if file is NULL, otherwise use CSV
-    if (is.null(file)) {
-        data_name <- switch(trajectory,
-            rubble = "rubble_scale",
-            algae = "algae_scale",
-            recovery = "recovery_scale"
-        )
-        # Try to load the data object from the package
-        # First, try to get from global env, then from package namespace
-        if (!exists(data_name, envir = .GlobalEnv)) {
-            data(list = data_name, package = "mizerReef", envir = .GlobalEnv)
-        }
-        if (exists(data_name, envir = .GlobalEnv)) {
-            dat <- get(data_name, envir = .GlobalEnv)
-        } else if (exists(data_name, envir = asNamespace("mizerReef"))) {
-            dat <- get(data_name, envir = asNamespace("mizerReef"))
-        } else {
-            stop(paste("Could not find data object:", data_name))
-        }
-        # If it's a data.frame, convert to matrix
-        if (is.data.frame(dat)) {
-            dat <- as.matrix(dat)
-        }
-    } else {
-        dat <- as.matrix(read.csv(file, header = FALSE))
-        # Check that user-provided data is numeric
+    dat <- NULL
+    # If trajectory is a matrix or data.frame, use it directly
+    if (is.matrix(trajectory) || is.data.frame(trajectory)) {
+        dat <- as.matrix(trajectory)
         if (!is.numeric(dat)) {
-            stop("Provided data must be a numeric matrix or CSV with only numeric values.")
+            stop("Provided trajectory matrix/data.frame must be numeric.")
+        }
+        # If ot's not provided directly, use file or built-in data
+    } else {
+        # If trajectory is missing, default to 'rubble'
+        if (is.null(trajectory)) {
+            trajectory <- "rubble"
+        }
+        # If trajectory is a vector, use the first value
+        if (length(trajectory) > 1) {
+            trajectory <- trajectory[1]
+        }
+        if (!trajectory %in% valid_trajectories) {
+            stop(paste0("Invalid trajectory: '", trajectory, "'. Valid options are: ", paste(valid_trajectories, collapse = ", ")))
+        }
+        # Use built-in R data object if file is NULL, otherwise use CSV
+        if (is.null(file)) {
+            data_name <- switch(trajectory,
+                rubble = "rubble_scale",
+                algae = "algae_scale",
+                recovery = "recovery_scale"
+            )
+            # Try to load the data object from the package
+            # First, try to get from global env, then from package namespace
+            if (!exists(data_name, envir = .GlobalEnv)) {
+                data(list = data_name, package = "mizerReef", envir = .GlobalEnv)
+            }
+            if (exists(data_name, envir = .GlobalEnv)) {
+                dat <- get(data_name, envir = .GlobalEnv)
+            } else if (exists(data_name, envir = asNamespace("mizerReef"))) {
+                dat <- get(data_name, envir = asNamespace("mizerReef"))
+            } else {
+                stop(paste("Could not find data object:", data_name))
+            }
+            # If it's a data.frame, convert to matrix
+            if (is.data.frame(dat)) {
+                dat <- as.matrix(dat)
+            }
+        } else {
+            dat <- as.matrix(read.csv(file, header = FALSE))
+            # Check that user-provided data is numeric
+            if (!is.numeric(dat)) {
+                stop("Provided data must be a numeric matrix or CSV with only numeric values.")
+            }
         }
     }
     df_long <- reshape2::melt(dat)
@@ -444,23 +452,25 @@ plotDegScale <- function(trajectory = NULL,
     labels <- ifelse(breaks == 1, "Bleach", as.character(breaks - 1))
     ggplot(df_long, aes(x = factor(Year, levels = breaks), y = SizeBin, fill = Scaling)) +
         geom_tile(colour = "black", linewidth = 0.25) +
-        scale_fill_gradient2(
+        scale_fill_gradientn(
             name = "Refuge\nDensity\nScaling",
-            low = "orangered1",
-            mid = "gray90",
-            high = "springgreen",
-            midpoint = 1,
-            limits = c(min(df_long$Scaling, na.rm = TRUE), max(df_long$Scaling, na.rm = TRUE))
+            colors = c("deeppink3", "orangered1", "gray90", "springgreen", "dodgerblue2"),
+            values = scales::rescale(c(0, 0.95, 1, 1.05, 2)),
+            limits = c(0, 2),
+            labels = function(x) paste0(round((x - 1) * 100), "%")
         ) +
         scale_x_discrete(
             name = "Years Post Bleaching",
             breaks = breaks,
             labels = labels
         ) +
+        scale_y_discrete(
+            name = "Refuge Size Bin",
+            limits = rev(levels(df_long$SizeBin))
+        ) +
+        coord_fixed(ratio = 1) +
         labs(
-            y = "Refuge Size Bin",
-            title = paste(trajectory, "Trajectory"),
-            subtitle = "Degradation scaling heatmap"
+            title = if (is.character(trajectory) && trajectory %in% valid_trajectories) paste(trajectory, "trajectory") else "Custom Trajectory",
         ) +
         theme_minimal() +
         theme(
@@ -473,9 +483,9 @@ plotDegScale <- function(trajectory = NULL,
 #'
 #' Returns an interactive heatmap for degradation scaling parameters.
 #'
-#' @inheritParams plotDegScale
+#' @inheritParams plotDegradationScale
 #' @return A plotly object
 #' @export
-plotlyDegScale <- function(trajectory = NULL, file = NULL) {
+plotlyDegradationScale <- function(trajectory = NULL, file = NULL) {
     ggplotly(plotDegScale(trajectory = trajectory, file = file))
 }

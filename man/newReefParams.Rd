@@ -5,7 +5,7 @@
 \title{Set up parameters for a mizerReef model}
 \usage{
 newReefParams(
-  group_params,
+  species_params,
   interaction = NULL,
   crit_feed = NULL,
   min_w_pp = NA,
@@ -45,16 +45,15 @@ newReefParams(
 )
 }
 \arguments{
-\item{group_params}{A functional group parameter data frame containing at
-least the name of each functional group, their
-observed abundances, and the cut-off size for
-observations in grams.}
+\item{species_params}{A species parameter data frame containing at
+least the name of each species or group, their
+observed abundances, and their maximum size.}
 
 \item{interaction}{The group specific interaction matrix, \eqn{\theta_{ij}}}
 
 \item{crit_feed}{Critical feeding level}
 
-\item{min_w_pp}{Minimum size of plankton in grams}
+\item{min_w_pp}{Minimum size of plankton in grams, default to 0.1 g}
 
 \item{w_pp_cutoff}{Maximum size of plankton in grams}
 

@@ -1,6 +1,0 @@
-species,l_max,a,b,refuge_user,bad_pred,interaction_resource,interaction_algae,interaction_detritus,linecolour,group_names
-surgeonfish - deep,40,0.0324,2.95,TRUE,FALSE,1,1,0,#70c464,Deep
-damsel - compressed,30,0.0379,2.857,TRUE,FALSE,1,1,0,#54832f,Compressed
-eel - elongate,80,0.00098,3.24,TRUE,FALSE,1,0,0,#9b2f68,Elongated
-grouper - fusiform,80,0.0182,2.97,TRUE,TRUE,1,0,0,#b95236,Fusiform
-inverts,50,0.025,3,FALSE,FALSE,1,0,0,#c7923f,Invertebrates

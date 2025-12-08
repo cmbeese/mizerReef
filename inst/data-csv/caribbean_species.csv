@@ -1,4 +1,4 @@
-﻿species,l_max,w_mat,age_mat,k_vb,beta,sigma,biomass_cutoff,biomass_observed,a,b,interaction_resource,interaction_detritus,interaction_algae,ks,refuge_user,bad_pred,satiation,linecolour,rep_species,group_names,Resilience,old_groups
+﻿species,l_max,w_mat,age_mat,k_vb,beta,sigma,biomass_cutoff,biomass_observed,a,b,interaction_resource,interaction_detritus,interaction_algae,ks,refuge_user,blocked_pred,satiation,linecolour,rep_species,group_names,Resilience,old_groups
 pred_eng,45,50,2,0.4,60,2,12.62968984,5.51,0.011,3.06,1,0,0,0.15,TRUE,TRUE,FALSE,#d35569,Cephalopholis cruentatus,Engulfers,medium,Predators
 pred_grab,60,140,2,0.1,40,2,17.80529807,27.6,0.0174,3.01,1,0,0,0.15,TRUE,TRUE,FALSE,#b95236,Lutjanus apodus,Grabbers,medium,Predators
 eels,100,300,3,0.19,30,2,NA,NA,0.00098,3.24,1,0,0,0.15,TRUE,FALSE,FALSE,#d078ca,Gymnothorax miliaris,Eels,medium,Predators

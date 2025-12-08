@@ -94,7 +94,7 @@ object the steady state biomasses are plotted.
 Other plotting functions: 
 \code{\link{plot2Productivity}()},
 \code{\link{plotBiomass}()},
-\code{\link{plotDegScale}()},
+\code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
 \code{\link{plotRefuge}()},
