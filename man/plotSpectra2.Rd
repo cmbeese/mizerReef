@@ -2,6 +2,7 @@
 % Please edit documentation in R/reef-analysis_plots.R
 \name{plotSpectra2}
 \alias{plotSpectra2}
+\alias{plotlySpectra2}
 \title{Show two size spectra in the same plot}
 \usage{
 plotSpectra2(
@@ -12,6 +13,8 @@ plotSpectra2(
   power = 1,
   ...
 )
+
+plotlySpectra2(object1, object2, ...)
 }
 \arguments{
 \item{object1}{First MizerParams or MizerSim object.}

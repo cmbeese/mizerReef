@@ -9,22 +9,22 @@ binned methods. For the competitive method, it finds the indices of fish
 within the prescribed size bins. These values are used by \code{\link[=reefVulnerable]{reefVulnerable()}}
 to set the vulnerability to predation at each time step.}
 \usage{
-getRefuge(params, use_dummy_fish_bins = NULL, ...)
+getRefuge(params, use_dummy_fish_bins = TRUE, ...)
 }
 \arguments{
 \item{params}{a mizer params object}
 
-\item{...}{Unused}
-
-\item{species_specific_bins}{Logical. If TRUE, refuge thresholds and bin
+\item{use_dummy_fish_bins}{Logical. If FALSE, refuge thresholds and bin
 boundaries are calculated using each species'
 own length-weight parameters (\code{a}, \code{b}). If
-FALSE (default), dummy fish parameters
+TRUE (default), dummy fish parameters
 (\code{a_bar}, \code{b_bar}) are used for conversions.
 Applies to both sigmoidal and binned methods.
 If not provided, uses value from
 \code{params@refuge_params$species_specific_bins}.
 See \code{\link[=setRefuge]{setRefuge()}} for details.}
+
+\item{...}{Unused}
 }
 \value{
 A mizer params object with updated refuge profiles

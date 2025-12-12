@@ -2,6 +2,7 @@
 % Please edit documentation in R/reef-analysis_plots.R
 \name{plotRelativeContribution}
 \alias{plotRelativeContribution}
+\alias{plotlyRelativeContribution}
 \title{Plot the relative contribution of each species group to total abundance,
 total biomass, and total productivity}
 \usage{
@@ -12,6 +13,8 @@ plotRelativeContribution(
   return_data = FALSE,
   ...
 )
+
+plotlyRelativeContribution(object, ...)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerParams}}
@@ -41,8 +44,8 @@ selected (TRUE) or not.}
 Defaults to max length.}
     \item{\code{stack}}{A boolean value that determines whether bars are separated
 by species. Defaults to FALSE. If true, returns a stacked
-barplot with the total biomass for each group instead of
-individual bars for each group. Useful for comparison
+barplot with the total biomass for each species instead of
+individual bars for each species. Useful for comparison
 between steady states.}
     \item{\code{start_time}}{The first time to be plotted. Default is the beginning
 of the time series.}
@@ -75,15 +78,13 @@ Other plotting functions:
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}

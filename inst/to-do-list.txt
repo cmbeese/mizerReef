@@ -29,6 +29,8 @@ MizerReef Major Package Update To Do List - 18/11/2025
 - Set defaults for parameters that users must provide for MizerReef - no known currently
 - Add error messages
 
+- create a version of plot vulbnerable that works for MizerSim objects - heatmap through time of vulnerable proportion by species
+
 - create versions of calibrateReef, calibrateReefYield, and CalibrateReefNumber that use scaleReefModel
 
 - check on algae growth and boosting mechanics to make sure they are actually implemented during simulations (because the params object doesn't get updated?)
@@ -46,7 +48,15 @@ MizerReef Major Package Update To Do List - 18/11/2025
 
 ============================================================================
 COMPLETED TASKS:
+
 ============================================================================
+
+- 12/12 Systematically replaced @import plotly with @importFrom plotly ggplotly in all relevant files and wrappers
+- 12/12 Added/updated plotly wrappers for all major plotting functions (plotlyTotalAbundance, plotlyTotalBiomass, plotly2TotalBiomass, plotlyProductivity, plotly2Productivity, plotlyProductivityRelative, plotlySpectra2, plotlySpectraRelative, plotlyRelativeContribution, plotlyRefugeDensity, plotlyVulnerable, plotlyRefugeProfile, plotlyDegradationScale)
+- 12/12 Unified and clarified documentation for all plotting functions, ensuring consistent terminology and robust input handling
+- 12/12 Removed deprecated/duplicate plotting functions and documentation (e.g., plotRefuge → plotRefugeProfile)
+- 12/12 Ensured documentation builds without warnings or errors (fixed missing @name/@title, removed orphaned .Rd files)
+- 12/12 Updated NAMESPACE and references to match new/renamed functions and imports
 
 - 8/12 fixed plotDegradation plot to match thesis
 - 8/12 added CSVs for built-in degradation trajectories to inst/data-csvs

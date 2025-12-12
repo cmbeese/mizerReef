@@ -28,9 +28,9 @@ plotly2TotalBiomass(object1, object2, species = NULL, ...)
 
 \item{object2}{Second MizerParams or MizerSim object.}
 
-\item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
+\item{species}{The species to be selected. Optional. By default all target
+species are selected. A vector of species names, or a numeric
+vector with the species indices, or a logical vector
 indicating for each group whether it is to be selected
 (TRUE) or not.}
 
@@ -69,7 +69,9 @@ itself. Default value is FALSE.}
 \item{...}{
   Arguments passed on to \code{\link[=plotTotalBiomass]{plotTotalBiomass}}
   \describe{
-    \item{\code{object}}{An object of class \linkS4class{MizerParams}}
+    \item{\code{object}}{An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
+If a \linkS4class{MizerSim} object is provided, the biomass at the
+last time step is used.}
     \item{\code{min_fishing_l}}{The minimum length (cm) for biomass estimates.
 Defaults to smallest size.}
     \item{\code{max_fishing_l}}{The maximum length (cm) of for biomass estimates.
@@ -78,8 +80,8 @@ Defaults to max length.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
-frame with the the total steady state biomass for each functional
-group by model is returned as well as another column called
+frame with the the total steady state biomass for each species
+by model is returned as well as another column called
 \code{rel_diff}that gives the relative difference between the two
 values.
 }
@@ -97,16 +99,14 @@ Other plotting functions:
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}

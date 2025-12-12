@@ -100,16 +100,14 @@ Other plotting functions:
 \code{\link{plotBiomass}()},
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}

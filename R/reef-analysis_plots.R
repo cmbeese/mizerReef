@@ -1,58 +1,64 @@
-#' Reef Model Simulation & Results Plotting Functions
+#' Description of mizerReef plotting functions
 #'
-#' This file contains plotting functions for visualizing results of
-#' steady-state and dynamic simulations in mizerReef models. These
-#' functions help users interpret model outputs, compare scenarios, and
-#' analyze effects of parameter changes or management interventions.
-#' Plots in this file focus on simulation results, time series, and
-#' comparative analyses—not input parameter verification.
+#' In addition to the plotting functions offered by the mizer package,
+#' MizerReef provides new and extended plotting functions to visualize
+#' both input parameters and the results of dynamic simulations for reef
+#' ecosystem models. Several functions adapt or build on mizer's
+#' plotting tools for reef-specific features.
 #'
-#' Functions in this file:
-#'   - plotBiomass: Biomass of species groups and unstructured components
-#'     through time.
-#'   - plotSpectra2: Two size spectra (e.g., models or scenarios) in one plot.
-#'   - plotSpectraRelative: Relative or percent change between two spectra.
-#'   - plotProductivity: Total productivity for each species group through
-#'     time or at steady state.
-#'   - plotProductivityRelative: Relative or percent change in productivity
-#'     between two models or scenarios.
-#'   - plot2Productivity: Productivity of two models or two size ranges in
-#'     one plot.
-#'   - plotTotalAbundance: Total abundance for each species group at steady
-#'     state.
-#'   - plotTotalBiomass: Total fishable biomass for each species group at
-#'     steady state.
-#'   - plot2TotalBiomass: Total biomass of two models or two size ranges in
-#'     one plot.
-#'   - plotTotalBiomassRelative: Relative change in total biomass between
-#'     two models or scenarios.
-#'   - plotRelativeContribution: Relative contribution of each species group
-#'     to total abundance, biomass, and productivity.
-#'   - plotRefugeDensity: Density of refuge through time for each group
-#'     (simulation output).
+#' Available plotting functions:
 #'
-#' For each plot type, an interactive plotly version exists (e.g.,
-#' plotlyBiomass, plotlyProductivity).
+#' \strong{Input parameter plots}
+#' \tabular{ll}{
+#'   Plot \tab Description \cr
+#'   [plotRefugeProfile()] \tab Plots the proportion of individuals (by length) that are protected from predators for each species (the refuge profile) \cr
+#'   [plotDegradationScale()] \tab Plots a heatmap of the degradation scaling for refuge density in degradation simulations across bleaching years and size bins. \cr
+#'   [plotVulnerable()] \tab Plots vulnerability to predation by size and proportion for each species, either at steady state or for a chosen simulation time step. \cr
+#'   [plotRefugeDensity()] \tab Plots the density of refuge by size at steady state and through time. \cr
+#' }
 #'
-#' These tools are especially useful for:
-#'   - Visualizing simulation results and time series
-#'   - Comparing model scenarios, interventions, or parameter sets
-#'   - Diagnosing unexpected model behavior or trends
-#'   - Communicating model outcomes to stakeholders
+#' \strong{Result plots}
+#' \tabular{ll}{
+#'   Plot \tab Description \cr
+#'   [plotBiomass()] \tab Plots the biomass of species and unstructured components through time. \cr
+#'   [plotSpectra2()] \tab Compare two size spectra (e.g., models or scenarios) in one plot. \cr
+#'   [plotSpectraRelative()] \tab Plots relative or percent change between two spectra. \cr
+#'   [plotRelativeContribution()] \tab Relative contribution of each species group to total abundance, biomass, and productivity. \cr
+#'   [plotProductivity()] \tab Plots productivity for each species through time or at steady state. \cr
+#'   [plot2Productivity()] \tab Productivity of two models or two size ranges in one plot. \cr
+#'   [plotProductivityRelative()] \tab Plots the relative or percent change in productivity between two models or scenarios. \cr
+#'   [plotTotalAbundance()] \tab Plots total abundance for each species at steady state. \cr
+#'   [plotTotalBiomass()] \tab Plots total biomass for each species within a given size range at steady state. \cr
+#'   [plot2TotalBiomass()] \tab Total biomass of two models or two size ranges in one plot. \cr
+#'   [plotTotalBiomassRelative()] \tab Relative change in total biomass between two models or scenarios. \cr
+#' }
 #'
-#' For input parameter checking and setup, see plotting functions in
-#' `reef-parameter-plots.R`.
+#' All plotting functions return a ggplot object, which can be further
+#' customized using the ggplot2 grammar. Most functions accept either a
+#' [MizerSim] or [MizerParams] object as input. Species colors and line
+#' types are controlled by the `linecolour` and `linetype` slots in
+#' [MizerParams], and can be changed by the user.
+#'
+#' For group or legend naming, you can add a column `group_names`
+#' to your `species_params` data frame. This column should contain a
+#' nicely formatted character string for each group or species, and will
+#' be used in plot legends and facet labels for improved readability.
+#'
+#' Most plots allow selection of a subset of species via the `species`
+#' argument. The order of species in legends matches the species parameter
+#' data frame.
+#'
+#' @references
+#' For the original mizer plotting functions and further details, see:
+#' https://sizespectrum.org/mizer/reference/plotting_functions.html
 #'
 #' @section Usage:
-#' Call these functions with a `MizerSim` or `MizerParams` object
-#' containing simulation results. See individual function documentation
-#' for details and examples.
+#' Call these functions with a [MizerSim] or [MizerParams] object containing
+#' simulation results. See individual function documentation for details and
+#' examples.
 #'
 #' @author cmbeese
-#' @concept sumplots
-#' @family plotting functions
-#' @seealso [reef-parameter_plots], [MizerSim], [MizerParams]
-#' @name reef-analysis_plots
+#' @name reef_plots
 NULL
 
 # Set global variables to avoid R CMD check notes
@@ -67,8 +73,7 @@ utils::globalVariables(c(
     "refuge_density", "size_bin", "scale_color_viridis"
 ))
 
-#' Plot the biomass of species Groups and unstructured components through
-#' time
+#' Plot the biomass of species and unstructured components through time
 #'
 #' After running a projection, the biomass of each Species Group and each
 #' unstructured component can be plotted against time. The biomass is
@@ -77,9 +82,9 @@ utils::globalVariables(c(
 #'
 #' @param sim An object of class \linkS4class{MizerSim}
 #'
-#' @param species   The groups to be selected. Optional. By default all target
-#'                  groups are selected. A vector of groups names, or a numeric
-#'                  vector with the groups indices, or a logical vector
+#' @param species   The species to be selected. Optional. By default all target
+#'                  species are selected. A vector of species names, or a numeric
+#'                  vector with the species indices, or a logical vector
 #'                  indicating for each group whether it is to be selected
 #'                  (TRUE) or not.
 #'
@@ -214,6 +219,7 @@ plotBiomass <- function(sim, species = NULL,
 }
 
 
+#' @importFrom plotly ggplotly
 #' @rdname plotBiomass
 #' @export
 plotlyBiomass <- function(sim,
@@ -292,6 +298,16 @@ plotSpectra2 <- function(object1, object2,
         scale_x_log10("Weight [g]") +
         scale_y_log10(y_label) +
         scale_colour_manual(values = linecolours)
+}
+
+#' @importFrom plotly ggplotly
+#' @rdname plotSpectra2
+#' @export
+plotlySpectra2 <- function(object1, object2, ...) {
+    argg <- as.list(environment())
+    ggplotly(do.call("plotSpectra2", argg),
+        tooltip = c("Legend", "w", "value", "Model")
+    )
 }
 
 #' Plot the relative difference or percent change between two spectra
@@ -412,6 +428,7 @@ plotSpectraRelative <- function(object1, object2, species = NULL,
         )
 }
 
+#' @importFrom plotly ggplotly
 #' @rdname plotSpectraRelative
 #' @export
 plotlySpectraRelative <- function(object1, object2, diff_method, ...) {
@@ -611,6 +628,7 @@ plotProductivity <- function(object,
 }
 
 
+#' @importFrom plotly ggplotly
 #' @rdname plotProductivity
 #' @export
 plotlyProductivity <- function(object,
@@ -632,9 +650,9 @@ plotlyProductivity <- function(object,
 #'
 #' @param object2 Second MizerParams or MizerSim object.
 #'
-#' @param species   The groups to be selected. Optional. By default all target
-#'                  groups are selected. A vector of groups names, or a numeric
-#'                  vector with the groups indices, or a logical vector
+#' @param species   The species to be selected. Optional. By default all target
+#'                  species are selected. A vector of species names, or a numeric
+#'                  vector with the species indices, or a logical vector
 #'                  indicating for each group whether it is to be selected
 #'                  (TRUE) or not.
 #'
@@ -775,6 +793,7 @@ plot2Productivity <- function(object1, object2, species = NULL,
     }
 }
 
+#' @importFrom plotly ggplotly
 #' @rdname plot2Productivity
 #' @export
 plotly2Productivity <- function(object1, object2, ...) {
@@ -790,7 +809,7 @@ plotly2Productivity <- function(object1, object2, ...) {
 #' This function creates a barplot with the percent change in potential
 #' fisheries productivity between either: (1) two different mizerParams objects
 #' (2) two different size ranges. If comparing two mizerParams objects, they
-#' must have the same species groups.
+#' must have the same species.
 #'
 #' This function is usually used in conjunction with
 #' [plotTotalBiomassRelative()] to check for decoupling between biomass and
@@ -808,10 +827,10 @@ plotly2Productivity <- function(object1, object2, ...) {
 #'
 #' @param object2 Second MizerParams or MizerSim object.
 #'
-#' @param species   The groups to be selected. Optional. By default all target
-#'                  groups are selected. A vector of groups names, or a numeric
-#'                  vector with the groups indices, or a logical vector
-#'                  indicating for each group whether it is to be selected
+#' @param species   The species to be selected. Optional. By default all target
+#'                  species are selected. A vector of species names, or a numeric
+#'                  vector with the species indices, or a logical vector
+#'                  indicating for each species whether it is to be selected
 #'                  (TRUE) or not.
 #'
 #' @param diff_method   The method to calculate the relative change between
@@ -843,7 +862,7 @@ plotly2Productivity <- function(object1, object2, ...) {
 #' @inheritDotParams plotProductivity
 #'
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
-#'          frame with the the productivity for each Species Group
+#'          frame with the the productivity for each species
 #'          by model is returned as well as another column called `rel_diff`
 #'          that gives the relative difference between the two values.
 #'
@@ -901,7 +920,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
         params <- object1
     }
 
-    # group names -
+    # species names -
     if (is.null(params@species_params$group_names)) {
         group_names <- params@species_params$species
         names(group_names) <- params@species_params$species
@@ -925,13 +944,14 @@ plotProductivityRelative <- function(object1, object2, diff_method,
             values = params@linecolour[legend_levels],
             labels = group_names[legend_levels]
         ) +
-        labs(fill = "Species Group", x = "Species Group") +
+        labs(fill = "Species", x = "Species") +
         geom_hline(
             yintercept = 0, linetype = 1,
             colour = "dark grey", linewidth = 0.9
         )
 }
 
+#' @importFrom plotly ggplotly
 #' @rdname plotProductivityRelative
 #' @export
 plotlyProductivityRelative <- function(object1, object2,
@@ -942,12 +962,14 @@ plotlyProductivityRelative <- function(object1, object2,
     )
 }
 
-#' Plot the total abundance for each species group at steady state
+#' Plot the total abundance for each species in a size range
 #'
-#' This functions creates a barplot with the abundance of each species group
+#' This functions creates a barplot with the abundance of each species
 #' within a given size range.
 #'
-#' @param object An object of class \linkS4class{MizerParams}
+#' @param object An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
+#'               If a \linkS4class{MizerSim} object is provided, the abundance at the
+#'              last time step is used. 
 #'
 #' @param species   The species to be selected. Optional. By default all
 #'                  species are selected. A vector of species names, or a
@@ -967,8 +989,8 @@ plotlyProductivityRelative <- function(object1, object2,
 #'
 #' @param stack     A boolean value that determines whether bars are separated
 #'                  by species. Defaults to FALSE. If true, returns a stacked
-#'                  barplot with the total biomass for each group instead of
-#'                  individual bars for each group. Useful for comparison
+#'                  barplot with the total biomass for each species instead of
+#'                  individual bars for each species. Useful for comparison
 #'                  between steady states.
 #'
 #' @param ... unused
@@ -1002,6 +1024,7 @@ plotTotalAbundance <- function(object, stack = FALSE,
         )
 
         abd <- abd[end_time, , drop = TRUE]
+
     } else {
         # params -
         params <- object
@@ -1067,14 +1090,26 @@ plotTotalAbundance <- function(object, stack = FALSE,
     }
 }
 
+#' @importFrom plotly ggplotly
+#' @rdname plotTotalAbundance
+#' @export
+plotlyTotalAbundance <- function(object, ...) {
+    argg <- as.list(environment())
+    ggplotly(do.call("plotTotalAbundance", argg),
+        tooltip = c("Species", "value")
+    )
+}
 
-#' Plot the total fishable biomass for each Species Group at steady state
+
+#' Plot the total biomass for each species in a size range
 #'
-#' This functions creates a barplot with the biomass of each Species Group
+#' This functions creates a barplot with the biomass of each specie
 #' within a size range. Usually used in conjunction with [plotProductivity()]
 #' to check for decoupling.
 #'
-#' @param object An object of class \linkS4class{MizerParams}
+#' @param object An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
+#'               If a \linkS4class{MizerSim} object is provided, the biomass at the
+#'               last time step is used. 
 #'
 #' @param species   The species to be selected. Optional. By default all
 #'                  species are selected. A vector of species names, or a
@@ -1123,6 +1158,7 @@ plotTotalBiomass <- function(object,
         )
 
         biom <- biom[end_time, , drop = TRUE]
+
     } else {
         # params -
         params <- object
@@ -1182,9 +1218,10 @@ plotTotalBiomass <- function(object,
             values = params@linecolour[legend_levels],
             labels = group_names[legend_levels]
         ) +
-        labs(fill = "Species Group", x = "Species Group")
+        labs(fill = "Species", x = "Species")
 }
 
+#' @importFrom plotly ggplotly
 #' @rdname plotTotalBiomass
 #' @export
 plotlyTotalBiomass <- function(object, ...) {
@@ -1206,8 +1243,8 @@ plotlyTotalBiomass <- function(object, ...) {
 #' @inheritDotParams plotTotalBiomass
 #'
 #' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
-#'          frame with the the total steady state biomass for each functional
-#'          group by model is returned as well as another column called
+#'          frame with the the total steady state biomass for each species
+#'          by model is returned as well as another column called
 #'          `rel_diff`that gives the relative difference between the two
 #'          values.
 #'
@@ -1288,7 +1325,7 @@ plot2TotalBiomass <- function(object1, object2,
                 values = c(0.5, 1),
                 labels = c(name1, name2)
             ) +
-            labs(fill = "Species Group", x = "Species Group")
+            labs(fill = "Species", x = "Species")
     } else if (stack == TRUE) {
         p <- ggplot(sf, aes(
             x = Model, y = value,
@@ -1305,10 +1342,11 @@ plot2TotalBiomass <- function(object1, object2,
                 values = c(0.5, 1),
                 labels = c(name1, name2)
             ) +
-            labs(fill = "Species Group", x = "Model")
+            labs(fill = "Species", x = "Model")
     }
 }
 
+#' @importFrom plotly ggplotly
 #' @rdname plot2TotalBiomass
 #' @export
 plotly2TotalBiomass <- function(object1, object2,
@@ -1319,11 +1357,11 @@ plotly2TotalBiomass <- function(object1, object2,
     )
 }
 
-#' Plot the relative difference in between the total fishable biomasses of each
-#' each Species Group at steady state
+#' Plot the relative difference in between the total biomasses of each
+#' each species within a size range at steady state
 #'
 #' This functions creates a barplot with the relative change in biomass of
-#' each Species Group within a size range between either (1) two different
+#' each species within a size range between either (1) two different
 #' mizerParams objects (two models) or (2) two different size ranges.
 #'
 #' This function is usually used in conjunction with
@@ -1433,6 +1471,7 @@ plotTotalBiomassRelative <- function(object1, object2,
         )
 }
 
+#' @importFrom plotly ggplotly
 #' @rdname plotTotalBiomassRelative
 #' @export
 plotlyTotalBiomassRelative <- function(object1, object2,
@@ -1553,6 +1592,16 @@ plotRelativeContribution <- function(object,
         labs(x = "Relative Contribution", y = "Metric", fill = "")
 }
 
+#' @importFrom plotly ggplotly
+#' @rdname plotRelativeContribution
+#' @export
+plotlyRelativeContribution <- function(object, ...) {
+    argg <- as.list(environment())
+    ggplotly(do.call("plotRelativeContribution", argg),
+        tooltip = c("Species", "rel", "Metric")
+    )
+}
+
 #' Plot refuge density through time
 #'
 #' Plots the refuge density at each size bin through time as colored lines,
@@ -1583,6 +1632,7 @@ plotRefugeDensity <- function(sim, return_data = FALSE, ...) {
 
     # Use getDegrade to get refuge density array (time x size_bin)
     degrade <- getDegrade(sim)
+
     plot_dat <- as.data.frame(as.table(degrade))
     colnames(plot_dat) <- c("time", "size_bin", "refuge_density")
     plot_dat$time <- as.numeric(as.character(plot_dat$time))
@@ -1615,6 +1665,7 @@ plotRefugeDensity <- function(sim, return_data = FALSE, ...) {
     return(p)
 }
 
+#' @importFrom plotly ggplotly
 #' @rdname plotRefugeDensity
 #' @export
 plotlyRefugeDensity <- function(sim, ...) {

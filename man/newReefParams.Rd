@@ -46,10 +46,10 @@ newReefParams(
 }
 \arguments{
 \item{species_params}{A species parameter data frame containing at
-least the name of each species or group, their
+least the name of each specie, their
 observed abundances, and their maximum size.}
 
-\item{interaction}{The group specific interaction matrix, \eqn{\theta_{ij}}}
+\item{interaction}{The species specific interaction matrix, \eqn{\theta_{ij}}}
 
 \item{crit_feed}{Critical feeding level}
 

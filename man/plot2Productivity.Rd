@@ -28,9 +28,9 @@ plotly2Productivity(object1, object2, ...)
 
 \item{object2}{Second MizerParams or MizerSim object.}
 
-\item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
+\item{species}{The species to be selected. Optional. By default all target
+species are selected. A vector of species names, or a numeric
+vector with the species indices, or a logical vector
 indicating for each group whether it is to be selected
 (TRUE) or not.}
 
@@ -108,16 +108,14 @@ Other plotting functions:
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}

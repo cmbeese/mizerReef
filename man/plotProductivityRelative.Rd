@@ -32,10 +32,10 @@ calculated relative to the value from object 1 with
 formula 100*(new-old)/old. If \code{rel.diff} the relative
 difference is returned given by (new - old)/(old + new).}
 
-\item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
-indicating for each group whether it is to be selected
+\item{species}{The species to be selected. Optional. By default all target
+species are selected. A vector of species names, or a numeric
+vector with the species indices, or a logical vector
+indicating for each species whether it is to be selected
 (TRUE) or not.}
 
 \item{min_fishing_l1}{Optional.  The minimum length (cm) of fished
@@ -83,7 +83,7 @@ productivity estimates. Defaults to max length.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
-frame with the the productivity for each Species Group
+frame with the the productivity for each species
 by model is returned as well as another column called \code{rel_diff}
 that gives the relative difference between the two values.
 }
@@ -91,7 +91,7 @@ that gives the relative difference between the two values.
 This function creates a barplot with the percent change in potential
 fisheries productivity between either: (1) two different mizerParams objects
 (2) two different size ranges. If comparing two mizerParams objects, they
-must have the same species groups.
+must have the same species.
 }
 \details{
 This function is usually used in conjunction with
@@ -116,16 +116,14 @@ Other plotting functions:
 \code{\link{plotBiomass}()},
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}

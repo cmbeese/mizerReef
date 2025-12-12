@@ -879,10 +879,10 @@ setRefuge <- function(params, method, method_params = NULL,
 #' @inheritSection setRefuge Setting the refuge profile
 #'
 #' @param params a mizer params object
-#' @param species_specific_bins Logical. If TRUE, refuge thresholds and bin
+#' @param use_dummy_fish_bins   Logical. If FALSE, refuge thresholds and bin
 #'                              boundaries are calculated using each species'
 #'                              own length-weight parameters (`a`, `b`). If
-#'                              FALSE (default), dummy fish parameters
+#'                              TRUE (default), dummy fish parameters
 #'                              (`a_bar`, `b_bar`) are used for conversions.
 #'                              Applies to both sigmoidal and binned methods.
 #'                              If not provided, uses value from
@@ -895,7 +895,7 @@ setRefuge <- function(params, method, method_params = NULL,
 #' @concept refugeParams
 #' @seealso [setRefuge()], [reefVulnerable()]
 #' @export
-getRefuge <- function(params, use_dummy_fish_bins = NULL, ...) {
+getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
     # object - Check if mizerParams is valid
     assert_that(is(params, "MizerParams"))
 
@@ -941,7 +941,7 @@ getRefuge <- function(params, use_dummy_fish_bins = NULL, ...) {
         refuge <- matrix(0, nrow = no_sp, ncol = no_w)
         rownames(refuge) <- rownames(params@initial_n)
         colnames(refuge) <- colnames(params@initial_n)
-        if (!use_dummy_fish_bins) {
+        if (isFALSE(use_dummy_fish_bins)) {
             # Species-specific threshold: use each species' a and b
             for (i in 1:no_sp) {
                 W_refuge_i <- sp[["a"]][i] * method_params$L_refuge^sp[["b"]][i]
@@ -951,7 +951,7 @@ getRefuge <- function(params, use_dummy_fish_bins = NULL, ...) {
                 refuge[i, ] <- refuge_user[i] * ref
             }
             refuge_lengths <- data.frame(species = sp$species, L_refuge = method_params$L_refuge)
-        } else if (use_dummy_fish_bins) {
+        } else if (isTRUE(use_dummy_fish_bins)) {
             # Dummy fish threshold: use a_bar and b_bar
             W_refuge <- a_bar * method_params$L_refuge^b_bar
             denom <- 1 + exp(slope * (w - W_refuge))
@@ -1336,7 +1336,7 @@ setDegradation <- function(params, trajectory = NULL, deg_scale,
     params@refuge_params$degrade <- degrade
     params@refuge_params$t_bleach <- bleach_time
     params@refuge_params$trajectory <- trajectory
-    params@refuge_params[["deg_scale"]] <- deg_scale
+    params@refuge_params$deg_scale <- deg_scale
 
     # Store algae adjustment parameters
     params@algae_params$algae_boost <- algae_boost

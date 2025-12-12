@@ -2,15 +2,15 @@
 % Please edit documentation in R/reef-parameter_plots.R
 \name{plotlyDegradationScale}
 \alias{plotlyDegradationScale}
-\title{Interactive Plotly version of plotDegScale}
+\title{Interactive Plotly version of plotDegradationScale}
 \usage{
 plotlyDegradationScale(trajectory = NULL, file = NULL)
 }
 \arguments{
-\item{trajectory}{Either a character string ("rubble", "algae", "recovery", "constant") to use built-in data, OR a user-provided numeric matrix/data.frame with the correct format (bleaching year in first column, remaining columns as refuge size bins).}
-
-\item{file}{Optional. Path to CSV file to use. If NULL, uses built-in
-data from inst/.}
+\item{trajectory}{Optional. Either a character string (\code{"rubble"},
+\code{"algae"}, \code{"recovery"}) to use built-in data, or a
+user-provided numeric matrix/data.frame with the correct format (bleaching
+year in first column, remaining columns as refuge size bins).}
 }
 \value{
 A plotly object

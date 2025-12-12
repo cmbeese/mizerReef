@@ -18,7 +18,7 @@
 #' )
 #' @export
 #' @docType class
-#' @name MizerReefParams
+#' @name MizerReefParams-class
 #' @concept parameters
 #' @family parameters
 #' @importFrom methods new

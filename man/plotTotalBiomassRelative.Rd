@@ -3,8 +3,8 @@
 \name{plotTotalBiomassRelative}
 \alias{plotTotalBiomassRelative}
 \alias{plotlyTotalBiomassRelative}
-\title{Plot the relative difference in between the total fishable biomasses of each
-each Species Group at steady state}
+\title{Plot the relative difference in between the total biomasses of each
+each species within a size range at steady state}
 \usage{
 plotTotalBiomassRelative(
   object1,
@@ -32,10 +32,10 @@ calculated relative to the value from object 1 with
 formula 100*(new-old)/old. If \code{rel.diff} the relative
 difference is returned given by (new - old)/(old + new).}
 
-\item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
-indicating for each group whether it is to be selected
+\item{species}{The species to be selected. Optional. By default all target
+species are selected. A vector of species names, or a numeric
+vector with the species indices, or a logical vector
+indicating for each species whether it is to be selected
 (TRUE) or not.}
 
 \item{min_fishing_l1}{Optional.  The minimum length (cm) of fished
@@ -61,7 +61,9 @@ itself. Default value is FALSE.}
 \item{...}{
   Arguments passed on to \code{\link[=plotTotalBiomass]{plotTotalBiomass}}
   \describe{
-    \item{\code{object}}{An object of class \linkS4class{MizerParams}}
+    \item{\code{object}}{An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
+If a \linkS4class{MizerSim} object is provided, the biomass at the
+last time step is used.}
     \item{\code{min_fishing_l}}{The minimum length (cm) for biomass estimates.
 Defaults to smallest size.}
     \item{\code{max_fishing_l}}{The maximum length (cm) of for biomass estimates.
@@ -77,7 +79,7 @@ values.
 }
 \description{
 This functions creates a barplot with the relative change in biomass of
-each Species Group within a size range between either (1) two different
+each species within a size range between either (1) two different
 mizerParams objects (two models) or (2) two different size ranges.
 }
 \details{
@@ -104,15 +106,13 @@ Other plotting functions:
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}

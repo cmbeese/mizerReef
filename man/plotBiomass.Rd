@@ -37,9 +37,9 @@ plotlyBiomass(
 \arguments{
 \item{sim}{An object of class \linkS4class{MizerSim}}
 
-\item{species}{The groups to be selected. Optional. By default all target
-groups are selected. A vector of groups names, or a numeric
-vector with the groups indices, or a logical vector
+\item{species}{The species to be selected. Optional. By default all target
+species are selected. A vector of species names, or a numeric
+vector with the species indices, or a logical vector
 indicating for each group whether it is to be selected
 (TRUE) or not.}
 
@@ -90,8 +90,7 @@ frame with the four variables 'Year', 'Biomass', 'Species',
 'Legend' is returned.
 }
 \description{
-Plot the biomass of species Groups and unstructured components through
-time
+Plot the biomass of species and unstructured components through time
 }
 \details{
 After running a projection, the biomass of each Species Group and each
@@ -109,16 +108,14 @@ Other plotting functions:
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}

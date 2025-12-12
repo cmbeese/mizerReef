@@ -16,10 +16,10 @@
 #' @inheritParams setDegradation
 #'
 #' @param species_params A species parameter data frame containing at
-#'                       least the name of each species or group, their
+#'                       least the name of each specie, their
 #'                       observed abundances, and their maximum size.
 #'
-#' @param interaction The group specific interaction matrix, \eqn{\theta_{ij}}
+#' @param interaction The species specific interaction matrix, \eqn{\theta_{ij}}
 #'
 #' @param include_ext_mort A boolean value that indicates whether the user wants
 #'                         to use default external mortality. Defaults to TRUE.
@@ -76,7 +76,7 @@ newReefParams <- function( # Original mizer parameters
                           z0pre = 0.2, ...) {
     ## Initialize model with newMultispeciesParams ----
     params <- newMultispeciesParams(
-        species_params = group_params,
+        species_params = species_params,
         interaction = interaction,
         min_w_pp = min_w_pp,
         w_pp_cutoff = w_pp_cutoff,
@@ -148,7 +148,7 @@ newReefParams <- function( # Original mizer parameters
     # Algae & Detritus ----
     ### Calculate Rho ----
     # Determine the necessary detritus and algae encounter rates so that at
-    # maximum size the group has feeding level f0
+    # maximum size the species has feeding level f0
     if (is.null(crit_feed)) {
         crit_feed <- 0.7
     }

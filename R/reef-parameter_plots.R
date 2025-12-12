@@ -1,50 +1,13 @@
-#' Reef Model Parameter Plotting Functions
-#'
-#' This file contains plotting functions to help users verify and visualize
-#' the input parameters of a mizerReef model. These plots are intended for
-#' model setup, diagnostics, and parameter checking, not for visualizing
-#' simulation results.
-#'
-#' Functions in this file:
-#'   - plotVulnerable: Plots the vulnerability to predation for each species
-#'     by weight. Useful for checking refuge and predation profiles.
-#'   - plotRefuge: Plots the refuge profile for each species by length,
-#'     showing the complement of vulnerability. Useful for verifying refuge
-#'     parameterization.
-#'   - plotDegScale: Plots a heatmap of degradation scaling parameters for
-#'     refuge density across bleaching years and size bins. Useful for
-#'     checking input degradation trajectories.
-#'
-#' Each plot also has an interactive Plotly version for exploring results.
-#'
-#' These tools are especially useful for:
-#'   - Ensuring input data is correctly formatted and interpreted
-#'   - Diagnosing unexpected model behavior due to parameter choices
-#'   - Comparing parameter sets before running simulations
-#'
-#' For plots of simulation results and time series, see the summary plotting
-#' functions in `reef-analysis_plots.R`.
-#'
-#' @section Usage:
-#' Call these functions with a `MizerReefParams` object or relevant parameter
-#' data. See individual function documentation for details and examples.
-#'
-#' @author cmbeese
-#' @concept parameterPlots
-#' @family plotting functions
-#' @seealso [reef-analysis_plots], [MizerReefParams], [setRefuge()],
-#'   [setDegradation()]
-#' @name reef-parameter_plots
-NULL
-
-utils::globalVariables(c("Year"))
+utils::globalVariables(c("Year", "SizeBin"))
 
 #' Plot the vulnerability to predation of species by weight
 #'
 #' When called with a \linkS4class{MizerParams} object the initial
 #' vulnerability is plotted. The complement of refuge.
 #'
-#' @param object An object of class \linkS4class{MizerParams}
+#' @param object An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
+#'               If a \linkS4class{MizerSim} object is provided, the abundance at the
+#'              last time step is used. 
 #'
 #' @param species   The species to be selected. Optional. By default all
 #'                  species are selected. A vector of species names, or a
@@ -52,8 +15,12 @@ utils::globalVariables(c("Year"))
 #'                  vector indicating for each species whether it is to be
 #'                  selected (TRUE) or not.
 #'
-#' @param all.sizes If TRUE, then feeding level is plotted also for sizes
+#' @param all.sizes If TRUE, then vulnerability is plotted also for sizes
 #'                  outside a species' size range. Default FALSE.
+#' 
+#' @param time_step If `object` is a \linkS4class{MizerSim} object, this optional
+#'                  parameter specifies which time step to use for calculating 
+#'                  vulnerability. Default is the last time step.
 #'
 #' @param return_data   A boolean value that determines whether the formatted
 #'                      data used for the plot is returned instead of the plot
@@ -64,7 +31,6 @@ utils::globalVariables(c("Year"))
 #'          frame the vulnerability at each size
 #'
 #' @import ggplot2
-#' @import plotly
 #' @importFrom dplyr mutate filter select arrange rename summarise
 #' @export
 #'
@@ -72,10 +38,11 @@ utils::globalVariables(c("Year"))
 #' @name plotVulnerable
 #' @family plotting functions
 #' @concept refugePlots
-#' @seealso [plotting_functions], [setRefuge()], [plotRefuge()]
+#' @seealso [plotting_functions], [setRefuge()], [plotRefugeProfile()]
 plotVulnerable <- function(object,
                            species = NULL,
                            all.sizes = FALSE,
+                           time_step = NULL,
                            return_data = FALSE, ...) {
     # input check ----
     assert_that(
@@ -86,10 +53,20 @@ plotVulnerable <- function(object,
     if (is(object, "MizerSim")) {
         ## sim values ----
         params <- object@params
-        warning("This functionality is not set up yet.")
+        sim <- object
+        # Get time for end of simulation
+        if (is.null(time_step)) {
+            t <- max(as.numeric(dimnames(object@n)$time))
+        }
+        t <- time_step
+        vul <- getVulnerable(object, time_range = t)
+
     } else if (is(object, "MizerParams")) {
         ## params values ----
         params <- object
+
+        # Calculate proportion of fish in refuge
+        vul <- getVulnerable(params)
     }
 
     # make plot_dat ----
@@ -100,9 +77,6 @@ plotVulnerable <- function(object,
     } else {
         group_names <- params@species_params$group_names
     }
-
-    # Calculate proportion of fish in refuge
-    vul <- getVulnerable(params)
 
     ## species selector ----
     sel_sp <- valid_species_arg(params, species,
@@ -178,6 +152,7 @@ plotVulnerable <- function(object,
 }
 
 
+#' @importFrom plotly ggplotly
 #' @rdname plotVulnerable
 #' @export
 plotlyVulnerable <- function(object,
@@ -218,7 +193,7 @@ plotlyVulnerable <- function(object,
 #' @family plotting functions
 #' @concept refugePlots
 #' @seealso [plotting_functions], [setRefuge()], [plotVulnerable()]
-plotRefuge <- function(object,
+plotRefugeProfile <- function(object,
                        species = NULL,
                        all.sizes = FALSE,
                        return_data = FALSE, ...) {
@@ -231,7 +206,7 @@ plotRefuge <- function(object,
     if (is(object, "MizerSim")) {
         ## sim values ----
         params <- object@params
-        warning("This functionality is not set up yet.")
+        warning("You are plotting the refuge profile from the steady state. To view refuge density through time, use plotRefugeDensity.")
     } else if (is(object, "MizerParams")) {
         ## params ----
         params <- object
@@ -349,13 +324,14 @@ plotRefuge <- function(object,
         )
 }
 
-#' @rdname plotRefuge
+#' @importFrom plotly ggplotly
+#' @rdname plotRefugeProfile
 #' @export
-plotlyRefuge <- function(object,
+plotlyRefugeProfile <- function(object,
                          species = NULL,
                          ...) {
     argg <- as.list(environment())
-    ggplotly(do.call("plotRefuge", argg),
+    ggplotly(do.call("plotRefugeProfile", argg),
         tooltip = c("Functional Group", "w", "value")
     )
 }
@@ -367,55 +343,74 @@ plotlyRefuge <- function(object,
 #' data should have the first column as bleaching year, and the remaining
 #' columns as refuge size bins.
 #'
-#' @param trajectory Either a character string ("rubble", "algae", "recovery", "constant") to use built-in data, OR a user-provided numeric matrix/data.frame with the correct format (bleaching year in first column, remaining columns as refuge size bins).
+#' This function is flexible in its input:
+#' \itemize{
+#'   \item If \code{trajectory} is provided, it takes precedence. It can be:
+#'     \itemize{
+#'       \item A character string (\code{"rubble"}, \code{"algae"},
+#'         \code{"recovery"}) to use built-in data.
+#'       \item A user-provided numeric matrix or data.frame (bleaching year in
+#'         first column, remaining columns as refuge size bins).
+#'     }
+#'   \item If \code{trajectory} is not provided, \code{object} must be
+#'     supplied and can be a \linkS4class{MizerParams} or
+#'     \linkS4class{MizerSim} object. The function will extract the
+#'     degradation scaling or trajectory from
+#'     \code{object@refuge_params$trajectory} or
+#'     \code{object@refuge_params$deg_scale}.
+#' }
 #'
-#' @param file Optional. Path to CSV file to use. If NULL, uses built-in
-#'             data from inst/.
-#'
+#' @param object An optional object of class \linkS4class{MizerParams} or
+#'               \linkS4class{MizerSim}. If provided, the function will attempt to extract
+#'               the degradation scaling or trajectory from its \code{@refuge_params} slot.
+#' 
+#' @param trajectory Optional. Either a character string (\code{"rubble"},
+#'                   \code{"algae"}, \code{"recovery"}) to use built-in data, or a
+#'                   user-provided numeric matrix/data.frame with the correct format (bleaching
+#'                   year in first column, remaining columns as refuge size bins).
+#' 
 #' @param return_data Logical. If TRUE, returns the formatted data frame
 #'                    instead of the plot. Default FALSE.
 #'
-#' @return ggplot2 object (heatmap), or data frame if return_data = TRUE.
+#' @return A ggplot2 object (heatmap), or a data frame if
+#'         \code{return_data = TRUE}.
 #' @importFrom reshape2 melt
-#' @importFrom utils data
-#' @importFrom utils read.csv
 #' @export
 #' @family plotting functions
-#' @concept parameterPlots
+#' @concept refugePlots
 #' @seealso [plotting_functions], [setDegradation()], [reefDegrade()]
-plotDegradationScale <- function(trajectory = NULL,
-                                 file = NULL,
+plotDegradationScale <- function(object = NULL,
+                                 trajectory = NULL,
                                  return_data = FALSE) {
+    # At least a MizerParams object, MizerSim object, or custom trajectory must be provided
+    if (is.null(object) && is.null(trajectory)) {
+        stop("Either 'object' or 'trajectory' must be provided.")
+    }
     valid_trajectories <- c("rubble", "algae", "recovery")
     dat <- NULL
-    # If trajectory is a matrix or data.frame, use it directly
-    if (is.matrix(trajectory) || is.data.frame(trajectory)) {
-        dat <- as.matrix(trajectory)
-        if (!is.numeric(dat)) {
-            stop("Provided trajectory matrix/data.frame must be numeric.")
-        }
-        # If ot's not provided directly, use file or built-in data
-    } else {
-        # If trajectory is missing, default to 'rubble'
-        if (is.null(trajectory)) {
-            trajectory <- "rubble"
-        }
-        # If trajectory is a vector, use the first value
-        if (length(trajectory) > 1) {
-            trajectory <- trajectory[1]
-        }
-        if (!trajectory %in% valid_trajectories) {
-            stop(paste0("Invalid trajectory: '", trajectory, "'. Valid options are: ", paste(valid_trajectories, collapse = ", ")))
-        }
-        # Use built-in R data object if file is NULL, otherwise use CSV
-        if (is.null(file)) {
+
+    # 1. If trajectory is provided, it takes precedence
+    if (!is.null(trajectory)) {
+        # If trajectory is a matrix or data.frame, use it directly
+        if (is.matrix(trajectory) || is.data.frame(trajectory)) {
+            dat <- as.matrix(trajectory)
+            if (!is.numeric(dat)) {
+                stop("Provided trajectory matrix/data.frame must be numeric.")
+            }
+        } else if (is.character(trajectory)) {
+            # If trajectory is a vector, use the first value
+            if (length(trajectory) > 1) {
+                trajectory <- trajectory[1]
+            }
+            if (!trajectory %in% valid_trajectories) {
+                stop(paste0("Invalid trajectory: '", trajectory, "'. Valid options are: ", paste(valid_trajectories, collapse = ", ")))
+            }
             data_name <- switch(trajectory,
                 rubble = "rubble_scale",
                 algae = "algae_scale",
                 recovery = "recovery_scale"
             )
             # Try to load the data object from the package
-            # First, try to get from global env, then from package namespace
             if (!exists(data_name, envir = .GlobalEnv)) {
                 data(list = data_name, package = "mizerReef", envir = .GlobalEnv)
             }
@@ -426,18 +421,36 @@ plotDegradationScale <- function(trajectory = NULL,
             } else {
                 stop(paste("Could not find data object:", data_name))
             }
-            # If it's a data.frame, convert to matrix
             if (is.data.frame(dat)) {
                 dat <- as.matrix(dat)
             }
         } else {
-            dat <- as.matrix(read.csv(file, header = FALSE))
-            # Check that user-provided data is numeric
-            if (!is.numeric(dat)) {
-                stop("Provided data must be a numeric matrix or CSV with only numeric values.")
-            }
+            stop("'trajectory' must be a character, matrix, or data.frame.")
+        }
+    } else if (!is.null(object)) {
+        # 2. If only object is provided
+        if (inherits(object, "MizerSim")) {
+            params <- object@params
+        } else if (inherits(object, "MizerParams")) {
+            params <- object
+        } else {
+            stop("'object' must be a MizerParams or MizerSim object.")
+        }
+        # Try to extract trajectory or deg_scale from params@refuge_params
+        if (!is.null(params@refuge_params$trajectory)) {
+            dat <- params@refuge_params$trajectory
+        } else if (!is.null(params@refuge_params$deg_scale)) {
+            dat <- params@refuge_params$deg_scale
+        } else {
+            stop("No degradation scaling or trajectory found in object@refuge_params.")
         }
     }
+
+    # Validate dat
+    if (is.null(dat) || !is.matrix(dat) || !is.numeric(dat)) {
+        stop("Could not extract a valid numeric matrix for degradation scaling.")
+    }
+    
     df_long <- reshape2::melt(dat)
     colnames(df_long) <- c("SizeBin", "Year", "Scaling")
     df_long$SizeBin <- as.factor(df_long$SizeBin)
@@ -478,14 +491,14 @@ plotDegradationScale <- function(trajectory = NULL,
             legend.key.height = unit(2, "cm")
         )
 }
-
-#' Interactive Plotly version of plotDegScale
+#' Interactive Plotly version of plotDegradationScale
 #'
 #' Returns an interactive heatmap for degradation scaling parameters.
 #'
 #' @inheritParams plotDegradationScale
 #' @return A plotly object
+#' @importFrom plotly ggplotly
 #' @export
 plotlyDegradationScale <- function(trajectory = NULL, file = NULL) {
-    ggplotly(plotDegScale(trajectory = trajectory, file = file))
+    ggplotly(plotDegradationScale(trajectory = trajectory, file = file))
 }

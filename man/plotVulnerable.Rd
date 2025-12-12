@@ -9,6 +9,7 @@ plotVulnerable(
   object,
   species = NULL,
   all.sizes = FALSE,
+  time_step = NULL,
   return_data = FALSE,
   ...
 )
@@ -22,7 +23,9 @@ plotlyVulnerable(
 )
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams}}
+\item{object}{An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
+If a \linkS4class{MizerSim} object is provided, the abundance at the
+last time step is used.}
 
 \item{species}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a
@@ -30,8 +33,12 @@ numeric vector with the species indices, or a logical
 vector indicating for each species whether it is to be
 selected (TRUE) or not.}
 
-\item{all.sizes}{If TRUE, then feeding level is plotted also for sizes
+\item{all.sizes}{If TRUE, then vulnerability is plotted also for sizes
 outside a species' size range. Default FALSE.}
+
+\item{time_step}{If \code{object} is a \linkS4class{MizerSim} object, this optional
+parameter specifies which time step to use for calculating
+vulnerability. Default is the last time step.}
 
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot
@@ -51,7 +58,7 @@ When called with a \linkS4class{MizerParams} object the initial
 vulnerability is plotted. The complement of refuge.
 }
 \seealso{
-\link[mizer:plotting_functions]{mizer::plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotRefuge]{plotRefuge()}}
+\link[mizer:plotting_functions]{mizer::plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotRefugeProfile]{plotRefugeProfile()}}
 
 Other plotting functions: 
 \code{\link{plot2Productivity}()},
@@ -60,15 +67,13 @@ Other plotting functions:
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
-\code{\link{plotTotalBiomassRelative}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotTotalBiomassRelative}()}
 }
 \concept{plotting functions}
 \concept{refugePlots}

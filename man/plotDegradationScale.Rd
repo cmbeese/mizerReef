@@ -4,25 +4,48 @@
 \alias{plotDegradationScale}
 \title{Plot heatmap of degradation scaling parameters}
 \usage{
-plotDegradationScale(trajectory = NULL, file = NULL, return_data = FALSE)
+plotDegradationScale(object = NULL, trajectory = NULL, return_data = FALSE)
 }
 \arguments{
-\item{trajectory}{Either a character string ("rubble", "algae", "recovery", "constant") to use built-in data, OR a user-provided numeric matrix/data.frame with the correct format (bleaching year in first column, remaining columns as refuge size bins).}
+\item{object}{An optional object of class \linkS4class{MizerParams} or
+\linkS4class{MizerSim}. If provided, the function will attempt to extract
+the degradation scaling or trajectory from its \code{@refuge_params} slot.}
 
-\item{file}{Optional. Path to CSV file to use. If NULL, uses built-in
-data from inst/.}
+\item{trajectory}{Optional. Either a character string (\code{"rubble"},
+\code{"algae"}, \code{"recovery"}) to use built-in data, or a
+user-provided numeric matrix/data.frame with the correct format (bleaching
+year in first column, remaining columns as refuge size bins).}
 
 \item{return_data}{Logical. If TRUE, returns the formatted data frame
 instead of the plot. Default FALSE.}
 }
 \value{
-ggplot2 object (heatmap), or data frame if return_data = TRUE.
+A ggplot2 object (heatmap), or a data frame if
+\code{return_data = TRUE}.
 }
 \description{
 Creates a heatmap showing the scaling of refuge density across bleaching
 years and refuge size bins for a given degradation trajectory. The input
 data should have the first column as bleaching year, and the remaining
 columns as refuge size bins.
+}
+\details{
+This function is flexible in its input:
+\itemize{
+\item If \code{trajectory} is provided, it takes precedence. It can be:
+\itemize{
+\item A character string (\code{"rubble"}, \code{"algae"},
+\code{"recovery"}) to use built-in data.
+\item A user-provided numeric matrix or data.frame (bleaching year in
+first column, remaining columns as refuge size bins).
+}
+\item If \code{trajectory} is not provided, \code{object} must be
+supplied and can be a \linkS4class{MizerParams} or
+\linkS4class{MizerSim} object. The function will extract the
+degradation scaling or trajectory from
+\code{object@refuge_params$trajectory} or
+\code{object@refuge_params$deg_scale}.
+}
 }
 \seealso{
 \link[mizer:plotting_functions]{mizer::plotting_functions}, \code{\link[=setDegradation]{setDegradation()}}, \code{\link[=reefDegrade]{reefDegrade()}}
@@ -33,16 +56,14 @@ Other plotting functions:
 \code{\link{plotBiomass}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
-\concept{parameterPlots}
 \concept{plotting functions}
+\concept{refugePlots}

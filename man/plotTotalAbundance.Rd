@@ -2,7 +2,8 @@
 % Please edit documentation in R/reef-analysis_plots.R
 \name{plotTotalAbundance}
 \alias{plotTotalAbundance}
-\title{Plot the total abundance for each species group at steady state}
+\alias{plotlyTotalAbundance}
+\title{Plot the total abundance for each species in a size range}
 \usage{
 plotTotalAbundance(
   object,
@@ -13,14 +14,18 @@ plotTotalAbundance(
   return_data = FALSE,
   ...
 )
+
+plotlyTotalAbundance(object, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams}}
+\item{object}{An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
+If a \linkS4class{MizerSim} object is provided, the abundance at the
+last time step is used.}
 
 \item{stack}{A boolean value that determines whether bars are separated
 by species. Defaults to FALSE. If true, returns a stacked
-barplot with the total biomass for each group instead of
-individual bars for each group. Useful for comparison
+barplot with the total biomass for each species instead of
+individual bars for each species. Useful for comparison
 between steady states.}
 
 \item{species}{The species to be selected. Optional. By default all
@@ -45,7 +50,7 @@ itself. Default value is FALSE.}
 A ggplot2 object
 }
 \description{
-This functions creates a barplot with the abundance of each species group
+This functions creates a barplot with the abundance of each species
 within a given size range.
 }
 \seealso{
@@ -61,15 +66,13 @@ Other plotting functions:
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalBiomass}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}

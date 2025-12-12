@@ -3,7 +3,7 @@
 \name{plotTotalBiomass}
 \alias{plotTotalBiomass}
 \alias{plotlyTotalBiomass}
-\title{Plot the total fishable biomass for each Species Group at steady state}
+\title{Plot the total biomass for each species in a size range}
 \usage{
 plotTotalBiomass(
   object,
@@ -17,7 +17,9 @@ plotTotalBiomass(
 plotlyTotalBiomass(object, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams}}
+\item{object}{An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
+If a \linkS4class{MizerSim} object is provided, the biomass at the
+last time step is used.}
 
 \item{species}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a
@@ -41,7 +43,7 @@ itself. Default value is FALSE.}
 A ggplot2 object
 }
 \description{
-This functions creates a barplot with the biomass of each Species Group
+This functions creates a barplot with the biomass of each specie
 within a size range. Usually used in conjunction with \code{\link[=plotProductivity]{plotProductivity()}}
 to check for decoupling.
 }
@@ -58,15 +60,13 @@ Other plotting functions:
 \code{\link{plotDegradationScale}()},
 \code{\link{plotProductivity}()},
 \code{\link{plotProductivityRelative}()},
-\code{\link{plotRefuge}()},
 \code{\link{plotRefugeDensity}()},
+\code{\link{plotRefugeProfile}()},
 \code{\link{plotRelativeContribution}()},
 \code{\link{plotSpectraRelative}()},
 \code{\link{plotTotalAbundance}()},
 \code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()},
-\code{\link{reef-analysis_plots}},
-\code{\link{reef-parameter_plots}}
+\code{\link{plotVulnerable}()}
 }
 \concept{plotting functions}
 \concept{sumplots}
