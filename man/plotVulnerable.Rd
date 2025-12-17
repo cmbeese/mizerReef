@@ -23,26 +23,25 @@ plotlyVulnerable(
 )
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
-If a \linkS4class{MizerSim} object is provided, the abundance at the
-last time step is used.}
+\item{object}{An object of class \linkS4class{MizerParams} or
+\linkS4class{MizerSim}. If a \linkS4class{MizerSim} object is provided, the
+abundance at the last time step is used.}
 
-\item{species}{The species to be selected. Optional. By default all
-species are selected. A vector of species names, or a
-numeric vector with the species indices, or a logical
-vector indicating for each species whether it is to be
-selected (TRUE) or not.}
+\item{species}{The species to be selected. Optional. By default all species
+are selected. A vector of species names, or a numeric vector with the
+species indices, or a logical vector indicating for each species whether
+it is to be selected (TRUE) or not.}
 
 \item{all.sizes}{If TRUE, then vulnerability is plotted also for sizes
 outside a species' size range. Default FALSE.}
 
-\item{time_step}{If \code{object} is a \linkS4class{MizerSim} object, this optional
-parameter specifies which time step to use for calculating
+\item{time_step}{If \code{object} is a \linkS4class{MizerSim} object, this
+optional parameter specifies which time step to use for calculating
 vulnerability. Default is the last time step.}
 
 \item{return_data}{A boolean value that determines whether the formatted
-data used for the plot is returned instead of the plot
-itself. Default value is FALSE.}
+data used for the plot is returned instead of the plot itself. Default
+value is FALSE.}
 
 \item{...}{unused}
 }

@@ -21,7 +21,7 @@ Array (species x size) with the encounter rate in g/year.
 \description{
 The encounter rate \eqn{E_i(w)} for an unstructured resource like algae or
 detritus is proportional to the total biomass \eqn{B} with a coefficient
-\eqn{\rho_i(w)} that depends on the functional group \eqn{i} and the size of
+\eqn{\rho_i(w)} that depends on the species \eqn{i} and the size of
 the consumer:
 }
 \details{

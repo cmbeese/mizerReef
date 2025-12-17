@@ -9,19 +9,20 @@ newReefParams(
   interaction = NULL,
   crit_feed = NULL,
   min_w_pp = NA,
-  w_pp_cutoff = 0.1,
+  w_pp_cutoff = 1,
   n = 0.75,
   new_refuge = FALSE,
   method,
   method_params,
   refuge_user = NULL,
-  bad_pred = NULL,
+  blocked_pred = NULL,
   satiation = NULL,
   a_bar = NULL,
   b_bar = NULL,
   w_settle = NULL,
   max_protect = NULL,
   tau = NULL,
+  use_dummy_fish_bins = TRUE,
   degrade = FALSE,
   bleach_time = 2,
   trajectory = NULL,
@@ -29,14 +30,17 @@ newReefParams(
   algae_boost = FALSE,
   algae_growth_boost = c(1.11, 1.11, 1.11, 1.11),
   algae_capacity_boost = c(2),
-  UR_interaction,
+  UR_interaction = NULL,
   use_UR_cc = FALSE,
   initial_algae_growth = NULL,
   algae_capacity = NULL,
   detritus_capacity = NULL,
   sen_decomp = NULL,
   ext_decomp = NULL,
-  initial_d_external = NULL,
+  external = NULL,
+  algae_colour = "darkseagreen3",
+  detritus_colour = "plum4",
+  resource_color = "lightseagreen",
   ext_mort_params = NULL,
   include_ext_mort = TRUE,
   include_sen_mort = TRUE,
@@ -46,16 +50,16 @@ newReefParams(
 }
 \arguments{
 \item{species_params}{A species parameter data frame containing at
-least the name of each specie, their
+least the name of each species, their
 observed abundances, and their maximum size.}
 
 \item{interaction}{The species specific interaction matrix, \eqn{\theta_{ij}}}
 
 \item{crit_feed}{Critical feeding level}
 
-\item{min_w_pp}{Minimum size of plankton in grams, default to 0.1 g}
+\item{min_w_pp}{Minimum size of plankton in grams}
 
-\item{w_pp_cutoff}{Maximum size of plankton in grams}
+\item{w_pp_cutoff}{Maximum size of plankton in grams, default to 1 g}
 
 \item{n}{Allometric growth exponent (also used as metabolic exponent p)}
 
@@ -73,6 +77,8 @@ One of "sigmoidal", "binned", "competitive", or
 
 \item{refuge_user}{Logical vector (length = number of species). Indicates which groups use refuge.
 If not present in \code{species_params}, must be provided. Defaults to FALSE.}
+
+\item{blocked_pred}{Optional. Logical vector (length = number of species). Indicates whether the predator is blocked by refuge for this species. TRUE means hunting is blocked by refuge; FALSE means the species can access prey within refuge (e.g. eels). Defaults to FALSE.}
 
 \item{satiation}{Logical vector (length = number of species). Indicates which groups are subject to
 satiation. If not provided, defaults are set automatically: FALSE for carnivores
@@ -93,6 +99,14 @@ is used for that species and a warning is issued.}
 \item{max_protect}{Numeric. Maximum proportion of fish protected by refuge (0–1). \strong{Default:} 0.98.}
 
 \item{tau}{Numeric. Proportion of fish with access to refuge expected to utilize it (0–1). \strong{Default:} 1.}
+
+\item{use_dummy_fish_bins}{Logical. Controls how refuge bin boundaries and thresholds are calculated for sigmoidal and binned methods:
+\itemize{
+\item TRUE: Use each species' own length-weight parameters (\code{a}, \code{b}).
+\item FALSE (default): Use dummy fish parameters (\code{a_bar}, \code{b_bar}).
+Set according to your data collection method. The setting is stored in
+\code{params@refuge_params$use_dummy_fish_bins} and used by \code{\link[=getRefuge]{getRefuge()}}.
+}}
 
 \item{bleach_time}{The year of the simulation to implement bleaching.
 Defaults to year 2.}
@@ -147,6 +161,17 @@ that becomes detritus. Default is 0.8.}
 
 \item{ext_decomp}{Numeric. Proportion of decomposing mass from external mortality
 that becomes detritus. Default is 0.2.}
+
+\item{external}{Numeric. Rate at which detritus biomass sinks from the pelagic
+zone (grams per year). Default is 1.}
+
+\item{algae_colour}{Character. Colour to use for algae in plots.
+Default is "darkseagreen3".}
+
+\item{detritus_colour}{Character. Colour to use for detritus in plots. Default is "plum4".}
+
+\item{resource_color}{Character. Colour to use for the resource line in plots.
+Default is "lightseagreen".}
 
 \item{ext_mort_params}{Optional. A named list or matrix with columns/names
 'nat_mort', 'sen_prop', and 'sen_curve'. If NULL,

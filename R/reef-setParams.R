@@ -1027,7 +1027,6 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
         ## Competitive method ------------------------------------------------------
     } else if (refuge_params$method == "competitive") {
         # Initialize empty list to hold number of competitors for each bin
-        competitor_density <- numeric(nrow(method_params))
         bin.id <- list(1)
         start_l.i <- list(1)
         end_l.i <- list(1)

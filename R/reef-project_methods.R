@@ -445,8 +445,8 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 	enc <- matrix(0, no_sp, no_w)
 
 	# Find indices of predator species impacted by refuge
-	bad_pred  <- which(params@species_params$bad_pred == TRUE)
-	good_pred <- which(params@species_params$bad_pred == FALSE)
+	blocked_pred  <- which(params@species_params$blocked_pred == TRUE)
+	good_pred <- which(params@species_params$blocked_pred == FALSE)
 
 	# Calculate n_vulnerable, number at each size vulnerable to being
 	# encountered
@@ -494,7 +494,7 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 		bad_encounter <- params@search_vol * (v_phi_prey_species +
 												  phi_prey_background)
 
-		enc[bad_pred,] <- bad_encounter[bad_pred,]
+		enc[blocked_pred,] <- bad_encounter[blocked_pred,]
 
 		encounter <- enc
 
@@ -544,7 +544,7 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 		v_avail_energy[v_avail_energy < 1e-18] <- 0
 
 		bad_enc <- params@search_vol * v_avail_energy
-		enc[bad_pred,] <- bad_enc[bad_pred,]
+		enc[blocked_pred,] <- bad_enc[blocked_pred,]
 
 		encounter <- enc
 	}
@@ -633,12 +633,12 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 	int <- params@interaction
 
 	# Find indices of predator species whose foraging is hindered by refuge
-	bad_pred  <- which(params@species_params$bad_pred == TRUE)
-	good_pred <- which(params@species_params$bad_pred == FALSE)
+	blocked_pred  <- which(params@species_params$blocked_pred == TRUE)
+	good_pred <- which(params@species_params$blocked_pred == FALSE)
 
 	# Create list of vulnerabilities for each predator
 	vul <- vector("list", no_sp)
-	vul[bad_pred] <- list(vulnerable)
+	vul[blocked_pred] <- list(vulnerable)
 	vul[good_pred] <- list(matrix(1, nrow = no_sp, ncol = ncol(vulnerable)))
 
 	# Loop through predator species to calculate predation mortality on

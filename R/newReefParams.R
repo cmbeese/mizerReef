@@ -16,7 +16,7 @@
 #' @inheritParams setDegradation
 #'
 #' @param species_params A species parameter data frame containing at
-#'                       least the name of each specie, their
+#'                       least the name of each species, their
 #'                       observed abundances, and their maximum size.
 #'
 #' @param interaction The species specific interaction matrix, \eqn{\theta_{ij}}
@@ -32,29 +32,35 @@
 #'              to 1-n where n is the given allometric scaling exponent and
 #'              z0pre defaults to 0.2.
 #'
-#' @param min_w_pp Minimum size of plankton in grams, default to 0.1 g
-#' @param w_pp_cutoff Maximum size of plankton in grams
-#' @param n Growth exponent (also used as metabolic exponent p)
-#' @param crit_feed Critical feeding level
-#' @param ... Extra parameters to be passed to [newMultispeciesParams()]
+#' @param resource_color Character. Colour to use for the resource line in plots.
+#'                       Default is "lightseagreen".
+#'
+#' @param min_w_pp Minimum size of plankton in grams
+#'
+#' @param w_pp_cutoff Maximum size of plankton in grams, default to 1 g
 #'
 #' @param n Allometric growth exponent (also used as metabolic exponent p)
+#'
+#' @param crit_feed Critical feeding level
+#'
 #' @param ... Extra parameters to be passed to [newMultispeciesParams()]
+#'
 #' @concept setup
 #' @return An object of type \linkS4class{MizerParams}
 newReefParams <- function( # Original mizer parameters
                           species_params, interaction = NULL,
                           crit_feed = NULL,
-                          min_w_pp = NA, w_pp_cutoff = 0.1,
+                          min_w_pp = NA, w_pp_cutoff = 1,
                           n = 0.75,
                           # Parameters for setting up refuge
                           new_refuge = FALSE,
                           method, method_params,
-                          refuge_user = NULL, bad_pred = NULL,
+                          refuge_user = NULL, blocked_pred = NULL,
                           satiation = NULL,
                           a_bar = NULL, b_bar = NULL,
                           w_settle = NULL, max_protect = NULL,
                           tau = NULL,
+                          use_dummy_fish_bins = TRUE,
                           # Parameters for setting up degradation
                           degrade = FALSE, bleach_time = 2,
                           trajectory = NULL, deg_scale = 1,
@@ -62,13 +68,17 @@ newReefParams <- function( # Original mizer parameters
                           algae_growth_boost = c(1.11, 1.11, 1.11, 1.11),
                           algae_capacity_boost = c(2.0),
                           # Parameters for unstructured resources
-                          UR_interaction,
+                          UR_interaction = NULL,
                           use_UR_cc = FALSE,
                           initial_algae_growth = NULL,
                           algae_capacity = NULL,
                           detritus_capacity = NULL,
                           sen_decomp = NULL, ext_decomp = NULL,
-                          initial_d_external = NULL,
+                          external = NULL,
+                          # Resource aesthetics
+                          algae_colour = "darkseagreen3",
+                          detritus_colour = "plum4",
+                          resource_color = "lightseagreen",
                           # Parameters for external mortality
                           ext_mort_params = NULL,
                           include_ext_mort = TRUE,
@@ -83,8 +93,11 @@ newReefParams <- function( # Original mizer parameters
         n = n, p = n, ...
     )
 
+    # Convert params to MizerReefParams ----
+    params <- as(params, "MizerReefParams")
+
     # Change resource color
-    params@linecolour["Resource"] <- "lightseagreen"
+    params@linecolour["Resource"] <- resource_color
     params@linecolour["Fishing"] <- "blue"
 
     # Save include_sen_mort
@@ -97,11 +110,12 @@ newReefParams <- function( # Original mizer parameters
         params = params, method = method,
         method_params = method_params,
         refuge_user = refuge_user,
-        bad_pred = bad_pred,
+        blocked_pred = blocked_pred,
         satiation = satiation,
         a_bar = a_bar, b_bar = b_bar,
         w_settle = w_settle,
-        max_protect = max_protect, tau = tau, ...
+        max_protect = max_protect, tau = tau,
+        use_dummy_fish_bins = use_dummy_fish_bins, ...
     )
 
     params <- getRefuge(params, ...)
@@ -113,7 +127,8 @@ newReefParams <- function( # Original mizer parameters
         algae_growth_initial = initial_algae_growth,
         algae_capacity = algae_capacity,
         UR_interaction = UR_interaction,
-        use_UR_cc = carry_capacity
+        use_UR_cc = use_UR_cc,
+        algae_colour = algae_colour
     )
 
     #### Detritus ----
@@ -124,7 +139,8 @@ newReefParams <- function( # Original mizer parameters
         ext_decomp = ext_decomp,
         external = external,
         UR_interaction = UR_interaction,
-        use_UR_cc = carry_capacity
+        use_UR_cc = use_UR_cc,
+        detritus_colour = detritus_colour
     )
 
     ### External mortality ----
@@ -134,16 +150,19 @@ newReefParams <- function( # Original mizer parameters
     )
 
     ### Degradation ----
-    params <- setDegradation(params,
-        deg_scale = deg_scale,
-        bleach_time = bleach_time,
-        trajectory = trajectory,
-        degrade = degrade,
-        algae_boost = algae_boost,
-        algae_growth_boost = algae_growth_boost,
-        algae_capacity_boost = algae_capacity_boost
-    )
-
+    if (isTRUE(degrade)) {
+        params <- setDegradation(params,
+            deg_scale = deg_scale,
+            bleach_time = bleach_time,
+            trajectory = trajectory,
+            degrade = degrade,
+            algae_boost = algae_boost,
+            algae_growth_boost = algae_growth_boost,
+            algae_capacity_boost = algae_capacity_boost
+        )
+    } else {
+        params@refuge_params$degrade <- FALSE
+    }
 
     # Algae & Detritus ----
     ### Calculate Rho ----
@@ -182,7 +201,7 @@ newReefParams <- function( # Original mizer parameters
     rho_alg <- outer(params@species_params$rho_algae, params@w^0.86)
     rho_det <- outer(params@species_params$rho_detritus, params@w^n)
 
-    if (carry_capacity == FALSE) {
+    if (use_UR_cc == FALSE) {
         ### Algae Component - Add in algae ----
         params <- mizer::setComponent(
             params, "algae",
@@ -210,7 +229,7 @@ newReefParams <- function( # Original mizer parameters
                 external = params@other_params$initial_d_external
             )
         )
-    } else if (carry_capacity == TRUE) {
+    } else if (use_UR_cc == TRUE) {
         ### Algae Component - Add in algae ----
         params <- mizer::setComponent(
             params, "algae",
@@ -235,7 +254,7 @@ newReefParams <- function( # Original mizer parameters
                 sen_decomp = params@other_params$sen_decomp,
                 ext_decomp = params@other_params$ext_decomp,
                 capacity = params@other_params$detritus_capacity,
-                external = params@other_params$initial_d_external
+                external = params@other_params$external
             )
         )
     }

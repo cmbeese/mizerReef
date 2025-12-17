@@ -12,16 +12,17 @@
 removeSpecies <- function(params, species) {
     p <- mizer::removeSpecies(params, species)
     species <- valid_species_arg(params, species,
-                                 return.logical = TRUE)
+        return.logical = TRUE
+    )
     keep <- !species
 
     # Remove algae rho values for species
-    p@other_params$algae$rho <-
-        p@other_params$algae$rho[keep, , drop = FALSE]
+    p@algae_params$rho <-
+        p@algae_params$rho[keep, , drop = FALSE]
 
     # Remove detritus rho values for species
-    p@other_params$detritus$rho <-
-        p@other_params$detritus$rho[keep, , drop = FALSE]
+    p@detritus_params$rho <-
+        p@detritus_params$rho[keep, , drop = FALSE]
 
     p
 }
@@ -40,6 +41,8 @@ removeSpecies <- function(params, species) {
 #' @return TRUE or FALSE
 #' @concept helper
 different <- function(a, b) {
-    !isTRUE(all.equal(a, b, check.attributes = FALSE, scale = 1,
-                      tolerance = 10 * .Machine$double.eps))
+    !isTRUE(all.equal(a, b,
+        check.attributes = FALSE, scale = 1,
+        tolerance = 10 * .Machine$double.eps
+    ))
 }

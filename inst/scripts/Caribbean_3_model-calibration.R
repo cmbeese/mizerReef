@@ -1,27 +1,31 @@
-# Setting up a Caribbean coral reef mizer model with multiple resources
+# Setting up a generic Caribbean coral reef model with multiple resources
 # Three groups: Predators, Herbivores, Invertebrates
 # Model steady state calibration
-# last tuned 23rd February 2024
+# last tuned 17/12/2025
 
 ## Setup - load packages -------------------------------------------------------
 library(mizer)
 library(mizerExperimental)
 library(mizerReef)
-library(assertthat)
+#library(assertthat)
 library(here)
+
+# Check that using newest version of mizerReef
+packageVersion("mizerReef") # Should be >= 2.0.0
 
 ## Load parameters -------------------------------------------------------------
 
 # Load species parameter data and save as an object to be included with package
-bonaire_species <- read.csv(here("inst/data-csv/bonaire_species.csv"))
-bonaire_interaction <- read.csv(here("inst/data-csv/bonaire_interaction.csv"), row.names = 1)
+caribbean_3_species <- read.csv(here("inst/data-csv/caribbean_3_species.csv"))
+caribbean_3_interaction <- read.csv(here("inst/data-csv/caribbean_3_interaction.csv"), row.names = 1)
 # Refuge densities from Karpata reef in Bonaire, FORCE dataset
-bonaire_refuge <- read.csv(here("inst/data-csv/karpata_refuge.csv"))
+karpata_refuge <- read.csv(here("inst/data-csv/karpata_refuge.csv"))
 tuning_profile <- read.csv(here("inst/data-csv/tuning_profile.csv")) # 60% refuge for all size classes
 
 # Save these as R data objects
-save(bonaire_species, file = "data/bonaire_species.rda")
-save(bonaire_interaction, file = "data/bonaire_interaction.rda")
+save(caribbean_3_species, file = "data/caribbean_3_species.rda")
+save(caribbean_3_interaction, file = "data/caribbean_3_interaction.rda")
+save(karpata_refuge, file = "data/caribbean_3_refuge.rda")
 save(tuning_profile, file = "data/tuning_profile.rda")
 
 # With these parameters, herbivores consume plankton at small sizes and
@@ -31,8 +35,8 @@ save(tuning_profile, file = "data/tuning_profile.rda")
 
 ## Set model -------------------------------------------------------------------
 params <- newReefParams(
-    group_params = bonaire_species,
-    interaction = bonaire_interaction,
+    species_params = caribbean_3_species,
+    interaction = caribbean_3_interaction,
     method = "binned",
     method_params = tuning_profile
 )
@@ -52,7 +56,7 @@ params <- matchReefGrowth(params)
 params <- reefSteady(params)
 
 # Check for match with age at maturity
-age_mat_observed <- bonaire_species$age_mat
+age_mat_observed <- caribbean_3_species$age_mat
 age_mat_model <- age_mat(params)
 data.frame(age_mat_model, age_mat_observed)
 # Not bad
@@ -91,7 +95,7 @@ params <- params |>
 plotBiomassVsSpecies(params) # spot on
 
 # Check match with observed age at maturity
-age_mat_observed <- bonaire_species$age_mat
+age_mat_observed <- caribbean_3_species$age_mat
 age_mat_model <- age_mat(params)
 data.frame(age_mat_model, age_mat_observed)
 # Closer than needed
@@ -102,7 +106,7 @@ plotTotalBiomass(params)
 ## Now switch to competitive method --------------------------------------------
 params <- newRefuge(params,
     new_method = "competitive",
-    new_method_params = bonaire_refuge
+    new_method_params = caribbean_3_refuge
 )
 
 # Match biomasses again - run three times
@@ -140,7 +144,7 @@ plotRefuge(params)
 plotBiomassVsSpecies(params) # spot on
 
 # Check match with observed age at maturity
-age_mat_observed <- bonaire_species$age_mat
+age_mat_observed <- caribbean_3_species$age_mat
 age_mat_model <- age_mat(params)
 data.frame(age_mat_model, age_mat_observed)
 # Also spot on
@@ -213,13 +217,13 @@ plotPredMort(params)
 # Everything looks good here! I am happy with my results.
 
 # Save!
-bonaire_model <- reefSteady(params)
+caribbean_3_model <- reefSteady(params)
 
 # Save in package --------------------------------------------------------------
 #
-# bonaire_model <- bonaire_model
-# bonaire_model@other_params$degrade <- FALSE
-# bonaire_model@other_params$new_refuge <- FALSE
+# caribbean_3_model <- caribbean_3_model
+# caribbean_3_model@other_params$degrade <- FALSE
+# caribbean_3_model@other_params$new_refuge <- FALSE
 
 # Params object
-save(bonaire_model, file = "data/bonaire_model.rda")
+save(caribbean_3_model, file = "data/caribbean_3_model.rda")

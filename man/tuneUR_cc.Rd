@@ -24,7 +24,7 @@ that productions equals consumption at steady state.
 With a carrying capacity, the time evolution of the algae biomass
 \eqn{B_A(t)} is described by
 
-\deqn{ \frac{dB_A}{dt} = P_A\left( 1 - 
+\deqn{ \frac{dB_A}{dt} = P_A\left( 1 -
                          \frac{B_A}{K_A} \right) - c_A \, B_A }{
                 dB_A/dt = P_A * (1 - B_A/ K_A) - c_A * B_A}
 
@@ -40,7 +40,7 @@ so that consumption is equal to production for steady state.
 Similarly, the time evolution of the detritus biomass \eqn{B_D(t)} is
 described by
 
-\deqn{ \frac{dB_D}{dt} = P_D\left( 1 - 
+\deqn{ \frac{dB_D}{dt} = P_D\left( 1 -
                          \frac{B_D}{K_D} \right) - c_D \, B_D }{
                 dB_D/dt = P_D * (1 - B_D/ K_D) - c_D * B_D}
 

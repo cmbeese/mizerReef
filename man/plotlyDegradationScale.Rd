@@ -4,13 +4,25 @@
 \alias{plotlyDegradationScale}
 \title{Interactive Plotly version of plotDegradationScale}
 \usage{
-plotlyDegradationScale(trajectory = NULL, file = NULL)
+plotlyDegradationScale(
+  object = NULL,
+  trajectory = NULL,
+  return_data = FALSE,
+  ...
+)
 }
 \arguments{
+\item{object}{An optional object of class \linkS4class{MizerParams} or
+\linkS4class{MizerSim}. If provided, the function will attempt to extract
+the degradation scaling or trajectory from its \code{@refuge_params} slot.}
+
 \item{trajectory}{Optional. Either a character string (\code{"rubble"},
 \code{"algae"}, \code{"recovery"}) to use built-in data, or a
 user-provided numeric matrix/data.frame with the correct format (bleaching
 year in first column, remaining columns as refuge size bins).}
+
+\item{return_data}{Logical. If TRUE, returns the formatted data frame
+instead of the plot. Default FALSE.}
 }
 \value{
 A plotly object

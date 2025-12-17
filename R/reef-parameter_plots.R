@@ -5,30 +5,30 @@ utils::globalVariables(c("Year", "SizeBin"))
 #' When called with a \linkS4class{MizerParams} object the initial
 #' vulnerability is plotted. The complement of refuge.
 #'
-#' @param object An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
-#'               If a \linkS4class{MizerSim} object is provided, the abundance at the
-#'              last time step is used. 
+#' @param object An object of class \linkS4class{MizerParams} or
+#'   \linkS4class{MizerSim}. If a \linkS4class{MizerSim} object is provided, the
+#'   abundance at the last time step is used.
 #'
-#' @param species   The species to be selected. Optional. By default all
-#'                  species are selected. A vector of species names, or a
-#'                  numeric vector with the species indices, or a logical
-#'                  vector indicating for each species whether it is to be
-#'                  selected (TRUE) or not.
+#' @param species The species to be selected. Optional. By default all species
+#'   are selected. A vector of species names, or a numeric vector with the
+#'   species indices, or a logical vector indicating for each species whether
+#'   it is to be selected (TRUE) or not.
 #'
 #' @param all.sizes If TRUE, then vulnerability is plotted also for sizes
-#'                  outside a species' size range. Default FALSE.
-#' 
-#' @param time_step If `object` is a \linkS4class{MizerSim} object, this optional
-#'                  parameter specifies which time step to use for calculating 
-#'                  vulnerability. Default is the last time step.
+#'   outside a species' size range. Default FALSE.
 #'
-#' @param return_data   A boolean value that determines whether the formatted
-#'                      data used for the plot is returned instead of the plot
-#'                      itself. Default value is FALSE.
+#' @param time_step If `object` is a \linkS4class{MizerSim} object, this
+#'   optional parameter specifies which time step to use for calculating
+#'   vulnerability. Default is the last time step.
+#'
+#' @param return_data A boolean value that determines whether the formatted
+#'   data used for the plot is returned instead of the plot itself. Default
+#'   value is FALSE.
+#'
 #' @param ... unused
 #'
-#' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
-#'          frame the vulnerability at each size
+#' @return A ggplot2 object, unless `return_data = TRUE`, in which case a data
+#'   frame the vulnerability at each size
 #'
 #' @import ggplot2
 #' @importFrom dplyr mutate filter select arrange rename summarise
@@ -53,14 +53,12 @@ plotVulnerable <- function(object,
     if (is(object, "MizerSim")) {
         ## sim values ----
         params <- object@params
-        sim <- object
         # Get time for end of simulation
         if (is.null(time_step)) {
             t <- max(as.numeric(dimnames(object@n)$time))
         }
         t <- time_step
         vul <- getVulnerable(object, time_range = t)
-
     } else if (is(object, "MizerParams")) {
         ## params values ----
         params <- object
@@ -168,23 +166,22 @@ plotlyVulnerable <- function(object,
 
 #' Plot the refuge profile, species by length
 #'
-#' When called with a \linkS4class{MizerParams} object the initial
-#' refuge profile is plotted. The complement of vulnerability.
+#' When called with a \linkS4class{MizerParams} object the initial refuge
+#' profile is plotted. The complement of vulnerability.
 #'
 #' @param object An object of class \linkS4class{MizerParams}
 #'
-#' @param species   The species to be selected. Optional. By default all
-#'                  species are selected. A vector of species names, or a
-#'                  numeric vector with the species indices, or a logical
-#'                  vector indicating for each species whether it is to be
-#'                  selected (TRUE) or not.
+#' @param species The species to be selected. Optional. By default all species
+#'   are selected. A vector of species names, or a numeric vector with the
+#'   species indices, or a logical vector indicating for each species whether
+#'   it is to be selected (TRUE) or not.
 #'
 #' @param all.sizes If TRUE, then feeding level is plotted also for sizes
-#'                  outside a species' size range. Default FALSE.
+#'   outside a species' size range. Default FALSE.
 #'
-#' @param return_data   A boolean value that determines whether the formatted
-#'                      data used for the plot is returned instead of the plot
-#'                      itself. Default value is FALSE.
+#' @param return_data A boolean value that determines whether the formatted
+#'   data used for the plot is returned instead of the plot itself. Default
+#'   value is FALSE.
 #' @param ... unused
 #'
 #' @return A ggplot2 object
@@ -194,9 +191,9 @@ plotlyVulnerable <- function(object,
 #' @concept refugePlots
 #' @seealso [plotting_functions], [setRefuge()], [plotVulnerable()]
 plotRefugeProfile <- function(object,
-                       species = NULL,
-                       all.sizes = FALSE,
-                       return_data = FALSE, ...) {
+                              species = NULL,
+                              all.sizes = FALSE,
+                              return_data = FALSE, ...) {
     # input check ----
     assert_that(
         is.flag(all.sizes),
@@ -328,8 +325,8 @@ plotRefugeProfile <- function(object,
 #' @rdname plotRefugeProfile
 #' @export
 plotlyRefugeProfile <- function(object,
-                         species = NULL,
-                         ...) {
+                                species = NULL,
+                                ...) {
     argg <- as.list(environment())
     ggplotly(do.call("plotRefugeProfile", argg),
         tooltip = c("Functional Group", "w", "value")
@@ -361,19 +358,19 @@ plotlyRefugeProfile <- function(object,
 #' }
 #'
 #' @param object An optional object of class \linkS4class{MizerParams} or
-#'               \linkS4class{MizerSim}. If provided, the function will attempt to extract
-#'               the degradation scaling or trajectory from its \code{@refuge_params} slot.
-#' 
+#'   \linkS4class{MizerSim}. If provided, the function will attempt to extract
+#'   the degradation scaling or trajectory from its \code{@refuge_params} slot.
+#'
 #' @param trajectory Optional. Either a character string (\code{"rubble"},
-#'                   \code{"algae"}, \code{"recovery"}) to use built-in data, or a
-#'                   user-provided numeric matrix/data.frame with the correct format (bleaching
-#'                   year in first column, remaining columns as refuge size bins).
-#' 
+#'   \code{"algae"}, \code{"recovery"}) to use built-in data, or a
+#'   user-provided numeric matrix/data.frame with the correct format (bleaching
+#'   year in first column, remaining columns as refuge size bins).
+#'
 #' @param return_data Logical. If TRUE, returns the formatted data frame
-#'                    instead of the plot. Default FALSE.
+#'   instead of the plot. Default FALSE.
 #'
 #' @return A ggplot2 object (heatmap), or a data frame if
-#'         \code{return_data = TRUE}.
+#'   \code{return_data = TRUE}.
 #' @importFrom reshape2 melt
 #' @export
 #' @family plotting functions
@@ -450,7 +447,7 @@ plotDegradationScale <- function(object = NULL,
     if (is.null(dat) || !is.matrix(dat) || !is.numeric(dat)) {
         stop("Could not extract a valid numeric matrix for degradation scaling.")
     }
-    
+
     df_long <- reshape2::melt(dat)
     colnames(df_long) <- c("SizeBin", "Year", "Scaling")
     df_long$SizeBin <- as.factor(df_long$SizeBin)
@@ -499,6 +496,6 @@ plotDegradationScale <- function(object = NULL,
 #' @return A plotly object
 #' @importFrom plotly ggplotly
 #' @export
-plotlyDegradationScale <- function(trajectory = NULL, file = NULL) {
-    ggplotly(plotDegradationScale(trajectory = trajectory, file = file))
+plotlyDegradationScale <- function(object = NULL, trajectory = NULL, return_data = FALSE, ...) {
+    ggplotly(plotDegradationScale(object = object, trajectory = trajectory, return_data = return_data, ...))
 }

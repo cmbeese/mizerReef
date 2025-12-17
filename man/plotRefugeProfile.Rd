@@ -18,18 +18,17 @@ plotlyRefugeProfile(object, species = NULL, ...)
 \arguments{
 \item{object}{An object of class \linkS4class{MizerParams}}
 
-\item{species}{The species to be selected. Optional. By default all
-species are selected. A vector of species names, or a
-numeric vector with the species indices, or a logical
-vector indicating for each species whether it is to be
-selected (TRUE) or not.}
+\item{species}{The species to be selected. Optional. By default all species
+are selected. A vector of species names, or a numeric vector with the
+species indices, or a logical vector indicating for each species whether
+it is to be selected (TRUE) or not.}
 
 \item{all.sizes}{If TRUE, then feeding level is plotted also for sizes
 outside a species' size range. Default FALSE.}
 
 \item{return_data}{A boolean value that determines whether the formatted
-data used for the plot is returned instead of the plot
-itself. Default value is FALSE.}
+data used for the plot is returned instead of the plot itself. Default
+value is FALSE.}
 
 \item{...}{unused}
 }
@@ -37,8 +36,8 @@ itself. Default value is FALSE.}
 A ggplot2 object
 }
 \description{
-When called with a \linkS4class{MizerParams} object the initial
-refuge profile is plotted. The complement of vulnerability.
+When called with a \linkS4class{MizerParams} object the initial refuge
+profile is plotted. The complement of vulnerability.
 }
 \seealso{
 \link[mizer:plotting_functions]{mizer::plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotVulnerable]{plotVulnerable()}}

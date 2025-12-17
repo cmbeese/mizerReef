@@ -8,15 +8,15 @@
 data frame
 }
 \source{
-PhD Thesis, FORCE dataset
+Beese PhD Thesis
 }
 \usage{
 tuning_profile
 }
 \description{
-This data frame provides a constant refuge profile for model calibration and
-steady-state tuning. It contains start and end lengths for size bins and sets
-\code{prop_protect} to 60\% for all bins up to 50 cm in length.
+This data frame provides a constant refuge profile for model calibration
+and steady-state tuning. It contains start and end lengths for size bins
+and sets \code{prop_protect} to 60\% for all bins up to 50 cm in length.
 }
 \details{
 These parameters are intended to be used with the "binned" method, which
@@ -25,12 +25,8 @@ calibrating biomass and growth rates before switching to the competitive
 method. See the "Getting Started" vignette for more details.
 }
 \references{
-FORCE dataset: http://theses.ncl.ac.uk/jspui/handle/10443/3574
-
-Beese, C. (2025). PhD Thesis. Victoria University of Wellington. \url{https://doi.org/10.26686/thesis.123456}
-}
-\seealso{
-\linkVignette{Getting Started}
+Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+\url{https://doi.org/10.26686/thesis.123456}
 }
 \concept{calibration}
 \keyword{datasets}
