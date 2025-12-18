@@ -94,6 +94,7 @@ newReefParams <- function( # Original mizer parameters
     )
 
     # Convert params to MizerReefParams ----
+    # This new class has slots for refuge, algae, and detritus parameters
     params <- as(params, "MizerReefParams")
 
     # Change resource color
@@ -104,8 +105,13 @@ newReefParams <- function( # Original mizer parameters
     params@other_params$include_sen_mort <- include_sen_mort
 
     # Add parameters ----
+
     ### Refuge ----
+    # Set new_refuge to FALSE for initial models
+    # (this flag prevents recalculation of algae & detritus dynamics when changing refuge and running reefSteady)
     params@other_params$new_refuge <- FALSE
+
+    # Add refuge parameters
     params <- setRefuge(
         params = params, method = method,
         method_params = method_params,
@@ -118,6 +124,7 @@ newReefParams <- function( # Original mizer parameters
         use_dummy_fish_bins = use_dummy_fish_bins, ...
     )
 
+    # Find initial refuge profiles
     params <- getRefuge(params, ...)
 
     ### Unstructured resources ----
@@ -201,6 +208,12 @@ newReefParams <- function( # Original mizer parameters
     rho_alg <- outer(params@species_params$rho_algae, params@w^0.86)
     rho_det <- outer(params@species_params$rho_detritus, params@w^n)
 
+    # Store rho values in new params slots
+    params@algae_params$rho_algae <- rho_alg
+    params@detritus_params$rho_detritus <- rho_det
+
+    ### Add components ----
+
     if (use_UR_cc == FALSE) {
         ### Algae Component - Add in algae ----
         params <- mizer::setComponent(
@@ -210,8 +223,8 @@ newReefParams <- function( # Original mizer parameters
             encounter_fun = "encounter_contribution",
             component_params = list(
                 rho = rho_alg,
-                capacity = params@other_params$algae_capacity,
-                growth = params@other_params$initial_algae_growth
+                capacity = params@algae_params$algae_capacity,
+                growth = params@algae_params$algae_growth_initial
             )
         )
 
@@ -223,10 +236,10 @@ newReefParams <- function( # Original mizer parameters
             encounter_fun = "encounter_contribution",
             component_params = list(
                 rho = rho_det,
-                capacity = params@other_params$detritus_capacity,
-                sen_decomp = params@other_params$sen_decomp,
-                ext_decomp = params@other_params$ext_decomp,
-                external = params@other_params$initial_d_external
+                capacity = params@detritus_params$detritus_capacity,
+                sen_decomp = params@detritus_params$sen_decomp,
+                ext_decomp = params@detritus_params$ext_decomp,
+                external = params@detritus_params$d_external
             )
         )
     } else if (use_UR_cc == TRUE) {

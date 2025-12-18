@@ -1,4 +1,4 @@
 test_that("calibrateReefBiomass runs without error", {
-    params <- newReefParams()
-    expect_error(calibrateReefBiomass(params), NA)
+    data(caribbean_3_model)
+    expect_error(calibrateReefBiomass(caribbean_3_model), NA)
 })

@@ -94,8 +94,8 @@ setAlgaeParams <- function(params,
     if (is.null(algae_growth_initial)) {
         params@algae_params$algae_growth <- 2e3
     } else {
-        if (!is.numeric(algae_growth_initial)) stop("algae_growth should be a numerical value.")
-        if (algae_growth_initial < 0) stop("algae_growth must be non-negative.")
+        if (!is.numeric(algae_growth_initial)) stop("algae_growth_initial should be a numerical value.")
+        if (algae_growth_initial < 0) stop("algae_growth_initial must be non-negative.")
         params@algae_params$algae_growth <- algae_growth_initial
     }
 
@@ -765,6 +765,10 @@ setRefuge <- function(params, method, method_params = NULL,
             stop("You must provide method specific parameters.")
         }
 
+        # Convert list to data frame if needed
+        if (is.list(method_params) && !is.data.frame(method_params)) {
+            method_params <- as.data.frame(method_params)
+        }
         # check if method_params values are positive and numeric
         if (!is.matrix(method_params)) {
             mp <- as.matrix(method_params)
@@ -1193,6 +1197,7 @@ newRefuge <- function(params, new_refuge = FALSE,
                     }
                     # If it's not given, use the old one
                 } else {
+                    
                     new_prop_protect <- method_params$prop_protect
                 }
 
@@ -1228,6 +1233,9 @@ newRefuge <- function(params, new_refuge = FALSE,
                 }
             }
         } else {
+            if (is.list(new_method_params) && !is.data.frame(new_method_params)) {
+                new_method_params <- as.data.frame(new_method_params)
+            }
             new_mp <- new_method_params
         }
     }

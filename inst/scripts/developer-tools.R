@@ -26,3 +26,6 @@ pkgdown::build_site()
 # Installing for local testing
 devtools::install() # Install the package in your local R library
 remove.packages("mizerReef") # Unload the package if already loaded
+
+
+devtools::test()

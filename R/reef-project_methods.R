@@ -54,96 +54,123 @@ reefRates <- function(params, n, n_pp, n_other, t = 0, effort, rates_fns, ...) {
     # Pull time step size from parameters
     # Calculate the current time
 
-	## Degradation -----
-	# Implement degradation in projections
-	r$degrade <- reefDegrade(
-		params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+    ## Degradation -----
+    # Implement degradation in projections
+    r$degrade <- reefDegrade(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other, t = t, ...
+    )
 
-	## Vulnerability ----
-	# Calculate vulnerability of fish based on complexity
-	r$vulnerable <- reefVulnerable(
-		params, n = n, n_pp = n_pp, n_other = n_other, t = t,
-		new_rd = r$degrade, ...)
+    ## Vulnerability ----
+    # Calculate vulnerability of fish based on complexity
+    r$vulnerable <- reefVulnerable(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other, t = t,
+        new_rd = r$degrade, ...
+    )
 
-	## Growth ----
-	# Calculate rate E_{e,i}(w) of encountered food
-	r$encounter <- reefEncounter(
-		# rates_fns$Encounter(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		vulnerable = r$vulnerable, t = t, ...)
-	# Calculate feeding level f_i(w)
-	r$feeding_level <- reefFeedingLevel(
-		# rates_fns$FeedingLevel(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		encounter = r$encounter, t = t, ...)
-	# Calculate the energy available for reproduction and growth
-	r$e <- rates_fns$EReproAndGrowth(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		encounter = r$encounter, feeding_level = r$feeding_level, t = t, ...)
-	# Calculate the energy for reproduction
-	r$e_repro <- rates_fns$ERepro(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		e = r$e, t = t, ...)
-	# Calculate the growth rate g_i(w)
-	r$e_growth <- rates_fns$EGrowth(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		e_repro = r$e_repro, e = r$e, t = t, ...)
+    ## Growth ----
+    # Calculate rate E_{e,i}(w) of encountered food
+    r$encounter <- reefEncounter(
+        # rates_fns$Encounter(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        vulnerable = r$vulnerable, t = t, ...
+    )
+    # Calculate feeding level f_i(w)
+    r$feeding_level <- reefFeedingLevel(
+        # rates_fns$FeedingLevel(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        encounter = r$encounter, t = t, ...
+    )
+    # Calculate the energy available for reproduction and growth
+    r$e <- rates_fns$EReproAndGrowth(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        encounter = r$encounter, feeding_level = r$feeding_level, t = t, ...
+    )
+    # Calculate the energy for reproduction
+    r$e_repro <- rates_fns$ERepro(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        e = r$e, t = t, ...
+    )
+    # Calculate the growth rate g_i(w)
+    r$e_growth <- rates_fns$EGrowth(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        e_repro = r$e_repro, e = r$e, t = t, ...
+    )
 
-	## Mortality ----
-	# Calculate the predation rate
-	r$pred_rate <- rates_fns$PredRate(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		feeding_level = r$feeding_level, vulnerable = r$vulnerable,
-		t = t, ...)
-	# Calculate predation mortality on fish \mu_{p,i}(w)
-	r$pred_mort <- reefPredMort(
-		# rates_fns$PredMort(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		pred_rate = r$pred_rate, t = t, ...)
-	# Calculate fishing mortality
-	r$f_mort <- rates_fns$FMort(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		effort = effort, t = t,
-		e_growth = r$e_growth, pred_mort = r$pred_mort, ...)
-	# Calculate total mortality \mu_i(w)
-	r$mort <- reefMort(
-		# rates_fns$Mort(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		f_mort = r$f_mort, pred_mort = r$pred_mort, t = t, ...)
+    ## Mortality ----
+    # Calculate the predation rate
+    r$pred_rate <- rates_fns$PredRate(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        feeding_level = r$feeding_level, vulnerable = r$vulnerable,
+        t = t, ...
+    )
+    # Calculate predation mortality on fish \mu_{p,i}(w)
+    r$pred_mort <- reefPredMort(
+        # rates_fns$PredMort(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        pred_rate = r$pred_rate, t = t, ...
+    )
+    # Calculate fishing mortality
+    r$f_mort <- rates_fns$FMort(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        effort = effort, t = t,
+        e_growth = r$e_growth, pred_mort = r$pred_mort, ...
+    )
+    # Calculate total mortality \mu_i(w)
+    r$mort <- reefMort(
+        # rates_fns$Mort(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        f_mort = r$f_mort, pred_mort = r$pred_mort, t = t, ...
+    )
 
-	## Reproduction ----
-	# R_di
-	r$rdi <- rates_fns$RDI(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		e_growth = r$e_growth,
-		mort = r$mort,
-		e_repro = r$e_repro, t = t, ...)
-	# R_dd
-	r$rdd <- rates_fns$RDD(
-		rdi = r$rdi, species_params = params@species_params, ...)
+    ## Reproduction ----
+    # R_di
+    r$rdi <- rates_fns$RDI(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        e_growth = r$e_growth,
+        mort = r$mort,
+        e_repro = r$e_repro, t = t, ...
+    )
+    # R_dd
+    r$rdd <- rates_fns$RDD(
+        rdi = r$rdi, species_params = params@species_params, ...
+    )
 
-	## Resource ----
-	# Calculate mortality on the resource spectrum
-	r$resource_mort <- rates_fns$ResourceMort(
-		params, n = n, n_pp = n_pp, n_other = n_other,
-		pred_rate = r$pred_rate, t = t, ...)
+    ## Resource ----
+    # Calculate mortality on the resource spectrum
+    r$resource_mort <- rates_fns$ResourceMort(
+        params,
+        n = n, n_pp = n_pp, n_other = n_other,
+        pred_rate = r$pred_rate, t = t, ...
+    )
 
-	return(r)
+    return(r)
 }
 
 #' Scales the refuge density by a given value at set times
 #'
 #' Allows for the gradual degradation of habitat structure following an
 #' acute disturbance by decreasing the availability of refuge over time.
-#' 
+#'
 #' The degradation is controlled by a scaling matrix `deg_scale` where:
 #' \itemize{
 #'   \item Column 1 represents the bleaching year (initial impact)
 #'   \item Columns 2+ represent years 1, 2, 3... post-bleaching
 #' }
-#' 
-#' At each timestep, the scaling factors are multiplied by the previous 
-#' timestep's refuge density. Optional algae dynamics adjustments can be 
+#'
+#' At each timestep, the scaling factors are multiplied by the previous
+#' timestep's refuge density. Optional algae dynamics adjustments can be
 #' specified via [setDegradation()].
 #'
 #' @inheritParams reefRates
@@ -153,92 +180,95 @@ reefRates <- function(params, n, n_pp, n_other, t = 0, effort, rates_fns, ...) {
 #' @concept degradation
 #' @export
 #' @family mizer rate functions
-reefDegrade <- function(params, n, n_pp, n_other, t,...) {
+reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
+    method_params <- params@refuge_params$method_params
+    degrade <- params@refuge_params$degrade # true/false for whether to degrade
+    method <- params@refuge_params$method
 
-	method_params <- params@refuge_params$method_params
-	degrade <- params@refuge_params$degrade #true/false for whether to degrade
+    # Only competitive method has refuge_density and supports degradation
+    if (method != "competitive") {
+        return(NULL)
+    }
 
-	# Save original refuge density
-	rd <- method_params$refuge_density
+    # Always get the current refuge density
+    rd <- method_params$refuge_density
 
-	if (degrade == TRUE){
-		# If not competitive method, error
-		if (params@refuge_params$method != "competitive"){
-			stop("Degradation is only available for the competitive method.")
-		}
+    # Only apply degradation logic for competitive method and degrade == TRUE
+    if (degrade == TRUE) {
+        # Pull times (years) for bleaching & scaling parameters
+        t_bleach <- params@refuge_params$t_bleach # year for bleaching to occur
+        deg_scale <- params@refuge_params$deg_scale # matrix of refuge scaling parameters
 
-		# Pull times (years) for bleaching & scaling parameters
-		t_bleach    <- params@refuge_params$t_bleach         # year for bleaching to occur
-		deg_scale   <- params@refuge_params$deg_scale   # matrix of refuge scaling parameters
+        # If before bleaching, return old method parameters
+        time <- t
+        if (time < t_bleach) {
+            return(rd)
+        }
 
-		# If before bleaching, return old method parameters
-		time <- t
-		if(time < t_bleach) {return(rd)}
+        old_rd <- reefDegrade(params, n, n_pp, n_other, t = t - 1)
+        # Bleaching time - at bleach year
+        if (time == t_bleach) {
+            # Pull initial bleaching impact from first column of deg_scale
+            scale_bin <- deg_scale[, 1]
+            new_rd <- scale_bin * old_rd
 
-		old_rd <- reefDegrade(params, n, n_pp, n_other, t = t-1)
-		# Bleaching time - at bleach year
-		if(time == t_bleach) {
-			# Pull initial bleaching impact from first column of deg_scale
-			scale_bin <- deg_scale[, 1]
-			new_rd <- scale_bin * old_rd
+            # Apply algae dynamics if specified
+            if (isTRUE(params@algae_params$algae_boost)) {
+                growth_boosts <- params@algae_params$algae_growth_boost
+                capacity_boosts <- params@algae_params$algae_capacity_boost
 
-			# Apply algae dynamics if specified
-			if (isTRUE(params@algae_params$algae_boost)) {
-				growth_boosts   <- params@algae_params$algae_growth_boost
-				capacity_boosts <- params@algae_params$algae_capacity_boost
+                # Apply first element of boost vectors (bleaching year = index 1)
+                if (length(growth_boosts) >= 1 && !is.null(params@algae_params$algae_growth)) {
+                    a_growth <- params@algae_params$algae_growth
+                    params@algae_params$algae_growth <- growth_boosts[1] * a_growth
+                }
+                if (length(capacity_boosts) >= 1 && !is.null(params@algae_params$algae_capacity)) {
+                    a_capacity <- params@algae_params$algae_capacity
+                    params@algae_params$algae_capacity <- capacity_boosts[1] * a_capacity
+                }
+            }
 
-				# Apply first element of boost vectors (bleaching year = index 1)
-				if (length(growth_boosts) >= 1 && !is.null(params@algae_params$algae_growth)) {
-					a_growth <- params@algae_params$algae_growth
-					params@algae_params$algae_growth <- growth_boosts[1] * a_growth
-				}
-				if (length(capacity_boosts) >= 1 && !is.null(params@algae_params$algae_capacity)) {
-					a_capacity <- params@algae_params$algae_capacity
-					params@algae_params$algae_capacity <- capacity_boosts[1] * a_capacity
-				}
-			}
+            params@time_modified <- lubridate::now()
+            return(new_rd)
+        }
 
-			params@time_modified <- lubridate::now()
-			return(new_rd)
-		}
+        if (time > t_bleach) {
+            # Calculate number of years post bleaching
+            years_post <- time - t_bleach
 
-		if(time > t_bleach){
-			# Calculate number of years post bleaching
-			years_post <- time - t_bleach
+            # Check if we have a deg_scale column for this post-bleaching year
+            # Column 1 is bleaching year, so years_post maps to column years_post + 1
+            deg_duration <- ncol(deg_scale)
+            if ((years_post + 1) <= deg_duration) {
+                # Get refuge density scaling from deg_scale
+                scale_bin <- deg_scale[, years_post + 1]
+                # multiply bins by scaling values
+                new_rd <- scale_bin * old_rd
 
-			# Check if we have a deg_scale column for this post-bleaching year
-			# Column 1 is bleaching year, so years_post maps to column years_post + 1
-			deg_duration <- ncol(deg_scale)
-			if ((years_post + 1) <= deg_duration) {
-				# Get refuge density scaling from deg_scale
-				scale_bin <- deg_scale[, years_post + 1]
-				# multiply bins by scaling values
-				new_rd <- scale_bin * old_rd
+                # Apply continued algae boost if within boost vector length
+                if (isTRUE(params@algae_params$algae_boost)) {
+                    growth_boosts <- params@algae_params$algae_growth_boost
+                    capacity_boosts <- params@algae_params$algae_capacity_boost
 
-				# Apply continued algae boost if within boost vector length
-				if (isTRUE(params@algae_params$algae_boost)) {
-					growth_boosts <- params@algae_params$algae_growth_boost
-					capacity_boosts <- params@algae_params$algae_capacity_boost
+                    # years_post = 1,2,3... maps to indices 2,3,4... in the boost vectors
+                    boost_idx <- years_post + 1
 
-					# years_post = 1,2,3... maps to indices 2,3,4... in the boost vectors
-					boost_idx <- years_post + 1
-
-					if (boost_idx <= length(growth_boosts) && !is.null(params@algae_params$algae_growth)) {
-						a_growth <- params@algae_params$algae_growth
-						params@algae_params$algae_growth <- growth_boosts[boost_idx] * a_growth
-					}
-					if (boost_idx <= length(capacity_boosts) && !is.null(params@algae_params$algae_capacity)) {
-						a_capacity <- params@algae_params$algae_capacity
-						params@algae_params$algae_capacity <- capacity_boosts[boost_idx] * a_capacity
-					}
-				}
-				return(new_rd)
-			}
-			return(old_rd)
-		}
-	} else {
-		return(rd)
-	}
+                    if (boost_idx <= length(growth_boosts) && !is.null(params@algae_params$algae_growth)) {
+                        a_growth <- params@algae_params$algae_growth
+                        params@algae_params$algae_growth <- growth_boosts[boost_idx] * a_growth
+                    }
+                    if (boost_idx <= length(capacity_boosts) && !is.null(params@algae_params$algae_capacity)) {
+                        a_capacity <- params@algae_params$algae_capacity
+                        params@algae_params$algae_capacity <- capacity_boosts[boost_idx] * a_capacity
+                    }
+                }
+                return(new_rd)
+            }
+            return(old_rd)
+        }
+    }
+    # For competitive method with degrade == FALSE, just return the current refuge density
+    return(rd)
 }
 
 #' Find the proportion of fish vulnerable to being encountered by predators
@@ -259,101 +289,102 @@ reefDegrade <- function(params, n, n_pp, n_other, t,...) {
 #' @family mizer rate functions
 #'
 reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
-
-	# Extract relevant data from params
-	method_params <- params@refuge_params$method_params
-	degrade <- params@refuge_params$degrade
+    # Extract relevant data from params
+    method_params <- params@refuge_params$method_params
+    degrade <- params@refuge_params$degrade
 
     # If degradation is being implemented, calculate new refuge density
-	if(degrade == TRUE) {
+    if (degrade == TRUE) {
         if (is.null(new_rd)) {
-		new_rd <- reefDegrade(params,  n, n_pp, n_other, t, ...)
+            new_rd <- reefDegrade(params, n, n_pp, n_other, t, ...)
         }
     } else {
         new_rd <- method_params$refuge_density
     }
 
-	# Set parameters used with all methods
-	max_protect <- params@refuge_params$max_protect
-	tau         <- params@refuge_params$tau
+    # Set parameters used with all methods
+    max_protect <- params@refuge_params$max_protect
+    tau <- params@refuge_params$tau
 
-	# Pull no of species and size bins
-	no_w <- length(params@w)
-	no_sp <- dim(params@interaction)[1]
+    # Pull no of species and size bins
+    no_w <- length(params@w)
+    no_sp <- dim(params@interaction)[1]
 
-	# Store which functional groups use refuge
-	refuge_user <- params@species_params$refuge_user
+    # Store which functional groups use refuge
+    refuge_user <- params@species_params$refuge_user
 
-	# Static methods -----------------------------------------------------------
-	static = c("sigmoidal", "binned", "noncomplex")
+    # Static methods -----------------------------------------------------------
+    static <- c("sigmoidal", "binned", "noncomplex")
 
-	if (params@refuge_params$method %in% static){
-		refuge <- params@refuge_params$refuge
-		vulnerable <- 1 - refuge
+    if (params@refuge_params$method %in% static) {
+        refuge <- params@refuge_params$refuge
+        vulnerable <- 1 - refuge
 
-	# Competitive method -------------------------------------------------------
-	} else if (params@refuge_params$method == "competitive") {
-		# Determine bin.id structure
-		bin_id_list <- params@refuge_params$bin.id
-		# Check if bin.id uses character keys (species-specific bins)
-		bin_names <- names(bin_id_list)
-		use_dummy_fish_bins <- !is.null(bin_names) && !any(grepl("sp", bin_names))
+        # Competitive method -------------------------------------------------------
+    } else if (params@refuge_params$method == "competitive") {
+        # Determine bin.id structure
+        bin_id_list <- params@refuge_params$bin.id
+        # Check if bin.id uses character keys (species-specific bins)
+        bin_names <- names(bin_id_list)
+        use_dummy_fish_bins <- !is.null(bin_names) && !any(grepl("sp", bin_names))
 
-		# Initialize storage for the array of refuge proportions
-		refuge <- matrix(0, nrow = no_sp, ncol = no_w)
-		rownames(refuge) <- rownames(params@initial_n)
-		colnames(refuge) <- colnames(params@initial_n)
+        # Initialize storage for the array of refuge proportions
+        refuge <- matrix(0, nrow = no_sp, ncol = no_w)
+        rownames(refuge) <- rownames(params@initial_n)
+        colnames(refuge) <- colnames(params@initial_n)
 
-		if (!use_dummy_fish_bins) {
-			# Handle species-specific bins
-			competitor_density <- numeric(length(bin_id_list))
-			bin_keys <- bin_names
-			for (idx in seq_along(bin_keys)) {
-				key <- bin_keys[idx]
-				# Parse species and bin from key
-				sp_match <- regmatches(key, regexec("sp([0-9]+)_bin([0-9]+)", key))[[1]]
-				if (length(sp_match) == 3) {
-					i <- as.integer(sp_match[2])
-					k <- as.integer(sp_match[3])
-					bin.id <- bin_id_list[[key]]
-					# Create logical vector and use to get abundances in size bin
-					bin_fish <- 1:no_w %in% bin.id
-					bin_fish <- sweep(n, 2, bin_fish, "*")
-					# Calculate number of competitors from all refuge users in bin k
-					refuge_user_idx <- which(params@species_params$refuge_user == TRUE)
-					competitors <- bin_fish[refuge_user_idx, , drop = FALSE] %*% params@dw
-					competitor_density[idx] <- sum(competitors)
-					# Set vulnerability for fish in size bin for this species
-					refuge[i, bin.id] <- ifelse(competitor_density[idx] == 0,
-						max_protect,
-						tau * new_rd[k]/competitor_density[idx])
-				}
-			}
-		} else if (use_dummy_fish_bins) {
-			# Handle non-species-specific bins
-			competitor_density <- numeric(length(new_rd))
-			for (k in seq_len(nrow(new_rd))) {
-				bin.id <- bin_id_list[[k]]
-				bin_fish <- 1:no_w %in% bin.id
-				bin_fish <- sweep(n, 2, bin_fish, "*")
-				competitors <- bin_fish %*% params@dw
-				# Remove species that don't use refuge
-				sp <- params@species_params$species
-				sp <- sp[params@species_params$refuge_user == TRUE]
-				competitors <- competitors[sp,]
-				competitor_density[k] <- sum(competitors)
-				refuge[, bin.id] <- ifelse(competitor_density[k] == 0,
-					max_protect,
-					tau * new_rd[k]/competitor_density[k])
-			}
-		}
-		# Make sure none of the values are higher than max_protect
-		refuge[refuge > max_protect] <- max_protect
-		# Account for vulnerability of species that don't utilize refuge
-		vulnerable <- 1 - (refuge_user * refuge)
-	}
+        if (!use_dummy_fish_bins) {
+            # Handle species-specific bins
+            competitor_density <- numeric(length(bin_id_list))
+            bin_keys <- bin_names
+            for (idx in seq_along(bin_keys)) {
+                key <- bin_keys[idx]
+                # Parse species and bin from key
+                sp_match <- regmatches(key, regexec("sp([0-9]+)_bin([0-9]+)", key))[[1]]
+                if (length(sp_match) == 3) {
+                    i <- as.integer(sp_match[2])
+                    k <- as.integer(sp_match[3])
+                    bin.id <- bin_id_list[[key]]
+                    # Create logical vector and use to get abundances in size bin
+                    bin_fish <- 1:no_w %in% bin.id
+                    bin_fish <- sweep(n, 2, bin_fish, "*")
+                    # Calculate number of competitors from all refuge users in bin k
+                    refuge_user_idx <- which(params@species_params$refuge_user == TRUE)
+                    competitors <- bin_fish[refuge_user_idx, , drop = FALSE] %*% params@dw
+                    competitor_density[idx] <- sum(competitors)
+                    # Set vulnerability for fish in size bin for this species
+                    refuge[i, bin.id] <- ifelse(competitor_density[idx] == 0,
+                        max_protect,
+                        tau * new_rd[k] / competitor_density[idx]
+                    )
+                }
+            }
+        } else if (use_dummy_fish_bins) {
+            # Handle non-species-specific bins
+            competitor_density <- numeric(length(new_rd))
+            for (k in seq_len(nrow(new_rd))) {
+                bin.id <- bin_id_list[[k]]
+                bin_fish <- 1:no_w %in% bin.id
+                bin_fish <- sweep(n, 2, bin_fish, "*")
+                competitors <- bin_fish %*% params@dw
+                # Remove species that don't use refuge
+                sp <- params@species_params$species
+                sp <- sp[params@species_params$refuge_user == TRUE]
+                competitors <- competitors[sp, ]
+                competitor_density[k] <- sum(competitors)
+                refuge[, bin.id] <- ifelse(competitor_density[k] == 0,
+                    max_protect,
+                    tau * new_rd[k] / competitor_density[k]
+                )
+            }
+        }
+        # Make sure none of the values are higher than max_protect
+        refuge[refuge > max_protect] <- max_protect
+        # Account for vulnerability of species that don't utilize refuge
+        vulnerable <- 1 - (refuge_user * refuge)
+    }
 
-	return(vulnerable)
+    return(vulnerable)
 }
 
 #' Get encounter rate needed to project a mizerReef model
@@ -422,143 +453,158 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
 #' @concept refugeRates
 #' @family mizer rate functions
 reefEncounter <- function(params, n, n_pp, n_other, t,
-				vulnerable = NULL, ...) {
+                          vulnerable = NULL, ...) {
+    # Lazily compute default vulnerability to avoid '...' in default args
+    if (is.null(vulnerable)) {
+        vulnerable <- reefVulnerable(
+            params, n, n_pp, n_other, t,
+            new_rd = reefDegrade(params, n, n_pp, n_other, t, ...)
+        )
+    }
 
-	# Lazily compute default vulnerability to avoid '...' in default args
-	if (is.null(vulnerable)) {
-		vulnerable <- reefVulnerable(
-			params, n, n_pp, n_other, t,
-			new_rd = reefDegrade(params, n, n_pp, n_other, t, ...)
-		)
-	}
+    # Pull values from params
+    no_sp <- dim(params@interaction)[1]
+    no_w <- length(params@w)
+    no_w_full <- length(params@w_full)
 
-	# Pull values from params
-	no_sp <- dim(params@interaction)[1]
-	no_w <- length(params@w)
-	no_w_full <- length(params@w_full)
+    # idx_sp are the index values of params@w_full such that
+    # params@w_full[idx_sp] = params@w
+    idx_sp <- (no_w_full - no_w + 1):no_w_full
 
-	# idx_sp are the index values of params@w_full such that
-	# params@w_full[idx_sp] = params@w
-	idx_sp <- (no_w_full - no_w + 1):no_w_full
+    # Initialize encounter matrix
+    enc <- matrix(0, no_sp, no_w)
 
-	# Initialize encounter matrix
-	enc <- matrix(0, no_sp, no_w)
+    # Find indices of predator species impacted by refuge
+    blocked_pred <- which(params@species_params$blocked_pred == TRUE)
+    good_pred <- which(params@species_params$blocked_pred == FALSE)
 
-	# Find indices of predator species impacted by refuge
-	blocked_pred  <- which(params@species_params$blocked_pred == TRUE)
-	good_pred <- which(params@species_params$blocked_pred == FALSE)
+    # Calculate n_vulnerable, number at each size vulnerable to being
+    # encountered
+    n_vul <- vulnerable * n
 
-	# Calculate n_vulnerable, number at each size vulnerable to being
-	# encountered
-	n_vul <- vulnerable * n
+    # If the the user has set a custom pred_kernel we can not use fft.
+    # In this case we use the code from mizer version 0.3
+    if (!is.null(comment(params@pred_kernel))) {
+        # n_eff_prey is the total prey abundance by size exposed to each
+        # predator (prey not broken into species - here we are just working out
+        # how much a predator eats - not which species are being eaten - that is
+        # in the mortality calculation
+        # \sum_j \theta_{ij} N_j(w_p) w_p dw_p
 
-	# If the the user has set a custom pred_kernel we can not use fft.
-	# In this case we use the code from mizer version 0.3
-	if (!is.null(comment(params@pred_kernel))) {
-		# n_eff_prey is the total prey abundance by size exposed to each
-		# predator (prey not broken into species - here we are just working out
-		# how much a predator eats - not which species are being eaten - that is
-		# in the mortality calculation
-		# \sum_j \theta_{ij} N_j(w_p) w_p dw_p
+        # First deal with encounter rate for predators unaffected by refuge
+        n_eff_prey <- sweep(params@interaction %*% n, 2,
+            params@w * params@dw, "*",
+            check.margin = FALSE
+        )
+        # pred_kernel is predator species x predator size x prey size
+        # So multiply 3rd dimension of pred_kernel by the prey biomass density
+        # Then sum over 3rd dimension to get consumption rate of each predator
+        # by predator size
+        # This line is a bottle neck
+        phi_prey_species <- rowSums(sweep(
+            params@pred_kernel[, , idx_sp, drop = FALSE],
+            c(1, 3), n_eff_prey, "*",
+            check.margin = FALSE
+        ), dims = 2)
+        # Eating the background
+        # This line is a bottle neck
+        phi_prey_background <- params@species_params$interaction_resource *
+            rowSums(sweep(
+                params@pred_kernel, 3, params@dw_full * params@w_full * n_pp,
+                "*",
+                check.margin = FALSE
+            ), dims = 2)
 
-		# First deal with encounter rate for predators unaffected by refuge
-		n_eff_prey <- sweep(params@interaction %*% n, 2,
-							params@w * params@dw, "*", check.margin = FALSE)
-		# pred_kernel is predator species x predator size x prey size
-		# So multiply 3rd dimension of pred_kernel by the prey biomass density
-		# Then sum over 3rd dimension to get consumption rate of each predator
-		# by predator size
-		# This line is a bottle neck
-		phi_prey_species <- rowSums(sweep(
-			params@pred_kernel[, , idx_sp, drop = FALSE],
-			c(1, 3), n_eff_prey, "*", check.margin = FALSE), dims = 2)
-		# Eating the background
-		# This line is a bottle neck
-		phi_prey_background <- params@species_params$interaction_resource *
-			rowSums(sweep(
-				params@pred_kernel, 3, params@dw_full * params@w_full * n_pp,
-				"*", check.margin = FALSE), dims = 2)
+        good_encounter <- params@search_vol * (phi_prey_species +
+            phi_prey_background)
+        enc[good_pred, ] <- good_encounter[good_pred, ]
 
-		good_encounter <- params@search_vol * (phi_prey_species +
-												   phi_prey_background)
-		enc[good_pred,] <- good_encounter[good_pred,]
+        # Now deal with predators who are affected by refuge
+        v_n_eff_prey <- sweep(params@interaction %*% n_vul, 2,
+            params@w * params@dw, "*",
+            check.margin = FALSE
+        )
 
-		# Now deal with predators who are affected by refuge
-		v_n_eff_prey <- sweep(params@interaction %*% n_vul, 2,
-							  params@w * params@dw, "*", check.margin = FALSE)
+        v_phi_prey_species <- rowSums(sweep(
+            params@pred_kernel[, , idx_sp, drop = FALSE],
+            c(1, 3), v_n_eff_prey, "*",
+            check.margin = FALSE
+        ), dims = 2)
 
-		v_phi_prey_species <- rowSums(sweep(
-			params@pred_kernel[, , idx_sp, drop = FALSE],
-			c(1, 3), v_n_eff_prey, "*", check.margin = FALSE), dims = 2)
+        bad_encounter <- params@search_vol * (v_phi_prey_species +
+            phi_prey_background)
 
-		bad_encounter <- params@search_vol * (v_phi_prey_species +
-												  phi_prey_background)
+        enc[blocked_pred, ] <- bad_encounter[blocked_pred, ]
 
-		enc[blocked_pred,] <- bad_encounter[blocked_pred,]
+        encounter <- enc
+    } else {
+        # First deal with predators that are not affected by refuge
+        prey <- outer(params@species_params$interaction_resource, n_pp)
+        prey[, idx_sp] <- prey[, idx_sp] + params@interaction %*% n
+        # The vector prey equals everything inside integral (3.4)
+        # except the feeding kernel phi_i(w_p/w).
+        prey <- sweep(prey, 2, params@w_full * params@dw_full, "*")
+        # Eq (3.4) is then a convolution integral in terms of prey[w_p]
+        # and phi[w_p/w]. We approximate the integral by the trapezoidal
+        # method. Using the convolution theorem we can evaluate the resulting
+        # sum via fast fourier transform.
+        # mvfft() does a Fourier transform of each column of its argument, but
+        # we need the Fourier transforms of each row, so we need to apply
+        # mvfft() to the transposed matrices and then transpose again at
+        # the end.
+        avail_energy <- Re(base::t(mvfft(
+            base::t(params@ft_pred_kernel_e) *
+                mvfft(base::t(prey)),
+            inverse = TRUE
+        ))) / length(params@w_full)
+        # Only keep the bit for fish sizes
+        avail_energy <- avail_energy[, idx_sp, drop = FALSE]
+        # Due to numerical errors we might get negative or very small entries
+        # that should be 0
+        avail_energy[avail_energy < 1e-18] <- 0
 
-		encounter <- enc
+        good_enc <- params@search_vol * avail_energy
+        enc[good_pred, ] <- good_enc[good_pred, ]
 
-	} else {
+        # Now deal with predators who are affected by refuge
+        v_prey <- outer(params@species_params$interaction_resource, n_pp)
+        v_prey[, idx_sp] <- v_prey[, idx_sp] + params@interaction %*% n_vul
+        # The vector prey equals everything inside integral (3.4)
+        # except the feeding kernel phi_i(w_p/w).
+        v_prey <- sweep(v_prey, 2, params@w_full * params@dw_full, "*")
 
-		# First deal with predators that are not affected by refuge
-		prey <- outer(params@species_params$interaction_resource, n_pp)
-		prey[, idx_sp] <- prey[, idx_sp] + params@interaction %*% n
-		# The vector prey equals everything inside integral (3.4)
-		# except the feeding kernel phi_i(w_p/w).
-		prey <- sweep(prey, 2, params@w_full * params@dw_full, "*")
-		# Eq (3.4) is then a convolution integral in terms of prey[w_p]
-		# and phi[w_p/w]. We approximate the integral by the trapezoidal
-		# method. Using the convolution theorem we can evaluate the resulting
-		# sum via fast fourier transform.
-		# mvfft() does a Fourier transform of each column of its argument, but
-		# we need the Fourier transforms of each row, so we need to apply
-		# mvfft() to the transposed matrices and then transpose again at
-		# the end.
-		avail_energy <- Re(base::t(mvfft(base::t(params@ft_pred_kernel_e) *
-											 mvfft(base::t(prey)),
-									inverse = TRUE))) / length(params@w_full)
-		# Only keep the bit for fish sizes
-		avail_energy <- avail_energy[, idx_sp, drop = FALSE]
-		# Due to numerical errors we might get negative or very small entries
-		# that should be 0
-		avail_energy[avail_energy < 1e-18] <- 0
+        v_avail_energy <- Re(base::t(mvfft(
+            base::t(params@ft_pred_kernel_e) *
+                mvfft(base::t(v_prey)),
+            inverse = TRUE
+        ))) / length(params@w_full)
 
-		good_enc <- params@search_vol * avail_energy
-		enc[good_pred,] <- good_enc[good_pred,]
+        # Only keep the bit for fish sizes
+        v_avail_energy <- v_avail_energy[, idx_sp, drop = FALSE]
+        # Due to numerical errors we might get negative or very small entries
+        # that should be 0
+        v_avail_energy[v_avail_energy < 1e-18] <- 0
 
-		# Now deal with predators who are affected by refuge
-		v_prey <- outer(params@species_params$interaction_resource, n_pp)
-		v_prey[, idx_sp] <- v_prey[, idx_sp] + params@interaction %*% n_vul
-		# The vector prey equals everything inside integral (3.4)
-		# except the feeding kernel phi_i(w_p/w).
-		v_prey <- sweep(v_prey, 2, params@w_full * params@dw_full, "*")
+        bad_enc <- params@search_vol * v_avail_energy
+        enc[blocked_pred, ] <- bad_enc[blocked_pred, ]
 
-		v_avail_energy <- Re(base::t(mvfft(base::t(params@ft_pred_kernel_e) *
-											   mvfft(base::t(v_prey)),
-										   inverse = TRUE)))/length(params@w_full)
+        encounter <- enc
+    }
 
-		# Only keep the bit for fish sizes
-		v_avail_energy <- v_avail_energy[, idx_sp, drop = FALSE]
-		# Due to numerical errors we might get negative or very small entries
-		# that should be 0
-		v_avail_energy[v_avail_energy < 1e-18] <- 0
+    # Add contributions from other components
+    for (i in seq_along(params@other_encounter)) {
+        encounter <- encounter +
+            do.call(
+                params@other_encounter[[i]],
+                list(
+                    params = params,
+                    n = n, n_pp = n_pp, n_other = n_other,
+                    component = names(params@other_encounter)[[i]], ...
+                )
+            )
+    }
 
-		bad_enc <- params@search_vol * v_avail_energy
-		enc[blocked_pred,] <- bad_enc[blocked_pred,]
-
-		encounter <- enc
-	}
-
-	# Add contributions from other components
-	for (i in seq_along(params@other_encounter)) {
-		encounter <- encounter +
-			do.call(params@other_encounter[[i]],
-					list(params = params,
-						 n = n, n_pp = n_pp, n_other = n_other,
-						 component = names(params@other_encounter)[[i]], ...))
-	}
-
-	return(encounter)
+    return(encounter)
 }
 
 #' Reef feeding level
@@ -576,17 +622,16 @@ reefEncounter <- function(params, n, n_pp, n_other, t,
 #' @family mizer rate functions
 #' @concept extmort
 #' @export
-reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,...) {
+reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter, ...) {
+    # Set predator max intake to Inf
+    params@intake_max[params@species_params$satiation == FALSE] <- Inf
 
-	# Set predator max intake to Inf
-	params@intake_max[params@species_params$satiation == FALSE] <- Inf
+    # Find mizer feeding level and set to 0 for any NAs (if use wants to set h)
+    fl <- mizerFeedingLevel(params, n, n_pp, n_other, t, encounter, ...)
 
-	# Find mizer feeding level and set to 0 for any NAs (if use wants to set h)
-	fl <- mizerFeedingLevel(params, n, n_pp, n_other, t, encounter, ...)
+    fl[is.na(fl)] <- 0
 
-	fl[is.na(fl)] <- 0
-
-	return(fl)
+    return(fl)
 }
 
 #' Get total predation mortality rate needed to project mizer reef model
@@ -612,61 +657,61 @@ reefFeedingLevel <- function(params, n, n_pp, n_other, t, encounter,...) {
 #' @concept refugeRates
 #' @export
 reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
-			vulnerable = NULL, ...) {
+                         vulnerable = NULL, ...) {
+    # Lazily compute default vulnerability
+    if (is.null(vulnerable)) {
+        vulnerable <- reefVulnerable(
+            params, n, n_pp, n_other, t,
+            new_rd = reefDegrade(params, n, n_pp, n_other, t, ...)
+        )
+    }
 
-	# Lazily compute default vulnerability
-	if (is.null(vulnerable)) {
-		vulnerable <- reefVulnerable(
-			params, n, n_pp, n_other, t,
-			new_rd = reefDegrade(params, n, n_pp, n_other, t, ...)
-		)
-	}
+    # Number of species, number of bins in resource spectrum and full
+    # size spectrum
+    no_sp <- nrow(params@species_params)
 
-	# Number of species, number of bins in resource spectrum and full
-	# size spectrum
-	no_sp <- nrow(params@species_params)
+    # Get index of species that have grown out of the resource spectrum
+    idx_sp <- (length(params@w_full) -
+        length(params@w) + 1):length(params@w_full)
+    pr <- pred_rate[, idx_sp, drop = FALSE]
+    int <- params@interaction
 
-	# Get index of species that have grown out of the resource spectrum
-	idx_sp <- (length(params@w_full) -
-				   length(params@w) + 1):length(params@w_full)
-	pr  <- pred_rate[,idx_sp, drop = FALSE]
-	int <- params@interaction
+    # Find indices of predator species whose foraging is hindered by refuge
+    blocked_pred <- which(params@species_params$blocked_pred == TRUE)
+    good_pred <- which(params@species_params$blocked_pred == FALSE)
 
-	# Find indices of predator species whose foraging is hindered by refuge
-	blocked_pred  <- which(params@species_params$blocked_pred == TRUE)
-	good_pred <- which(params@species_params$blocked_pred == FALSE)
+    # Create list of vulnerabilities for each predator
+    vul <- vector("list", no_sp)
+    vul[blocked_pred] <- list(vulnerable)
+    vul[good_pred] <- list(matrix(1, nrow = no_sp, ncol = ncol(vulnerable)))
 
-	# Create list of vulnerabilities for each predator
-	vul <- vector("list", no_sp)
-	vul[blocked_pred] <- list(vulnerable)
-	vul[good_pred] <- list(matrix(1, nrow = no_sp, ncol = ncol(vulnerable)))
+    # Loop through predator species to calculate predation mortality on
+    # each prey species & size by all predators
+    pm <- matrix(0, no_sp, length(params@w))
+    dimnames(pm) <- dimnames(vulnerable)
 
-	# Loop through predator species to calculate predation mortality on
-	# each prey species & size by all predators
-	pm <- matrix(0, no_sp, length(params@w))
-	dimnames(pm) <- dimnames(vulnerable)
+    for (i in 1:no_sp) {
+        # Vulnerability rate of all prey, including resource
+        # (species by size) to predator i
+        v <- vul[[i]]
+        # Predation rate of predator species i on all prey species (by size)
+        pr_i <- pr[i, ]
+        # Predation rate of predator species i (prey species x prey size)
+        pr_i <- matrix(rep(pr_i, each = nrow(v)),
+            nrow = nrow(v), ncol = ncol(v)
+        )
+        # Interaction of predator species i with all prey
+        int_i <- int[i, ]
+        # Predation rate predator species i * interaction of predator species i
+        pr_int <- pr_i * int_i
+        # vul*pr_i predation mortality on prey (species by size) by
+        # predator i, adding to pm to sum over all predators
+        pm <- pm + v * pr_int
+    }
 
-	for (i in 1:no_sp){
-		# Vulnerability rate of all prey, including resource
-		# (species by size) to predator i
-		v <- vul[[i]]
-		# Predation rate of predator species i on all prey species (by size)
-		pr_i <- pr[i,]
-		# Predation rate of predator species i (prey species x prey size)
-		pr_i <- matrix(rep(pr_i, each = nrow(v)),
-						 nrow = nrow(v), ncol = ncol(v))
-		# Interaction of predator species i with all prey
-		int_i <- int[i,]
-		# Predation rate predator species i * interaction of predator species i
-		pr_int <- pr_i * int_i
-		# vul*pr_i predation mortality on prey (species by size) by
-		# predator i, adding to pm to sum over all predators
-		pm <- pm + v*pr_int
-	}
+    pred_mort <- pm
 
-	pred_mort <- pm
-
-	return(pred_mort)
+    return(pred_mort)
 }
 
 
@@ -696,36 +741,35 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 #'          mortality rates.
 #' @concept extmort
 #' @export
-reefSenMort <- function(params,...) {
+reefSenMort <- function(params, ...) {
+    # Pull number of species and weight classes from params
+    no_sp <- dim(params@interaction)[1]
+    no_w <- length(params@w)
 
-	# Pull number of species and weight classes from params
-	no_sp <- dim(params@interaction)[1]
-	no_w <- length(params@w)
+    # Get user set senescence mortality parameters
+    mort_params <- params@other_params[["ext_mort_params"]]
+    sen_prop <- mort_params$sen_prop
+    sen_curve <- mort_params$sen_curve
 
-	# Get user set senescence mortality parameters
-	mort_params <- params@other_params[['ext_mort_params']]
-	sen_prop    <- mort_params$sen_prop
-	sen_curve   <- mort_params$sen_curve
+    # Initialize storage for each mortality rates
+    sen_mort <- matrix(0, nrow = no_sp, ncol = no_w)
 
-	# Initialize storage for each mortality rates
-	sen_mort <- matrix(0, nrow = no_sp, ncol = no_w)
+    # # Convert length to weight to get senesence weight for each species
+    # sen_weight <- params@species_params[["a"]] *
+    #     sen_length ^ params@species_params[["b"]]
 
-	# # Convert length to weight to get senesence weight for each species
-	# sen_weight <- params@species_params[["a"]] *
-	#     sen_length ^ params@species_params[["b"]]
+    # Or could use max size?
+    sen_weight <- params@species_params[["w_max"]]
+    log_sw <- log10(sen_weight)
+    log_w <- log10(params@w)
 
-	# Or could use max size?
-	sen_weight <- params@species_params[['w_max']]
-	log_sw <- log10(sen_weight)
-	log_w  <- log10(params@w)
-
-	# Loop through species
-	for (i in seq_along(sen_weight)){
-		sen <- sen_prop * ( log_w / log_sw[i] )
-		sen[sen < 0] <- 0
-		sen_mort[i,] <- sen ^ sen_curve
-	}
-	return(sen_mort)
+    # Loop through species
+    for (i in seq_along(sen_weight)) {
+        sen <- sen_prop * (log_w / log_sw[i])
+        sen[sen < 0] <- 0
+        sen_mort[i, ] <- sen^sen_curve
+    }
+    return(sen_mort)
 }
 
 #' Total mortality rate in the reef ecosystem model
@@ -753,13 +797,12 @@ reefSenMort <- function(params,...) {
 #' @concept extmort
 #' @export
 reefMort <- function(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) {
+    include_sen_mort <- params@other_params$include_sen_mort
 
-	include_sen_mort <- params@other_params$include_sen_mort
-
-	if(include_sen_mort == TRUE){
-	mizerMort(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) +
-		reefSenMort(params, ...)
-	} else {
-		mizerMort(params, n, n_pp, n_other, t, f_mort, pred_mort, ...)
-	}
+    if (include_sen_mort == TRUE) {
+        mizerMort(params, n, n_pp, n_other, t, f_mort, pred_mort, ...) +
+            reefSenMort(params, ...)
+    } else {
+        mizerMort(params, n, n_pp, n_other, t, f_mort, pred_mort, ...)
+    }
 }

@@ -1,0 +1,75 @@
+/* mizerReef vignette custom styles */
+
+/* Tip box */
+.tip, .callout-tip {
+  border-left: 4px solid #2b8cbe;
+  background: #e6f2fa;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 4px;
+}
+.tip:before, .callout-tip:before {
+  content: "Tip";
+  font-weight: bold;
+  color: #2b8cbe;
+  margin-right: 0.5em;
+}
+
+/* Warning box */
+.warning, .callout-warning {
+  border-left: 4px solid #e6550d;
+  background: #fff3e6;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 4px;
+}
+.warning:before, .callout-warning:before {
+  content: "Warning";
+  font-weight: bold;
+  color: #e6550d;
+  margin-right: 0.5em;
+}
+
+/* Note box */
+.note, .callout-note {
+  border-left: 4px solid #31a354;
+  background: #eafbe7;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 4px;
+}
+.note:before, .callout-note:before {
+  content: "Note";
+  font-weight: bold;
+  color: #31a354;
+  margin-right: 0.5em;
+}
+
+/* Skip box (for steps to skip) */
+.skip, .callout-skip {
+  border-left: 4px solid #bdbdbd;
+  background: #f7f7f7;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 4px;
+  font-style: italic;
+  color: #636363;
+}
+.skip:before, .callout-skip:before {
+  content: "Skip";
+  font-weight: bold;
+  color: #636363;
+  margin-right: 0.5em;
+}
+
+/* General callout block for custom types */
+[class^="callout-"] {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+/* Code chunk styling for clarity */
+pre code {
+  background: #f8f8f8;
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+}

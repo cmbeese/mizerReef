@@ -1,4 +1,13 @@
-test_that("reefDegrade runs without error", {
-    params <- newReefParams()
-    expect_s4_class(reefDegrade(params, n = NULL, n_pp = NULL, n_other = NULL, t = 1), "MizerReefParams")
+test_that("reefDegrade returns NULL when degrade is FALSE", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+
+    result <- reefDegrade(
+        params,
+        n = params@initial_n,
+        n_pp = params@initial_n_pp,
+        n_other = params@initial_n_other,
+        t = 1
+    )
+    expect_null(result)
 })

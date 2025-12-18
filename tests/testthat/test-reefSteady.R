@@ -1,4 +1,4 @@
 test_that("reefSteady runs without error", {
-    params <- newReefParams()
-    expect_error(reefSteady(params), NA)
+    data(caribbean_3_model)
+    expect_error(reefSteady(caribbean_3_model), NA)
 })

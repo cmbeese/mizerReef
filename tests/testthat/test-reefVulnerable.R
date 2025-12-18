@@ -1,4 +1,9 @@
 test_that("reefVulnerable runs without error", {
-    params <- newReefParams()
-    expect_error(reefVulnerable(params, n = NULL, n_pp = NULL, n_other = NULL, t = 0), NA)
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    expect_error(reefVulnerable(params, 
+        n = params@initial_n,
+        n_pp = params@initial_n_pp,
+        n_other = params@initial_n_other,
+        t = 0), NA)
 })

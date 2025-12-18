@@ -138,7 +138,7 @@ params <- params |>
 
 # Make sure new refuge is in place
 plotVulnerable(params)
-plotRefuge(params)
+plotRefugeProfile(params)
 # looks good
 
 plotBiomassVsSpecies(params) # spot on
@@ -166,7 +166,7 @@ plotFeedingLevel(params, species = "inverts")
 # First attempt to set very low to see what the minimum values are
 params <- setBevertonHolt(params, erepro = 0.0001)
 # Now set setting erepro same for all species, as low as possible
-params <- setBevertonHolt(params, erepro = 0.009)
+params <- setBevertonHolt(params, erepro = 0.0134)
 params <- reefSteady(params)
 # Check reproduction level (value between 0 and 1) - should be higher for
 # larger, slow growing species and low for small, fast growing ones

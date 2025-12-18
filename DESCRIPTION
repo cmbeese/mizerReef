@@ -70,4 +70,4 @@ Collate:
     'reef-setParams.R'
     'reef-steady.R'
     'reef-summary_methods.R'
-# VignetteBuilder: knitr
+VignetteBuilder: knitr

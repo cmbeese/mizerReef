@@ -189,10 +189,10 @@ getDetritusConsumption <- function(params) {
     consumption <- (params@detritus_params$rho * params@initial_n *
         (1 - feeding_level)) %*% params@dw
 
-    names(consumption) <- params@species_params$species
-
     # Convert from mass specific rate to total rates
     consumption <- consumption * params@initial_n_other$detritus
+
+    names(consumption) <- params@species_params$species
 
     return(consumption)
 }
@@ -208,9 +208,23 @@ plotDetritusConsumption <- function(params) {
     consumption <- getDetritusConsumption(params)
     total <- sum(consumption)
     consumption <- consumption[consumption > total / 100]
+    # Defensive: ensure names(consumption) is never NULL and matches length(consumption)
+    cons_names <- names(consumption)
+    if (is.null(cons_names)) cons_names <- character(length(consumption))
+    if (length(consumption) == 0) {
+        # Return an empty ggplot with a message
+        return(ggplot() +
+            labs(
+                title = "No detritus consumers with >1% of total consumption",
+                x = NULL, y = NULL
+            ) +
+            theme_void()
+        )
+    }
     df <- data.frame(
-        Consumer = names(consumption),
-        Rate = consumption
+        Consumer = cons_names,
+        Rate = as.numeric(consumption),
+        stringsAsFactors = FALSE
     )
     ggplot(df, aes(x = "", y = Rate, fill = Consumer)) +
         geom_bar(stat = "identity", width = 1) +

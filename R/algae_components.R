@@ -185,10 +185,12 @@ getAlgaeConsumption <- function(params) {
     feeding_level <- getFeedingLevel(params)
     consumption <- (params@algae_params$rho * params@initial_n *
                         (1 - feeding_level)) %*% params@dw
-    # Fix names
-    names(consumption) <- params@species_params$species
+
     # Convert from mass specific rate to total rates
     consumption <- consumption * params@initial_n_other$algae
+
+    # Fix names
+    names(consumption) <- params@species_params$species
 
     return(consumption)
 }

@@ -1,4 +1,9 @@
 test_that("algae_dynamics runs without error", {
-    params <- newReefParams()
-    expect_error(algae_dynamics(params, n = NULL, n_other = NULL, rates = NULL, dt = 1), NA)
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    expect_error(algae_dynamics(params, 
+        n = params@initial_n,
+        n_other = params@initial_n_other,
+        rates = getRates(params),
+        dt = 1), NA)
 })

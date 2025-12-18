@@ -1,28 +1,24 @@
 MizerReef Major Package Update To Do List - 18/11/2025
 
 ** For Major Update  - Manuscript version**
-- check remaining current diffs and approve them for each file
 
-- update remaining data files and documentation
+- update caribbean_10_model data object, changing bad_pred to blocked_pred in species_params
+- add degradation scale data objects
+- add degradation related tests
 
-- write tests for all new and updated functions
-- Fix all failing tests by ensuring newReefParams and related functions are called with all required arguments
+# Outstanding for Manuscript/CRAN:
+- Update remaining data files and documentation (if any)
+- Finish/polish the vignettes and articles for Mizer Reef
+	- Clean referencing, links, and document structure
+    - apply getting started vignette template formatting
+    - Getting started vignette: put notes in boxes, add emojis, mention scaling background resource step
+	- Steady state recipe: add more thorough descriptions of each step
+	- Karpata and Bonaire model descriptions: mimic mizer shelf model description structure, bring back in skips and stops, add description for three group Bonaire model
+	- Simulations with degradation: add thorough description of all degradation parameters, add descriptions of built-in degradation trajectories (with sources and plots), add section on new plotting functions for simulations
 - Update or remove non-portable file names (e.g., in ignore/) for CRAN compliance
 - Add VignetteBuilder field to DESCRIPTION if vignettes are to be included
 - Ensure all S4 classes and methods are fully documented (especially MizerReefParams)
 - Clean up any remaining Rd cross-reference notes (add package anchors for external links)
-
-- finish/ polish the vignettes and articles for Mizer Reef
--- clean referencing, links, and document structure
--- steady state recipe
----- add more thorough descriptions of each step
--- karpata and Bonaire model descriptions
----- mimic mizer shelf model description structure, bring back in skips and stops
----- add description for three group Bonaire model
--- simulations with degradation
----- add thorough description of all degradation parameters
----- add descriptions of built-in degradation trajectories, with sources and plots
----- add section that goes over the nice new plotting functions for looking at simulations in mizerReef
 
 ######################################################################################
 ** Code updates for future (not necessary for manuscript submission/ next update) **
@@ -30,6 +26,8 @@ MizerReef Major Package Update To Do List - 18/11/2025
 - Add error messages
 
 - create a version of plot vulbnerable that works for MizerSim objects - heatmap through time of vulnerable proportion by species
+
+- creat function to compute and plot trophic level
 
 - create versions of calibrateReef, calibrateReefYield, and CalibrateReefNumber that use scaleReefModel
 
@@ -45,11 +43,25 @@ MizerReef Major Package Update To Do List - 18/11/2025
 - Add data object with rabbitfish parameters/ Indo-Pacific parameters
 - new plotting functions
 
-
 ============================================================================
 COMPLETED TASKS:
 
 ============================================================================
+
+- 12/18 check remaining current diffs and approve them for each file
+- 12/18 All major exported functions and S4 methods have robust, minimal tests
+- 12/18 Fixed all failing tests except expected degradation plotting (due to lack of data)
+- 12/18 Updated reefDegrade() to handle all methods robustly, returning NULL for non-competitive methods
+- 12/18 Patched plotDetritusConsumption() to always return a valid ggplot object, even when no consumers remain after filtering
+- 12/18 Fixed getDetritusConsumption() so that names are preserved after scalar multiplication
+- 12/18 Updated test for reefDegrade to expect NULL when degradation is not enabled
+- 12/18 Documentation, linter, and roxygen2 are clean; vignettes/articles are being finalized
+
+- 12/17 Debugged and fixed regression in getEncounter() due to parameter name changes (bad_pred → blocked_pred)
+- 12/17 Updated all resource parameter access to use new S4 slots (detritus_params, algae_params, etc.)
+- 12/17 Compared diffs between main and major_update branches for core files
+- 12/17 Confirmed vulnerable and encounter arrays are correct after refactor
+- 12/17 Emphasized importance of testing after major refactors
 
 - 12/12 Systematically replaced @import plotly with @importFrom plotly ggplotly in all relevant files and wrappers
 - 12/12 Added/updated plotly wrappers for all major plotting functions (plotlyTotalAbundance, plotlyTotalBiomass, plotly2TotalBiomass, plotlyProductivity, plotly2Productivity, plotlyProductivityRelative, plotlySpectra2, plotlySpectraRelative, plotlyRelativeContribution, plotlyRefugeDensity, plotlyVulnerable, plotlyRefugeProfile, plotlyDegradationScale)
