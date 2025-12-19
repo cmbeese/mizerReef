@@ -31,9 +31,9 @@ dimensional array (prey species x prey size) based on the
 abundances also passed in.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{     If a `MizerSim` object is passed in, the function returns a three
-     dimensional array (time step x prey species x prey size) 
-     with the vulnerability calculated at every time step in the 
-     simulation. If \code{drop = TRUE} then the dimension of length 1 
+     dimensional array (time step x prey species x prey size)
+     with the vulnerability calculated at every time step in the
+     simulation. If \code{drop = TRUE} then the dimension of length 1
      will be removed from the returned array.
 }\if{html}{\out{</div>}}
 }

@@ -67,43 +67,63 @@ observed abundances, and their maximum size.}
 One of "sigmoidal", "binned", "competitive", or
 "noncomplex". See Details. \strong{Required.}}
 
-\item{method_params}{Data frame or named list. Specifies parameters required for the chosen method:
+\item{method_params}{Data frame or named list. Specifies parameters
+required for the chosen method:
 \itemize{
-\item For "sigmoidal": must include \code{L_refuge} (numeric, length at which refuge becomes scarce, cm; \strong{no default}) and \code{prop_protect} (numeric, max proportion protected, default: 0.98).
-\item For "binned": must include \code{start_L} (numeric, start length, cm; \strong{no default}), \code{end_L} (numeric, end length, cm; \strong{no default}), and \code{prop_protect} (numeric, proportion protected, default: 0.98).
-\item For "competitive": must include \code{start_L}, \code{end_L} (as above), and \code{refuge_density} (numeric, refuges per size bin, no/m^2; \strong{no default}).
+\item For "sigmoidal": must include \code{L_refuge} (numeric, length at which
+refuge becomes scarce, cm; \strong{no default}) and \code{prop_protect}
+(numeric, max proportion protected, default: 0.98).
+\item For "binned": must include \code{start_L} (numeric, start length, cm;
+\strong{no default}), \code{end_L} (numeric, end length, cm; \strong{no default}),
+and \code{prop_protect} (numeric, proportion protected, default: 0.98).
+\item For "competitive": must include \code{start_L}, \code{end_L} (as above), and
+\code{refuge_density} (numeric, refuges per size bin, no/m^2; \strong{no
+default}).
 \item For "noncomplex": no parameters required.
 }}
 
-\item{refuge_user}{Logical vector (length = number of species). Indicates which groups use refuge.
-If not present in \code{species_params}, must be provided. Defaults to FALSE.}
+\item{refuge_user}{Logical vector (length = number of species). Indicates
+which groups use refuge. If not present in
+\code{species_params}, must be provided. Defaults to FALSE.}
 
-\item{blocked_pred}{Optional. Logical vector (length = number of species). Indicates whether the predator is blocked by refuge for this species. TRUE means hunting is blocked by refuge; FALSE means the species can access prey within refuge (e.g. eels). Defaults to FALSE.}
+\item{blocked_pred}{Optional. Logical vector (length = number of species).
+Indicates whether the predator is blocked by refuge for
+this species. TRUE means hunting is blocked by refuge;
+FALSE means the species can access prey within refuge
+(e.g. eels). Defaults to FALSE.}
 
-\item{satiation}{Logical vector (length = number of species). Indicates which groups are subject to
-satiation. If not provided, defaults are set automatically: FALSE for carnivores
-(species that eat other species, i.e. row sum of interaction matrix > 0), TRUE
-for pure resource consumers (species that do not eat other species but have
-positive resource interaction). A warning is issued if defaults are used.}
+\item{satiation}{Logical vector (length = number of species). Indicates which
+groups are subject to satiation. If not provided, defaults
+are set automatically: FALSE for carnivores (species that
+eat other species, i.e. row sum of interaction matrix > 0),
+TRUE for pure resource consumers (species that do not eat
+other species but have positive resource interaction). A
+warning is issued if defaults are used.}
 
-\item{a_bar}{Numeric. Length-weight conversion parameter for dummy fish. \strong{Default:} 0.025.
-If any species is missing an 'a' parameter, the value of a_bar is used for that
-species and a warning is issued.}
+\item{a_bar}{Numeric. Length-weight conversion parameter for dummy fish.
+\strong{Default:} 0.025. If any species is missing an 'a'
+parameter, the value of a_bar is used for that species and a
+warning is issued.}
 
 \item{b_bar}{Numeric. Length-weight exponent for dummy fish. \strong{Default:} 3.
 If any species is missing a 'b' parameter, the value of b_bar
 is used for that species and a warning is issued.}
 
-\item{w_settle}{Numeric. Minimum weight of fish protected by refuges at measured scale (grams). \strong{Default:} 0.1.}
+\item{w_settle}{Numeric. Minimum weight of fish protected by refuges at
+measured scale (grams). \strong{Default:} 0.1.}
 
-\item{max_protect}{Numeric. Maximum proportion of fish protected by refuge (0–1). \strong{Default:} 0.98.}
+\item{max_protect}{Numeric. Maximum proportion of fish protected by refuge
+(0–1). \strong{Default:} 0.98.}
 
-\item{tau}{Numeric. Proportion of fish with access to refuge expected to utilize it (0–1). \strong{Default:} 1.}
+\item{tau}{Numeric. Proportion of fish with access to refuge expected to
+utilize it (0–1). \strong{Default:} 1.}
 
-\item{use_dummy_fish_bins}{Logical. Controls how refuge bin boundaries and thresholds are calculated for sigmoidal and binned methods:
+\item{use_dummy_fish_bins}{Logical. Controls how refuge bin boundaries and
+thresholds are calculated for sigmoidal, binned, and competitive methods:
 \itemize{
-\item TRUE: Use each species' own length-weight parameters (\code{a}, \code{b}).
-\item FALSE (default): Use dummy fish parameters (\code{a_bar}, \code{b_bar}).
+\item TRUE (default, legacy behavior): Use dummy fish parameters (\code{a_bar},
+\code{b_bar}) to set bin boundaries/thresholds.
+\item FALSE: Use each species' own length-weight parameters (\code{a}, \code{b}).
 Set according to your data collection method. The setting is stored in
 \code{params@refuge_params$use_dummy_fish_bins} and used by \code{\link[=getRefuge]{getRefuge()}}.
 }}

@@ -14,14 +14,12 @@ getRefuge(params, use_dummy_fish_bins = TRUE, ...)
 \arguments{
 \item{params}{a mizer params object}
 
-\item{use_dummy_fish_bins}{Logical. If FALSE, refuge thresholds and bin
-boundaries are calculated using each species'
-own length-weight parameters (\code{a}, \code{b}). If
-TRUE (default), dummy fish parameters
-(\code{a_bar}, \code{b_bar}) are used for conversions.
-Applies to both sigmoidal and binned methods.
-If not provided, uses value from
-\code{params@refuge_params$species_specific_bins}.
+\item{use_dummy_fish_bins}{Logical. If TRUE (default), refuge thresholds/bin
+boundaries use dummy fish parameters (\code{a_bar}, \code{b_bar}),
+matching legacy behavior. If FALSE, boundaries use
+species-specific \code{a} and \code{b}. Applies to sigmoidal,
+binned, and competitive methods. If not provided,
+uses \code{params@refuge_params$use_dummy_fish_bins}.
 See \code{\link[=setRefuge]{setRefuge()}} for details.}
 
 \item{...}{Unused}

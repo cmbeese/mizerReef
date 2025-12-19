@@ -1,6 +1,5 @@
 ---
-title: "Functional Group Example"
-subtitle: "Karpata Reef Steady State Model Description"
+title: "Caribbean 10 Species Model Description"
 author: ""
 bibliography: references.bib
 csl: ecology.csl
