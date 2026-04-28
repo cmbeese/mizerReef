@@ -14,14 +14,14 @@
 
 ## Citation
 
-Beese C, Delius G, Mumby P, Rogers A (2025). *mizerReef: Mizer Models
+Beese C, Delius G, Mumby P, Rogers A (2026). *mizerReef: Mizer Models
 with Benthic Coupling for Coral Reefs*. R package version 1.0.1,
 <https://sizespectrum.org/mizerReef/>.
 
     @Manual{,
       title = {mizerReef: Mizer Models with Benthic Coupling for Coral Reefs},
       author = {Chelsey M. Beese and Gustav Delius and Peter J. Mumby and Alice Rogers},
-      year = {2025},
+      year = {2026},
       note = {R package version 1.0.1},
       url = {https://sizespectrum.org/mizerReef/},
     }
