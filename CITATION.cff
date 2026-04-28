@@ -1,0 +1,12 @@
+cff-version: 1.0.0
+title: "MizerReef: an R package to create multi-species size spectrum models for structurally complex habitats"
+message: "If you use this package, please cite it as below."
+authors:
+  - family-names: "Beese"
+    given-names: "Chelsey M."
+  - family-names: "Rogers"
+    given-names: "Alice"
+  - family-names: "Mumby"
+    given-names: "Peter J."
+date-released: 2026-04-28
+version: "2.0.0"
