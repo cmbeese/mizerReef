@@ -1,20 +1,20 @@
 #' Remove some species from the model
 #'
-#' This calls `mizer::removeSpecies()` and in addition removes the relevant
+#' This extends mizer's [removeSpecies()] to also remove the relevant
 #' row from the detritus and algae consumption arrays `rho`.
-#' @param params A MizerParams object
+#' @param params A `mizerReef` object
 #' @param species The species to be removed. A vector of species names, or a
 #'   numeric vector of species indices, or a logical vector indicating for each
 #'   species whether it is to be removed (TRUE) or not.
-#' @return A MizerParams object with fewer species.
+#' @param ... Unused
+#' @return A `mizerReef` object with fewer species.
+#' @method removeSpecies mizerReef
 #' @export
 #' @concept helper
-removeSpecies <- function(params, species) {
-    p <- mizer::removeSpecies(params, species)
-    species <- valid_species_arg(params, species,
-        return.logical = TRUE
-    )
-    keep <- !species
+removeSpecies.mizerReef <- function(params, species, ...) {
+    keep <- !valid_species_arg(params, species, return.logical = TRUE)
+
+    p <- NextMethod()
 
     # Remove algae rho values for species
     p@other_params$algae_params$rho <-

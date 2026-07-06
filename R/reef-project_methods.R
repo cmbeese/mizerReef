@@ -4,36 +4,96 @@
 # These replace the old setRateFunction() calls in newReefParams(). By using
 # project*.mizerReef methods with NextMethod(), multiple extension packages
 # can all modify the same rate without silently overwriting each other.
+#
+# Refuge/vulnerability modifies encounter and predation mortality
+# multiplicatively for "blocked_pred" species rather than adding a term on
+# top, so a single NextMethod() call cannot express the modification (unlike
+# mizerShelf's purely additive detritus contribution). Both methods below
+# call NextMethod() once, with unmodified inputs, to get the standard result
+# -- this is the part that stays composable, since it goes through the full
+# extension chain and so still picks up any lower extension's contribution.
+# The vulnerability-adjusted correction for "blocked_pred" predators is then
+# computed with a direct call to mizer's base rate function. (An earlier
+# version tried calling NextMethod() a second time with an overridden
+# argument, e.g. NextMethod(n = ...); this silently corrupts the matching of
+# the *other* arguments once a generic has more than two formals -- confirmed
+# by testing dim(n_pp) coming out wrong -- so it must be avoided.) This
+# correction therefore does not itself participate in the chain, so a lower
+# extension's contribution is only reflected in the non-blocked part of the
+# result; full composability would require mizer itself to expose a
+# prey-visibility hook that project*() could dispatch through.
 # ============================================================================
 
 #' @method projectEncounter mizerReef
 #' @export
 projectEncounter.mizerReef <- function(params, n, n_pp, n_other, t = 0, ...) {
-    reefEncounter(params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+    blocked_pred <- params@species_params$blocked_pred == TRUE
+    if (!any(blocked_pred)) {
+        return(NextMethod())
+    }
+
+    vulnerable <- reefVulnerable(params, n, n_pp, n_other, t,
+        new_rd = reefDegrade(params, n, n_pp, n_other, t, ...)
+    )
+
+    # Standard encounter (used as-is for predators unaffected by refuge)
+    encounter <- NextMethod()
+    # Encounter recomputed with vulnerability-reduced prey abundance (used
+    # for predators whose foraging is blocked by refuge)
+    encounter_vul <- mizer::mizerEncounter(params,
+        n = vulnerable * n, n_pp = n_pp, n_other = n_other, t = t, ...
+    )
+    encounter[blocked_pred, ] <- encounter_vul[blocked_pred, ]
+    encounter
 }
 
 #' @method projectFeedingLevel mizerReef
 #' @export
 projectFeedingLevel.mizerReef <- function(params, n, n_pp, n_other, t = 0,
                                           encounter, ...) {
-    reefFeedingLevel(params, n = n, n_pp = n_pp, n_other = n_other, t = t,
-                     encounter = encounter, ...)
+    # Predators without a satiation response have unlimited intake capacity
+    params@intake_max[params@species_params$satiation == FALSE] <- Inf
+    fl <- NextMethod()
+    fl[is.na(fl)] <- 0
+    fl
 }
 
 #' @method projectPredMort mizerReef
 #' @export
 projectPredMort.mizerReef <- function(params, n, n_pp, n_other, t = 0,
                                       pred_rate, ...) {
-    reefPredMort(params, n = n, n_pp = n_pp, n_other = n_other, t = t,
-                 pred_rate = pred_rate, ...)
+    blocked_pred <- params@species_params$blocked_pred == TRUE
+    if (!any(blocked_pred)) {
+        return(NextMethod())
+    }
+
+    vulnerable <- reefVulnerable(params, n, n_pp, n_other, t,
+        new_rd = reefDegrade(params, n, n_pp, n_other, t, ...)
+    )
+
+    # Standard predation mortality from all predators
+    pm <- NextMethod()
+    # Predation mortality from refuge-blocked predators only (zeroing the
+    # pred_rate of unblocked predators leaves their contribution out of the
+    # linear predMort calculation)
+    pred_rate_blocked <- pred_rate
+    pred_rate_blocked[!blocked_pred, ] <- 0
+    pm_blocked <- mizer::mizerPredMort(params, n, n_pp, n_other, t = t,
+        pred_rate = pred_rate_blocked, ...
+    )
+    # Prey vulnerability only discounts the contribution of blocked predators
+    pm + (vulnerable - 1) * pm_blocked
 }
 
 #' @method projectMort mizerReef
 #' @export
 projectMort.mizerReef <- function(params, n, n_pp, n_other, t = 0,
                                   f_mort, pred_mort, ...) {
-    reefMort(params, n = n, n_pp = n_pp, n_other = n_other, t = t,
-             f_mort = f_mort, pred_mort = pred_mort, ...)
+    mort <- NextMethod()
+    if (isTRUE(params@other_params$include_sen_mort)) {
+        mort <- mort + reefSenMort(params, ...)
+    }
+    mort
 }
 
 # ============================================================================

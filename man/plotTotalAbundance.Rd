@@ -54,7 +54,7 @@ This functions creates a barplot with the abundance of each species
 within a given size range.
 }
 \seealso{
-\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[mizer:plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
 \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
 \code{\link[=plotProductivity]{plotProductivity()}},
 \code{\link[=plot2Productivity]{plot2Productivity()}}, \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
@@ -62,14 +62,13 @@ within a given size range.
 Other plotting functions:
 \code{\link[=plot2Productivity]{plot2Productivity()}},
 \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
-\code{\link[=plotBiomass]{plotBiomass()}},
 \code{\link[=plotDegradationScale]{plotDegradationScale()}},
 \code{\link[=plotProductivity]{plotProductivity()}},
 \code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
 \code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
 \code{\link[=plotRefugeProfile]{plotRefugeProfile()}},
 \code{\link[=plotRelativeContribution]{plotRelativeContribution()}},
-\code{\link[=plotSpectraRelative]{plotSpectraRelative()}},
+\code{\link[=plotSpectraPercentChange]{plotSpectraPercentChange()}},
 \code{\link[=plotTotalBiomass]{plotTotalBiomass()}},
 \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
 \code{\link[=plotVulnerable]{plotVulnerable()}}
