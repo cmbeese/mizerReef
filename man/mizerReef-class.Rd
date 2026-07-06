@@ -3,7 +3,6 @@
 \docType{class}
 \name{mizerReef-class}
 \alias{mizerReef-class}
-\alias{mizerReefSim-class}
 \title{S4 marker class for mizerReef extension}
 \description{
 A formal S4 class that extends \link[mizer:MizerParams]{MizerParams} but adds no new slots.
@@ -11,7 +10,20 @@ All reef-specific state (refuge, algae, detritus parameters) lives in
 \code{other_params(params)}. The class label enables S3 dispatch of mizer
 generics to mizerReef-specific methods.
 }
+\details{
+The class is \strong{not} defined statically. Instead mizer creates it when the
+package is loaded: \code{.onLoad()} calls \code{\link[mizer:registerExtension]{mizer::registerExtension()}}, which
+recognises mizerReef as a dispatching extension from the S3 methods it
+registers for its marker class and inserts \code{mizerReef} at the correct place
+in the S4 hierarchy relative to any other extension packages loaded in the
+same session. This lets mizerReef be chained with other extensions (for
+example mizerMR, to add multiple resources) in either load order. A static
+\code{contains = "MizerParams"} definition would fix mizerReef as a direct sibling
+of every other extension and prevent such chaining, because a sealed class
+cannot be re-parented.
+}
 \seealso{
 \link[mizer:MizerParams]{MizerParams}, \code{\link[=newReefParams]{newReefParams()}}
 }
 \concept{parameters}
+\keyword{internal}

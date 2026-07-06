@@ -27,7 +27,7 @@ License: GPL-3
 Depends: 
     R (>= 4.1.0)
 Imports:
-    mizer (>= 2.4.0),
+    mizer (>= 3.1.0.9001),
     mizerExperimental (>= 2.4.0),
     assertthat,
     lubridate,
