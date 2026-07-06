@@ -122,6 +122,9 @@ articles:
     contents:
       - steady-state-recipe
       - reef-degradation-simulations
+  - title: "Model Description"
+    contents:
+      - model-description
   - title: "Package Internals"
     contents:
       - extension_mechanism
