@@ -1,3 +1,25 @@
+# MizerReef 2.1.0
+
+## New features
+
+- New vignette "Combining mizerReef with mizerMR: multiple background
+  resources" showing how to chain mizerReef with
+  [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
+  size-structured background resources.
+
+## Bug fixes
+
+- `getSenMort()` no longer errors when another extension (such as mizerMR)
+  changes what `initialNResource()` returns. Its `n_pp` default now uses
+  `params@initial_n_pp` directly, which is what the internal length check
+  validates against.
+- `getBiomass()` for `mizerReefSim` objects now only folds the unstructured
+  algae and detritus biomasses into the biomass table. Size-structured
+  components added by other extensions (for example the multiple-resource
+  array from mizerMR) are no longer mis-reshaped into the table, which
+  previously produced a "data length differs from size of matrix" warning and
+  corrupted `plotBiomass()`.
+
 # MizerReef 2.0.0
 
 ## Major changes

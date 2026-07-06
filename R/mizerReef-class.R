@@ -41,13 +41,25 @@ getBiomass.mizerReefSim <- function(object, ...) {
     b <- unclass(NextMethod())
     dimname_names <- names(dimnames(b))
 
-    comp_mat <- matrix(unlist(sim@n_other),
-        nrow = nrow(sim@n_other), ncol = ncol(sim@n_other)
-    )
-    dimnames(comp_mat) <- dimnames(sim@n_other)
+    # Only unstructured components (algae, detritus) hold a single biomass
+    # value per time step. Size-structured components contributed by other
+    # extensions in the chain - such as the "MR" resource array added by
+    # mizerMR - store a whole spectrum per time step and are reported by those
+    # extensions instead, so they must be excluded here.
+    scalar <- vapply(seq_len(ncol(sim@n_other)),
+                     function(j) all(lengths(sim@n_other[, j]) == 1L),
+                     logical(1))
 
-    b <- cbind(b, comp_mat[rownames(b), , drop = FALSE])
-    names(dimnames(b)) <- dimname_names
+    if (any(scalar)) {
+        comp_mat <- matrix(unlist(sim@n_other[, scalar, drop = FALSE]),
+            nrow = nrow(sim@n_other), ncol = sum(scalar)
+        )
+        dimnames(comp_mat) <- list(rownames(sim@n_other),
+                                   colnames(sim@n_other)[scalar])
+
+        b <- cbind(b, comp_mat[rownames(b), , drop = FALSE])
+        names(dimnames(b)) <- dimname_names
+    }
 
     mizer::ArrayTimeBySpecies(b,
         value_name = "Biomass", units = "g",

@@ -7,7 +7,7 @@
 getSenMort(
   params,
   n = initialN(params),
-  n_pp = initialNResource(params),
+  n_pp = params@initial_n_pp,
   n_other = initialNOther(params),
   t = 0,
   ...
