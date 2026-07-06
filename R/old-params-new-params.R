@@ -187,13 +187,13 @@ setRefuge <- function(params, method, method_params = NULL,
     }
 
     # Store all values directly in refuge_params slot
-    params@refuge_params$method <- method
-    params@refuge_params$a_bar <- a_bar
-    params@refuge_params$b_bar <- b_bar
-    params@refuge_params$w_settle <- w_settle
-    params@refuge_params$max_protect <- max_protect
-    params@refuge_params$tau <- tau
-    params@refuge_params$use_dummy_fish_bins <- use_dummy_fish_bins
+    params@other_params$refuge_params$method <- method
+    params@other_params$refuge_params$a_bar <- a_bar
+    params@other_params$refuge_params$b_bar <- b_bar
+    params@other_params$refuge_params$w_settle <- w_settle
+    params@other_params$refuge_params$max_protect <- max_protect
+    params@other_params$refuge_params$tau <- tau
+    params@other_params$refuge_params$use_dummy_fish_bins <- use_dummy_fish_bins
 
     #  method_params set up and checks
     if (method != "noncomplex") {
@@ -295,7 +295,7 @@ setRefuge <- function(params, method, method_params = NULL,
 
 
     # Store method_params in params object
-    params@refuge_params[["method_params"]] <- as.data.frame(method_params)
+    params@other_params$refuge_params[["method_params"]] <- as.data.frame(method_params)
 
     params@time_modified <- lubridate::now()
 

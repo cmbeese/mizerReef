@@ -4,8 +4,8 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
     assert_that(is(params, "MizerParams"))
 
     # Extract relevant data from params
-    refuge_params <- params@refuge_params
-    method_params <- params@refuge_params[["method_params"]]
+    refuge_params <- params@other_params$refuge_params
+    method_params <- params@other_params$refuge_params[["method_params"]]
 
     # Use value from params if not explicitly provided
     if (is.null(use_dummy_fish_bins)) {
@@ -34,7 +34,7 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
         rownames(refuge) <- rownames(params@initial_n)
         colnames(refuge) <- colnames(params@initial_n)
         # store refuge and bin indices in params object
-        params@refuge_params$refuge <- refuge
+        params@other_params$refuge_params$refuge <- refuge
 
         # Sigmoidal method ---------------------------------------------------------
     } else if (refuge_params$method == "sigmoidal") {
@@ -67,8 +67,8 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
             L_refuge.i <- (W_refuge / sp[["a"]])^(1 / sp[["b"]])
             refuge_lengths <- data.frame(species = sp$species, L_refuge = L_refuge.i)
         }
-        params@refuge_params$refuge <- refuge
-        params@refuge_params$refuge_lengths <- refuge_lengths
+        params@other_params$refuge_params$refuge <- refuge
+        params@other_params$refuge_params$refuge_lengths <- refuge_lengths
         params@time_modified <- lubridate::now()
 
         # Binned method ------------------------------------------------------------
@@ -118,14 +118,14 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
         # Account for species that don't utilize refuge
         refuge <- refuge_user * refuge
         # store refuge and bin indices in params object
-        params@refuge_params$refuge <- refuge
-        params@refuge_params$bin.id <- bin.id
+        params@other_params$refuge_params$refuge <- refuge
+        params@other_params$refuge_params$bin.id <- bin.id
         # store length bins by functional group in params object
         start_l.i <- t(do.call(rbind, start_l.i))
         end_l.i <- t(do.call(rbind, end_l.i))
         refuge_lengths <- cbind(start_l.i, end_l.i)
         row.names(refuge_lengths) <- sp$species
-        params@refuge_params$refuge_lengths <- refuge_lengths
+        params@other_params$refuge_params$refuge_lengths <- refuge_lengths
         params@time_modified <- lubridate::now()
 
         ## Competitive method ------------------------------------------------------
@@ -163,13 +163,13 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
             }
         }
         # Store indices of each bin
-        params@refuge_params$bin.id <- bin.id
+        params@other_params$refuge_params$bin.id <- bin.id
         # Store length bins by species group in a data frame
         start_l.i <- t(do.call(rbind, start_l.i))
         end_l.i <- t(do.call(rbind, end_l.i))
         refuge_lengths <- cbind(start_l.i, end_l.i)
         row.names(refuge_lengths) <- sp$species
-        params@refuge_params$refuge_lengths <- refuge_lengths
+        params@other_params$refuge_params$refuge_lengths <- refuge_lengths
         params@time_modified <- lubridate::now()
     }
     return(params)

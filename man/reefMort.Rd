@@ -33,17 +33,17 @@ A named two dimensional array (species x size) with the total
 mortality rates.
 }
 \description{
-This function replaces the usual \code{\link[mizer:mizerMort]{mizer::mizerMort()}} function and returns the
+This function replaces the usual \code{\link[mizer:mizerMort]{mizerMort()}} function and returns the
 sum of the usual mortality and size-based external/ senescence mortality
 }
 \seealso{
-Other mizer rate functions: 
-\code{\link{reefDegrade}()},
-\code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
-\code{\link{reefPredMort}()},
-\code{\link{reefRates}()},
-\code{\link{reefVulnerable}()}
+Other mizer rate functions:
+\code{\link[=reefDegrade]{reefDegrade()}},
+\code{\link[=reefEncounter]{reefEncounter()}},
+\code{\link[=reefFeedingLevel]{reefFeedingLevel()}},
+\code{\link[=reefPredMort]{reefPredMort()}},
+\code{\link[=reefRates]{reefRates()}},
+\code{\link[=reefVulnerable]{reefVulnerable()}}
 }
 \concept{extmort}
 \concept{mizer rate functions}

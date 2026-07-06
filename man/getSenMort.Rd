@@ -46,9 +46,9 @@ Returns the rate of senescence mortality at each size by functional group.
 }
 
 \seealso{
-Other rate functions: 
-\code{\link{getDegrade}()},
-\code{\link{getVulnerable}()}
+Other rate functions:
+\code{\link[=getDegrade]{getDegrade()}},
+\code{\link[=getVulnerable]{getVulnerable()}}
 }
 \concept{extmort}
 \concept{rate functions}

@@ -53,20 +53,20 @@ to check for decoupling.
 \code{\link[=plotProductivity]{plotProductivity()}}, \code{\link[=plot2Productivity]{plot2Productivity()}},
 \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
 
-Other plotting functions: 
-\code{\link{plot2Productivity}()},
-\code{\link{plot2TotalBiomass}()},
-\code{\link{plotBiomass}()},
-\code{\link{plotDegradationScale}()},
-\code{\link{plotProductivity}()},
-\code{\link{plotProductivityRelative}()},
-\code{\link{plotRefugeDensity}()},
-\code{\link{plotRefugeProfile}()},
-\code{\link{plotRelativeContribution}()},
-\code{\link{plotSpectraRelative}()},
-\code{\link{plotTotalAbundance}()},
-\code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()}
+Other plotting functions:
+\code{\link[=plot2Productivity]{plot2Productivity()}},
+\code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotBiomass]{plotBiomass()}},
+\code{\link[=plotDegradationScale]{plotDegradationScale()}},
+\code{\link[=plotProductivity]{plotProductivity()}},
+\code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
+\code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
+\code{\link[=plotRefugeProfile]{plotRefugeProfile()}},
+\code{\link[=plotRelativeContribution]{plotRelativeContribution()}},
+\code{\link[=plotSpectraRelative]{plotSpectraRelative()}},
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}},
+\code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
+\code{\link[=plotVulnerable]{plotVulnerable()}}
 }
 \concept{plotting functions}
 \concept{sumplots}

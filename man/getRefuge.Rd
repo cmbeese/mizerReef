@@ -19,7 +19,7 @@ boundaries use dummy fish parameters (\code{a_bar}, \code{b_bar}),
 matching legacy behavior. If FALSE, boundaries use
 species-specific \code{a} and \code{b}. Applies to sigmoidal,
 binned, and competitive methods. If not provided,
-uses \code{params@refuge_params$use_dummy_fish_bins}.
+uses \code{params@other_params$refuge_params$use_dummy_fish_bins}.
 See \code{\link[=setRefuge]{setRefuge()}} for details.}
 
 \item{...}{Unused}

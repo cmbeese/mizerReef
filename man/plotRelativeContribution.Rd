@@ -33,7 +33,7 @@ data used for the plot is returned instead of the plot
 itself. Default value is FALSE.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=plotTotalBiomass]{plotTotalBiomass}}, \code{\link[=plotTotalAbundance]{plotTotalAbundance}}, \code{\link[=plotProductivity]{plotProductivity}}
+  Arguments passed on to \code{\link{plotTotalBiomass}}, \code{\link{plotTotalAbundance}}, \code{\link{plotProductivity}}
   \describe{
     \item{\code{species}}{The species to be selected. Optional. By default all
 species are selected. A vector of species names, or a
@@ -71,20 +71,20 @@ for more details.
 \seealso{
 \code{\link[=plotTotalAbundance]{plotTotalAbundance()}}, \code{\link[=plotTotalBiomass]{plotTotalBiomass()}}, \code{\link[=plotProductivity]{plotProductivity()}}
 
-Other plotting functions: 
-\code{\link{plot2Productivity}()},
-\code{\link{plot2TotalBiomass}()},
-\code{\link{plotBiomass}()},
-\code{\link{plotDegradationScale}()},
-\code{\link{plotProductivity}()},
-\code{\link{plotProductivityRelative}()},
-\code{\link{plotRefugeDensity}()},
-\code{\link{plotRefugeProfile}()},
-\code{\link{plotSpectraRelative}()},
-\code{\link{plotTotalAbundance}()},
-\code{\link{plotTotalBiomass}()},
-\code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()}
+Other plotting functions:
+\code{\link[=plot2Productivity]{plot2Productivity()}},
+\code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotBiomass]{plotBiomass()}},
+\code{\link[=plotDegradationScale]{plotDegradationScale()}},
+\code{\link[=plotProductivity]{plotProductivity()}},
+\code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
+\code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
+\code{\link[=plotRefugeProfile]{plotRefugeProfile()}},
+\code{\link[=plotSpectraRelative]{plotSpectraRelative()}},
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}},
+\code{\link[=plotTotalBiomass]{plotTotalBiomass()}},
+\code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
+\code{\link[=plotVulnerable]{plotVulnerable()}}
 }
 \concept{plotting functions}
 \concept{sumplots}

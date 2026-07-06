@@ -56,10 +56,10 @@ percent change, given by \deqn{ 100*(N_2(w) - N_1(w)) / (N_1(w)).}
 If \code{diff_method} is given as \code{rel_diff} the difference is calculated
 relative to their average, so \deqn{2 (N_2(w) - N_1(w)) / (N_2(w) + N_1(w)).}
 
-The individual spectra are calculated by the \code{\link[mizer:plotSpectra]{mizer::plotSpectra()}} function which
+The individual spectra are calculated by the \code{\link[mizer:plotSpectra]{plotSpectra()}} function which
 is passed all additional arguments you supply. So you can for example
 determine a size range over which to average the simulation results via the
-\code{time_range} argument. See \code{\link[mizer:plotSpectra]{mizer::plotSpectra()}} for more options.
+\code{time_range} argument. See \code{\link[mizer:plotSpectra]{plotSpectra()}} for more options.
 
 Note that it does not matter whether the relative difference is calculated
 for the number density or the biomass density or the biomass density in log
@@ -67,20 +67,20 @@ weight because the factors of \eqn{w} by which the densities differ cancels
 out in the relative difference.
 }
 \seealso{
-Other plotting functions: 
-\code{\link{plot2Productivity}()},
-\code{\link{plot2TotalBiomass}()},
-\code{\link{plotBiomass}()},
-\code{\link{plotDegradationScale}()},
-\code{\link{plotProductivity}()},
-\code{\link{plotProductivityRelative}()},
-\code{\link{plotRefugeDensity}()},
-\code{\link{plotRefugeProfile}()},
-\code{\link{plotRelativeContribution}()},
-\code{\link{plotTotalAbundance}()},
-\code{\link{plotTotalBiomass}()},
-\code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()}
+Other plotting functions:
+\code{\link[=plot2Productivity]{plot2Productivity()}},
+\code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotBiomass]{plotBiomass()}},
+\code{\link[=plotDegradationScale]{plotDegradationScale()}},
+\code{\link[=plotProductivity]{plotProductivity()}},
+\code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
+\code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
+\code{\link[=plotRefugeProfile]{plotRefugeProfile()}},
+\code{\link[=plotRelativeContribution]{plotRelativeContribution()}},
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}},
+\code{\link[=plotTotalBiomass]{plotTotalBiomass()}},
+\code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
+\code{\link[=plotVulnerable]{plotVulnerable()}}
 }
 \concept{plotting functions}
 \concept{sumplots}

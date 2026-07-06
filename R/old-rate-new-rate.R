@@ -1,8 +1,8 @@
 # New reef vulnerable for competitive method
 reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
     # Extract relevant data from params
-    method_params <- params@refuge_params$method_params
-    degrade <- params@refuge_params$degrade
+    method_params <- params@other_params$refuge_params$method_params
+    degrade <- params@other_params$refuge_params$degrade
 
     # If degradation is being implemented, calculate new refuge density
     if (degrade == TRUE) {
@@ -14,8 +14,8 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
     }
 
     # Set parameters used with all methods
-    max_protect <- params@refuge_params$max_protect
-    tau <- params@refuge_params$tau
+    max_protect <- params@other_params$refuge_params$max_protect
+    tau <- params@other_params$refuge_params$tau
 
     # Pull no of species and size bins
     no_w <- length(params@w)
@@ -27,14 +27,14 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
     # Static methods -----------------------------------------------------------
     static <- c("sigmoidal", "binned", "noncomplex")
 
-    if (params@refuge_params$method %in% static) {
-        refuge <- params@refuge_params$refuge
+    if (params@other_params$refuge_params$method %in% static) {
+        refuge <- params@other_params$refuge_params$refuge
         vulnerable <- 1 - refuge
 
         # Competitive method -------------------------------------------------------
-    } else if (params@refuge_params$method == "competitive") {
+    } else if (params@other_params$refuge_params$method == "competitive") {
         # Determine bin.id structure
-        bin_id_list <- params@refuge_params$bin.id
+        bin_id_list <- params@other_params$refuge_params$bin.id
         # Check if bin.id uses character keys (species-specific bins)
         bin_names <- names(bin_id_list)
         use_dummy_fish_bins <- !is.null(bin_names) && !any(grepl("sp", bin_names))

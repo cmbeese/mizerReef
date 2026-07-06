@@ -30,17 +30,17 @@ A two dimensional array (predator species x predator size) with the
 feeding level.
 }
 \description{
-This function replaces the usual \code{\link[mizer:mizerFeedingLevel]{mizer::mizerFeedingLevel()}} function and returns
+This function replaces the usual \code{\link[mizer:mizerFeedingLevel]{mizerFeedingLevel()}} function and returns
 the a feeding level of 0 for piscivores.
 }
 \seealso{
-Other mizer rate functions: 
-\code{\link{reefDegrade}()},
-\code{\link{reefEncounter}()},
-\code{\link{reefMort}()},
-\code{\link{reefPredMort}()},
-\code{\link{reefRates}()},
-\code{\link{reefVulnerable}()}
+Other mizer rate functions:
+\code{\link[=reefDegrade]{reefDegrade()}},
+\code{\link[=reefEncounter]{reefEncounter()}},
+\code{\link[=reefMort]{reefMort()}},
+\code{\link[=reefPredMort]{reefPredMort()}},
+\code{\link[=reefRates]{reefRates()}},
+\code{\link[=reefVulnerable]{reefVulnerable()}}
 }
 \concept{extmort}
 \concept{mizer rate functions}

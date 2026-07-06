@@ -40,9 +40,9 @@ Plot \tab Description \cr
 
 All plotting functions return a ggplot object, which can be further
 customized using the ggplot2 grammar. Most functions accept either a
-\link[mizer:MizerSim]{mizer::MizerSim} or \link[mizer:MizerParams]{mizer::MizerParams} object as input. Species colors and line
+\link[mizer:MizerSim]{MizerSim} or \link[mizer:MizerParams]{MizerParams} object as input. Species colors and line
 types are controlled by the \code{linecolour} and \code{linetype} slots in
-\link[mizer:MizerParams]{mizer::MizerParams}, and can be changed by the user.
+\link[mizer:MizerParams]{MizerParams}, and can be changed by the user.
 
 For group or legend naming, you can add a column \code{group_names}
 to your \code{species_params} data frame. This column should contain a
@@ -55,7 +55,7 @@ data frame.
 }
 \section{Usage}{
 
-Call these functions with a \link[mizer:MizerSim]{mizer::MizerSim} or \link[mizer:MizerParams]{mizer::MizerParams} object containing
+Call these functions with a \link[mizer:MizerSim]{MizerSim} or \link[mizer:MizerParams]{MizerParams} object containing
 simulation results. See individual function documentation for details and
 examples.
 }

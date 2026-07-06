@@ -1,3 +1,43 @@
+# ============================================================================
+# S3 dispatch methods for the mizerReef class
+#
+# These replace the old setRateFunction() calls in newReefParams(). By using
+# project*.mizerReef methods with NextMethod(), multiple extension packages
+# can all modify the same rate without silently overwriting each other.
+# ============================================================================
+
+#' @method projectEncounter mizerReef
+#' @export
+projectEncounter.mizerReef <- function(params, n, n_pp, n_other, t = 0, ...) {
+    reefEncounter(params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+}
+
+#' @method projectFeedingLevel mizerReef
+#' @export
+projectFeedingLevel.mizerReef <- function(params, n, n_pp, n_other, t = 0,
+                                          encounter, ...) {
+    reefFeedingLevel(params, n = n, n_pp = n_pp, n_other = n_other, t = t,
+                     encounter = encounter, ...)
+}
+
+#' @method projectPredMort mizerReef
+#' @export
+projectPredMort.mizerReef <- function(params, n, n_pp, n_other, t = 0,
+                                      pred_rate, ...) {
+    reefPredMort(params, n = n, n_pp = n_pp, n_other = n_other, t = t,
+                 pred_rate = pred_rate, ...)
+}
+
+#' @method projectMort mizerReef
+#' @export
+projectMort.mizerReef <- function(params, n, n_pp, n_other, t = 0,
+                                  f_mort, pred_mort, ...) {
+    reefMort(params, n = n, n_pp = n_pp, n_other = n_other, t = t,
+             f_mort = f_mort, pred_mort = pred_mort, ...)
+}
+
+# ============================================================================
+
 #' Get all rates needed to project a mizerReef model
 #'
 #' Calls other rate functions in sequence and collects the results in a list.
@@ -181,9 +221,9 @@ reefRates <- function(params, n, n_pp, n_other, t = 0, effort, rates_fns, ...) {
 #' @export
 #' @family mizer rate functions
 reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
-    method_params <- params@refuge_params$method_params
-    degrade <- params@refuge_params$degrade # true/false for whether to degrade
-    method <- params@refuge_params$method
+    method_params <- params@other_params$refuge_params$method_params
+    degrade <- params@other_params$refuge_params$degrade # true/false for whether to degrade
+    method <- params@other_params$refuge_params$method
 
     # Only competitive method has refuge_density and supports degradation
     if (method != "competitive") {
@@ -196,8 +236,8 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
     # Only apply degradation logic for competitive method and degrade == TRUE
     if (degrade == TRUE) {
         # Pull times (years) for bleaching & scaling parameters
-        t_bleach <- params@refuge_params$t_bleach # year for bleaching to occur
-        deg_scale <- params@refuge_params$deg_scale # matrix of refuge scaling parameters
+        t_bleach <- params@other_params$refuge_params$t_bleach # year for bleaching to occur
+        deg_scale <- params@other_params$refuge_params$deg_scale # matrix of refuge scaling parameters
 
         # If before bleaching, return old method parameters
         time <- t
@@ -213,18 +253,18 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
             new_rd <- scale_bin * old_rd
 
             # Apply algae dynamics if specified
-            if (isTRUE(params@algae_params$algae_boost)) {
-                growth_boosts <- params@algae_params$algae_growth_boost
-                capacity_boosts <- params@algae_params$algae_capacity_boost
+            if (isTRUE(params@other_params$algae_params$algae_boost)) {
+                growth_boosts <- params@other_params$algae_params$algae_growth_boost
+                capacity_boosts <- params@other_params$algae_params$algae_capacity_boost
 
                 # Apply first element of boost vectors (bleaching year = index 1)
-                if (length(growth_boosts) >= 1 && !is.null(params@algae_params$algae_growth)) {
-                    a_growth <- params@algae_params$algae_growth
-                    params@algae_params$algae_growth <- growth_boosts[1] * a_growth
+                if (length(growth_boosts) >= 1 && !is.null(params@other_params$algae_params$algae_growth)) {
+                    a_growth <- params@other_params$algae_params$algae_growth
+                    params@other_params$algae_params$algae_growth <- growth_boosts[1] * a_growth
                 }
-                if (length(capacity_boosts) >= 1 && !is.null(params@algae_params$algae_capacity)) {
-                    a_capacity <- params@algae_params$algae_capacity
-                    params@algae_params$algae_capacity <- capacity_boosts[1] * a_capacity
+                if (length(capacity_boosts) >= 1 && !is.null(params@other_params$algae_params$algae_capacity)) {
+                    a_capacity <- params@other_params$algae_params$algae_capacity
+                    params@other_params$algae_params$algae_capacity <- capacity_boosts[1] * a_capacity
                 }
             }
 
@@ -246,20 +286,20 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
                 new_rd <- scale_bin * old_rd
 
                 # Apply continued algae boost if within boost vector length
-                if (isTRUE(params@algae_params$algae_boost)) {
-                    growth_boosts <- params@algae_params$algae_growth_boost
-                    capacity_boosts <- params@algae_params$algae_capacity_boost
+                if (isTRUE(params@other_params$algae_params$algae_boost)) {
+                    growth_boosts <- params@other_params$algae_params$algae_growth_boost
+                    capacity_boosts <- params@other_params$algae_params$algae_capacity_boost
 
                     # years_post = 1,2,3... maps to indices 2,3,4... in the boost vectors
                     boost_idx <- years_post + 1
 
-                    if (boost_idx <= length(growth_boosts) && !is.null(params@algae_params$algae_growth)) {
-                        a_growth <- params@algae_params$algae_growth
-                        params@algae_params$algae_growth <- growth_boosts[boost_idx] * a_growth
+                    if (boost_idx <= length(growth_boosts) && !is.null(params@other_params$algae_params$algae_growth)) {
+                        a_growth <- params@other_params$algae_params$algae_growth
+                        params@other_params$algae_params$algae_growth <- growth_boosts[boost_idx] * a_growth
                     }
-                    if (boost_idx <= length(capacity_boosts) && !is.null(params@algae_params$algae_capacity)) {
-                        a_capacity <- params@algae_params$algae_capacity
-                        params@algae_params$algae_capacity <- capacity_boosts[boost_idx] * a_capacity
+                    if (boost_idx <= length(capacity_boosts) && !is.null(params@other_params$algae_params$algae_capacity)) {
+                        a_capacity <- params@other_params$algae_params$algae_capacity
+                        params@other_params$algae_params$algae_capacity <- capacity_boosts[boost_idx] * a_capacity
                     }
                 }
                 return(new_rd)
@@ -290,8 +330,8 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
 #'
 reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
     # Extract relevant data from params
-    method_params <- params@refuge_params$method_params
-    degrade <- isTRUE(params@refuge_params$degrade)
+    method_params <- params@other_params$refuge_params$method_params
+    degrade <- isTRUE(params@other_params$refuge_params$degrade)
 
     # If degradation is being implemented, calculate new refuge density
     if (isTRUE(degrade)) {
@@ -304,8 +344,8 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
     }
 
     # Set parameters used with all methods
-    max_protect <- params@refuge_params$max_protect
-    tau <- params@refuge_params$tau
+    max_protect <- params@other_params$refuge_params$max_protect
+    tau <- params@other_params$refuge_params$tau
 
     # Pull no of species and size bins
     no_w <- length(params@w)
@@ -317,16 +357,16 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
     # Static methods -----------------------------------------------------------
     static <- c("sigmoidal", "binned", "noncomplex")
 
-    if (params@refuge_params$method %in% static) {
-        refuge <- params@refuge_params$refuge
+    if (params@other_params$refuge_params$method %in% static) {
+        refuge <- params@other_params$refuge_params$refuge
         vulnerable <- 1 - refuge
 
         # Competitive method -------------------------------------------------------
-    } else if (params@refuge_params$method == "competitive") {
+    } else if (params@other_params$refuge_params$method == "competitive") {
         # Determine bin.id structure
-        bin_id_list <- params@refuge_params$bin.id
+        bin_id_list <- params@other_params$refuge_params$bin.id
         bin_names <- names(bin_id_list)
-        use_dummy_fish_bins <- isTRUE(params@refuge_params$use_dummy_fish_bins)
+        use_dummy_fish_bins <- isTRUE(params@other_params$refuge_params$use_dummy_fish_bins)
 
         # Initialize storage for the array of refuge proportions
         refuge <- matrix(0, nrow = no_sp, ncol = no_w)

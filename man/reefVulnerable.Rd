@@ -125,13 +125,13 @@ as a .csv file. The data can then be read into R using the command
 }
 
 \seealso{
-Other mizer rate functions: 
-\code{\link{reefDegrade}()},
-\code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
-\code{\link{reefMort}()},
-\code{\link{reefPredMort}()},
-\code{\link{reefRates}()}
+Other mizer rate functions:
+\code{\link[=reefDegrade]{reefDegrade()}},
+\code{\link[=reefEncounter]{reefEncounter()}},
+\code{\link[=reefFeedingLevel]{reefFeedingLevel()}},
+\code{\link[=reefMort]{reefMort()}},
+\code{\link[=reefPredMort]{reefPredMort()}},
+\code{\link[=reefRates]{reefRates()}}
 }
 \concept{mizer rate functions}
 \concept{refugeRates}

@@ -54,7 +54,7 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 
     consumption <- algae_consumption(params, n, rates)
     production <- sum(getAlgaeProduction(params))
-    ka <- params@algae_params$algae_capacity
+    ka <- params@other_params$algae_params$algae_capacity
     
     if(is.nan(consumption)){ 
         warning("The algae consumption function is producing NaNs.")
@@ -164,7 +164,7 @@ algae_consumption <- function(params,
                               n = params@initial_n,
                               rates = getRates(params)) {
 
-    sum((params@algae_params$rho * n) %*% params@dw)
+    sum((params@other_params$algae_params$rho * n) %*% params@dw)
 }
 
 #' Get algae consumption rates
@@ -183,7 +183,7 @@ getAlgaeConsumption <- function(params) {
 
     # With feeding level
     feeding_level <- getFeedingLevel(params)
-    consumption <- (params@algae_params$rho * params@initial_n *
+    consumption <- (params@other_params$algae_params$rho * params@initial_n *
                         (1 - feeding_level)) %*% params@dw
 
     # Convert from mass specific rate to total rates
@@ -227,7 +227,7 @@ plotAlgaeConsumption <- function(params) {
 #' @concept algae
 #' @export
 getAlgaeProduction <- function(params) {
-    return(params@algae_params$algae_growth)
+    return(params@other_params$algae_params$algae_growth)
 }
 
 
@@ -295,7 +295,7 @@ rescale_algae <- function(params, factor) {
         params@initial_n_other[["algae"]] * factor
     params@species_params$rho_algae <-
         params@species_params$rho_algae / factor
-    params@algae_params$rho <-
-        params@algae_params$rho / factor
+    params@other_params$algae_params$rho <-
+        params@other_params$algae_params$rho / factor
     params
 }

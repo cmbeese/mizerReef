@@ -17,12 +17,12 @@ removeSpecies <- function(params, species) {
     keep <- !species
 
     # Remove algae rho values for species
-    p@algae_params$rho <-
-        p@algae_params$rho[keep, , drop = FALSE]
+    p@other_params$algae_params$rho <-
+        p@other_params$algae_params$rho[keep, , drop = FALSE]
 
     # Remove detritus rho values for species
-    p@detritus_params$rho <-
-        p@detritus_params$rho[keep, , drop = FALSE]
+    p@other_params$detritus_params$rho <-
+        p@other_params$detritus_params$rho[keep, , drop = FALSE]
 
     p
 }
