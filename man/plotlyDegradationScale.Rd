@@ -30,3 +30,4 @@ A plotly object
 \description{
 Returns an interactive heatmap for degradation scaling parameters.
 }
+\concept{refugePlots}
