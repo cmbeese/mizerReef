@@ -25,4 +25,11 @@
 .onLoad <- function(libname, pkgname) {
     mizer::registerExtension(pkgname,
                              requirement = "sizespectrum/mizerReef")
+    if (exists("caribbean_3_model", envir = asNamespace(pkgname), inherits = FALSE)) {
+        ns <- asNamespace(pkgname)
+        raw_caribbean_3_model <- get("caribbean_3_model", envir = ns)
+        makeActiveBinding("caribbean_3_model",
+                          fun = function() mizer::coerceToExtensionClass(raw_caribbean_3_model),
+                          env = ns)
+    }
 }
