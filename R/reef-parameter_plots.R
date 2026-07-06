@@ -495,6 +495,7 @@ plotDegradationScale <- function(object = NULL,
 #' @inheritParams plotDegradationScale
 #' @return A plotly object
 #' @importFrom plotly ggplotly
+#' @concept refugePlots
 #' @export
 plotlyDegradationScale <- function(object = NULL, trajectory = NULL, return_data = FALSE, ...) {
     ggplotly(plotDegradationScale(object = object, trajectory = trajectory, return_data = return_data, ...))
