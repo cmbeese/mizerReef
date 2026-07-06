@@ -9,19 +9,21 @@
 # multiplicatively for "blocked_pred" species rather than adding a term on
 # top, so a single NextMethod() call cannot express the modification (unlike
 # mizerShelf's purely additive detritus contribution). Both methods below
-# call NextMethod() once, with unmodified inputs, to get the standard result
-# -- this is the part that stays composable, since it goes through the full
-# extension chain and so still picks up any lower extension's contribution.
-# The vulnerability-adjusted correction for "blocked_pred" predators is then
-# computed with a direct call to mizer's base rate function. (An earlier
-# version tried calling NextMethod() a second time with an overridden
-# argument, e.g. NextMethod(n = ...); this silently corrupts the matching of
-# the *other* arguments once a generic has more than two formals -- confirmed
-# by testing dim(n_pp) coming out wrong -- so it must be avoided.) This
-# correction therefore does not itself participate in the chain, so a lower
-# extension's contribution is only reflected in the non-blocked part of the
-# result; full composability would require mizer itself to expose a
-# prey-visibility hook that project*() could dispatch through.
+# therefore call NextMethod() twice: once with unmodified inputs to get the
+# standard result, and once more with a formal argument reassigned to compute
+# the vulnerability-adjusted correction for "blocked_pred" predators. Because
+# a bare NextMethod() forwards the *current* values of the formals as bound in
+# this frame (not the values the generic was originally called with), doing
+# `n <- vulnerable * n` (or zeroing rows of `pred_rate`) before the second
+# bare call sends the modified input down the full extension chain -- so both
+# the standard result and the correction pick up any lower extension's
+# contribution, and full composability is preserved.
+#
+# NB: the reassign-then-bare-NextMethod() pattern is essential. An earlier
+# version instead passed a named override, e.g. NextMethod(n = vulnerable * n);
+# this silently corrupts the matching of the *other* arguments once a generic
+# has more than two formals (confirmed by testing dim(n_pp) coming out wrong),
+# so NextMethod() must only ever be called bare.
 # ============================================================================
 
 #' @method projectEncounter mizerReef
@@ -38,11 +40,12 @@ projectEncounter.mizerReef <- function(params, n, n_pp, n_other, t = 0, ...) {
 
     # Standard encounter (used as-is for predators unaffected by refuge)
     encounter <- NextMethod()
-    # Encounter recomputed with vulnerability-reduced prey abundance (used
-    # for predators whose foraging is blocked by refuge)
-    encounter_vul <- mizer::mizerEncounter(params,
-        n = vulnerable * n, n_pp = n_pp, n_other = n_other, t = t, ...
-    )
+    # Encounter recomputed with vulnerability-reduced prey abundance (used for
+    # predators whose foraging is blocked by refuge). Reassigning the formal
+    # `n` and then calling NextMethod() bare sends the reduced prey abundance
+    # down the full extension chain, so this correction stays composable too.
+    n <- vulnerable * n
+    encounter_vul <- NextMethod()
     encounter[blocked_pred, ] <- encounter_vul[blocked_pred, ]
     encounter
 }
@@ -73,14 +76,13 @@ projectPredMort.mizerReef <- function(params, n, n_pp, n_other, t = 0,
 
     # Standard predation mortality from all predators
     pm <- NextMethod()
-    # Predation mortality from refuge-blocked predators only (zeroing the
-    # pred_rate of unblocked predators leaves their contribution out of the
-    # linear predMort calculation)
-    pred_rate_blocked <- pred_rate
-    pred_rate_blocked[!blocked_pred, ] <- 0
-    pm_blocked <- mizer::mizerPredMort(params, n, n_pp, n_other, t = t,
-        pred_rate = pred_rate_blocked, ...
-    )
+    # Predation mortality from refuge-blocked predators only. Zeroing the
+    # pred_rate rows of unblocked predators leaves their contribution out of
+    # the (pred_rate-linear) predMort calculation; reassigning the formal
+    # `pred_rate` and calling NextMethod() bare runs this recomputation
+    # through the full extension chain, so the correction stays composable.
+    pred_rate[!blocked_pred, ] <- 0
+    pm_blocked <- NextMethod()
     # Prey vulnerability only discounts the contribution of blocked predators
     pm + (vulnerable - 1) * pm_blocked
 }

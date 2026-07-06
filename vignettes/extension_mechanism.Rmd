@@ -133,10 +133,10 @@ encounter and predation-mortality integrals are computed, i.e. it enters
 inputs for these rows only".
 
 `projectEncounter.mizerReef()` and `projectPredMort.mizerReef()` solve this by
-calling the rate calculation twice — once through the chain via `NextMethod()`
-to get the standard, composable result, and once more directly for the
-vulnerability-adjusted correction — and then combining the two by predator
-row:
+calling the rate calculation twice — once with unmodified inputs to get the
+standard result, and once more with a vulnerability-modified input to get the
+correction — and then combining the two by predator row. Both calls go through
+`NextMethod()`, so both stay fully composable:
 
 ```r
 projectEncounter.mizerReef <- function(params, n, n_pp, n_other, t = 0, ...) {
@@ -150,9 +150,11 @@ projectEncounter.mizerReef <- function(params, n, n_pp, n_other, t = 0, ...) {
     # Standard encounter (used as-is for predators unaffected by refuge)
     encounter <- NextMethod()
     # Encounter recomputed with vulnerability-reduced prey abundance (used
-    # for predators whose foraging is blocked by refuge)
-    encounter_vul <- mizer::mizerEncounter(params,
-        n = vulnerable * n, n_pp = n_pp, n_other = n_other, t = t, ...)
+    # for predators whose foraging is blocked by refuge). Reassigning the
+    # formal `n` and then calling NextMethod() bare sends the reduced prey
+    # abundance down the full extension chain.
+    n <- vulnerable * n
+    encounter_vul <- NextMethod()
     encounter[blocked_pred, ] <- encounter_vul[blocked_pred, ]
     encounter
 }
@@ -174,30 +176,30 @@ projectPredMort.mizerReef <- function(params, n, n_pp, n_other, t = 0,
         new_rd = reefDegrade(params, n, n_pp, n_other, t, ...))
 
     pm <- NextMethod()
-    pred_rate_blocked <- pred_rate
-    pred_rate_blocked[!blocked_pred, ] <- 0
-    pm_blocked <- mizer::mizerPredMort(params, n, n_pp, n_other, t = t,
-        pred_rate = pred_rate_blocked, ...)
+    pred_rate[!blocked_pred, ] <- 0
+    pm_blocked <- NextMethod()
     pm + (vulnerable - 1) * pm_blocked
 }
 ```
 
-Because the standard part of the calculation (`NextMethod()`) still goes
-through the full extension chain, a lower extension package's contribution to
-Encounter or PredMort is preserved for every predator that refuge does not
-block. Only the vulnerability *correction* bypasses the chain, since it needs
-a direct call to mizer's base rate function to recompute with modified
-inputs.
+Because *both* calls go through `NextMethod()` — the standard one and the
+vulnerability correction — a lower extension package's contribution to
+Encounter or PredMort is preserved for every predator, blocked or not. The
+trick is that a bare `NextMethod()` forwards the *current* values of the
+method's formal arguments as bound in this frame, not the values the generic
+was originally called with. So reassigning `n <- vulnerable * n` (or zeroing
+rows of `pred_rate`) before the second bare call is enough to recompute the
+integral with modified inputs *through the full chain*, with no direct call to
+mizer's base rate function needed.
 
 ## A `NextMethod()` pitfall worth knowing about
 
-An earlier version tried to get full composability by calling `NextMethod()`
-a *second* time with an overridden argument, e.g. `NextMethod(n = vulnerable *
-n)`, instead of falling back to a direct call. This looks like it should work
-— R does let you override a single argument this way — but testing surfaced a
-serious problem: once a generic has more than two formal arguments, passing an
-explicit named override to `NextMethod()` corrupts the matching of the
-*other* arguments. A minimal reproduction:
+The obvious way to recompute with a modified input is to pass an override
+directly to `NextMethod()`, e.g. `NextMethod(n = vulnerable * n)`. This looks
+like it should work — R does let you override a single argument this way — but
+testing surfaced a serious problem: once a generic has more than two formal
+arguments, passing an explicit named override to `NextMethod()` corrupts the
+matching of the *other* arguments. A minimal reproduction:
 
 ```r
 f <- function(params, n, n_pp, n_other, t = 0, ...) UseMethod("f")
@@ -213,10 +215,13 @@ f.foo <- function(params, n, n_pp, n_other, t = 0, ...) {
 Calling this with a 2×3 matrix `n` and a length-5 vector `n_pp` prints the
 correct `length(n_pp) = 5` for the first call, but `length(n_pp) = 6` for the
 second — `n_pp` has silently been overwritten by (part of) the new `n`. This
-is what led to the two rate methods above being written the way they are:
-`NextMethod()` is only ever called bare (no overridden arguments), and the
-modified-input branch uses a direct, explicit call to
-`mizer::mizerEncounter()` / `mizer::mizerPredMort()` instead.
+is why the two rate methods above never pass an argument to `NextMethod()`.
+Instead they reassign the formal in the local frame (`n <- vulnerable * n`)
+and then call `NextMethod()` bare: the modified value still propagates down
+the chain, but because no named argument is supplied, the matching of the
+remaining arguments is left intact. Reassigning-then-calling-bare gives you
+the composability of the chain *and* the modified input, with none of the
+argument-corruption.
 
 # Algae and detritus: two unstructured resource components
 
