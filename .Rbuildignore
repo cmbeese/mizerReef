@@ -11,7 +11,6 @@ test_i2.rda
 ^vignettes/Caribbean_10_model-description\.Rmd$
 ^vignettes/_Caribbean_10_model-description\.Rmd$
 ^vignettes/mizerReef-fancy\.qmd$
-^vignettes/karpata_model-description\.Rmd$
 ^vignettes/multiple-resources\.Rmd$
 ^vignettes/model-description\.Rmd$
 ^ignore$

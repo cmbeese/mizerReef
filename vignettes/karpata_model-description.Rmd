@@ -4,12 +4,7 @@ subtitle: "Karpata Reef Steady State Model Description"
 author: ""
 bibliography: references.bib
 csl: ecology.csl
-output:
-  bookdown::html_document2:
-    toc: true
-    code_folding: show
-    toc_depth: 4
-    fig_caption: true
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Functional Group Example}
   %\VignetteEngine{knitr::rmarkdown}
@@ -24,12 +19,12 @@ knitr::opts_chunk$set(dpi=400)
 library(ggplot2)
 library(dplyr)
 library(knitr)
-library(knitcitations)
 library(mizer)
 library(mizerExperimental)
 library(mizerReef)
 
-params <- karpata_model
+data(caribbean_10_model)
+params <- caribbean_10_model
 ```
 
 \newpage
@@ -38,11 +33,9 @@ params <- karpata_model
 
 The model includes `r nrow(params@species_params)-1` species groups of fish as well as a general group of benthic invertebrates. Species groups were assigned based on functional traits, body size, diet, and interactions with habitat structure. Estimates of observed biomass for each group were used to tune reproduction and resource consumption parameters so that steady state abundances agree with empirical observations. The process of establishing a steady state that agrees with empirical observations is nontrivial. The R script used to tune the steady state parameters is included at the end of this file. 
 
-Biomass estimates were based on data collected from Karpata Reef in Bonaire, a site with low fishing levels in a marine reserve [@Dryden2016; @Rogers2014; @Newman2015; @Williams2015; @Williams2016]. Observations of fish smaller than 10 cm were removed from analysis because their abundance is not well captured by visual survey methods. The cutoff weight for observed biomass estimates was calculated using published length-weight relationships [@FishBase]. The cutoff size is given in @tbl-biomass along with the observed biomass per square meter in grams.
+Biomass estimates were based on data collected from Karpata Reef in Bonaire, a site with low fishing levels in a marine reserve [@Dryden2016; @Rogers2014; @Newman2015; @Williams2015; @Williams2016]. Observations of fish smaller than 10 cm were removed from analysis because their abundance is not well captured by visual survey methods. The cutoff weight for observed biomass estimates was calculated using published length-weight relationships [@FishBase]. The cutoff size is given in the table below along with the observed biomass per square meter in grams.
 
 ```{r, echo = FALSE}
-#| label: tbl-biomass
-#| tbl-cap: Observed biomasses
 params@species_params %>%
     filter(!is.na(biomass_observed)) %>%
     select(species,biomass_observed, biomass_cutoff) %>%
@@ -65,11 +58,9 @@ The rate $E_{i}(w)$ at which a predator of species $i$ and weight $w$ encounters
 
 #### Interaction Matrix  
   
-The $\theta_{ij}$ matrix sets the interaction strength between predator group $i$ prey group $j$. The predator/prey interaction matrix has entries between 0 (if the groups can not interact) and 1, see @fig-interaction. All organisms were assumed to interact equally, with the exception of nocturnal invertivores which are known to hunt off the reef at night. 
+The $\theta_{ij}$ matrix sets the interaction strength between predator group $i$ prey group $j$. The predator/prey interaction matrix has entries between 0 (if the groups can not interact) and 1, see the figure below. All organisms were assumed to interact equally, with the exception of nocturnal invertivores which are known to hunt off the reef at night. 
 
 ```{r, echo = FALSE}
-#| label: fig-interaction
-#| fig-cap: "Group interaction matrix."
 p <- ggplot(melt(params@interaction),
        aes(x = prey, y = reorder(predator, desc(predator)), fill = value)) + 
     geom_tile(colour = "black", linewidth = 0.25) +
@@ -82,11 +73,9 @@ p <- ggplot(melt(params@interaction),
 
 #### Predation Kernel   
   
-The parameters for the predation kernels were based on trait-based studies of prey size selectivity, diet studies that estimate predator prey mass ratio, and home range size estimates from @Nash2014. Values were tuned to achieve expected diet compositions. All estimates fall within observed ranges. All groups use a lognormal predation kernel. The parameters are given in @tbl-lognormal. 
+The parameters for the predation kernels were based on trait-based studies of prey size selectivity, diet studies that estimate predator prey mass ratio, and home range size estimates from @Nash2014. Values were tuned to achieve expected diet compositions. All estimates fall within observed ranges. All groups use a lognormal predation kernel. The parameters are given in the table below. 
 
 ```{r, echo = FALSE, results='asis'}
-#| label: tbl-lognormal
-#| tbl-cap: Parameters for the lognormal predation kernels
 params@species_params %>%
     filter(pred_kernel_type == "lognormal") %>%
     select(beta, sigma, gamma) %>%
@@ -112,8 +101,6 @@ All fish are assumed to utilize refuge ($\tau = 1$). Fish smaller than `r paste(
 The following table gives the fish length bins and refuge densities that define the refuge profile used in the steady state. Length bins and refuge densities were garnered from the FORCE data for Karpata reef.
 
 ```{r, echo = FALSE}
-#| label: tbl-Refuge
-#| tbl-cap: Parameters for defining the refuge profile.
 #| 
 params@other_params$method_params %>%
     mutate(refuge_density = round(refuge_density,3)) %>%
@@ -123,11 +110,9 @@ params@other_params$method_params %>%
                         "Refuge Density (no./m^2)"))
 ```
 
-Each species group utilises benthic structures differently depending on their specific traits. @tbl-refugeUse indicates how each species group interacts with structures that provide predation refuge. 
+Each species group utilises benthic structures differently depending on their specific traits. the table below indicates how each species group interacts with structures that provide predation refuge. 
 
 ```{r, echo = FALSE, results='asis'}
-#| label: tbl-refugeUse
-#| tbl-cap: Parameters for defining how species interact with structure.
 #| 
 params@species_params %>%
     select(refuge_user, blocked_pred) %>%
@@ -138,11 +123,9 @@ params@species_params %>%
     kable(col.names = c("Group", "Uses refuge?", "Accesses prey in refuge?"))
 ```
 
-@fig-refuge shows the density-dependent refuge profile produced by the competitive method for the simple trait-based Bonaire model at steady state.
+the figure below shows the density-dependent refuge profile produced by the competitive method for the simple trait-based Bonaire model at steady state.
 
 ```{r, echo = FALSE}
-#| label: fig-refuge
-#| fig-cap: "Refuge profile used to find steady state abundances."
 q <- plotRefugeProfile(params)
 ```
 
@@ -152,13 +135,11 @@ q <- plotRefugeProfile(params)
   
 Invertebrate consumption of the detrital resource and planktivory are subject to a Holling functional response type II to represent satiation. This relationship is defined by the maximum intake rate, which increases allometrically with body size at rate $n$. The parameter $h$ is the max consumption rate for an invertebrate consumer of size 1 gram. Values for $h$ were chosen so that invertebrates are neither too starved nor totally satiated.
 
-Only a proportion $\alpha_i$ of consumed biomass is retained, while a proportion $1-\alpha_i$ is expelled in the form of feces, which contribute to the detritus. See @tbl-h for the max consumption rate for invertebrates.
+Only a proportion $\alpha_i$ of consumed biomass is retained, while a proportion $1-\alpha_i$ is expelled in the form of feces, which contribute to the detritus. See the table below for the max consumption rate for invertebrates.
 
 No maximum consumption rate is imposed for predatory or herbivorous groups.
 
 ```{r, echo = FALSE}
-#| label: tbl-h
-#| tbl-cap: Consumption parameters
 params@species_params %>%
     filter(satiation == TRUE) %>%
     select(h, alpha, n) %>%
@@ -170,8 +151,6 @@ params@species_params %>%
 The energy losses to metabolic needs are comprised of two components. Standard metabolism occurs at rate $k_{s.i}$, scaling allometrically with body size at rate $p$. The units of the coefficients $k_{s.i}$ are $\text{grams}^{1-p}$ per year. Losses due to activity and movement occur at rate $k_i$ in grams per year, scaling with body size at rate $1$.
 
 ```{r, results='asis', echo = FALSE}
-#| label: tbl-metab
-#| tbl-cap: Metabolism parameters
 params@species_params %>%
     select(ks, p, k) %>%
     kable()
@@ -184,8 +163,6 @@ A proportion $\psi_i(w)$ of the energy available for growth and reproduction is 
 Maturation length and age data were based on the most observed species from each species group in the FORCE data set [@Dryden2016; @Rogers2014; @Newman2015; @Williams2015; @Williams2016].
 
 ```{r, echo = FALSE}
-#| label: tbl-repro
-#| tbl-cap: Parameters determining the investment into reproduction.
 params@species_params %>%
     select(w_mat, w_max, age_mat) %>%
     kable()
@@ -199,11 +176,9 @@ $$
 $$ {#eq-growth} 
 When food supply does not cover the requirements of metabolism and activity, growth and reproduction stops. There is no negative growth or starvation mortality.
 
-The values for the model parameters were chosen so that the resulting growth curves would be close to von Bertalanffy growth curves. The parameters in @tbl-kvb were taken from the literature.
+The values for the model parameters were chosen so that the resulting growth curves would be close to von Bertalanffy growth curves. The parameters in the table below were taken from the literature.
 
 ```{r, echo = FALSE}
-#| label: tbl-kvb
-#| tbl-cap: Parameters for observed vonBertalanffy growth curves and length-weight relationships
 params@species_params %>%
     select(k_vb, w_max, a, b) %>%
     kable()
@@ -251,11 +226,9 @@ Fishing parameters for mizerReef models can be set up with `setFishing()`, which
 catchabilities for each group.
 
 Fishing mortality $\mu_{f.i}(w)$ is calculated with the function `getFMort()`.
-The vignettes were run with following fishing parameters (@tbl-fishing).
+The vignettes were run with following fishing parameters (the table below).
 
 ```{r, echo = FALSE}
-#| label: tbl-fishing
-#| tbl-cap: Selectivity parameters and catchability
 params@gear_params %>%
     filter(catchability > 0) %>%
     select(species, knife_edge_size, catchability) %>%
@@ -304,11 +277,9 @@ allometrically with body size with slope $p_{sen} =$ `r ext_mort$sen_curve`.
 ## Reproduction {#reproduction}
 The reproduction parameters $\epsilon_i$ and $R_{max.i}$ are not directly observable. The values were instead chosen so as to produce steady-state abundances of the groups that are in line with observations and to give reasonable values for the reproduction level.
 
-@tbl-reproduction gives the steady-state reproduction level which is defined as the ratio between the actual reproduction rate $R_i$ and the maximal possible reproduction rate $R_{\max.i}$.
+the table below gives the steady-state reproduction level which is defined as the ratio between the actual reproduction rate $R_i$ and the maximal possible reproduction rate $R_{\max.i}$.
 
 ```{r, echo = FALSE}
-#| label: tbl-reproduction
-#| tbl-cap: Parameters determining reproduction
 df <- params@species_params
 #df$reproduction_level <- getReproductionLevel(params)
 df %>%
@@ -340,8 +311,6 @@ algal biomass per square meter is $B_A = `r signif(algae_biomass(params), digits
 For each consumer species $i$, a parameter $\rho_{A.i}$ determines the rate at which individuals of that species encounter algal biomass. The parameters $\rho_{i.A}$ have units of $g^{-n}$ per year. They are non-zero only for species that consume at least some algae. The preference $\theta_{i.A}$ for algae is a value between 0 and 1 specifying the proportion of consumer diets that are comprised of algal matter.
 
 ```{r, echo = FALSE}
-#| label: tbl-rho-a
-#| tbl-cap: Parameters determining rates of algal consumption.
 params@species_params %>%
     select(rho_algae, interaction_algae) %>%
     rename(rho = rho_algae) %>%
@@ -366,8 +335,6 @@ Detritus is consumed by herbivores and benthic invertebrates. Feeding on detritu
 For each consumer species $i$, a parameter $\rho_{D.i}$ determines the rate at which individuals of that species encounter detritus. The parameters $\rho_{i.D}$ have units of $g^{-n}$ per year. They are non-zero only for species that consume at least some detritus. The preference $\theta_{i.D}$ for detritus is a value between 0 and 1 specifying the proportion of consumer diets comprised of detritus.
 
 ```{r, echo = FALSE}
-#| label: tbl-rho-d
-#| tbl-cap: Parameters determining rates of detritus consumption.
 params@species_params %>%
     select(rho_detritus,interaction_detritus) %>%
     rename(rho = rho_detritus) %>%
