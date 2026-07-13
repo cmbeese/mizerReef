@@ -503,5 +503,5 @@ For more information on the example data used in this vignette, see the [mizerRe
 ## Session info {.section-session-info}
 
 ```{r session-info, echo = FALSE}
-sessioninfo::session_info()
+sessionInfo()
 ```

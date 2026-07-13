@@ -19,7 +19,9 @@ and algae and detritus resources.
 }}
 
 \examples{
-# Example usage:
+\dontrun{
+# MizerReefParams() is deprecated; use newReefParams() instead.
+# See ?newReefParams for a working example.
 data(karpata_species)
 params <- MizerReefParams(
   species_params = karpata_species,
@@ -27,6 +29,7 @@ params <- MizerReefParams(
   algae_params = list(),
   detritus_params = list()
 )
+}
 }
 \seealso{
 \link[mizer:MizerParams]{mizer::MizerParams}

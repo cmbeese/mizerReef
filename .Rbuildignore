@@ -13,5 +13,10 @@ test_i2.rda
 ^vignettes/mizerReef-Chelsey-Laptop\.Rmd$
 ^vignettes/steady-state-recipe-Chelsey-Laptop\.Rmd$
 ^vignettes/mizerReef-fancy\.qmd$
+^vignettes/karpata_model-description\.Rmd$
+^vignettes/multiple-resources\.Rmd$
+^vignettes/reef-degradation-simulations\.Rmd$
+^vignettes/steady-state-recipe\.Rmd$
+^vignettes/model-description\.Rmd$
 ^ignore$
 ^check-results\.txt$
