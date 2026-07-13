@@ -13,6 +13,7 @@
 #'   Plot \tab Description \cr
 #'   [plotRefugeProfile()] \tab Plots the proportion of individuals (by length) that are protected from predators for each species (the refuge profile) \cr
 #'   [plotDegradationScale()] \tab Plots a heatmap of the degradation scaling for refuge density in degradation simulations across bleaching years and size bins. \cr
+#'   [plotDegScale()] \tab Plots a faceted heatmap comparing all three built-in degradation trajectories (rubble, algae, recovery) side by side. \cr
 #'   [plotVulnerable()] \tab Plots vulnerability to predation by size and proportion for each species, either at steady state or for a chosen simulation time step. \cr
 #'   [plotRefugeDensity()] \tab Plots the density of refuge by size at steady state and through time. \cr
 #' }
@@ -194,6 +195,11 @@ plotlySpectraPercentChange <- function(object1, object2, ...) {
 #'
 #' @param object An object of class \linkS4class{MizerParams} or
 #'                  \linkS4class{MizerSim}
+#'
+#' @param species The species to be selected. Optional. By default all species
+#'   are selected. A vector of species names, or a numeric vector with the
+#'   species indices, or a logical vector indicating for each species whether
+#'   it is to be selected (TRUE) or not.
 #'
 #' @param start_time    The first time to be plotted. Default is the beginning
 #'                      of the time series.

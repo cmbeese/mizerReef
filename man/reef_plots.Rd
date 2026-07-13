@@ -18,6 +18,7 @@ Available plotting functions:
 Plot \tab Description \cr
 \code{\link[=plotRefugeProfile]{plotRefugeProfile()}} \tab Plots the proportion of individuals (by length) that are protected from predators for each species (the refuge profile) \cr
 \code{\link[=plotDegradationScale]{plotDegradationScale()}} \tab Plots a heatmap of the degradation scaling for refuge density in degradation simulations across bleaching years and size bins. \cr
+\code{\link[=plotDegScale]{plotDegScale()}} \tab Plots a faceted heatmap comparing all three built-in degradation trajectories (rubble, algae, recovery) side by side. \cr
 \code{\link[=plotVulnerable]{plotVulnerable()}} \tab Plots vulnerability to predation by size and proportion for each species, either at steady state or for a chosen simulation time step. \cr
 \code{\link[=plotRefugeDensity]{plotRefugeDensity()}} \tab Plots the density of refuge by size at steady state and through time. \cr
 }

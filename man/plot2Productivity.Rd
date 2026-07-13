@@ -99,11 +99,12 @@ When called with a \linkS4class{MizerParams}
 object the steady state productivities are plotted.
 }
 \seealso{
-\code{\link[mizer:plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}}, \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
+\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}}, \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
 \code{\link[=plotProductivity]{plotProductivity()}}, \code{\link[=plot2Productivity]{plot2Productivity()}}, \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
 
 Other plotting functions:
 \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotDegScale]{plotDegScale()}},
 \code{\link[=plotDegradationScale]{plotDegradationScale()}},
 \code{\link[=plotProductivity]{plotProductivity()}},
 \code{\link[=plotProductivityRelative]{plotProductivityRelative()}},

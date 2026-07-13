@@ -1,0 +1,10 @@
+---
+title: "Change resources"
+---
+
+## Introduction
+
+Mizer can be used to explore the consequences of climate change on aquatic ecosystems and fisheries. One of the major effects that climate change is having on aquatic ecosystems is a change in resource abundance and size structure. However, responses in resources are highly uncertain and variable and predictions are difficult. For plankton we can use satellite observations of chlorophyll A and earth system models to assess past changes and aim to predict the future. We might want to explore the potential effect of these changes on the rest of aquatic food webs and on our fisheries. This is what we are going to do in this tutorial.
+
+
+## In preparation

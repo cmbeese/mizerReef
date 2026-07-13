@@ -99,7 +99,7 @@
 #'
 #' @keywords datasets
 #' @concept refugeParams
-#' @seealso \code{\link{setRefuge}()}, \code{\link{karpata_model}}
+#' @seealso \code{\link{setRefuge}()}, \code{\link{caribbean_10_model}}
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish
 #' community structure. PhD Thesis, Newcastle University.
@@ -114,17 +114,17 @@
 "karpata_refuge"
 
 
-#' Species parameters for the Karpata reef model (10 functional groups)
+#' Species parameters for a generic Caribbean reef (10 functional groups)
 #'
 #' A species parameter data frame for a 10-group size-spectrum model of
-#' the Karpata reef in Bonaire. Functional groups include multiple predator
+#' a Caribbean coral reef. Functional groups include multiple predator
 #' guilds (engulf, grab, eel-like, cryptic, invertebrate, planktivorous),
 #' parrotfish, farming damselfish, other herbivores, and invertebrates.
-#' Parameters are derived from field measurements (FORCE dataset, Dryden 2017)
-#' and published life-history data (FishBase).
+#' Parameters are derived from field measurements at Karpata Reef, Bonaire
+#' (FORCE dataset, Dryden 2017) and published life-history data (FishBase).
 #'
 #' @keywords datasets
-#' @seealso \code{\link{karpata_model}}, \code{\link{karpata_int}},
+#' @seealso \code{\link{caribbean_10_model}}, \code{\link{caribbean_10_interaction}},
 #'   \code{\link{karpata_refuge}}
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish
@@ -137,39 +137,40 @@
 #'   and resource interactions (\code{interaction_algae},
 #'   \code{interaction_detritus}).
 #' @source PhD Thesis, FORCE dataset
-"karpata_species"
+"caribbean_10_species"
 
 
-#' Interaction matrix for the Karpata reef model (10 functional groups)
+#' Interaction matrix for a generic Caribbean reef (10 functional groups)
 #'
-#' The predator-prey interaction matrix for the 10-group Karpata reef model.
+#' The predator-prey interaction matrix for the 10-group Caribbean reef model.
 #' Rows represent predators, columns prey. Values encode the relative
 #' vulnerability of each prey group to each predator.
 #'
 #' @keywords datasets
-#' @seealso \code{\link{karpata_model}}, \code{\link{karpata_species}}
+#' @seealso \code{\link{caribbean_10_model}}, \code{\link{caribbean_10_species}}
 #' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
 #'   https://doi.org/10.26686/wgtn.26421523
 #' @format A numeric matrix (10 x 10).
 #' @source PhD Thesis, FORCE dataset
-"karpata_int"
+"caribbean_10_interaction"
 
 
-#' mizerReef model for the Karpata reef in Bonaire (10 functional groups)
+#' mizerReef model for a generic Caribbean reef (10 functional groups)
 #'
-#' A calibrated \code{mizerReef} (class \linkS4class{MizerParams}) object for
-#' the Karpata reef site in Bonaire, Netherlands Antilles. The model includes
-#' ten functional groups, competitive predation refuge (using
-#' \code{\link{karpata_refuge}}), and benthic resources (algae and detritus).
+#' A calibrated \code{mizerReef} object for a generic Caribbean coral reef
+#' with ten functional groups, parameterised from field data collected at
+#' Karpata Reef, Bonaire (FORCE dataset, Dryden 2017). Functional groups span
+#' six predator guilds, parrotfish, farming damselfish, other herbivores, and
+#' invertebrates. The model includes competitive predation refuge (using
+#' \code{\link{karpata_refuge}}) and benthic resources (algae and detritus).
 #'
-#' This object was originally built from field data (FORCE dataset, Dryden
-#' 2017) and life-history parameters from FishBase, calibrated to match
-#' observed community structure, and upgraded from an earlier mizerReef
-#' version to comply with the mizerReef 2.1.0 / mizer 3.1.0 extension
-#' mechanism.
+#' Built from \code{\link{caribbean_10_species}},
+#' \code{\link{caribbean_10_interaction}}, and \code{\link{karpata_refuge}};
+#' calibrated to match observed biomasses and upgraded to mizerReef 2.1.0 /
+#' mizer 3.1.0.
 #'
 #' @keywords datasets
-#' @seealso \code{\link{karpata_species}}, \code{\link{karpata_int}},
+#' @seealso \code{\link{caribbean_10_species}}, \code{\link{caribbean_10_interaction}},
 #'   \code{\link{karpata_refuge}}, \code{\link{newReefParams}}
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish
@@ -179,7 +180,7 @@
 #' @format A \code{mizerReef} object (extends \linkS4class{MizerParams}) with
 #'   10 species, competitive refuge, and algae/detritus components.
 #' @source PhD Thesis, FORCE dataset
-"karpata_model"
+"caribbean_10_model"
 
 
 #' Constant refuge profile for tuning steady states

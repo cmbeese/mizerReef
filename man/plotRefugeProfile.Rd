@@ -45,6 +45,7 @@ profile is plotted. The complement of vulnerability.
 Other plotting functions:
 \code{\link[=plot2Productivity]{plot2Productivity()}},
 \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotDegScale]{plotDegScale()}},
 \code{\link[=plotDegradationScale]{plotDegradationScale()}},
 \code{\link[=plotProductivity]{plotProductivity()}},
 \code{\link[=plotProductivityRelative]{plotProductivityRelative()}},

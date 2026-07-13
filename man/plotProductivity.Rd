@@ -34,6 +34,11 @@ series.}
 \item{facet}{A boolean value indicating whether to facet the result plot by
 species group. Defaults to TRUE.}
 
+\item{species}{The species to be selected. Optional. By default all species
+are selected. A vector of species names, or a numeric vector with the
+species indices, or a logical vector indicating for each species whether
+it is to be selected (TRUE) or not.}
+
 \item{total}{A boolean value that determines whether the total productivity
 from all species is plotted as well. Default is TRUE.}
 
@@ -90,13 +95,14 @@ maximum weight in the model.
 
 \seealso{
 \code{\link[=getEGrowthTime]{getEGrowthTime()}},\code{\link[=getProductivity]{getProductivity()}},
-\code{\link[mizer:plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
 \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}}, \code{\link[=plotProductivity]{plotProductivity()}},
 \code{\link[=plot2Productivity]{plot2Productivity()}}, \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
 
 Other plotting functions:
 \code{\link[=plot2Productivity]{plot2Productivity()}},
 \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotDegScale]{plotDegScale()}},
 \code{\link[=plotDegradationScale]{plotDegradationScale()}},
 \code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
 \code{\link[=plotRefugeDensity]{plotRefugeDensity()}},

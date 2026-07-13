@@ -32,6 +32,14 @@
 #'              to 1-n where n is the given allometric scaling exponent and
 #'              z0pre defaults to 0.2.
 #'
+#' @param new_refuge Logical. If TRUE, indicates this refuge profile is being
+#'                   set for use in a new simulation (prevents algae/detritus
+#'                   from being re-tuned during [reefSteady()]). Default FALSE.
+#'
+#' @param degrade Logical. Whether to enable habitat degradation during
+#'                projections. Default FALSE. See [setDegradation()] for
+#'                details on degradation parameters.
+#'
 #' @param resource_color Character. Colour to use for the resource line in plots.
 #'                       Default is "lightseagreen".
 #'

@@ -184,6 +184,8 @@ getVulnerable <- function(object, n, n_pp, n_other,
 #'
 #' @inherit reefSenMort
 #'
+#' @inheritParams reefRates
+#'
 #' @export
 #' @concept extmort
 #' @family rate functions

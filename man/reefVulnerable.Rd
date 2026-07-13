@@ -21,6 +21,11 @@ ecosystem}
 mizer rate functions but useful for extensions with time-dependent
 parameters.)}
 
+\item{new_rd}{Optional numeric vector of refuge densities for each size bin,
+as returned by \code{\link[=reefDegrade]{reefDegrade()}}. If NULL (the default), the refuge density
+is taken from the current competitive method parameters (no degradation)
+or computed via \code{\link[=reefDegrade]{reefDegrade()}} when degradation is active.}
+
 \item{...}{Unused}
 }
 \value{

@@ -381,6 +381,10 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
 #'
 #' @inheritSection setRefuge Setting the refuge profile
 #' @inheritParams reefRates
+#' @param new_rd Optional numeric vector of refuge densities for each size bin,
+#'   as returned by [reefDegrade()]. If NULL (the default), the refuge density
+#'   is taken from the current competitive method parameters (no degradation)
+#'   or computed via [reefDegrade()] when degradation is active.
 #' @param ... Unused
 #'
 #' @return Array (species x size) with the proportion of individuals that are

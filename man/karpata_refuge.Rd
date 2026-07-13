@@ -5,29 +5,24 @@
 \alias{karpata_refuge}
 \title{Competitive method refuge parameters for Karpata reef in Bonaire}
 \format{
-data frame
+A data frame with 10 rows and 3 columns: \code{start_L} (start of
+length bin in cm), \code{end_L} (end of length bin in cm), and
+\code{refuge_density} (refuge density in no./m^2).
 }
 \source{
-PhD Thesis, FORCE dataset
+FORCE dataset, Bonaire (Dryden 2017)
 }
 \usage{
 karpata_refuge
 }
 \description{
-This data frame contains refuge density parameters for a trait-based
-competitive refuge model. It includes start and end lengths for size bins
-and the proportion protected (\code{prop_protect}) for each bin, representing
-refuge density per square meter for ten 5cm-wide fish length bins
-(0–50 cm).
+This data frame contains refuge density parameters for the competitive
+refuge method. It records the density of refuges (no./m^2) in each of
+ten 5 cm fish-length bins (0-50 cm), derived from field measurements at
+the Karpata reef site in Bonaire (FORCE dataset, Dryden 2017).
 }
 \details{
-Parameters are derived from the FORCE dataset
-(see: Dryden, C. (2017)) and field
-measurements from Bonaire. For details on refuge parameterization and
-model implementation, see Chapter 3 of the PhD Thesis:
-Beese, C. (2025). "Modelling Coral Reef Futures: Exploring the role
-of structural complexity in sustaining ecosystem services."
-Victoria University of Wellington.
+Use this with \code{method = "competitive"} in \code{\link{setRefuge}()}.
 }
 \references{
 FORCE dataset. From: Dryden, C. (2017). Habitat structural
@@ -39,4 +34,8 @@ Exploring the role of structural complexity in sustaining ecosystem
 services." Victoria University of Wellington.
 https://doi.org/10.26686/wgtn.26421523
 }
+\seealso{
+\code{\link{setRefuge}()}, \code{\link{caribbean_10_model}}
+}
+\concept{refugeParams}
 \keyword{datasets}

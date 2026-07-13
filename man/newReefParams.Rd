@@ -63,6 +63,10 @@ observed abundances, and their maximum size.}
 
 \item{n}{Allometric growth exponent (also used as metabolic exponent p)}
 
+\item{new_refuge}{Logical. If TRUE, indicates this refuge profile is being
+set for use in a new simulation (prevents algae/detritus
+from being re-tuned during \code{\link[=reefSteady]{reefSteady()}}). Default FALSE.}
+
 \item{method}{Character. The method for setting up benthic refuge.
 One of "sigmoidal", "binned", "competitive", or
 "noncomplex". See Details. \strong{Required.}}
@@ -127,6 +131,10 @@ thresholds are calculated for sigmoidal, binned, and competitive methods:
 Set according to your data collection method. The setting is stored in
 \code{params@other_params$refuge_params$use_dummy_fish_bins} and used by \code{\link[=getRefuge]{getRefuge()}}.
 }}
+
+\item{degrade}{Logical. Whether to enable habitat degradation during
+projections. Default FALSE. See \code{\link[=setDegradation]{setDegradation()}} for
+details on degradation parameters.}
 
 \item{bleach_time}{The year of the simulation to implement bleaching.
 Defaults to year 2.}

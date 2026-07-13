@@ -1,0 +1,398 @@
+===============================================================================
+mizerReef Review Session Summary - November 16, 2025
+Branch: review/changes-20251113
+===============================================================================
+
+MAJOR RELEASE: Version 2.0.0
+---------------------------
+- New S4 classes: MizerReefParams and MizerReefSim for reef-specific modeling and simulation storage.
+- Added slots for refuge, algae, detritus, and sponge parameters.
+- Simulation now stores time-varying refuge profiles (vulnerable).
+- Major refactor of the degradation system: all bleaching and algae responses are now fully parameterizable via user inputs.
+- New parameters: algae_boost, algae_growth_boost, algae_capacity_boost for flexible post-bleaching dynamics.
+- Boost vectors allow compounding effects and custom duration.
+- Auto-padding and validation for boost vectors.
+- Recursive logic in reefDegrade() preserved, but now fully flexible.
+- Fixed double-application bug in algae growth boost during bleaching year.
+- Improved error handling, parameter validation, and type safety throughout the package.
+- Documentation and examples overhauled for clarity and pkgdown compatibility.
+- Lintr and roxygen2 warnings fixed.
+- Vignette and article structure updated for future website integration.
+- Added progress to Imports and updated minimum R version to 4.1.0.
+
+See NEWS.md for full details and technical notes.
+===============================================================================
+
+OVERVIEW
+--------
+Major refactoring of the degradation system to remove hardcoded trajectory 
+logic and make all bleaching responses fully parameterizable via user inputs.
+
+
+COMMITS MADE
+------------
+Commit: fd840d4
+Message: "Refactor degradation: parameterize algae dynamics with vector-based boosts"
+
+Files Modified:
+  1. R/reef-project_methods.R (reefDegrade function)
+  2. R/reef-setParams.R (setDegradation function)
+  3. R/newReefParams.R (newReefParams function)
+
+
+CHANGES SUMMARY
+---------------
+
+1. REMOVED HARDCODED LOGIC
+   
+   Previous implementation in reefDegrade():
+   - Used hardcoded severity vectors:
+     * sev_bleach  = c(0.1, 0.1, rep(0.9, 8))  # for "rubble" trajectory
+     * mild_bleach = c(0.3, 0.7, rep(0.9, 8))  # for "algae" and "recovery"
+   - Had conditional logic checking trajectory names:
+     * if (trajectory == "algae") { ... }
+     * if (trajectory == "rubble") { ... }
+   - Hardcoded algae boost values:
+     * Bleaching year: growth 1.11×, capacity 2× (but applied growth TWICE by mistake!)
+     * Post-bleaching years 1-3: only growth 1.11×
+   - Assumed exactly 10 refuge bins (rep(0.9, 8) hardcoded)
+   
+   All of this has been removed and replaced with parameterizable vectors.
+
+2. NEW PARAMETERIZATION SYSTEM
+   
+   Added three new parameters to setDegradation():
+   
+   a) algae_boost (logical, default = FALSE)
+      - Master switch to enable/disable algae dynamics adjustments
+      - When FALSE, only refuge degradation occurs (via deg_scale)
+      - When TRUE, applies growth and capacity multipliers
+   
+   b) algae_growth_boost (numeric vector, default = c(1.11, 1.11, 1.11, 1.11))
+      - Multipliers for algae growth rate at each time point
+      - Applied by multiplying CURRENT growth rate (compounding)
+      - Element 1 = bleaching year (time = t_bleach)
+      - Element 2 = first year post-bleaching (time = t_bleach + 1)
+      - Element 3 = second year post-bleaching (time = t_bleach + 2)
+      - And so on...
+      - Vector length determines how many years to apply boosts
+      - Must contain only positive values (validated)
+   
+   c) algae_capacity_boost (numeric vector, default = c(2.0))
+      - Multipliers for algae carrying capacity at each time point
+      - Applied by multiplying CURRENT capacity (compounding)
+      - Same indexing structure as growth_boost
+      - If shorter than growth_boost, automatically padded with 1s (no change)
+      - Must contain only positive values (validated)
+   
+   How indexing works:
+   - Index 1 corresponds to bleaching year (year 0)
+   - Index 2 corresponds to post-bleaching year 1
+   - Index 3 corresponds to post-bleaching year 2
+   - boost_idx = years_post + 1
+   
+   Storage in params object:
+   - params@other_params$algae_boost (logical)
+   - params@other_params$algae_growth_boost (vector)
+   - params@other_params$algae_capacity_boost (vector)
+
+3. DEFAULT VALUES
+   algae_growth_boost = c(1.11, 1.11, 1.11, 1.11)   # 4 years of 11% boost
+   algae_capacity_boost = c(2.0)                    # 2x boost at bleaching only
+   
+   Auto-padding: If capacity_boost is shorter than growth_boost, it's 
+   automatically padded with 1s (no change) for remaining years.
+
+4. COMPOUNDING BEHAVIOR
+   Each year multiplies the CURRENT value by the boost factor:
+   - Year 0: initial_value × 1.11
+   - Year 1: (initial_value × 1.11) × 1.11 = initial_value × 1.11²
+   - Year 2: (initial_value × 1.11²) × 1.11 = initial_value × 1.11³
+   - Year 3: (initial_value × 1.11³) × 1.11 = initial_value × 1.11⁴
+
+5. BUG FIXES
+   
+    Original bug in bleaching year code:
+    ```
+    a_growth <- params@other_params$algae$growth
+    new_a_growth <- 1.11*a_growth
+    params@other_params$algae$growth <- 1.11*new_a_growth  # WRONG!
+    ```
+    This applied the boost TWICE: 1.11 × 1.11 = 1.2321
+   
+    Fixed implementation:
+    ```
+    a_growth <- params@other_params$algae$growth
+    params@other_params$algae$growth <- growth_boosts[1] * a_growth  # CORRECT
+    ```
+    Now applies the boost exactly once at bleaching year.
+   
+    Validation added in setDegradation():
+    - Checks that algae_growth_boost is numeric and all values > 0
+    - Checks that algae_capacity_boost is numeric and all values > 0
+    - Checks that deg_scale is a matrix/data.frame with at least 1 column
+    - Auto-pads capacity_boost if shorter than growth_boost:
+       * algae_capacity_boost <- c(algae_capacity_boost, 
+                                                   rep(1, length(algae_growth_boost) - length(algae_capacity_boost)))
+
+6. IMPLEMENTATION DETAILS
+   
+    reefDegrade() function logic flow:
+   
+    Base case (before bleaching):
+    - if (time < t_bleach) return(rd)
+    - Returns original refuge density, no modifications
+   
+    Recursive call:
+    - old_rd <- reefDegrade(params, n, n_pp, n_other, t = t-1)
+    - Gets previous timestep's refuge density
+    - Prevents infinite recursion via base case
+   
+    At bleaching year (time == t_bleach):
+    - Applies deg_scale[, 1] to refuge density
+    - If algae_boost == TRUE:
+       * Gets current algae growth from params@other_params$algae$growth
+       * Multiplies by growth_boosts[1]
+       * Stores result back in params@other_params$algae$growth
+       * Same process for capacity using capacity_boosts[1]
+    - Updates params@time_modified
+    - Returns new_rd
+   
+    Post-bleaching years (time > t_bleach):
+    - Calculates years_post = time - t_bleach
+    - Checks if (years_post + 1) <= ncol(deg_scale)
+    - If yes:
+       * Applies deg_scale[, years_post + 1] to refuge density
+       * If algae_boost == TRUE:
+          - Calculates boost_idx = years_post + 1
+          - If boost_idx <= length(growth_boosts):
+             * Gets current growth, multiplies by growth_boosts[boost_idx]
+          - If boost_idx <= length(capacity_boosts):
+             * Gets current capacity, multiplies by capacity_boosts[boost_idx]
+       * Returns new_rd
+    - If no, returns old_rd (no more degradation)
+   
+    Key implementation details:
+    - NO separate algae_boost_years parameter - vector length is duration
+    - Direct indexing: boost_idx = years_post + 1
+    - Always multiplies CURRENT value (enabling compounding)
+    - Checks vector length before applying to avoid out-of-bounds errors
+    - Auto-padding of capacity_boost happens in setDegradation(), not reefDegrade()
+
+7. DOCUMENTATION UPDATES
+   - Updated roxygen comments in all three files
+   - Made trajectory parameter optional (documentation only)
+   - Clarified that deg_scale column 1 = bleaching year, columns 2+ = post-bleaching
+   - Added @inheritParams to newReefParams for automatic documentation
+
+
+BENEFITS OF NEW DESIGN
+-----------------------
+✓ Fully flexible: Users can specify any boost pattern without code changes
+✓ Simpler: Vector length determines duration automatically
+✓ Cleaner: No hardcoded trajectory logic in reefDegrade()
+✓ More intuitive: Direct vector indexing by year
+✓ Type-safe: Validation checks ensure positive numeric values
+✓ Maintainable: All bleaching parameters in one place (setDegradation)
+✓ Extensible: Easy to add more years or different boost patterns
+
+
+EXAMPLE USAGE
+-------------
+# Basic usage with defaults (matches original "algae" trajectory):
+params <- setDegradation(params, 
+                         deg_scale = algae_scale,
+                         bleach_time = 2,
+                         algae_boost = TRUE)
+
+# Custom boost pattern (e.g., strong initial impact, gradual recovery):
+params <- setDegradation(params,
+                         deg_scale = custom_scale,
+                         bleach_time = 5,
+                         algae_boost = TRUE,
+                         algae_growth_boost = c(1.5, 1.3, 1.2, 1.1, 1.05),
+                         algae_capacity_boost = c(3.0, 2.0, 1.5))
+
+# No algae boost (only refuge degradation):
+params <- setDegradation(params,
+                         deg_scale = rubble_scale,
+                         bleach_time = 2,
+                         algae_boost = FALSE)
+
+
+TECHNICAL NOTES
+---------------
+- deg_scale structure unchanged: column 1 = bleaching, columns 2+ = post-bleaching
+- Recursive call pattern in reefDegrade() preserved (base case at t < t_bleach)
+- params@time_modified updated on each bleaching event
+- Validation prevents negative or zero boost values
+- Compatible with existing mizerReef models (backward compatible via defaults)
+
+
+DISCUSSION POINTS FOR LATER
+----------------------------
+1. Consider defining a MizerReefParams S4 class that extends MizerParams
+   - Would add proper slots for refuge_params, method_params, degradation, etc.
+   - Would eliminate reliance on @other_params
+   - Would provide better type safety and autocomplete
+   - Would improve code readability throughout the package
+
+2. Potentially add validation to ensure deg_scale columns ≥ boost vector length
+
+
+FILES NOT YET REVIEWED
+----------------------
+From original branch diff, still need to review:
+- R/mizerReef-package.R (description changes)
+- _pkgdown.yml (website configuration)
+- man/*.Rd files (documentation - will be regenerated by roxygen)
+- inst/reef-model_description.qmd (deleted file)
+
+
+NEXT STEPS
+----------
+1. Run roxygen2::roxygenize() to regenerate man/*.Rd files
+2. Test new parameterization with example scenarios
+3. Update vignettes to show new API
+4. Consider the MizerReefParams class extension proposal
+5. Continue reviewing remaining branch changes
+
+
+===============================================================================
+End of Session Summary
+===============================================================================
+
+---
+ADDITIONAL DETAILS FOR CONTINUITY
+--------------------------------
+- All S4 class documentation blocks have been reviewed and cleaned for pkgdown and reference manual compatibility.
+- Roxygen2 and lintr warnings have been systematically resolved, including import tag placement and example code cleanup.
+- The NEWS.md file now provides a comprehensive changelog for version 2.0.0, including technical notes and rationale for major refactors.
+- Session summaries are now appended in chronological order for easy review and onboarding.
+- The ignore/ folder is used for draft vignettes, session notes, and files not ready for package build.
+- Vignettes are currently excluded from the build; articles will be developed for pkgdown integration in future sessions.
+- The package is now ready for further feature development, vignette writing, and website deployment.
+- Next tasks may include: expanding articles, testing new parameterization, updating user documentation, and preparing for CRAN or public release.
+---
+
+===============================================================================
+mizerReef Review Session Summary - November 16, 2025 (PM update)
+Branch: major_update
+===============================================================================
+
+- Completed a thorough review and refactor of all resource parameter functions in `reef-setParams.R`.
+- Ensured all parameters are stored in their correct slots: `algae_params`, `detritus_params`, `refuge_params`, and global flags in `other_params`.
+- Refactored `setDegradation` to store degradation parameters in `refuge_params` and algae adjustment parameters in `algae_params`.
+- Updated documentation for all affected functions to reflect new storage logic and improve clarity.
+- Performed a consistency check across the entire script to confirm robust slot usage and documentation.
+- Updated NEWS.md and session summary documents with details of today's changes.
+- Ready for staging and commit.
+
+===============================================================================
+
+===============================================================================
+mizerReef Review Session Summary - November 17, 2025
+Branch: major_update
+===============================================================================
+
+KEY REALIZATION: No Custom Simulation Class Needed
+--------------------------------------------------
+
+DISCOVERY
+---------
+During review of the MizerReefSim class implementation, realized that both 
+`reefDegrade()` and `reefVulnerable()` are rate functions that can calculate 
+their outputs based solely on:
+- Current abundances (n, n_pp, n_other)
+- Model parameters (params)
+- Current time (t)
+
+This means they can be calculated post-hoc from any standard MizerSim object.
+
+IMPLICATIONS
+------------
+1. NO NEED for custom MizerReefSim S4 class
+   - Don't need to store vulnerable profiles during simulation
+   - Don't need custom slots or extended simulation object
+   
+2. NO NEED for custom reefProject() function
+   - Can use standard mizer::project() with MizerReefParams
+   - Returns standard MizerSim object
+   - Simpler workflow for users
+
+3. SIMPLER ARCHITECTURE
+   - Less custom code to maintain
+   - Better compatibility with mizer ecosystem
+   - More memory efficient (calculate only what you need)
+   - Users can leverage all standard mizer functions
+
+IMPLEMENTATION APPROACH
+-----------------------
+Instead of storing refuge/vulnerable data during simulation, calculate them 
+on-demand when needed:
+
+```r
+# Calculate refuge density through time
+refuge_density_list <- list()
+for (i in seq_along(sim@params@time)) {
+    refuge_density_list[[i]] <- reefDegrade(
+        params = sim@params,
+        n = sim@n[i, , ],
+        n_pp = sim@n_pp[i, ],
+        n_other = sim@n_other[i, ],
+        t = sim@params@time[i]
+    )
+}
+
+# Calculate vulnerable biomass through time
+vulnerable_list <- list()
+for (i in seq_along(sim@params@time)) {
+    rd <- refuge_density_list[[i]]
+    vulnerable_list[[i]] <- reefVulnerable(
+        params = sim@params,
+        n = sim@n[i, , ],
+        n_pp = sim@n_pp[i, ],
+        n_other = sim@n_other[i, ],
+        t = sim@params@time[i],
+        new_rd = rd
+    )
+}
+```
+
+RECOMMENDED PACKAGE STRUCTURE
+------------------------------
+Keep:
+- MizerReefParams class (extends MizerParams)
+- Rate functions: reefDegrade(), reefVulnerable()
+- Helper/getter functions for convenient post-hoc calculation
+
+Remove/Don't implement:
+- MizerReefSim class
+- reefProject() function
+- Custom projection methods
+
+Add convenience functions:
+- getRefugeDensity(sim, time_range = NULL)
+- getVulnerable(sim, time_range = NULL)
+
+BENEFITS
+--------
+✓ Simpler package architecture
+✓ Full compatibility with mizer workflow
+✓ Memory efficient (lazy calculation)
+✓ Easier maintenance
+✓ Users can use familiar mizer::project()
+✓ Less custom code to test and document
+✓ Natural integration with mizer visualization tools
+
+ACTION ITEMS
+------------
+1. Remove/refactor any MizerReefSim class code
+2. Remove/refactor any reefProject() function code
+3. Ensure rate functions work with standard MizerSim objects
+4. Add convenience getter functions if helpful
+5. Update documentation to reflect simpler workflow
+6. Update vignettes to show standard project() usage
+
+===============================================================================
+
