@@ -90,21 +90,16 @@
 
 #' Competitive method refuge parameters for Karpata reef in Bonaire
 #'
-#' This data frame contains refuge density parameters for a trait-based
-#' competitive refuge model. It includes start and end lengths for size bins
-#' and the proportion protected (`prop_protect`) for each bin, representing
-#' refuge density per square meter for ten 5cm-wide fish length bins
-#' (0–50 cm).
+#' This data frame contains refuge density parameters for the competitive
+#' refuge method. It records the density of refuges (no./m^2) in each of
+#' ten 5 cm fish-length bins (0-50 cm), derived from field measurements at
+#' the Karpata reef site in Bonaire (FORCE dataset, Dryden 2017).
 #'
-#' Parameters are derived from the FORCE dataset
-#' (see: Dryden, C. (2017)) and field
-#' measurements from Bonaire. For details on refuge parameterization and
-#' model implementation, see Chapter 3 of the PhD Thesis:
-#' Beese, C. (2025). "Modelling Coral Reef Futures: Exploring the role
-#' of structural complexity in sustaining ecosystem services."
-#' Victoria University of Wellington.
+#' Use this with \code{method = "competitive"} in \code{\link{setRefuge}()}.
 #'
 #' @keywords datasets
+#' @concept refugeParams
+#' @seealso \code{\link{setRefuge}()}, \code{\link{karpata_model}}
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish
 #' community structure. PhD Thesis, Newcastle University.
@@ -112,9 +107,79 @@
 #' Exploring the role of structural complexity in sustaining ecosystem
 #' services." Victoria University of Wellington.
 #' https://doi.org/10.26686/wgtn.26421523
-#' @format data frame
-#' @source PhD Thesis, FORCE dataset
+#' @format A data frame with 10 rows and 3 columns: \code{start_L} (start of
+#'   length bin in cm), \code{end_L} (end of length bin in cm), and
+#'   \code{refuge_density} (refuge density in no./m^2).
+#' @source FORCE dataset, Bonaire (Dryden 2017)
 "karpata_refuge"
+
+
+#' Species parameters for the Karpata reef model (10 functional groups)
+#'
+#' A species parameter data frame for a 10-group size-spectrum model of
+#' the Karpata reef in Bonaire. Functional groups include multiple predator
+#' guilds (engulf, grab, eel-like, cryptic, invertebrate, planktivorous),
+#' parrotfish, farming damselfish, other herbivores, and invertebrates.
+#' Parameters are derived from field measurements (FORCE dataset, Dryden 2017)
+#' and published life-history data (FishBase).
+#'
+#' @keywords datasets
+#' @seealso \code{\link{karpata_model}}, \code{\link{karpata_int}},
+#'   \code{\link{karpata_refuge}}
+#' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
+#' complexity of Caribbean coral reefs and its relationships with fish
+#' community structure. PhD Thesis, Newcastle University.
+#' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+#'   https://doi.org/10.26686/wgtn.26421523
+#' @format A data frame with one row per functional group and columns for
+#'   life-history parameters (w_max, w_mat, age_mat, h, beta, sigma, etc.),
+#'   refuge use (\code{refuge_user}, \code{blocked_pred}, \code{satiation}),
+#'   and resource interactions (\code{interaction_algae},
+#'   \code{interaction_detritus}).
+#' @source PhD Thesis, FORCE dataset
+"karpata_species"
+
+
+#' Interaction matrix for the Karpata reef model (10 functional groups)
+#'
+#' The predator-prey interaction matrix for the 10-group Karpata reef model.
+#' Rows represent predators, columns prey. Values encode the relative
+#' vulnerability of each prey group to each predator.
+#'
+#' @keywords datasets
+#' @seealso \code{\link{karpata_model}}, \code{\link{karpata_species}}
+#' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+#'   https://doi.org/10.26686/wgtn.26421523
+#' @format A numeric matrix (10 x 10).
+#' @source PhD Thesis, FORCE dataset
+"karpata_int"
+
+
+#' mizerReef model for the Karpata reef in Bonaire (10 functional groups)
+#'
+#' A calibrated \code{mizerReef} (class \linkS4class{MizerParams}) object for
+#' the Karpata reef site in Bonaire, Netherlands Antilles. The model includes
+#' ten functional groups, competitive predation refuge (using
+#' \code{\link{karpata_refuge}}), and benthic resources (algae and detritus).
+#'
+#' This object was originally built from field data (FORCE dataset, Dryden
+#' 2017) and life-history parameters from FishBase, calibrated to match
+#' observed community structure, and upgraded from an earlier mizerReef
+#' version to comply with the mizerReef 2.1.0 / mizer 3.1.0 extension
+#' mechanism.
+#'
+#' @keywords datasets
+#' @seealso \code{\link{karpata_species}}, \code{\link{karpata_int}},
+#'   \code{\link{karpata_refuge}}, \code{\link{newReefParams}}
+#' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
+#' complexity of Caribbean coral reefs and its relationships with fish
+#' community structure. PhD Thesis, Newcastle University.
+#' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+#'   https://doi.org/10.26686/wgtn.26421523
+#' @format A \code{mizerReef} object (extends \linkS4class{MizerParams}) with
+#'   10 species, competitive refuge, and algae/detritus components.
+#' @source PhD Thesis, FORCE dataset
+"karpata_model"
 
 
 #' Constant refuge profile for tuning steady states

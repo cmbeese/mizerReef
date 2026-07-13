@@ -8,3 +8,10 @@
 test2.rda
 test_sp2.rda
 test_i2.rda
+^vignettes/Caribbean_10_model-description\.Rmd$
+^vignettes/_Caribbean_10_model-description\.Rmd$
+^vignettes/mizerReef-Chelsey-Laptop\.Rmd$
+^vignettes/steady-state-recipe-Chelsey-Laptop\.Rmd$
+^vignettes/mizerReef-fancy\.qmd$
+^ignore$
+^check-results\.txt$
