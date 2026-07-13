@@ -1,7 +1,7 @@
 ---
 title: "Getting started with MizerReef"
 output:
-  html_document
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Getting started with MizerReef}
   %\VignetteEngine{knitr::rmarkdown}
@@ -207,16 +207,16 @@ MizerReef includes example model parameters with the package. See the [Model Des
 for more details on these example data.
 
 
-The included species parameter data frame (`Caribbean_10_species`) is based on fish
-assemblage data from a Caribbean reef site with relatively low fishing pressure. The full species parameter data frame for the Caribbean_10 example is
+The included species parameter data frame (`caribbean_10_species`) is based on fish
+assemblage data from a Caribbean reef site with relatively low fishing pressure. The full species parameter data frame for the Caribbean 10 example is
 shown below:
 
 
 ```{r setup, message=FALSE, echo = FALSE, eval=FALSE}
-data("Caribbean_10_species")
-knitr::kable(Caribbean_10_species[colnames(Caribbean_10_species) %in% c("species", "l_max", "w_mat",
+data("caribbean_10_species")
+knitr::kable(caribbean_10_species[colnames(caribbean_10_species) %in% c("species", "l_max", "w_mat",
 "age_mat", "biomass_cutoff", "biomass_observed", "beta", "sigma", "a", "b", "refuge_user",
-"bad_pred",  "satiation", "interaction_algae", "interaction_detritus")])
+"blocked_pred",  "satiation", "interaction_algae", "interaction_detritus")])
 ```
 
 
@@ -329,7 +329,7 @@ the `newReefParams()` function. This function extends `mizer`'s
 user-supplied parameters, and setting sensible defaults for any missing
 reef-specific values.
 
-> 💡 **Tip:** When creating a new `MizerReefParams` object, you can't use the competitive refuge method when calibrating biomasses because it is density-dependent.
+> 💡 **Tip:** When creating a new `mizerReef` model with `newReefParams()`, you can't use the competitive refuge method when calibrating biomasses because it is density-dependent.
 
 <details>
 <summary>Use a tuning profile instead.</summary>
@@ -342,8 +342,8 @@ and a simple step function (`step_tune`) that can be used for this purpose.
 
 
 ```{r create-params, eval = FALSE, echo = TRUE}
-Caribbean_10_model <- newReefParams(group_params = Caribbean_10_species,
-                                    interaction = Caribbean_10_interaction,
+caribbean_10_model <- newReefParams(species_params = caribbean_10_species,
+                                    interaction = caribbean_10_interaction,
                                     method = "binned",
                                     method_params = tuning_profile)
 ```
@@ -392,9 +392,9 @@ make ecological sense and match expectations for your system. MizerReef provides
 several plotting functions to help you visualize and interpret your model outputs:
 
 - **Refuge profile at steady state:**  
-  Use [plotRefuge()] to see the proportion of individuals protected by refuge across sizes and species.
+  Use [plotRefugeProfile()] to see the proportion of individuals protected by refuge across sizes and species.
   ```{r plot-refuge, eval=FALSE}
-  plotRefuge(params)
+  plotRefugeProfile(params)
   ```
 
 - **Diet composition:**  
@@ -438,18 +438,18 @@ Changing the refuge profile allows you to explore how habitat structure affects 
 ```{r change-refuge, echo = TRUE, eval=FALSE, fig.cap="The biomass (left) and productivity (right) for a model with no predation refuge (non-complex) and a model with predation refuge based on data from Karpata Reef in Bonaire (complex). Colours represent species groups.", fig.alt="Two-panel plot showing total biomass and productivity for complex and non-complex refuge profiles."}
 
 # Change to a non-complex (no refuge) profile
-non_complex <- newRefuge(Caribbean_10_model, new_method = "noncomplex")
+non_complex <- newRefuge(caribbean_10_model, new_method = "noncomplex")
 
 # Run to steady state
 non_complex <- non_complex |> reefSteady() |> reefSteady() |> reefSteady()
 
 # Compare biomass and productivity between models
-all_biom11 <- plot2TotalBiomass(non_complex, Caribbean_10_model,
+all_biom11 <- plot2TotalBiomass(non_complex, caribbean_10_model,
                                 name1 = "Flat", 
                                 name2 = "Complex",
                                 stack = TRUE)
 
-all_prod11 <- plot2Productivity(non_complex, Caribbean_10_model,
+all_prod11 <- plot2Productivity(non_complex, caribbean_10_model,
                                 name1 = "Flat", 
                                 name2 = "Complex",
                                 stack = TRUE) 
@@ -465,7 +465,7 @@ As we can see in Figure 4, removing refuge availability reduces both biomass and
 > <details><summary>💡 **Tip:** If your results look odd after changing the refuge profile, run `reefSteady()`.</summary> It needs to run enough times to reach a new steady state. To learn more about modifying refuge profiles and their parameters, see [setRefuge()].</details>
 
 
-For more information on the example data used in this vignette, see the [mizerReef model description vignette](caribbean10_model-description.html). To learn more about running simulations with mizerReef, see the [mizerReef degradation vignette](reef-degradation-simulations.html).
+For more information on the example data used in this vignette, see the [mizerReef model description vignette](karpata_model-description.html). To learn more about running simulations with mizerReef, see the [mizerReef degradation vignette](reef-degradation-simulations.html).
 
 
 ## Links and further reading {.section-links}

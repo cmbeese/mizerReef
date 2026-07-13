@@ -3,11 +3,7 @@ title: "MizerReef Degradation Simulations"
 author: ""
 bibliography: references.bib
 output:
-  bookdown::html_document2:
-    toc: true
-    code_folding: show
-    toc_depth: 3
-    fig_caption: true
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{MizerReef Degradation Simulations}
   %\VignetteEngine{knitr::rmarkdown}
@@ -51,7 +47,7 @@ library(dplyr)
 library(knitr)
 
 # Load example model and degradation data
-data("karpata_model")
+data("caribbean_10_model")
 data("rubble_scale")
 data("algae_scale") 
 data("recovery_scale")
@@ -120,7 +116,7 @@ setDegradation():
 
 ```{r setup-degradation, eval=FALSE}
 # Start with a tuned steady-state model
-params_degraded <- karpata_model
+params_degraded <- caribbean_10_model
 
 # Add degradation parameters - rubble trajectory example
 params_degraded <- setDegradation(
@@ -185,7 +181,7 @@ Let's compare the three different degradation trajectories:
 ```{r compare-trajectories, eval=FALSE}
 # Set up models for each trajectory
 params_algae <- setDegradation(
-  karpata_model,
+  caribbean_10_model,
   trajectory = "algae",
   deg_scale = algae_scale,
   bleach_time = 2,
@@ -193,7 +189,7 @@ params_algae <- setDegradation(
 ) %>% setURcapacity() %>% reefSteady()
 
 params_recovery <- setDegradation(
-  karpata_model,
+  caribbean_10_model,
   trajectory = "recovery", 
   deg_scale = recovery_scale,
   bleach_time = 2,
@@ -238,7 +234,7 @@ algae_boost:
 ```{r algae-boost-simulation, eval=FALSE}
 # Set up model with algae boost enabled
 params_algae_boost <- setDegradation(
-  karpata_model,
+  caribbean_10_model,
   trajectory = "rubble",
   deg_scale = rubble_scale,
   bleach_time = 2,
@@ -333,7 +329,7 @@ kable(custom_scale[, 1:8],
 
 # Set up and run simulation with custom trajectory
 params_custom <- setDegradation(
-  karpata_model,
+  caribbean_10_model,
   trajectory = "slow_recovery",
   deg_scale = custom_scale,
   bleach_time = 2,
@@ -492,7 +488,7 @@ simulation:
 
 ```{r complete-workflow, eval=FALSE}
 # 1. Start with tuned model
-params_base <- karpata_model
+params_base <- caribbean_10_model
 
 # 2. Set up degradation simulation
 params_sim <- setDegradation(
@@ -540,5 +536,5 @@ write.csv(getBiomass(sim_result), "simulation_biomass.csv")
 - `reefDegrade()` function documentation for degradation mechanics
 
 ```{r session-info, echo=FALSE}
-sessioninfo::session_info()
+sessionInfo()
 ```

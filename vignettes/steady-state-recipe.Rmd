@@ -3,11 +3,7 @@ title: "MizerReef Steady State Recipe"
 author: ""
 bibliography: references.bib
 output:
-  bookdown::html_document2:
-    toc: true
-    code_folding: show
-    toc_depth: 3
-    fig_caption: true
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{MizerReef Steady State Recipe}
   %\VignetteEngine{knitr::rmarkdown}
@@ -73,7 +69,7 @@ we can tune abundances first.
 
 ```{r create-initial-params, eval=FALSE}
 # Create initial parameters object with tuning refuge profile
-params <- newReefParams(group_params = karpata_species,
+params <- newReefParams(species_params = karpata_species,
                         interaction = karpata_int,
                         method = "binned",
                         method_params = tuning_profile)
@@ -87,7 +83,7 @@ Let's examine the species groups and their key parameters:
 ```{r species-overview, eval=FALSE}
 # Show key species parameters
 kable(karpata_species[, c("species", "w_max", "w_mat", "refuge_user", 
-                          "bad_pred", "biomass_observed")],
+                          "blocked_pred", "biomass_observed")],
       caption = "Key species parameters for the Karpata model")
 ```
 
@@ -466,7 +462,7 @@ data("tuning_profile")
 data("karpata_refuge")
 
 # 1. Create initial parameters
-params <- newReefParams(group_params = karpata_species,
+params <- newReefParams(species_params = karpata_species,
                         interaction = karpata_int,
                         method = "binned",
                         method_params = tuning_profile)
@@ -515,7 +511,7 @@ params <- params |>
     reefSteady() |> reefSteady() |> reefSteady()
 
 # Save final model
-karpata_model <- reefSteady(params)
+caribbean_10_model <- reefSteady(params)
 ```
 
 ## Further Reading
@@ -526,5 +522,5 @@ karpata_model <- reefSteady(params)
   2021-08-20-a-5-step-recipe-for-tuning-the-model-steady-state/)
 
 ```{r session-info, echo=FALSE}
-sessioninfo::session_info()
+sessionInfo()
 ```
