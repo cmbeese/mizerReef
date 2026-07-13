@@ -500,3 +500,87 @@ plotDegradationScale <- function(object = NULL,
 plotlyDegradationScale <- function(object = NULL, trajectory = NULL, return_data = FALSE, ...) {
     ggplotly(plotDegradationScale(object = object, trajectory = trajectory, return_data = return_data, ...))
 }
+
+
+#' Compare built-in degradation trajectories as faceted heatmaps
+#'
+#' Creates a faceted heatmap comparing the three built-in degradation
+#' trajectories (rubble, algae, and recovery) side by side. Each panel shows
+#' how refuge density scaling factors change over time and across refuge size
+#' bins following a bleaching event.
+#'
+#' The colour scale shows scaling factors relative to pre-disturbance refuge
+#' density: values below 1 (red/pink) indicate a reduction, 1 (grey) indicates
+#' no change, and values above 1 (green/blue) indicate an increase.
+#'
+#' @param return_data Logical. If TRUE, returns the combined long-format data
+#'   frame instead of the plot. Default FALSE.
+#'
+#' @return A ggplot2 object, or a data frame if \code{return_data = TRUE}.
+#' @importFrom reshape2 melt
+#' @export
+#' @family plotting functions
+#' @concept refugePlots
+#' @seealso [plotDegradationScale()], [setDegradation()], [reefDegrade()],
+#'   [rubble_scale], [algae_scale], [recovery_scale]
+plotDegScale <- function(return_data = FALSE) {
+    # Load the three built-in trajectory data objects
+    e <- new.env()
+    data("rubble_scale",   package = "mizerReef", envir = e)
+    data("algae_scale",    package = "mizerReef", envir = e)
+    data("recovery_scale", package = "mizerReef", envir = e)
+
+    traj_list <- list(
+        rubble   = e$rubble_scale,
+        algae    = e$algae_scale,
+        recovery = e$recovery_scale
+    )
+
+    # Convert each to long format and bind with trajectory label
+    df_list <- lapply(names(traj_list), function(traj) {
+        m <- traj_list[[traj]]
+        df <- reshape2::melt(m)
+        colnames(df) <- c("SizeBin", "Year", "Scaling")
+        df$Trajectory <- traj
+        df
+    })
+    df_long <- do.call(rbind, df_list)
+    df_long$SizeBin    <- as.factor(df_long$SizeBin)
+    df_long$Year       <- as.numeric(df_long$Year)
+    df_long$Trajectory <- factor(df_long$Trajectory,
+                                 levels = c("rubble", "algae", "recovery"))
+
+    if (return_data) return(df_long)
+
+    breaks <- sort(unique(df_long$Year))
+    labels <- ifelse(breaks == 1, "Bleach", as.character(breaks - 1))
+
+    ggplot(df_long,
+           aes(x = factor(Year, levels = breaks), y = SizeBin, fill = Scaling)) +
+        geom_tile(colour = "white", linewidth = 0.2) +
+        facet_wrap(~Trajectory, ncol = 3) +
+        scale_fill_gradientn(
+            name = "Scaling",
+            colors = c("deeppink3", "orangered1", "gray90",
+                       "springgreen", "dodgerblue2"),
+            values = scales::rescale(c(0, 0.95, 1, 1.05, 2)),
+            limits = c(0, 2),
+            labels = function(x) paste0(round((x - 1) * 100), "%")
+        ) +
+        scale_x_discrete(
+            name = "Years Post Bleaching",
+            breaks = breaks,
+            labels = labels
+        ) +
+        scale_y_discrete(
+            name = "Refuge Size Bin (cm)",
+            limits = rev(levels(df_long$SizeBin))
+        ) +
+        labs(title = "Built-in Degradation Trajectories") +
+        theme_minimal() +
+        theme(
+            axis.text.x  = element_text(angle = 45, hjust = 1, size = 7),
+            axis.title.y = element_text(angle = 0, vjust = 0.5),
+            strip.text   = element_text(face = "bold")
+        )
+}
