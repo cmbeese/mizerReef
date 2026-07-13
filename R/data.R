@@ -136,3 +136,87 @@
 #' @format data frame
 #' @source Beese PhD Thesis
 "tuning_profile"
+
+
+#' Degradation scaling matrix for the rubble trajectory
+#'
+#' A 10 x 15 numeric matrix of multiplicative scaling factors for refuge
+#' density under the rubble disturbance trajectory. Each row corresponds to
+#' a 5 cm refuge size bin (0-5 cm through 45-50 cm) and each column to a
+#' simulation year (column 1 = bleaching year, columns 2-15 = post-bleaching
+#' years 1-14). Values are applied as \code{new_rd = scale * old_rd} inside
+#' \code{\link{reefDegrade}()}, so a value of 1.4 means a 40\% increase in
+#' refuge density and 0.4 means a 60\% reduction.
+#'
+#' In the rubble trajectory, large structural refuges collapse while an
+#' initial pulse of rubble temporarily increases the availability of small
+#' refuges (0-5 cm bin) before all sizes return to baseline.
+#'
+#' Values are derived from \code{inst/data-csv/deg_scales.csv} by computing
+#' \code{multiplier = 1 + delta} for each cell.
+#'
+#' @keywords datasets
+#' @concept degradation
+#' @seealso \code{\link{algae_scale}}, \code{\link{recovery_scale}},
+#'   \code{\link{setDegradation}}, \code{\link{reefDegrade}}
+#' @format A numeric matrix with 10 rows (refuge size bins) and 15 columns
+#'   (time steps). Row names are size bin labels (e.g. \code{"0 to 5"});
+#'   column names are integers 1 to 15.
+#' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+#'   https://doi.org/10.26686/wgtn.26421523
+"rubble_scale"
+
+
+#' Degradation scaling matrix for the algae trajectory
+#'
+#' A 10 x 15 numeric matrix of multiplicative scaling factors for refuge
+#' density under the algae disturbance trajectory. Each row corresponds to
+#' a 5 cm refuge size bin (0-5 cm through 45-50 cm) and each column to a
+#' simulation year (column 1 = bleaching year, columns 2-15 = post-bleaching
+#' years 1-14).
+#'
+#' In the algae trajectory, moderate coral loss is partially offset by algal
+#' colonisation of rubble. Small refuges (0-5 cm bin) show a slight
+#' overshoot above baseline (1.02x) during years 6-9 before returning to
+#' pre-disturbance levels.
+#'
+#' Values are derived from \code{inst/data-csv/deg_scales.csv} by computing
+#' \code{multiplier = 1 + delta} for each cell.
+#'
+#' @keywords datasets
+#' @concept degradation
+#' @seealso \code{\link{rubble_scale}}, \code{\link{recovery_scale}},
+#'   \code{\link{setDegradation}}, \code{\link{reefDegrade}}
+#' @format A numeric matrix with 10 rows (refuge size bins) and 15 columns
+#'   (time steps). Row names are size bin labels; column names are integers
+#'   1 to 15.
+#' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+#'   https://doi.org/10.26686/wgtn.26421523
+"algae_scale"
+
+
+#' Degradation scaling matrix for the recovery trajectory
+#'
+#' A 10 x 15 numeric matrix of multiplicative scaling factors for refuge
+#' density under a recovery trajectory. Each row corresponds to a 5 cm
+#' refuge size bin (0-5 cm through 45-50 cm) and each column to a simulation
+#' year (column 1 = bleaching year, columns 2-15 = post-bleaching years
+#' 1-14).
+#'
+#' In the recovery trajectory, reefs experience an initial decline in refuge
+#' availability followed by a sustained partial recovery above pre-disturbance
+#' levels. Small and medium bins recover more quickly than large bins.
+#'
+#' Values are derived from \code{inst/data-csv/deg_scales.csv} by computing
+#' \code{multiplier = 1 + delta} for each cell.
+#'
+#' @keywords datasets
+#' @concept degradation
+#' @seealso \code{\link{rubble_scale}}, \code{\link{algae_scale}},
+#'   \code{\link{setDegradation}}, \code{\link{reefDegrade}}
+#' @format A numeric matrix with 10 rows (refuge size bins) and 15 columns
+#'   (time steps). Row names are size bin labels; column names are integers
+#'   1 to 15.
+#' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+#'   https://doi.org/10.26686/wgtn.26421523
+"recovery_scale"
