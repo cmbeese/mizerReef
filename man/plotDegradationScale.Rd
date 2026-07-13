@@ -9,7 +9,7 @@ plotDegradationScale(object = NULL, trajectory = NULL, return_data = FALSE)
 \arguments{
 \item{object}{An optional object of class \linkS4class{MizerParams} or
 \linkS4class{MizerSim}. If provided, the function will attempt to extract
-the degradation scaling or trajectory from its \code{@refuge_params} slot.}
+the degradation scaling or trajectory from its \code{@other_params$refuge_params} slot.}
 
 \item{trajectory}{Optional. Either a character string (\code{"rubble"},
 \code{"algae"}, \code{"recovery"}) to use built-in data, or a
@@ -43,27 +43,26 @@ first column, remaining columns as refuge size bins).
 supplied and can be a \linkS4class{MizerParams} or
 \linkS4class{MizerSim} object. The function will extract the
 degradation scaling or trajectory from
-\code{object@refuge_params$trajectory} or
-\code{object@refuge_params$deg_scale}.
+\code{object@other_params$refuge_params$trajectory} or
+\code{object@other_params$refuge_params$deg_scale}.
 }
 }
 \seealso{
-\link[mizer:plotting_functions]{mizer::plotting_functions}, \code{\link[=setDegradation]{setDegradation()}}, \code{\link[=reefDegrade]{reefDegrade()}}
+\link[mizer:plotting_functions]{plotting_functions}, \code{\link[=setDegradation]{setDegradation()}}, \code{\link[=reefDegrade]{reefDegrade()}}
 
-Other plotting functions: 
-\code{\link{plot2Productivity}()},
-\code{\link{plot2TotalBiomass}()},
-\code{\link{plotBiomass}()},
-\code{\link{plotProductivity}()},
-\code{\link{plotProductivityRelative}()},
-\code{\link{plotRefugeDensity}()},
-\code{\link{plotRefugeProfile}()},
-\code{\link{plotRelativeContribution}()},
-\code{\link{plotSpectraRelative}()},
-\code{\link{plotTotalAbundance}()},
-\code{\link{plotTotalBiomass}()},
-\code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()}
+Other plotting functions:
+\code{\link[=plot2Productivity]{plot2Productivity()}},
+\code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotProductivity]{plotProductivity()}},
+\code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
+\code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
+\code{\link[=plotRefugeProfile]{plotRefugeProfile()}},
+\code{\link[=plotRelativeContribution]{plotRelativeContribution()}},
+\code{\link[=plotSpectraPercentChange]{plotSpectraPercentChange()}},
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}},
+\code{\link[=plotTotalBiomass]{plotTotalBiomass()}},
+\code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
+\code{\link[=plotVulnerable]{plotVulnerable()}}
 }
 \concept{plotting functions}
 \concept{refugePlots}

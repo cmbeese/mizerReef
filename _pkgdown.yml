@@ -33,11 +33,10 @@ reference:
 - contents: has_concept("calibration")
 - subtitle: Tuning Profiles
   desc:  >
-        These refuge profiles are useful for tuning mizerReef models to steady 
+        These refuge profiles are useful for tuning mizerReef models to steady
         state.
 - contents:
     - tuning_profile
-    - step_tune
 - title: Predation Refuge
   desc:  >
         These functions set up the mediation of predation with refuge.
@@ -77,62 +76,59 @@ reference:
 - contents: has_concept("extmort")
 - title: Summary Functions
 - contents: has_concept("summary")
-- title: Summary Plots 
+- title: Summary Plots
   desc:  >
-        These functions calculate and plot summary statistics and allow for the 
-        comparison of results between different models. 
-- contents: has_concept("sumplots")
+        These functions calculate and plot summary statistics and allow for the
+        comparison of results between different models.
+- contents:
+    - reef_plots
+    - has_concept("sumplots")
 - title: Helper Functions
 - contents: has_concept("helper")
+- title: Extension Mechanism
+  desc:  >
+        The S4 marker classes and S3 methods that let mizerReef participate in
+        mizer's extension mechanism. See `vignette("extension_mechanism")` for
+        details.
+- contents:
+    - mizerReef-class
+    - getBiomass.mizerReefSim
+    - upgrade.mizerReef
+- title: Deprecated
+- contents:
+    - MizerReefParams
 - title: Example Models
   desc:  >
-        These files hold example parameters and mizer params object to explore
-        models set up to emulate the coral reefs of Bonaire.
-- subtitle: Simple trait based model
-- desc: >
-        This simple trait based model divides reef organisms into three broad
-        groups based on diet: predators, herbivores, and invertebrates.
-- contents: 
-    - bonaire_int
-    - bonaire_refuge
-    - bonaire_species
-    - bonaire_model
-- subtitle: Multi-species model
-- desc: >
-        This multi-species model contains 10 species groups based on diet,
-        body size and shape, functional role, and relationship to habitat
-        structural complexity.
-- contents:
-    - karpata_int
-    - karpata_refuge
-    - karpata_species
-    - karpata_model
-- subtitle: Refuge profiles
-- desc: >
-        A collection of empirical and theoretical refuge profiles for
-        testing steady states with.
-- contents:
-    - aquarius_refuge
-    # - test
-    # - test_sp
-    # - test_i
-- subtitle: Chapter 3 example
+        These files hold example parameters and a mizerReef params object for
+        a simple, generic Caribbean coral reef with three functional groups.
+- subtitle: Simple trait-based model
   desc: >
-    Small example data used in the Getting Started vignette.
-  contents:
-    - bodyshape_methods_example
-    - bodyshape_methods_example_int
+        This simple trait-based model divides reef organisms into three broad
+        groups based on diet: predators, herbivores, and invertebrates.
+- contents:
+    - caribbean_3_species
+    - caribbean_3_interaction
+    - caribbean_3_model
+- subtitle: Refuge profiles
+  desc: >
+        Example refuge profiles for testing steady states with.
+- contents:
+    - karpata_refuge
 articles:
-  - title: "General Model Description"
-    contents:
-      - reef-model_description
-  - title: "Example Model Description: Simple Trait-Based Steady State"
-    contents:
-      - c3_parameters
-  - title: "Example Model Description: Resolved Functional Group Steady State"
-    contents:
-      - c4_parameters
-  - title: "Getting started with MizerReef"
+  - title: "Getting Started"
     contents:
       - mizerReef
+  - title: "Tuning and Simulation"
+    contents:
+      - steady-state-recipe
+      - reef-degradation-simulations
+  - title: "Model Description"
+    contents:
+      - model-description
+  - title: "Combining Extensions"
+    contents:
+      - multiple-resources
+  - title: "Package Internals"
+    contents:
+      - extension_mechanism
 

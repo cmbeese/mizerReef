@@ -53,7 +53,7 @@ detritus_biomass <- function(params) {
 detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     consumption <- detritus_consumption(params, n, rates)
     production <- sum(getDetritusProduction(params))
-    kd <- params@detritus_params$detritus_capacity
+    kd <- params@other_params$detritus_params$detritus_capacity
 
     if (is.nan(consumption)) {
         warning("The detritus consumption function is producing NaNs.")
@@ -145,7 +145,7 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
 detritus_consumption <- function(params,
                                  n = params@initial_n,
                                  rates = getRates(params)) {
-    sum((params@detritus_params$rho * n *
+    sum((params@other_params$detritus_params$rho * n *
         (1 - rates$feeding_level)) %*% params@dw)
 }
 
@@ -186,7 +186,7 @@ detritus_consumption <- function(params,
 getDetritusConsumption <- function(params) {
     # With feeding level
     feeding_level <- getFeedingLevel(params)
-    consumption <- (params@detritus_params$rho * params@initial_n *
+    consumption <- (params@other_params$detritus_params$rho * params@initial_n *
         (1 - feeding_level)) %*% params@dw
 
     # Convert from mass specific rate to total rates
@@ -315,14 +315,14 @@ getDetritusProduction <- function(params, n = params@initial_n,
     sen_mort <- sum((sen_mort * n) %*% (params@w * params@dw))
 
     # Get proportions of decomposition
-    sen_decomp <- params@detritus_params$sen_decomp
-    ext_decomp <- params@detritus_params$ext_decomp
+    sen_decomp <- params@other_params$detritus_params$sen_decomp
+    ext_decomp <- params@other_params$detritus_params$ext_decomp
 
     # Return vector
     c(
         feces = sum(feces),
         decomp = (ext_decomp * ex_mort) + (sen_decomp * sen_mort),
-        external = params@detritus_params$external
+        external = params@other_params$detritus_params$external
     )
 }
 
@@ -398,7 +398,7 @@ rescale_detritus <- function(params, factor) {
         params@initial_n_other[["detritus"]] * factor
     params@species_params$rho_detritus <-
         params@species_params$rho_detritus / factor
-    params@detritus_params$rho <-
-        params@detritus_params$rho / factor
+    params@other_params$detritus_params$rho <-
+        params@other_params$detritus_params$rho / factor
     params
 }

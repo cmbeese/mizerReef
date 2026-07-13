@@ -85,7 +85,7 @@ thresholds are calculated for sigmoidal, binned, and competitive methods:
 \code{b_bar}) to set bin boundaries/thresholds.
 \item FALSE: Use each species' own length-weight parameters (\code{a}, \code{b}).
 Set according to your data collection method. The setting is stored in
-\code{params@refuge_params$use_dummy_fish_bins} and used by \code{\link[=getRefuge]{getRefuge()}}.
+\code{params@other_params$refuge_params$use_dummy_fish_bins} and used by \code{\link[=getRefuge]{getRefuge()}}.
 }}
 
 \item{...}{Unused.}
@@ -150,7 +150,7 @@ predator-prey interactions are determined entirely by size-preference.
 }\if{html}{\out{</div>}}
 
 This choice applies to all refuge methods (sigmoidal, binned, competitive)
-and is stored in \code{params@refuge_params$use_dummy_fish_bins}. Select the
+and is stored in \code{params@other_params$refuge_params$use_dummy_fish_bins}. Select the
 option that matches your measurement approach and ecological realism.
 }
 

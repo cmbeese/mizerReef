@@ -41,7 +41,7 @@
 #' @param progress_bar  A shiny progress object to implement a progress bar in a
 #'                      shiny app. Default FALSE.
 #'
-#' @inheritDotParams tuneUR
+#' @param ... unused
 #'
 #' @return An object of type \linkS4class{MizerParams}
 #' @concept setup

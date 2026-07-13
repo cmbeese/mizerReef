@@ -59,7 +59,7 @@ data used for the plot is returned instead of the plot
 itself. Default value is FALSE.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=plotTotalBiomass]{plotTotalBiomass}}
+  Arguments passed on to \code{\link{plotTotalBiomass}}
   \describe{
     \item{\code{object}}{An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
 If a \linkS4class{MizerSim} object is provided, the biomass at the
@@ -96,23 +96,22 @@ and \code{max_fishing_l1} arguments for the first size range and  the
 \code{min_fishing_l2}and \code{max_fishing_l2} arguments for the second.
 }
 \seealso{
-\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}}, \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
+\code{\link[mizer:plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}}, \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
 \code{\link[=plotProductivity]{plotProductivity()}}, \code{\link[=plot2Productivity]{plot2Productivity()}}, \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
 
-Other plotting functions: 
-\code{\link{plot2Productivity}()},
-\code{\link{plot2TotalBiomass}()},
-\code{\link{plotBiomass}()},
-\code{\link{plotDegradationScale}()},
-\code{\link{plotProductivity}()},
-\code{\link{plotProductivityRelative}()},
-\code{\link{plotRefugeDensity}()},
-\code{\link{plotRefugeProfile}()},
-\code{\link{plotRelativeContribution}()},
-\code{\link{plotSpectraRelative}()},
-\code{\link{plotTotalAbundance}()},
-\code{\link{plotTotalBiomass}()},
-\code{\link{plotVulnerable}()}
+Other plotting functions:
+\code{\link[=plot2Productivity]{plot2Productivity()}},
+\code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotDegradationScale]{plotDegradationScale()}},
+\code{\link[=plotProductivity]{plotProductivity()}},
+\code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
+\code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
+\code{\link[=plotRefugeProfile]{plotRefugeProfile()}},
+\code{\link[=plotRelativeContribution]{plotRelativeContribution()}},
+\code{\link[=plotSpectraPercentChange]{plotSpectraPercentChange()}},
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}},
+\code{\link[=plotTotalBiomass]{plotTotalBiomass()}},
+\code{\link[=plotVulnerable]{plotVulnerable()}}
 }
 \concept{plotting functions}
 \concept{sumplots}

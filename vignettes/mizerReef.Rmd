@@ -409,7 +409,7 @@ several plotting functions to help you visualize and interpret your model output
   plotBiomass(params)
   ```
 
-> <details><summary>💡 **Tip:** MizerReef overrides mizer's version of the `plotBiomass()` function.</summary> If you get an error about object type, restart R and load `mizerReef` after `mizer`.</details>
+> <details><summary>💡 **Tip:** `plotBiomass()` is mizer's own function.</summary> mizerReef does not override it — instead it registers a `getBiomass()` method for `mizerReef` models so that algae and detritus biomass are automatically included alongside species biomass, regardless of the order in which `mizer` and `mizerReef` are loaded.</details>
 
 
 - **Productivity by species:**  

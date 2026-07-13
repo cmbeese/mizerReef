@@ -353,13 +353,13 @@ plotlyRefugeProfile <- function(object,
 #'     supplied and can be a \linkS4class{MizerParams} or
 #'     \linkS4class{MizerSim} object. The function will extract the
 #'     degradation scaling or trajectory from
-#'     \code{object@refuge_params$trajectory} or
-#'     \code{object@refuge_params$deg_scale}.
+#'     \code{object@other_params$refuge_params$trajectory} or
+#'     \code{object@other_params$refuge_params$deg_scale}.
 #' }
 #'
 #' @param object An optional object of class \linkS4class{MizerParams} or
 #'   \linkS4class{MizerSim}. If provided, the function will attempt to extract
-#'   the degradation scaling or trajectory from its \code{@refuge_params} slot.
+#'   the degradation scaling or trajectory from its \code{@other_params$refuge_params} slot.
 #'
 #' @param trajectory Optional. Either a character string (\code{"rubble"},
 #'   \code{"algae"}, \code{"recovery"}) to use built-in data, or a
@@ -433,13 +433,13 @@ plotDegradationScale <- function(object = NULL,
         } else {
             stop("'object' must be a MizerParams or MizerSim object.")
         }
-        # Try to extract trajectory or deg_scale from params@refuge_params
-        if (!is.null(params@refuge_params$trajectory)) {
-            dat <- params@refuge_params$trajectory
-        } else if (!is.null(params@refuge_params$deg_scale)) {
-            dat <- params@refuge_params$deg_scale
+        # Try to extract trajectory or deg_scale from params@other_params$refuge_params
+        if (!is.null(params@other_params$refuge_params$trajectory)) {
+            dat <- params@other_params$refuge_params$trajectory
+        } else if (!is.null(params@other_params$refuge_params$deg_scale)) {
+            dat <- params@other_params$refuge_params$deg_scale
         } else {
-            stop("No degradation scaling or trajectory found in object@refuge_params.")
+            stop("No degradation scaling or trajectory found in object@other_params$refuge_params.")
         }
     }
 
@@ -495,6 +495,7 @@ plotDegradationScale <- function(object = NULL,
 #' @inheritParams plotDegradationScale
 #' @return A plotly object
 #' @importFrom plotly ggplotly
+#' @concept refugePlots
 #' @export
 plotlyDegradationScale <- function(object = NULL, trajectory = NULL, return_data = FALSE, ...) {
     ggplotly(plotDegradationScale(object = object, trajectory = trajectory, return_data = return_data, ...))

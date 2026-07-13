@@ -125,7 +125,7 @@ thresholds are calculated for sigmoidal, binned, and competitive methods:
 \code{b_bar}) to set bin boundaries/thresholds.
 \item FALSE: Use each species' own length-weight parameters (\code{a}, \code{b}).
 Set according to your data collection method. The setting is stored in
-\code{params@refuge_params$use_dummy_fish_bins} and used by \code{\link[=getRefuge]{getRefuge()}}.
+\code{params@other_params$refuge_params$use_dummy_fish_bins} and used by \code{\link[=getRefuge]{getRefuge()}}.
 }}
 
 \item{bleach_time}{The year of the simulation to implement bleaching.
@@ -209,7 +209,7 @@ each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
 to 1-n where n is the given allometric scaling exponent and
 z0pre defaults to 0.2.}
 
-\item{...}{Extra parameters to be passed to \code{\link[mizer:newMultispeciesParams]{mizer::newMultispeciesParams()}}}
+\item{...}{Extra parameters to be passed to \code{\link[mizer:newMultispeciesParams]{newMultispeciesParams()}}}
 }
 \value{
 An object of type \linkS4class{MizerParams}

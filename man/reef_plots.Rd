@@ -25,9 +25,10 @@ Plot \tab Description \cr
 \strong{Result plots}
 \tabular{ll}{
 Plot \tab Description \cr
-\code{\link[=plotBiomass]{plotBiomass()}} \tab Plots the biomass of species and unstructured components through time. \cr
-\code{\link[=plotSpectra2]{plotSpectra2()}} \tab Compare two size spectra (e.g., models or scenarios) in one plot. \cr
-\code{\link[=plotSpectraRelative]{plotSpectraRelative()}} \tab Plots relative or percent change between two spectra. \cr
+\code{\link[mizer:plotBiomass]{mizer::plotBiomass()}} \tab Plots the biomass of species and unstructured components through time (mizerReef extends this via a \code{getBiomass.mizerReefSim} method). \cr
+\code{\link[mizer:plotSpectra2]{mizer::plotSpectra2()}} \tab Compare two size spectra (e.g., models or scenarios) in one plot. \cr
+\code{\link[mizer:plotSpectraRelative]{mizer::plotSpectraRelative()}} \tab Plots relative difference between two spectra. \cr
+\code{\link[=plotSpectraPercentChange]{plotSpectraPercentChange()}} \tab Plots percent change between two spectra. \cr
 \code{\link[=plotRelativeContribution]{plotRelativeContribution()}} \tab Relative contribution of each species group to total abundance, biomass, and productivity. \cr
 \code{\link[=plotProductivity]{plotProductivity()}} \tab Plots productivity for each species through time or at steady state. \cr
 \code{\link[=plot2Productivity]{plot2Productivity()}} \tab Productivity of two models or two size ranges in one plot. \cr
@@ -40,9 +41,9 @@ Plot \tab Description \cr
 
 All plotting functions return a ggplot object, which can be further
 customized using the ggplot2 grammar. Most functions accept either a
-\link[mizer:MizerSim]{mizer::MizerSim} or \link[mizer:MizerParams]{mizer::MizerParams} object as input. Species colors and line
+\link[mizer:MizerSim]{MizerSim} or \link[mizer:MizerParams]{MizerParams} object as input. Species colors and line
 types are controlled by the \code{linecolour} and \code{linetype} slots in
-\link[mizer:MizerParams]{mizer::MizerParams}, and can be changed by the user.
+\link[mizer:MizerParams]{MizerParams}, and can be changed by the user.
 
 For group or legend naming, you can add a column \code{group_names}
 to your \code{species_params} data frame. This column should contain a
@@ -55,7 +56,7 @@ data frame.
 }
 \section{Usage}{
 
-Call these functions with a \link[mizer:MizerSim]{mizer::MizerSim} or \link[mizer:MizerParams]{mizer::MizerParams} object containing
+Call these functions with a \link[mizer:MizerSim]{MizerSim} or \link[mizer:MizerParams]{MizerParams} object containing
 simulation results. See individual function documentation for details and
 examples.
 }

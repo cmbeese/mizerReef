@@ -66,7 +66,7 @@ setAlgaeParams <- function(params,
     params@other_params$use_UR_cc <- use_UR_cc
 
     # Ensure algae_params slot exists
-    if (is.null(params@algae_params)) params@algae_params <- list()
+    if (is.null(params@other_params$algae_params)) params@other_params$algae_params <- list()
 
     # Interaction setup (array for all URs)
     if (is.null(UR_interaction)) {
@@ -92,20 +92,20 @@ setAlgaeParams <- function(params,
     # Store algae params in slot with checks
     # algae_growth_initial check
     if (is.null(algae_growth_initial)) {
-        params@algae_params$algae_growth <- 2e3
+        params@other_params$algae_params$algae_growth <- 2e3
     } else {
         if (!is.numeric(algae_growth_initial)) stop("algae_growth_initial should be a numerical value.")
         if (algae_growth_initial < 0) stop("algae_growth_initial must be non-negative.")
-        params@algae_params$algae_growth <- algae_growth_initial
+        params@other_params$algae_params$algae_growth <- algae_growth_initial
     }
 
     # algae_capacity check
     if (is.null(algae_capacity)) {
-        params@algae_params$algae_capacity <- 1
+        params@other_params$algae_params$algae_capacity <- 1
     } else {
         if (!is.numeric(algae_capacity)) stop("algae_capacity should be a numerical value.")
         if (algae_capacity < 0) stop("algae_capacity must be non-negative.")
-        params@algae_params$algae_capacity <- algae_capacity
+        params@other_params$algae_params$algae_capacity <- algae_capacity
     }
 
     # Colour check (for algae_colour)
@@ -194,7 +194,7 @@ setDetritusParams <- function(params,
     params@other_params$use_UR_cc <- use_UR_cc
 
     # Ensure detritus_params slot exists
-    if (is.null(params@detritus_params)) params@detritus_params <- list()
+    if (is.null(params@other_params$detritus_params)) params@other_params$detritus_params <- list()
 
     # Interaction setup (array for all URs)
     if (is.null(UR_interaction)) {
@@ -222,27 +222,27 @@ setDetritusParams <- function(params,
     }
 
     # Store detritus params in slot with checks
-    params@detritus_params$detritus_capacity <- ifelse(is.null(detritus_capacity), 1, detritus_capacity)
+    params@other_params$detritus_params$detritus_capacity <- ifelse(is.null(detritus_capacity), 1, detritus_capacity)
 
     # sen_decomp check
     if (is.null(sen_decomp)) {
-        params@detritus_params$sen_decomp <- 0.8
+        params@other_params$detritus_params$sen_decomp <- 0.8
     } else {
         if (!is.numeric(sen_decomp)) stop("sen_decomp should be a numerical value.")
         if (sen_decomp < 0 || sen_decomp > 1) stop("sen_decomp must be a proportion between 0 and 1.")
-        params@detritus_params$sen_decomp <- sen_decomp
+        params@other_params$detritus_params$sen_decomp <- sen_decomp
     }
 
     # ext_decomp check
     if (is.null(ext_decomp)) {
-        params@detritus_params$ext_decomp <- 0.2
+        params@other_params$detritus_params$ext_decomp <- 0.2
     } else {
         if (!is.numeric(ext_decomp)) stop("ext_decomp should be a numerical value.")
         if (ext_decomp < 0 || ext_decomp > 1) stop("ext_decomp must be a proportion between 0 and 1.")
-        params@detritus_params$ext_decomp <- ext_decomp
+        params@other_params$detritus_params$ext_decomp <- ext_decomp
     }
 
-    params@detritus_params$external <- ifelse(is.null(external), 1, external)
+    params@other_params$detritus_params$external <- ifelse(is.null(external), 1, external)
 
     # Colour check (for detritus_colour)
     if (!is.null(detritus_colour)) {
@@ -418,7 +418,7 @@ setExtMortParams <- function(params,
 #'        refuge hole entrances are measured for each species.
 #'
 #'  This choice applies to all refuge methods (sigmoidal, binned, competitive)
-#'  and is stored in `params@refuge_params$use_dummy_fish_bins`. Select the
+#'  and is stored in `params@other_params$refuge_params$use_dummy_fish_bins`. Select the
 #'  option that matches your measurement approach and ecological realism.
 #'
 #' @section Setting the refuge profile:
@@ -536,7 +536,7 @@ setExtMortParams <- function(params,
 #'     `b_bar`) to set bin boundaries/thresholds.
 #'   - FALSE: Use each species' own length-weight parameters (`a`, `b`).
 #'   Set according to your data collection method. The setting is stored in
-#'   `params@refuge_params$use_dummy_fish_bins` and used by [getRefuge()].
+#'   `params@other_params$refuge_params$use_dummy_fish_bins` and used by [getRefuge()].
 #'
 #' @param refuge_user   Logical vector (length = number of species). Indicates
 #'                      which groups use refuge. If not present in
@@ -770,13 +770,13 @@ setRefuge <- function(params, method, method_params = NULL,
     }
 
     # Store all values directly in refuge_params slot
-    params@refuge_params$method <- method
-    params@refuge_params$a_bar <- a_bar
-    params@refuge_params$b_bar <- b_bar
-    params@refuge_params$w_settle <- w_settle
-    params@refuge_params$max_protect <- max_protect
-    params@refuge_params$tau <- tau
-    params@refuge_params$use_dummy_fish_bins <- use_dummy_fish_bins
+    params@other_params$refuge_params$method <- method
+    params@other_params$refuge_params$a_bar <- a_bar
+    params@other_params$refuge_params$b_bar <- b_bar
+    params@other_params$refuge_params$w_settle <- w_settle
+    params@other_params$refuge_params$max_protect <- max_protect
+    params@other_params$refuge_params$tau <- tau
+    params@other_params$refuge_params$use_dummy_fish_bins <- use_dummy_fish_bins
 
     #  method_params set up and checks
     if (method != "noncomplex") {
@@ -878,7 +878,7 @@ setRefuge <- function(params, method, method_params = NULL,
 
 
     # Store method_params in params object
-    params@refuge_params[["method_params"]] <- as.data.frame(method_params)
+    params@other_params$refuge_params[["method_params"]] <- as.data.frame(method_params)
 
     params@time_modified <- lubridate::now()
 
@@ -908,7 +908,7 @@ setRefuge <- function(params, method, method_params = NULL,
 #'                              matching legacy behavior. If FALSE, boundaries use
 #'                              species-specific `a` and `b`. Applies to sigmoidal,
 #'                              binned, and competitive methods. If not provided,
-#'                              uses `params@refuge_params$use_dummy_fish_bins`.
+#'                              uses `params@other_params$refuge_params$use_dummy_fish_bins`.
 #'                              See [setRefuge()] for details.
 #'
 #' @param ... Unused
@@ -922,8 +922,8 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
     assert_that(is(params, "MizerParams"))
 
     # Extract relevant data from params
-    refuge_params <- params@refuge_params
-    method_params <- params@refuge_params[["method_params"]]
+    refuge_params <- params@other_params$refuge_params
+    method_params <- params@other_params$refuge_params[["method_params"]]
 
     # Use value from params if not explicitly provided
     if (is.null(use_dummy_fish_bins)) {
@@ -952,7 +952,7 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
         rownames(refuge) <- rownames(params@initial_n)
         colnames(refuge) <- colnames(params@initial_n)
         # store refuge and bin indices in params object
-        params@refuge_params$refuge <- refuge
+        params@other_params$refuge_params$refuge <- refuge
 
         # Sigmoidal method ---------------------------------------------------------
     } else if (refuge_params$method == "sigmoidal") {
@@ -985,8 +985,8 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
             L_refuge.i <- (W_refuge / sp[["a"]])^(1 / sp[["b"]])
             refuge_lengths <- data.frame(species = sp$species, L_refuge = L_refuge.i)
         }
-        params@refuge_params$refuge <- refuge
-        params@refuge_params$refuge_lengths <- refuge_lengths
+        params@other_params$refuge_params$refuge <- refuge
+        params@other_params$refuge_params$refuge_lengths <- refuge_lengths
         params@time_modified <- lubridate::now()
 
         # Binned method ------------------------------------------------------------
@@ -1036,14 +1036,14 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
         # Account for species that don't utilize refuge
         refuge <- refuge_user * refuge
         # store refuge and bin indices in params object
-        params@refuge_params$refuge <- refuge
-        params@refuge_params$bin.id <- bin.id
+        params@other_params$refuge_params$refuge <- refuge
+        params@other_params$refuge_params$bin.id <- bin.id
         # store length bins by functional group in params object
         start_l.i <- t(do.call(rbind, start_l.i))
         end_l.i <- t(do.call(rbind, end_l.i))
         refuge_lengths <- cbind(start_l.i, end_l.i)
         row.names(refuge_lengths) <- sp$species
-        params@refuge_params$refuge_lengths <- refuge_lengths
+        params@other_params$refuge_params$refuge_lengths <- refuge_lengths
         params@time_modified <- lubridate::now()
 
         ## Competitive method ------------------------------------------------------
@@ -1081,13 +1081,13 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
             }
         }
         # Store indices of each bin
-        params@refuge_params$bin.id <- bin.id
+        params@other_params$refuge_params$bin.id <- bin.id
         # Store length bins by species group in a data frame
         start_l.i <- t(do.call(rbind, start_l.i))
         end_l.i <- t(do.call(rbind, end_l.i))
         refuge_lengths <- cbind(start_l.i, end_l.i)
         row.names(refuge_lengths) <- sp$species
-        params@refuge_params$refuge_lengths <- refuge_lengths
+        params@other_params$refuge_params$refuge_lengths <- refuge_lengths
         params@time_modified <- lubridate::now()
     }
     return(params)
@@ -1165,15 +1165,15 @@ newRefuge <- function(params, new_refuge = FALSE,
     assert_that(is(params, "MizerParams"))
 
     # Extract relevant data from params
-    refuge_params <- params@refuge_params
-    method_params <- params@refuge_params[["method_params"]]
+    refuge_params <- params@other_params$refuge_params
+    method_params <- params@other_params$refuge_params[["method_params"]]
 
     # method checks
     # Check if the user provided one of the available refuge profile methods
     m_opt <- c("sigmoidal", "binned", "competitive", "noncomplex")
     if (is.null(new_method)) {
         warning("Since you did not provide a new method to set the refuge profile,
-                    I will use the one currently stored in params@refuge_params$method.")
+                    I will use the one currently stored in params@other_params$refuge_params$method.")
         # If user did not provide a method, use old one
         new_method <- refuge_params$method
         # If user did provide a method, check that it's one of the options
@@ -1358,16 +1358,16 @@ setDegradation <- function(params, trajectory = NULL, deg_scale,
     }
 
     # Add new parameters to params object
-    params@refuge_params$degrade <- degrade
-    params@refuge_params$t_bleach <- bleach_time
-    params@refuge_params$trajectory <- trajectory
-    params@refuge_params$deg_scale <- deg_scale
+    params@other_params$refuge_params$degrade <- degrade
+    params@other_params$refuge_params$t_bleach <- bleach_time
+    params@other_params$refuge_params$trajectory <- trajectory
+    params@other_params$refuge_params$deg_scale <- deg_scale
 
     # Store algae adjustment parameters
-    params@algae_params$algae_boost <- algae_boost
+    params@other_params$algae_params$algae_boost <- algae_boost
     if (algae_boost) {
-        params@algae_params$algae_growth_boost <- algae_growth_boost
-        params@algae_params$algae_capacity_boost <- algae_capacity_boost
+        params@other_params$algae_params$algae_growth_boost <- algae_growth_boost
+        params@other_params$algae_params$algae_capacity_boost <- algae_capacity_boost
     }
 
     # Save time parameters were modified
@@ -1405,11 +1405,11 @@ setURcapacity <- function(params, cap = 1.5, ...) {
     # Algae
     ba <- algae_biomass(params)
     new_a_carry <- cap * ba
-    params@algae_params$algae_capacity <- new_a_carry
+    params@other_params$algae_params$algae_capacity <- new_a_carry
     # Detritus
     bd <- detritus_biomass(params)
     new_d_carry <- cap * bd
-    params@detritus_params$detritus_capacity <- new_d_carry
+    params@other_params$detritus_params$detritus_capacity <- new_d_carry
 
     # Switch to carrying capacity dynamics
     params@other_dynamics$algae <- "algae_dynamics_cc"

@@ -11,7 +11,7 @@ getDetritusProduction(params, n = params@initial_n, rates = getRates(params))
 
 \item{n}{A matrix of current species abundances (species x size)}
 
-\item{rates}{A list of rates as returned by \code{\link[mizer:getRates]{mizer::getRates()}}}
+\item{rates}{A list of rates as returned by \code{\link[mizer:getRates]{getRates()}}}
 }
 \value{
 A vector with named entries "feces", "decomp", and "external",

@@ -48,25 +48,24 @@ within a size range. Usually used in conjunction with \code{\link[=plotProductiv
 to check for decoupling.
 }
 \seealso{
-\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[mizer:plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
 \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
 \code{\link[=plotProductivity]{plotProductivity()}}, \code{\link[=plot2Productivity]{plot2Productivity()}},
 \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
 
-Other plotting functions: 
-\code{\link{plot2Productivity}()},
-\code{\link{plot2TotalBiomass}()},
-\code{\link{plotBiomass}()},
-\code{\link{plotDegradationScale}()},
-\code{\link{plotProductivity}()},
-\code{\link{plotProductivityRelative}()},
-\code{\link{plotRefugeDensity}()},
-\code{\link{plotRefugeProfile}()},
-\code{\link{plotRelativeContribution}()},
-\code{\link{plotSpectraRelative}()},
-\code{\link{plotTotalAbundance}()},
-\code{\link{plotTotalBiomassRelative}()},
-\code{\link{plotVulnerable}()}
+Other plotting functions:
+\code{\link[=plot2Productivity]{plot2Productivity()}},
+\code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotDegradationScale]{plotDegradationScale()}},
+\code{\link[=plotProductivity]{plotProductivity()}},
+\code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
+\code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
+\code{\link[=plotRefugeProfile]{plotRefugeProfile()}},
+\code{\link[=plotRelativeContribution]{plotRelativeContribution()}},
+\code{\link[=plotSpectraPercentChange]{plotSpectraPercentChange()}},
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}},
+\code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},
+\code{\link[=plotVulnerable]{plotVulnerable()}}
 }
 \concept{plotting functions}
 \concept{sumplots}

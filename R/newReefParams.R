@@ -93,9 +93,11 @@ newReefParams <- function( # Original mizer parameters
         n = n, p = n, ...
     )
 
-    # Convert params to MizerReefParams ----
-    # This new class has slots for refuge, algae, and detritus parameters
-    params <- as(params, "MizerReefParams")
+    # Initialise other_params sub-lists for reef-specific state
+    # (these replace the old custom S4 slots)
+    if (is.null(params@other_params$refuge_params))  params@other_params$refuge_params  <- list()
+    if (is.null(params@other_params$algae_params))   params@other_params$algae_params   <- list()
+    if (is.null(params@other_params$detritus_params)) params@other_params$detritus_params <- list()
 
     # Change resource color
     params@linecolour["Resource"] <- resource_color
@@ -168,7 +170,7 @@ newReefParams <- function( # Original mizer parameters
             algae_capacity_boost = algae_capacity_boost
         )
     } else {
-        params@refuge_params$degrade <- FALSE
+        params@other_params$refuge_params$degrade <- FALSE
     }
 
     # Algae & Detritus ----
@@ -209,8 +211,8 @@ newReefParams <- function( # Original mizer parameters
     rho_det <- outer(params@species_params$rho_detritus, params@w^n)
 
     # Store rho values in new params slots
-    params@algae_params$rho_algae <- rho_alg
-    params@detritus_params$rho_detritus <- rho_det
+    params@other_params$algae_params$rho_algae <- rho_alg
+    params@other_params$detritus_params$rho_detritus <- rho_det
 
     ### Add components ----
 
@@ -223,8 +225,8 @@ newReefParams <- function( # Original mizer parameters
             encounter_fun = "encounter_contribution",
             component_params = list(
                 rho = rho_alg,
-                capacity = params@algae_params$algae_capacity,
-                growth = params@algae_params$algae_growth_initial
+                capacity = params@other_params$algae_params$algae_capacity,
+                growth = params@other_params$algae_params$algae_growth_initial
             )
         )
 
@@ -236,10 +238,10 @@ newReefParams <- function( # Original mizer parameters
             encounter_fun = "encounter_contribution",
             component_params = list(
                 rho = rho_det,
-                capacity = params@detritus_params$detritus_capacity,
-                sen_decomp = params@detritus_params$sen_decomp,
-                ext_decomp = params@detritus_params$ext_decomp,
-                external = params@detritus_params$d_external
+                capacity = params@other_params$detritus_params$detritus_capacity,
+                sen_decomp = params@other_params$detritus_params$sen_decomp,
+                ext_decomp = params@other_params$detritus_params$ext_decomp,
+                external = params@other_params$detritus_params$d_external
             )
         )
     } else if (use_UR_cc == TRUE) {
@@ -296,18 +298,13 @@ newReefParams <- function( # Original mizer parameters
         mizer::ext_mort(params) <- allo_mort
     }
 
-    # Changes rates for refuge ----
-    # Replace mizerRate functions with mizerReef versions
-    # mizerRates
-    params <- setRateFunction(params, "Rates", "reefRates")
-    # mizerEncounter
-    params <- setRateFunction(params, "Encounter", "reefEncounter")
-    # mizerFeedingLevel
-    params <- setRateFunction(params, "FeedingLevel", "reefFeedingLevel")
-    # mizerPredMort
-    params <- setRateFunction(params, "PredMort", "reefPredMort")
-    # Add in senescence mortality
-    params <- setRateFunction(params, "Mort", "reefMort")
+    # Register the extension chain and promote to the mizerReef S4 class ----
+    # Rate overrides (Encounter, FeedingLevel, PredMort, Mort) are handled via
+    # project*.mizerReef S3 methods defined in reef-project_methods.R, which
+    # participate in the daisy-chain via NextMethod() rather than
+    # setRateFunction(), making them composable with other extension packages.
+    params@extensions <- mizer::getRegisteredExtensions()
+    params <- mizer::coerceToExtensionClass(params)
 
     # Return object ----
     return(params)

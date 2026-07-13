@@ -20,9 +20,10 @@
 #' \strong{Result plots}
 #' \tabular{ll}{
 #'   Plot \tab Description \cr
-#'   [plotBiomass()] \tab Plots the biomass of species and unstructured components through time. \cr
-#'   [plotSpectra2()] \tab Compare two size spectra (e.g., models or scenarios) in one plot. \cr
-#'   [plotSpectraRelative()] \tab Plots relative or percent change between two spectra. \cr
+#'   [mizer::plotBiomass()] \tab Plots the biomass of species and unstructured components through time (mizerReef extends this via a `getBiomass.mizerReefSim` method). \cr
+#'   [mizer::plotSpectra2()] \tab Compare two size spectra (e.g., models or scenarios) in one plot. \cr
+#'   [mizer::plotSpectraRelative()] \tab Plots relative difference between two spectra. \cr
+#'   [plotSpectraPercentChange()] \tab Plots percent change between two spectra. \cr
 #'   [plotRelativeContribution()] \tab Relative contribution of each species group to total abundance, biomass, and productivity. \cr
 #'   [plotProductivity()] \tab Plots productivity for each species through time or at steady state. \cr
 #'   [plot2Productivity()] \tab Productivity of two models or two size ranges in one plot. \cr
@@ -73,265 +74,23 @@ utils::globalVariables(c(
     "refuge_density", "size_bin", "scale_color_viridis"
 ))
 
-#' Plot the biomass of species and unstructured components through time
+#' Plot the percent change between two spectra
 #'
-#' After running a projection, the biomass of each Species Group and each
-#' unstructured component can be plotted against time. The biomass is
-#' calculated within user defined size limits (min_w, max_w, min_l, max_l, see
-#' [get_size_range_array()]).
+#' This plots the percent change between the steady state spectra of two
+#' mizer objects. Let the spectra of the two objects be represented as
+#' \eqn{N_1(w)} and \eqn{N_2(w)}. This function plots the percent change,
+#' given by \deqn{ 100*(N_2(w) - N_1(w)) / (N_1(w)).}
 #'
-#' @param sim An object of class \linkS4class{MizerSim}
+#' For the difference calculated relative to the average of the two spectra,
+#' \eqn{2 (N_2(w) - N_1(w)) / (N_2(w) + N_1(w))}, use mizer's own
+#' [mizer::plotSpectraRelative()], which already dispatches correctly for
+#' `mizerReef` objects.
 #'
-#' @param species   The species to be selected. Optional. By default all target
-#'                  species are selected. A vector of species names, or a numeric
-#'                  vector with the species indices, or a logical vector
-#'                  indicating for each group whether it is to be selected
-#'                  (TRUE) or not.
-#'
-#' @param y_ticks The approximate number of ticks desired on the y axis.
-#'
-#' @param start_time    The first time to be plotted. Default is the beginning
-#'                      of the time series.
-#'
-#' @param end_time  The last time to be plotted. Default is the end of the time
-#'                  series.
-#'
-#' @param ylim  A numeric vector of length two providing lower and upper limits
-#'              for the y axis. Use NA to refer to the existing minimum or
-#'              maximum. Any values below 1e-20 are always cut off.
-#'
-#' @param total A boolean value that determines whether the total biomass from
-#'              species is plotted as well. Default is FALSE.
-#'
-#' @param background    A boolean value that determines whether background
-#'                      species are included. Ignored if the model does not
-#'                      contain background species. Default is TRUE.
-#' @param highlight Name or vector of names of the species to be highlighted.
-#'
-#' @param min_length minimum length of organism to include in biomass
-#'                   calculation
-#'
-#' @param return_data   A boolean value that determines whether the formatted
-#'                      data used for the plot is returned instead of the plot
-#'                      itself. Default value is FALSE
-#'
-#' @inheritDotParams mizer::get_size_range_array -params
-#'
-#' @return  A ggplot2 object, unless `return_data = TRUE`, in which case a data
-#'          frame with the four variables 'Year', 'Biomass', 'Species',
-#'          'Legend' is returned.
-#'
-#' @import ggplot2
-#' @importFrom reshape2 melt
-#' @export
-#'
-#' @title Plot the biomass of species and unstructured components through time
-#' @name plotBiomass
-#' @concept sumplots
-#' @family plotting functions
-#' @seealso [plotBiomass()], [plot2TotalBiomass()], [plotTotalBiomassRelative()],
-#'          [plotProductivity()], [plot2Productivity()], [plotProductivityRelative()]
-plotBiomass <- function(sim, species = NULL,
-                        start_time, end_time,
-                        y_ticks = 6, ylim = c(NA, NA),
-                        total = FALSE, background = TRUE,
-                        highlight = NULL, return_data = FALSE,
-                        min_length = NULL,
-                        ...) {
-    params <- sim@params
-
-    # If there are no unstructured components then call the mizer function
-    if (is.null(getComponent(params, "algae"))) {
-        if (is.null(getComponent(params, "detritus"))) {
-            return(mizer::plotBiomass(sim,
-                species = species,
-                start_time = start_time,
-                end_time = end_time,
-                y_ticks = y_ticks, ylim = ylim,
-                total = total,
-                background = background,
-                highlight = highlight,
-                return_data = return_data,
-                min_l = min_length, ...
-            ))
-        }
-    }
-
-    # User mizer function to create dataframe -
-    df <- mizer::plotBiomass(sim,
-        species = species,
-        start_time = start_time,
-        end_time = end_time,
-        y_ticks = y_ticks,
-        ylim = ylim,
-        total = total,
-        background = background,
-        highlight = highlight,
-        return_data = TRUE,
-        min_l = min_length, ...
-    )
-
-    species <- valid_species_arg(sim, species)
-
-    if (missing(start_time)) {
-        start_time <-
-            as.numeric(dimnames(sim@n)[[1]][1])
-    }
-    if (missing(end_time)) {
-        end_time <-
-            as.numeric(dimnames(sim@n)[[1]][dim(sim@n)[1]])
-    }
-    if (start_time >= end_time) {
-        stop("start_time must be less than end_time")
-    }
-
-    # other components
-    bu <- unlist(sim@n_other)
-    dim(bu) <- dim(sim@n_other)
-    dimnames(bu) <- dimnames(sim@n_other)
-    times <- as.numeric(dimnames(bu)[[1]])
-    bu <- bu[(times >= start_time) & (times <= end_time), , drop = FALSE]
-    bu <- reshape2::melt(bu)
-
-    # Implement ylim and a minimal cutoff and bring columns
-    # in desired order
-    min_value <- 1e-20
-    bu <- bu[bu$value >= min_value &
-        (is.na(ylim[1]) | bu$value >= ylim[1]) &
-        (is.na(ylim[2]) | bu$value <= ylim[2]), c(1, 3, 2)]
-    names(bu) <- c("Year", "Biomass", "Species")
-    bu$Legend <- bu$Species
-
-    # Return data -
-    plot_dat <- rbind(df, bu)
-    if (return_data) {
-        return(plot_dat)
-    }
-
-    p <- mizer::plotDataFrame(plot_dat, params,
-        xlab = "Year", ylab = "Biomass (g)",
-        ytrans = "log10", y_ticks = y_ticks,
-        highlight = highlight,
-        legend_var = "Legend"
-    )
-
-    return(p)
-}
-
-
-#' @importFrom plotly ggplotly
-#' @rdname plotBiomass
-#' @export
-plotlyBiomass <- function(sim,
-                          species = NULL,
-                          start_time,
-                          end_time,
-                          y_ticks = 6,
-                          ylim = c(NA, NA),
-                          total = FALSE,
-                          background = TRUE,
-                          highlight = NULL,
-                          min_length = NULL,
-                          ...) {
-    argg <- c(as.list(environment()), list(...))
-    ggplotly(do.call("plotBiomass", argg),
-        tooltip = c("Species", "Year", "Biomass")
-    )
-}
-
-#' Show two size spectra in the same plot
-#'
-#' @param object1 First MizerParams or MizerSim object.
-#' @param object2 Second MizerParams or MizerSim object.
-#' @param name1 An optional string with the name for the first model, to be used
-#'   in the legend. Set to "First" by default.
-#' @param name2 An optional string with the name for the second model, to be
-#'   used in the legend. Set to "Second" by default.
-#' @param power The abundance is plotted as the number density times the weight
-#'   raised to this power. The default power = 1 gives the biomass density,
-#'   whereas power = 2 gives the biomass density with respect to logarithmic
-#'   size bins.
-#' @param ... Parameters to pass to `plotSpectra()`
-#' @return A ggplot2 object
-#' @export
-#' @concept sumplots
-plotSpectra2 <- function(object1, object2,
-                         name1 = "First", name2 = "Second",
-                         power = 1, ...) {
-    if (is(object1, "MizerSim")) {
-        params <- object1@params
-    } else {
-        params <- object1
-    }
-
-    sf1 <- plotSpectra(object1,
-        power = power, return_data = TRUE, ...
-    )
-    sf1$Model <- name1
-    sf2 <- plotSpectra(object2,
-        power = power, return_data = TRUE, ...
-    )
-    sf2$Model <- name2
-    sf <- rbind(sf1, sf2)
-
-    # Adding this line ensures model 1 will always be model 1,
-    # regardless of naming - that way they could be named with numbers
-    sf$Model <- factor(sf$Model, levels = c(name1, name2))
-    sf$Legend <- factor(sf$Legend,
-        levels = c(params@species_params$species, "Resource")
-    )
-
-    legend_levels <- intersect(names(params@linecolour), unique(sf$Legend))
-    linecolours <- params@linecolour[legend_levels]
-
-    if (power %in% c(0, 1, 2)) {
-        y_label <- c(
-            "Number density [1/g]", "Biomass density",
-            "Biomass density [g]"
-        )[power + 1]
-    } else {
-        y_label <- paste0("Number density * w^", power)
-    }
-
-    ggplot(sf, aes(x = w, y = value, colour = Legend, linetype = Model)) +
-        geom_line(linewidth = 0.8) +
-        scale_x_log10("Weight [g]") +
-        scale_y_log10(y_label) +
-        scale_colour_manual(values = linecolours)
-}
-
-#' @importFrom plotly ggplotly
-#' @rdname plotSpectra2
-#' @export
-plotlySpectra2 <- function(object1, object2, ...) {
-    argg <- as.list(environment())
-    ggplotly(do.call("plotSpectra2", argg),
-        tooltip = c("Legend", "w", "value", "Model")
-    )
-}
-
-#' Plot the relative difference or percent change between two spectra
-#'
-#' This plots a measure of the relative difference between the steady state
-#' spectra of two mizer objects. The user can choose how this difference is
-#' calculated. Let the spectra of the two objects be represented as
-#' \eqn{N_1(w)} and \eqn{N_2(w)}.
-#'
-#' If `diff_method` is given as `percent_change`, this function plots the
-#' percent change, given by \deqn{ 100*(N_2(w) - N_1(w)) / (N_1(w)).}
-#'
-#' If `diff_method` is given as `rel_diff` the difference is calculated
-#' relative to their average, so \deqn{2 (N_2(w) - N_1(w)) / (N_2(w) + N_1(w)).}
-#'
-#' The individual spectra are calculated by the [plotSpectra()] function which
-#' is passed all additional arguments you supply. So you can for example
-#' determine a size range over which to average the simulation results via the
-#' `time_range` argument. See [plotSpectra()] for more options.
-#'
-#' Note that it does not matter whether the relative difference is calculated
-#' for the number density or the biomass density or the biomass density in log
-#' weight because the factors of \eqn{w} by which the densities differ cancels
-#' out in the relative difference.
+#' The individual spectra are calculated by the [mizer::plotSpectra()]
+#' function which is passed all additional arguments you supply. So you can
+#' for example determine a size range over which to average the simulation
+#' results via the `time_range` argument. See [mizer::plotSpectra()] for more
+#' options.
 #'
 #' @param object1 An object of class MizerSim or MizerParams
 #' @param object2 An object of class MizerSim or MizerParams
@@ -340,11 +99,6 @@ plotlySpectra2 <- function(object1, object2, ...) {
 #'                  numeric vector with the species indices, or a logical
 #'                  vector indicating for each species whether it is to be
 #'                  selected (TRUE) or not.
-#' @param diff_method   The method to calculate the relative change between
-#'                      models. If `percent.change`, the percent change is
-#'                      calculated relative to the value from object 1 with
-#'                      formula 100*(new-old)/old. If `rel.diff` the relative
-#'                      difference is returned given by (new - old)/(old + new).
 #' @param power The abundance is plotted as the number density times the weight
 #'   raised to this power. The default power = 1 gives the biomass density,
 #'   whereas power = 2 gives the biomass density with respect to logarithmic
@@ -354,9 +108,8 @@ plotlySpectra2 <- function(object1, object2, ...) {
 #' @family plotting functions
 #' @return A ggplot2 object
 #' @export
-plotSpectraRelative <- function(object1, object2, species = NULL,
-                                power,
-                                diff_method = "percent_change", ...) {
+plotSpectraPercentChange <- function(object1, object2, species = NULL,
+                                     power, ...) {
     sf1 <- mizer::plotSpectra(object1,
         power = power,
         species = species,
@@ -367,22 +120,14 @@ plotSpectraRelative <- function(object1, object2, species = NULL,
         species = species,
         return_data = TRUE, ...
     )
+    # plotSpectra() names the value column after the chosen power (e.g.
+    # "Biomass density"); normalise it so the join below is stable.
+    names(sf1)[2] <- "value"
+    names(sf2)[2] <- "value"
 
-    # Calculate relative difference
-    if (diff_method == "percent_change") {
-        sf <- dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
-            dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
-        yLabel <- "% Change in Biomass"
-    } else if (diff_method == "rel_diff") {
-        sf <- dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
-            dplyr::mutate(
-                rel_diff =
-                    ((value.y - value.x) / (value.x + value.y))
-            )
-        yLabel <- "Relative Difference in Biomass"
-    } else {
-        stop("diff_method should be either 'percent_change' or 'rel_diff'.")
-    }
+    sf <- dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
+        dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
+    yLabel <- "% Change in Biomass"
 
     if (is(object1, "MizerSim")) {
         params <- object1@params
@@ -429,10 +174,10 @@ plotSpectraRelative <- function(object1, object2, species = NULL,
 }
 
 #' @importFrom plotly ggplotly
-#' @rdname plotSpectraRelative
+#' @rdname plotSpectraPercentChange
 #' @export
-plotlySpectraRelative <- function(object1, object2, diff_method, ...) {
-    ggplotly(plotSpectraRelative(object1, object2, diff_method, ...),
+plotlySpectraPercentChange <- function(object1, object2, ...) {
+    ggplotly(plotSpectraPercentChange(object1, object2, ...),
         tooltip = c("Legend", "w", "rel_diff")
     )
 }

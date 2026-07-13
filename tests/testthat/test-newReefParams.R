@@ -10,5 +10,5 @@ test_that("newReefParams returns correct class", {
         method = "binned",
         method_params = tuning_profile
     )
-    expect_s4_class(result, "MizerReefParams")
+    expect_s4_class(result, "mizerReef")
 })

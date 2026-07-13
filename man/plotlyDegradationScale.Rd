@@ -14,7 +14,7 @@ plotlyDegradationScale(
 \arguments{
 \item{object}{An optional object of class \linkS4class{MizerParams} or
 \linkS4class{MizerSim}. If provided, the function will attempt to extract
-the degradation scaling or trajectory from its \code{@refuge_params} slot.}
+the degradation scaling or trajectory from its \code{@other_params$refuge_params} slot.}
 
 \item{trajectory}{Optional. Either a character string (\code{"rubble"},
 \code{"algae"}, \code{"recovery"}) to use built-in data, or a
@@ -30,3 +30,4 @@ A plotly object
 \description{
 Returns an interactive heatmap for degradation scaling parameters.
 }
+\concept{refugePlots}

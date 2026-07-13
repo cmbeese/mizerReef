@@ -188,7 +188,7 @@ getVulnerable <- function(object, n, n_pp, n_other,
 #' @concept extmort
 #' @family rate functions
 getSenMort <- function(params, n = initialN(params),
-                       n_pp = initialNResource(params),
+                       n_pp = params@initial_n_pp,
                        n_other = initialNOther(params),
                        t = 0, ...) {
     params <- validParams(params)

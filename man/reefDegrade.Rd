@@ -41,13 +41,13 @@ timestep's refuge density. Optional algae dynamics adjustments can be
 specified via \code{\link[=setDegradation]{setDegradation()}}.
 }
 \seealso{
-Other mizer rate functions: 
-\code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
-\code{\link{reefMort}()},
-\code{\link{reefPredMort}()},
-\code{\link{reefRates}()},
-\code{\link{reefVulnerable}()}
+Other mizer rate functions:
+\code{\link[=reefEncounter]{reefEncounter()}},
+\code{\link[=reefFeedingLevel]{reefFeedingLevel()}},
+\code{\link[=reefMort]{reefMort()}},
+\code{\link[=reefPredMort]{reefPredMort()}},
+\code{\link[=reefRates]{reefRates()}},
+\code{\link[=reefVulnerable]{reefVulnerable()}}
 }
 \concept{degradation}
 \concept{mizer rate functions}

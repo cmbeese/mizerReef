@@ -48,17 +48,13 @@ with the "initial" slots set to the steady state.}
 \item{preserve}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 Specifies whether the \code{reproduction_level} should be preserved (default)
 or the maximum reproduction rate \code{R_max} or the reproductive
-efficiency \code{erepro}. See \code{\link[mizer:setBevertonHolt]{mizer::setBevertonHolt()}} for an explanation
+efficiency \code{erepro}. See \code{\link[mizer:setBevertonHolt]{setBevertonHolt()}} for an explanation
 of the \code{reproduction_level}.}
 
 \item{progress_bar}{A shiny progress object to implement a progress bar in a
 shiny app. Default FALSE.}
 
-\item{...}{
-  Arguments passed on to \code{\link[=tuneUR]{tuneUR}}
-  \describe{
-    \item{\code{}}{}
-  }}
+\item{...}{unused}
 }
 \value{
 An object of type \linkS4class{MizerParams}

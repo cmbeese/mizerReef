@@ -15,6 +15,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<!--
+This vignette references data objects (karpata_model, karpata_species) and a
+local CSV file (inst/cbn_interaction.csv) that are not currently part of the
+package, so it cannot be rendered by pkgdown. The file is prefixed with `_`
+(pkgdown's documented convention for excluding a vignette from the built
+site) until its content is updated to match the current package data
+(caribbean_3_* / karpata_refuge).
+-->
+
 ```{r setup, echo = FALSE}
 knitr::opts_chunk$set(dpi=400)
 ```

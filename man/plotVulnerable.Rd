@@ -57,22 +57,21 @@ When called with a \linkS4class{MizerParams} object the initial
 vulnerability is plotted. The complement of refuge.
 }
 \seealso{
-\link[mizer:plotting_functions]{mizer::plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotRefugeProfile]{plotRefugeProfile()}}
+\link[mizer:plotting_functions]{plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotRefugeProfile]{plotRefugeProfile()}}
 
-Other plotting functions: 
-\code{\link{plot2Productivity}()},
-\code{\link{plot2TotalBiomass}()},
-\code{\link{plotBiomass}()},
-\code{\link{plotDegradationScale}()},
-\code{\link{plotProductivity}()},
-\code{\link{plotProductivityRelative}()},
-\code{\link{plotRefugeDensity}()},
-\code{\link{plotRefugeProfile}()},
-\code{\link{plotRelativeContribution}()},
-\code{\link{plotSpectraRelative}()},
-\code{\link{plotTotalAbundance}()},
-\code{\link{plotTotalBiomass}()},
-\code{\link{plotTotalBiomassRelative}()}
+Other plotting functions:
+\code{\link[=plot2Productivity]{plot2Productivity()}},
+\code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[=plotDegradationScale]{plotDegradationScale()}},
+\code{\link[=plotProductivity]{plotProductivity()}},
+\code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
+\code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
+\code{\link[=plotRefugeProfile]{plotRefugeProfile()}},
+\code{\link[=plotRelativeContribution]{plotRelativeContribution()}},
+\code{\link[=plotSpectraPercentChange]{plotSpectraPercentChange()}},
+\code{\link[=plotTotalAbundance]{plotTotalAbundance()}},
+\code{\link[=plotTotalBiomass]{plotTotalBiomass()}},
+\code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}}
 }
 \concept{plotting functions}
 \concept{refugePlots}

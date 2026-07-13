@@ -2,7 +2,7 @@
 % Please edit documentation in R/MizerReefParams-class.R
 \name{MizerReefParams}
 \alias{MizerReefParams}
-\title{Constructor for MizerReefParams}
+\title{Deprecated: Use \code{newReefParams()} instead}
 \usage{
 MizerReefParams(
   ...,
@@ -12,21 +12,21 @@ MizerReefParams(
 )
 }
 \arguments{
-\item{...}{Arguments for \code{MizerParams}}
+\item{...}{Arguments passed to \code{\link[mizer:MizerParams]{MizerParams()}}}
 
-\item{refuge_params}{List for refuge parameters}
+\item{refuge_params}{Ignored (now stored in \code{other_params})}
 
-\item{algae_params}{List for algae parameters}
+\item{algae_params}{Ignored (now stored in \code{other_params})}
 
-\item{detritus_params}{List for detritus parameters}
+\item{detritus_params}{Ignored (now stored in \code{other_params})}
 }
 \value{
-A \code{MizerReefParams} object
+A \code{mizerReef} object
 }
 \description{
-Creates a \code{MizerReefParams} object with slots for reef-specific parameters,
-including predation refuge and algae and detritus resources.
+\code{MizerReefParams()} is a deprecated constructor. Use \code{\link[=newReefParams]{newReefParams()}} to
+create a mizerReef params object.
 }
 \seealso{
-\link[mizer:MizerParams]{mizer::MizerParams}
+\code{\link[=newReefParams]{newReefParams()}}
 }
