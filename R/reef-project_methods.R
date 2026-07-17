@@ -296,7 +296,7 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
     rd <- method_params$refuge_density
 
     # Only apply degradation logic for competitive method and degrade == TRUE
-    if (degrade == TRUE) {
+    if (isTRUE(degrade)) {
         # Pull times (years) for bleaching & scaling parameters
         t_bleach <- params@other_params$refuge_params$t_bleach # year for bleaching to occur
         deg_scale <- params@other_params$refuge_params$deg_scale # matrix of refuge scaling parameters

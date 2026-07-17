@@ -104,11 +104,14 @@ reefSteady <- function(params, d_func = NULL,
 
     # algae and detritus ----
     if (params@other_params$new_refuge == FALSE) {
-        cc <- params@other_params$use_UR_cc
-        if (cc == TRUE) {
+        # use_UR_cc is only set once setAlgaeParams()/setDetritusParams()
+        # have been called with use_UR_cc = TRUE; it is unset (NULL) on
+        # models that have never opted into the carrying-capacity-scaled
+        # formulation, so treat that as FALSE rather than erroring.
+        cc <- isTRUE(params@other_params$use_UR_cc)
+        if (cc) {
             params <- tuneUR_cc(params = params, ...)
-        }
-        if (cc == FALSE) {
+        } else {
             params <- tuneUR(params = params, ...)
         }
     }
