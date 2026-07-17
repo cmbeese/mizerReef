@@ -128,9 +128,9 @@ params_degraded <- setDegradation(
 )
 
 # Check that degradation parameters were stored
-cat("Degradation enabled:", params_degraded@refuge_params$degrade, "\n")
-cat("Bleaching time:", params_degraded@refuge_params$t_bleach, "\n")
-cat("Trajectory:", params_degraded@refuge_params$trajectory, "\n")
+cat("Degradation enabled:", params_degraded@other_params$refuge_params$degrade, "\n")
+cat("Bleaching time:", params_degraded@other_params$refuge_params$t_bleach, "\n")
+cat("Trajectory:", params_degraded@other_params$refuge_params$trajectory, "\n")
 ```
 
 ## Step 2: Add Carrying Capacity Dynamics
