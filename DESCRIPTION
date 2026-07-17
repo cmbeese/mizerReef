@@ -1,7 +1,7 @@
 Package: mizerReef
 Title: Mizer Models with Benthic Coupling for Structurally Complex Systems
 Version: 2.1.0
-Date: 2024-31-01
+Date: 2026-07-17
 Authors@R: c(
     person("Chelsey M.", "Beese",
            email = "beese.c.m@gmail.com",
@@ -51,7 +51,7 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-URL: https://sizespectrum.org/mizerReef/, https://cmbeese.github.io/mizerReef/
+URL: https://cmbeese.github.io/mizerReef/
 Language: en-GB
 Collate:
     'MizerReefParams-class.R'
