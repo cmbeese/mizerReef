@@ -1,23 +1,30 @@
+# Regenerate the built-in degradation trajectory scaling matrices
+# (rubble_scale, algae_scale, recovery_scale) from inst/data-csv/deg_scales.csv
+#
+# Each trajectory in deg_scales.csv stores a *change* (delta) in refuge
+# density per refuge size bin (rows) and year (columns 1-15); the scaling
+# matrices used by setDegradation()/reefDegrade() are multipliers, i.e.
+# 1 + delta, applied to the previous year's refuge density.
 library(here)
 
-# Rubble trajectory
-rubble_scale <- read.csv(here("inst/rubble.csv"), header = FALSE)
-rubble_scale <- as.matrix(rubble_scale)
+deg_scales <- read.csv(here("inst/data-csv/deg_scales.csv"))
+year_cols <- as.character(1:15)
 
-save(rubble_scale,   file = "data/rubble_scale.rda")
+make_scale_matrix <- function(trajectory) {
+    d <- deg_scales[deg_scales$trajectory == trajectory, ]
+    m <- 1 + as.matrix(d[, paste0("X", year_cols)])
+    dimnames(m) <- list(d$ref_size, year_cols)
+    m
+}
+
+# Rubble trajectory
+rubble_scale <- make_scale_matrix("rubble")
+save(rubble_scale, file = "data/rubble_scale.rda")
 
 # Algae trajectory
-algae_scale <- read.csv(here("inst/algae.csv"), header = FALSE)
-algae_scale <- as.matrix(algae_scale)
-
-save(algae_scale,   file = "data/algae_scale.rda")
+algae_scale <- make_scale_matrix("algae")
+save(algae_scale, file = "data/algae_scale.rda")
 
 # Recovery trajectory
-recovery_scale <- read.csv(here("inst/recovery.csv"), header = FALSE)
-recovery_scale <- as.matrix(recovery_scale)
-
-save(recovery_scale,   file = "data/recovery_scale.rda")
-
-# No degradation - for testing
-constant_scale <- matrix(1, nrow = nrow(algae_scale), ncol = ncol(algae_scale))
-save(constant_scale,   file = "data/constant_scale.rda")
+recovery_scale <- make_scale_matrix("recovery")
+save(recovery_scale, file = "data/recovery_scale.rda")
