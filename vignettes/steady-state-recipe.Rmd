@@ -49,8 +49,8 @@ library(dplyr)
 library(knitr)
 
 # Load example datasets
-data("karpata_species")
-data("karpata_int")
+data("caribbean_10_species")
+data("caribbean_10_interaction")
 data("tuning_profile")
 data("karpata_refuge")
 ```
@@ -69,8 +69,8 @@ we can tune abundances first.
 
 ```{r create-initial-params, eval=FALSE}
 # Create initial parameters object with tuning refuge profile
-params <- newReefParams(species_params = karpata_species,
-                        interaction = karpata_int,
+params <- newReefParams(species_params = caribbean_10_species,
+                        interaction = caribbean_10_interaction,
                         method = "binned",
                         method_params = tuning_profile)
 
@@ -82,7 +82,7 @@ Let's examine the species groups and their key parameters:
 
 ```{r species-overview, eval=FALSE}
 # Show key species parameters
-kable(karpata_species[, c("species", "w_max", "w_mat", "refuge_user", 
+kable(caribbean_10_species[, c("species", "w_max", "w_mat", "refuge_user", 
                           "blocked_pred", "biomass_observed")],
       caption = "Key species parameters for the Karpata model")
 ```
@@ -234,8 +234,8 @@ convenient—it often better reflects reef fish biology than either extreme
 
 ```{r reduce-reproduction, eval=FALSE}
 # Set reproduction levels to 0.5 for all species
-rdi <- rep(0.5, nrow(karpata_species))
-names(rdi) <- karpata_species$species
+rdi <- rep(0.5, nrow(caribbean_10_species))
+names(rdi) <- caribbean_10_species$species
 
 params <- setBevertonHolt(params, reproduction_level = rdi)
 
@@ -294,11 +294,11 @@ params <- matchReefGrowth(params)
 params <- reefSteady(params)
 
 # Check age at maturity matches observations
-age_mat_observed <- karpata_species$age_mat
+age_mat_observed <- caribbean_10_species$age_mat
 age_mat_model <- age_mat(params)
 
 age_comparison <- data.frame(
-  Species = karpata_species$species,
+  Species = caribbean_10_species$species,
   Observed = age_mat_observed,
   Model = age_mat_model,
   Difference = age_mat_model - age_mat_observed
@@ -357,7 +357,7 @@ params <- newRefuge(params,
                     new_method_params = karpata_refuge)
 
 # Check the new refuge profile
-plotRefuge(params) + 
+plotRefugeProfile(params) +
   ggtitle("Refuge profile with competitive method")
 ```
 
@@ -456,19 +456,19 @@ library(mizerReef)
 library(mizer)
 
 # Load data
-data("karpata_species")
-data("karpata_int") 
+data("caribbean_10_species")
+data("caribbean_10_interaction") 
 data("tuning_profile")
 data("karpata_refuge")
 
 # 1. Create initial parameters
-params <- newReefParams(species_params = karpata_species,
-                        interaction = karpata_int,
+params <- newReefParams(species_params = caribbean_10_species,
+                        interaction = caribbean_10_interaction,
                         method = "binned",
                         method_params = tuning_profile)
 
 # 2. Set intermediate reproduction level (moderate density-dependence)
-rdi <- rep(0.5, nrow(karpata_species))
+rdi <- rep(0.5, nrow(caribbean_10_species))
 params <- setBevertonHolt(params, reproduction_level = rdi)
 
 # 3. Initial steady state
