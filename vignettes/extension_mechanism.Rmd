@@ -472,11 +472,13 @@ mizerReef illustrates the following extension mechanisms working together:
 4. **A multiplicative rate override, handled without a full rewrite** —
    predation refuge cannot be expressed as a purely additive `NextMethod()`
    correction the way mizerShelf's detritus and carrion biomass can. mizerReef
-   instead calls `NextMethod()` once for the composable standard result and
-   combines it with a direct call to mizer's base rate function for the
-   vulnerability-adjusted part — a pattern worth reusing for any extension
-   whose modification depends on a subset of predators or a transformed
-   input, rather than a term added on top.
+   instead calls `NextMethod()` *twice* — once with unmodified inputs for the
+   composable standard result, and once more with vulnerability-modified
+   inputs to get the correction — and combines the two by predator row, so
+   both calls (and any extension package stacked below mizerReef) stay fully
+   composable. This is a pattern worth reusing for any extension whose
+   modification depends on a subset of predators or a transformed input,
+   rather than a term added on top.
 
 5. **`utils::upgrade()`** — migrates objects created with mizerReef versions
    that stored data in custom S4 slots rather than in `other_params()`.
