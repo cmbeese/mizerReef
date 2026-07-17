@@ -1,4 +1,4 @@
-utils::globalVariables(c("Year", "SizeBin"))
+utils::globalVariables(c("Year", "SizeBin", "Scaling"))
 
 #' Plot the vulnerability to predation of species by weight
 #'
@@ -493,6 +493,7 @@ plotDegradationScale <- function(object = NULL,
 #' Returns an interactive heatmap for degradation scaling parameters.
 #'
 #' @inheritParams plotDegradationScale
+#' @param ... Extra parameters passed on to [plotly::ggplotly()].
 #' @return A plotly object
 #' @importFrom plotly ggplotly
 #' @concept refugePlots
@@ -518,6 +519,7 @@ plotlyDegradationScale <- function(object = NULL, trajectory = NULL, return_data
 #'
 #' @return A ggplot2 object, or a data frame if \code{return_data = TRUE}.
 #' @importFrom reshape2 melt
+#' @importFrom utils data
 #' @export
 #' @family plotting functions
 #' @concept refugePlots

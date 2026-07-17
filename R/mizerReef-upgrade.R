@@ -8,6 +8,7 @@
 #' @param object A `mizerReef` params object (possibly from an older version).
 #' @param ... Unused.
 #' @return An upgraded `mizerReef` object.
+#' @importFrom methods .hasSlot slot
 #' @exportS3Method utils::upgrade
 upgrade.mizerReef <- function(object, ...) {
     # Migrate old S4 slot data to other_params sub-lists if needed.

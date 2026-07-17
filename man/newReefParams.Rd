@@ -178,6 +178,10 @@ values must be numeric and between 0 and 1.}
 all unstructured resources. Default is FALSE. This flag
 is stored in the other_params slot.}
 
+\item{initial_algae_growth}{Numeric. The initial growth rate of algae in
+grams/m^2/year, passed on to \code{\link[=setAlgaeParams]{setAlgaeParams()}}
+as \code{algae_growth_initial}. Default is 2e3.}
+
 \item{algae_capacity}{Numeric. Carrying capacity for algae biomass in
 grams per year. Default is 1e4.}
 

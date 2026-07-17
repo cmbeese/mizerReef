@@ -72,7 +72,9 @@ utils::globalVariables(c(
     "y_ticks", "highlight", "Metric",
     # variables used by ggplot for detritus and algae
     "Rate", "Source", "Consumer", "Year",
-    "refuge_density", "size_bin", "scale_color_viridis"
+    "refuge_density", "size_bin", "scale_color_viridis",
+    # variables used by ggplot in plotProductivity/plotRefugeDensity
+    "Productivity", "time"
 ))
 
 #' Plot the percent change between two spectra

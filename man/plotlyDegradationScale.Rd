@@ -23,6 +23,8 @@ year in first column, remaining columns as refuge size bins).}
 
 \item{return_data}{Logical. If TRUE, returns the formatted data frame
 instead of the plot. Default FALSE.}
+
+\item{...}{Extra parameters passed on to \code{\link[plotly:ggplotly]{plotly::ggplotly()}}.}
 }
 \value{
 A plotly object

@@ -34,6 +34,11 @@ trajectories are included as data objects in the package.}
 \item{bleach_time}{The year of the simulation to implement bleaching.
 Defaults to year 2.}
 
+\item{degrade}{Logical. Whether to enable habitat degradation during
+projections, i.e. whether \code{\link[=reefDegrade]{reefDegrade()}} applies the
+\code{deg_scale} trajectory once \code{t} reaches \code{bleach_time}.
+Default FALSE.}
+
 \item{algae_boost}{Logical. Should algae growth and/or carrying capacity
 be adjusted in response to bleaching? Default is FALSE.}
 

@@ -43,6 +43,10 @@
 #' @param resource_color Character. Colour to use for the resource line in plots.
 #'                       Default is "lightseagreen".
 #'
+#' @param initial_algae_growth Numeric. The initial growth rate of algae in
+#'                             grams/m^2/year, passed on to [setAlgaeParams()]
+#'                             as `algae_growth_initial`. Default is 2e3.
+#'
 #' @param min_w_pp Minimum size of plankton in grams
 #'
 #' @param w_pp_cutoff Maximum size of plankton in grams, default to 1 g

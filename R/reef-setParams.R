@@ -1299,6 +1299,11 @@ newRefuge <- function(params, new_refuge = FALSE,
 #' @param bleach_time   The year of the simulation to implement bleaching.
 #'                      Defaults to year 2.
 #'
+#' @param degrade       Logical. Whether to enable habitat degradation during
+#'                      projections, i.e. whether [reefDegrade()] applies the
+#'                      `deg_scale` trajectory once `t` reaches `bleach_time`.
+#'                      Default FALSE.
+#'
 #' @param algae_boost  Logical. Should algae growth and/or carrying capacity
 #'                      be adjusted in response to bleaching? Default is FALSE.
 #'
