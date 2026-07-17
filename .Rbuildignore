@@ -15,3 +15,6 @@ test_i2.rda
 ^vignettes/model-description\.Rmd$
 ^ignore$
 ^check-results\.txt$
+^\.env$
+^\.kilo$
+^\.vscode$
