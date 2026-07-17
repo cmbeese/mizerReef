@@ -33,7 +33,7 @@ params <- caribbean_10_model
 
 The model includes `r nrow(params@species_params)-1` species groups of fish as well as a general group of benthic invertebrates. Species groups were assigned based on functional traits, body size, diet, and interactions with habitat structure. Estimates of observed biomass for each group were used to tune reproduction and resource consumption parameters so that steady state abundances agree with empirical observations. The process of establishing a steady state that agrees with empirical observations is nontrivial. The R script used to tune the steady state parameters is included at the end of this file. 
 
-Biomass estimates were based on data collected from Karpata Reef in Bonaire, a site with low fishing levels in a marine reserve [@Dryden2016; @Rogers2014; @Newman2015; @Williams2015; @Williams2016]. Observations of fish smaller than 10 cm were removed from analysis because their abundance is not well captured by visual survey methods. The cutoff weight for observed biomass estimates was calculated using published length-weight relationships [@FishBase]. The cutoff size is given in the table below along with the observed biomass per square meter in grams.
+Biomass estimates were based on data collected from Karpata Reef in Bonaire, a site with low fishing levels in a marine reserve [@Dryden2016; @Rogers_2014; @Newman_2015; @Williams_2015; @Williams_2016]. Observations of fish smaller than 10 cm were removed from analysis because their abundance is not well captured by visual survey methods. The cutoff weight for observed biomass estimates was calculated using published length-weight relationships [@FishBase]. The cutoff size is given in the table below along with the observed biomass per square meter in grams.
 
 ```{r, echo = FALSE}
 params@species_params %>%
@@ -73,7 +73,7 @@ p <- ggplot(melt(params@interaction),
 
 #### Predation Kernel   
   
-The parameters for the predation kernels were based on trait-based studies of prey size selectivity, diet studies that estimate predator prey mass ratio, and home range size estimates from @Nash2014. Values were tuned to achieve expected diet compositions. All estimates fall within observed ranges. All groups use a lognormal predation kernel. The parameters are given in the table below. 
+The parameters for the predation kernels were based on trait-based studies of prey size selectivity, diet studies that estimate predator prey mass ratio, and home range size estimates from @Nash_2014. Values were tuned to achieve expected diet compositions. All estimates fall within observed ranges. All groups use a lognormal predation kernel. The parameters are given in the table below. 
 
 ```{r, echo = FALSE, results='asis'}
 params@species_params %>%
@@ -87,7 +87,7 @@ params@species_params %>%
 refuge_params <- params@other_params$refuge_params
 ```
 
-The refuge function, $R_j(w_p)$, describes the proportion of fish of size $w_p$ in prey group $j$ that are hidden from predators. $1 - R_j(w_p)$ is then the proportion of fish of weight $w_p$ and prey group $j$ that are vulnerable to consumption by predators.  This model uses the `r print(params@other_params$refuge_params$method)` method to determine the **refuge profile**, the set of proportions that describe refuge availability across the entire size range of model fish (@Rogers2018). The proportion of prey of weight $w_p$ and group $j$ with access to refuge $R_j(w_p)$ is given by
+The refuge function, $R_j(w_p)$, describes the proportion of fish of size $w_p$ in prey group $j$ that are hidden from predators. $1 - R_j(w_p)$ is then the proportion of fish of weight $w_p$ and prey group $j$ that are vulnerable to consumption by predators.  This model uses the `r print(params@other_params$refuge_params$method)` method to determine the **refuge profile**, the set of proportions that describe refuge availability across the entire size range of model fish (@Rogers_2018). The proportion of prey of weight $w_p$ and group $j$ with access to refuge $R_j(w_p)$ is given by
 
 $$
 R_j(w_p) = min\left \{R_{max} \, , \frac{\tau\cdot\eta_k}{\sum_{i}\int_{w_{k-1}}^{w_k} N_i(w)~dw}
@@ -160,7 +160,7 @@ params@species_params %>%
   
 A proportion $\psi_i(w)$ of the energy available for growth and reproduction is used for reproduction. This proportion changes from zero below the weight $w_{mat.i}$ of maturation to one at the maximum weight $w_{max.i}$, where all available energy is used for reproduction.
 
-Maturation length and age data were based on the most observed species from each species group in the FORCE data set [@Dryden2016; @Rogers2014; @Newman2015; @Williams2015; @Williams2016].
+Maturation length and age data were based on the most observed species from each species group in the FORCE data set [@Dryden2016; @Rogers_2014; @Newman_2015; @Williams_2015; @Williams_2016].
 
 ```{r, echo = FALSE}
 params@species_params %>%
@@ -353,7 +353,7 @@ pf <- r[1]
 pd <- r[2]
 dext <- params@other_params$detritus$external
 ```
-Detritus comes from defecation and decomposing dead organisms that die as a result of sources of external mortality. At steady state detritus from decomposing dead organisms is `r paste(round(pd,2))` g/year and defecation produces `r paste(round(pf,2))` g/year. A proportion `ext_decomp` of the external mortality and a proportion `sen_decomp` of senescence mortality decomposes to detritus.  The proportion of detritus that sinks from external mortality is `r paste(100*e_d,"%")` and the proportion that decomposes from senescence mortality is `r paste(100*s_d,"%")`. These values are based on estimates from @Hatcher1988.
+Detritus comes from defecation and decomposing dead organisms that die as a result of sources of external mortality. At steady state detritus from decomposing dead organisms is `r paste(round(pd,2))` g/year and defecation produces `r paste(round(pf,2))` g/year. A proportion `ext_decomp` of the external mortality and a proportion `sen_decomp` of senescence mortality decomposes to detritus.  The proportion of detritus that sinks from external mortality is `r paste(100*e_d,"%")` and the proportion that decomposes from senescence mortality is `r paste(100*s_d,"%")`. These values are based on estimates from @Hatcher_1988.
 
 External detritus is generated by unmodelled sources or sinks in from the pelagic zone. At steady state external detritus production is `r paste(round(dext,2))` g/year. This value is set so that steady state abundances match empirical observations. Where it is negative, feces and mortality are producing more detritus than can be consumed. Detrital biomass is assumed to be washed away by wave action in this case.
 

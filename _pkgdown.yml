@@ -143,6 +143,8 @@ articles:
       - reef-degradation-simulations
   - title: "Model Description"
     contents:
+      - karpata_model-description
+      - caribbean_3_model-description
       - model-description
   - title: "Combining Extensions"
     contents:
