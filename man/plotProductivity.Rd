@@ -95,7 +95,7 @@ maximum weight in the model.
 
 \seealso{
 \code{\link[=getEGrowthTime]{getEGrowthTime()}},\code{\link[=getProductivity]{getProductivity()}},
-\code{\link[=plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
+\code{\link[mizer:plotBiomass]{plotBiomass()}}, \code{\link[=plot2TotalBiomass]{plot2TotalBiomass()}},
 \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}}, \code{\link[=plotProductivity]{plotProductivity()}},
 \code{\link[=plot2Productivity]{plot2Productivity()}}, \code{\link[=plotProductivityRelative]{plotProductivityRelative()}}
 

@@ -303,7 +303,7 @@ knitr::include_graphics("figures/body-shape-example.png")
 
 <summary> The package includes several example refuge profiles for tuning and demonstration. </summary>
 
-The Caribbean_10 species reef example model uses a competitive refuge profile based on field data. Use the code below to view the built-in refuge profile:
+mizerReef's example models use competitive refuge profiles based on field data. Use the code below to view the built-in Karpata Reef refuge profile:
 
 ```{r karpata-refuge-profile, echo=TRUE, eval=TRUE}
 data(karpata_refuge)
@@ -479,7 +479,7 @@ For more information on the example data used in this vignette, see the [mizerRe
 **MizerReef documentation and tutorials:**
 
 - [MizerReef documentation](https://cmbeese.github.io/mizerReef/): Main package documentation and reference manual
-- [MizerReef model description vignette](caribbean10_model-description.html): Detailed explanation of model structure and example workflows
+- [MizerReef model description vignette](karpata_model-description.html): Detailed explanation of model structure and example workflows
 - [MizerReef degradation vignette](reef-degradation-simulations.html): Simulating habitat degradation and its effects
 - [MizerReef Steady State recipe](steady-state-recipe.html): Step-by-step guide for tuning models to steady state
 - [Example models and built-in data](https://cmbeese.github.io/mizerReef/reference/index.html#example-models): Reference for example species, interaction matrices, and refuge profiles

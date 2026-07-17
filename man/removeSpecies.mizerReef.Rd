@@ -19,7 +19,7 @@ species whether it is to be removed (TRUE) or not.}
 A \code{mizerReef} object with fewer species.
 }
 \description{
-This extends mizer's \code{\link[=removeSpecies]{removeSpecies()}} to also remove the relevant
+This extends mizer's \code{\link[mizer:removeSpecies]{removeSpecies()}} to also remove the relevant
 row from the detritus and algae consumption arrays \code{rho}.
 }
 \concept{helper}

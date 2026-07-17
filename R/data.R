@@ -97,9 +97,16 @@
 #'
 #' Use this with \code{method = "competitive"} in \code{\link{setRefuge}()}.
 #'
+#' This profile is reused across mizerReef's example models: it is the
+#' data behind \code{\link{caribbean_10_model}}'s refuge as well as
+#' \code{\link{caribbean_3_model}}'s.
+#'
+#' Use this with \code{method = "competitive"} in \code{\link{setRefuge}()}.
+#'
 #' @keywords datasets
 #' @concept refugeParams
-#' @seealso \code{\link{setRefuge}()}, \code{\link{caribbean_10_model}}
+#' @seealso \code{\link{setRefuge}()}, \code{\link{caribbean_10_model}},
+#'   \code{\link{caribbean_3_model}}, \code{\link{aquarius_refuge}}
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish
 #' community structure. PhD Thesis, Newcastle University.
@@ -112,6 +119,35 @@
 #'   \code{refuge_density} (refuge density in no./m^2).
 #' @source FORCE dataset, Bonaire (Dryden 2017)
 "karpata_refuge"
+
+
+#' Competitive method refuge parameters for Aquarius reef research station
+#'
+#' This data frame contains refuge density parameters for the competitive
+#' refuge method. It records the density of refuges (no./m^2) in each of
+#' ten 5 cm fish-length bins (0-50 cm), derived from field measurements at
+#' the Aquarius reef research station (FORCE dataset, Dryden 2017), from
+#' the same field hole-density survey pipeline as \code{\link{karpata_refuge}}.
+#' Like \code{karpata_refuge}, this profile is general-purpose and can be
+#' used with any mizerReef model, not just one particular example model.
+#'
+#' Use this with \code{method = "competitive"} in \code{\link{setRefuge}()}.
+#'
+#' @keywords datasets
+#' @concept refugeParams
+#' @seealso \code{\link{setRefuge}()}, \code{\link{karpata_refuge}}
+#' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
+#' complexity of Caribbean coral reefs and its relationships with fish
+#' community structure. PhD Thesis, Newcastle University.
+#' @references Beese, C. (2025). PhD Thesis. "Modelling Coral Reef Futures:
+#' Exploring the role of structural complexity in sustaining ecosystem
+#' services." Victoria University of Wellington.
+#' https://doi.org/10.26686/wgtn.26421523
+#' @format A data frame with 10 rows and 3 columns: \code{start_L} (start of
+#'   length bin in cm), \code{end_L} (end of length bin in cm), and
+#'   \code{refuge_density} (refuge density in no./m^2).
+#' @source FORCE dataset, Aquarius reef research station (Dryden 2017)
+"aquarius_refuge"
 
 
 #' Species parameters for a generic Caribbean reef (10 functional groups)

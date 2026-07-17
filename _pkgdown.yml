@@ -99,21 +99,40 @@ reference:
     - MizerReefParams
 - title: Example Models
   desc:  >
-        These files hold example parameters and a mizerReef params object for
-        a simple, generic Caribbean coral reef with three functional groups.
-- subtitle: Simple trait-based model
+        These files hold example parameters and mizerReef params objects for
+        generic Caribbean coral reef ecosystems.
+- subtitle: Simple 3-group model
   desc: >
-        This simple trait-based model divides reef organisms into three broad
-        groups based on diet: predators, herbivores, and invertebrates.
+        A simple trait-based model with three functional groups (predators,
+        herbivores, invertebrates) for a generic Caribbean reef.
 - contents:
     - caribbean_3_species
     - caribbean_3_interaction
     - caribbean_3_model
-- subtitle: Refuge profiles
+- subtitle: 10-group model (Karpata Reef, Bonaire)
   desc: >
-        Example refuge profiles for testing steady states with.
+        A 10-functional-group model parameterised from field data at Karpata
+        Reef in Bonaire, including competitive predation refuge.
+- contents:
+    - caribbean_10_species
+    - caribbean_10_interaction
+    - caribbean_10_model
+- subtitle: Empirical refuge profiles
+  desc: >
+        Refuge density profiles from field data, reusable across any
+        mizerReef model - not tied to a particular example model.
 - contents:
     - karpata_refuge
+    - aquarius_refuge
+- subtitle: Degradation trajectories
+  desc: >
+        Matrices of refuge-density scaling factors (multipliers) for three
+        built-in habitat disturbance trajectories. Use with
+        [setDegradation()] and [reefDegrade()].
+- contents:
+    - rubble_scale
+    - algae_scale
+    - recovery_scale
 articles:
   - title: "Getting Started"
     contents:
