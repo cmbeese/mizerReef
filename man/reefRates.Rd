@@ -54,8 +54,10 @@ By default this function returns a list with the following components:
 \item resource_mort from \code{\link[mizer:mizerResourceMort]{mizerResourceMort()}}
 }
 
-However you can replace any of these rate functions by your own rate
-function if you wish, see \code{\link[mizer:setRateFunction]{setRateFunction()}} for details.
+However you can replace any of these rate functions by overriding the
+relevant \code{project*.mizerReef} S3 method (e.g. \code{projectEncounter.mizerReef}),
+following the \code{NextMethod()}-based composition pattern used throughout
+this file so that other extension packages keep working.
 }
 \seealso{
 Other mizer rate functions:
