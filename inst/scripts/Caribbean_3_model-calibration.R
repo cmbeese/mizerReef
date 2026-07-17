@@ -53,7 +53,6 @@ log_msg("tuning_profile.csv md5", tools::md5sum(tuning_path), "rows", nrow(tunin
 # Save these as R data objects
 save(caribbean_3_species, file = "data/caribbean_3_species.rda")
 save(caribbean_3_interaction, file = "data/caribbean_3_interaction.rda")
-save(karpata_refuge, file = "data/caribbean_3_refuge.rda")
 save(tuning_profile, file = "data/tuning_profile.rda")
 
 # With these parameters, herbivores consume plankton at small sizes and
@@ -141,7 +140,7 @@ plotTotalBiomass(params)
 ## Now switch to competitive method --------------------------------------------
 params <- newRefuge(params,
     new_method = "competitive",
-    new_method_params = caribbean_3_refuge
+    new_method_params = karpata_refuge
 )
 log_msg("switched refuge to competitive")
 
