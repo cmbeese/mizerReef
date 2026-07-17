@@ -48,6 +48,103 @@ COMPLETED TASKS:
 
 ============================================================================
 
+- 17/07 [PAUSED MID-SESSION - ran out of session time. See
+  this-code-base-is-soft-feather.md plan. 16 commits landed on
+  work/recover-december, each scoped to one plan item - `git log` there
+  for full detail. main branch untouched throughout, as instructed.]
+
+  DONE AND COMMITTED: Phase 1 (all items). Phase 2 items 0-13, 15, 16:
+  - [CRITICAL] Replaced broken data/caribbean_3_model.rda (R_max=Inf,
+    erepro=1, "binned" method, identical getBiomass() for all species) by
+    porting main:data/bonaire_model.rda forward via mizer:::upgradeParams()
+    + coerceToExtensionClass(), renaming bad_pred->blocked_pred, and
+    mirroring other_params$algae/detritus/refuge_params fields into the
+    nested algae_params/detritus_params/refuge_params sublists the current
+    rate functions actually read (bonaire_model predates that convention -
+    no calibrated values changed, only mirrored to a second location).
+    Also fixed two pre-existing NULL-unsafe `== TRUE` checks discovered
+    while validating this (reef-steady.R's tuneUR/tuneUR_cc dispatch,
+    reefDegrade()'s degrade check) - both also reproduce on the
+    already-shipped caribbean_10_model, not introduced by this port.
+  - Deleted caribbean_3_refuge.rda duplicate; restored aquarius_refuge;
+    reframed both refuge datasets as general-purpose; fixed stale calls in
+    steady-state-recipe.Rmd and reef-degradation-simulations.Rmd;
+    consolidated the degradation-scale regeneration scripts (verified by
+    actually running the new one - output identical() to shipped data);
+    fixed the mizerReef.Rmd link, extension_mechanism.Rmd's self-
+    contradictory summary, reefRates()'s stale doc reference; DESCRIPTION
+    cleanup; deleted orphaned bonaire_* data; missing @param entries
+    (newReefParams/plotlyDegradationScale/setDegradation) and
+    globalVariables/@importFrom NOTEs (Scaling/Productivity/time,
+    methods .hasSlot+slot, utils data) - devtools::document() run for
+    real, NAMESPACE diff checked, matches expectations exactly.
+  - test-setDegradation.R (item 15): real rubble_scale trajectory +
+    degrade=TRUE instead of a dummy matrix; asserts refuge density
+    genuinely differs before/after the bleach event. 3/3 pass.
+  - test-reefDegrade.R (item 16): re-verified against the fixed
+    "competitive"-method model. The old expect_null() only ever passed
+    because of the OLD "binned" method's unconditional NULL short-
+    circuit, not because degrade was FALSE. Updated to assert the correct
+    competitive-method behaviour (returns refuge density, not NULL) plus
+    a second case confirming the non-competitive NULL short-circuit still
+    works via newRefuge(). 4/4 pass.
+  Phase 3 items 1-3 also committed: caribbean_3_model-description.Rmd
+  ported from ignore/c3_parameters.Rmd; superseded 10-group drafts +
+  mizerReef-fancy.qmd + stale .html artifacts deleted; model-description.Rmd
+  re-enabled (.Rbuildignore); _pkgdown.yml Model Description group now
+  lists karpata_model-description + caribbean_3_model-description (the
+  former was missing from _pkgdown.yml even after Phase 2d - never
+  caught before); also fixed mismatched @Rogers2014-style citation keys
+  in karpata_model-description.Rmd (references.bib actually uses
+  Rogers_2014 with underscores) discovered while prepping to render it.
+
+  === PICK UP HERE ===
+  1. [ACTIVE BUG, not yet fixed] test-plotRefugeDensity.R (item 14) is
+     EDITED ON DISK to use a real project()-built sim (no more try()/
+     succeed() no-op) but genuinely FAILS: plotRefugeDensity() ->
+     getVulnerable() -> getDegrade() errors "incorrect number of
+     dimensions" at reef-rates.R:80 (`deg_time[, , , drop = drop]`) when
+     called on a MizerSim object (the MizerParams-object path works
+     fine - confirmed interactively). Traced it partway: plyr::aaply()
+     with .drop=FALSE over 3 time steps x 10 refuge bins for
+     caribbean_3_model produces a 2D [3,10] array, not the expected 3D
+     array reef-rates.R:64-80 assumes - looks like a real, previously-
+     masked bug in getDegrade()'s MizerSim branch (not something the
+     port broke - the try()/succeed() wrapper in the OLD test hid this
+     for good). Needs a real fix in R/reef-rates.R before this test can
+     pass; don't just re-add a try() wrapper. NOT committed - working
+     tree has the edit, uncommitted, exactly as left.
+  2. Investigate the 3 "flux of external detritus is negative" warnings
+     from tuneUR()/tuneUR_cc() (R/reef-components.R:113,143) against the
+     now-fixed caribbean_3_model - not yet done at all.
+  3. Run a genuinely fresh devtools::test() and devtools::check() full
+     suite (not just the individual files checked above) and fix
+     whatever regressions or pre-existing issues surface - not yet done.
+  4. Actually render caribbean_3_model-description.Rmd and
+     karpata_model-description.Rmd (rmarkdown::render or
+     pkgdown::build_article) to confirm they build cleanly with the
+     citation fixes - not yet done, flagged in the Phase 3 items 1-3
+     commit message too.
+  5. Phase 3 items 4-7 not started: pull multiple-resources.Rmd from
+     _pkgdown.yml's article list (file itself stays); add the website
+     compatibility caveat to README.md + extension_mechanism.Rmd; flip
+     eval=TRUE on the representative chunk subset in steady-state-recipe.Rmd
+     and reef-degradation-simulations.Rmd and actually render both;
+     minor pkgdown polish (@keywords internal on different(), orphaned
+     \concept tags).
+  6. Phase 4 not started: full check()/test() green run, delete stale
+     docs/, pkgdown::build_site(), browse locally, THEN (only once
+     everything is genuinely green) fast-forward major_update to
+     work/recover-december's tip and push to origin/major_update.
+     major_update is currently still at fda290c, untouched since the
+     Phase 1 rebase-abort - has NOT been fast-forwarded yet.
+  7. Phase 5 (clean-room smoke test) not started.
+  8. One untracked file sitting in the repo root, not part of this
+     session's work and not touched: creating-extension-packages.Rmd
+     (the mizer-developers vignette the user added for the extension-
+     compliance audit, per the plan's context - leave as-is, it's
+     reference material, not meant to be committed to the package).
+
 - 12/18 check remaining current diffs and approve them for each file
 - 12/18 All major exported functions and S4 methods have robust, minimal tests
 - 12/18 Fixed all failing tests except expected degradation plotting (due to lack of data)
