@@ -110,6 +110,9 @@ tuneUR_cc <- function(params, ...) {
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
+        # Not an error: a negative external flux is a valid steady state,
+        # interpreted as detritus flowing off the reef (e.g. to deeper
+        # water) rather than flowing in from external sources.
         warning("The flux of external detritus is negative.")
     }
     params@other_params$detritus_params$external <- ((dout * bd) / (1 - bd / kd)) - din
@@ -140,6 +143,9 @@ tuneUR <- function(params, ...) {
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
+        # Not an error: a negative external flux is a valid steady state,
+        # interpreted as detritus flowing off the reef (e.g. to deeper
+        # water) rather than flowing in from external sources.
         warning("The flux of external detritus is negative.")
     }
     params@other_params$detritus_params$external <- dout - din
