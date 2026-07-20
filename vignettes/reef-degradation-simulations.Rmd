@@ -39,7 +39,7 @@ Before running degradation simulations, you need:
 2. A degradation trajectory (scaling matrix)
 3. Understanding of your desired simulation timeframe
 
-```{r load-packages, message=FALSE, warning=FALSE, eval=FALSE}
+```{r load-packages, message=FALSE, warning=FALSE, eval=TRUE}
 library(mizerReef)
 library(mizer)
 library(ggplot2)
@@ -114,7 +114,7 @@ cat("Default capacity boost (1 year):", default_capacity_boost, "\n")
 First, set up your tuned model with degradation parameters using 
 setDegradation():
 
-```{r setup-degradation, eval=FALSE}
+```{r setup-degradation, eval=TRUE}
 # Start with a tuned steady-state model
 params_degraded <- caribbean_10_model
 
@@ -138,7 +138,7 @@ cat("Trajectory:", params_degraded@other_params$refuge_params$trajectory, "\n")
 For realistic simulations, add carrying capacity dynamics to unstructured 
 resources using setURcapacity():
 
-```{r add-carrying-capacity, eval=FALSE}
+```{r add-carrying-capacity, eval=TRUE}
 # Add carrying capacity dynamics
 params_degraded <- setURcapacity(params_degraded, cap = 1.5)
 
@@ -153,7 +153,7 @@ cat("Carrying capacity dynamics enabled:",
 
 Now run a projection to see the effects of degradation:
 
-```{r basic-simulation, eval=FALSE}
+```{r basic-simulation, eval=TRUE}
 # Run 20-year simulation 
 sim_rubble <- project(params_degraded, t_max = 20, dt = 0.1)
 
@@ -162,8 +162,20 @@ plotBiomass(sim_rubble, total = TRUE) +
   ggtitle("Total fish biomass with rubble trajectory") +
   geom_vline(xintercept = 2, color = "red", linetype = "dashed",
              alpha = 0.7) +
-  annotate("text", x = 2.2, y = max(getBiomass(sim_rubble)), 
+  annotate("text", x = 2.2, y = max(getBiomass(sim_rubble)),
            label = "Bleaching", color = "red", hjust = 0)
+```
+
+It's also useful to look at the degradation trajectories themselves, and at
+how refuge density actually evolved over the course of this simulation:
+
+```{r rubble-trajectory-plots, eval=TRUE}
+# Compare all three built-in degradation trajectories
+plotDegScale()
+
+# Refuge density through time in this simulation, by size bin
+plotRefugeDensity(sim_rubble) +
+  ggtitle("Refuge density through the rubble trajectory")
 ```
 
 ```{r species-biomass, eval=FALSE}

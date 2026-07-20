@@ -41,7 +41,7 @@ Before starting, ensure you have:
 3. Observed biomass data for calibration
 4. A suitable refuge profile for initial tuning
 
-```{r load-packages, message=FALSE, warning=FALSE, eval=FALSE}
+```{r load-packages, message=FALSE, warning=FALSE, eval=TRUE}
 library(mizerReef)
 library(mizer)
 library(ggplot2)
@@ -67,7 +67,7 @@ before the biomasses are calibrated to observed values. We start with a
 simpler binned profile that approximates the final refuge shape so that 
 we can tune abundances first.
 
-```{r create-initial-params, eval=FALSE}
+```{r create-initial-params, eval=TRUE}
 # Create initial parameters object with tuning refuge profile
 params <- newReefParams(species_params = caribbean_10_species,
                         interaction = caribbean_10_interaction,
@@ -76,6 +76,15 @@ params <- newReefParams(species_params = caribbean_10_species,
 
 # Display the basic model structure
 print(params)
+```
+
+The tuning profile approximates the refuge shape we'll eventually switch to,
+so it's worth visualizing before we start tuning:
+
+```{r tuning-profile-plot, eval=TRUE}
+# Visualize the initial (tuning) refuge profile
+plotRefugeProfile(params) +
+  ggtitle("Initial refuge profile (tuning method)")
 ```
 
 Let's examine the species groups and their key parameters:
@@ -232,7 +241,7 @@ convenient—it often better reflects reef fish biology than either extreme
 
 </details>
 
-```{r reduce-reproduction, eval=FALSE}
+```{r reduce-reproduction, eval=TRUE}
 # Set reproduction levels to 0.5 for all species
 rdi <- rep(0.5, nrow(caribbean_10_species))
 names(rdi) <- caribbean_10_species$species
@@ -251,7 +260,7 @@ kable(data.frame(Species = names(reproduction_levels),
 Project the model forward to reach an initial steady state. This may require 
 multiple iterations of `reefSteady()`.
 
-```{r initial-steady-state, eval=FALSE}
+```{r initial-steady-state, eval=TRUE}
 # Project to steady state - multiple calls ensure convergence
 params <- params |>
     reefSteady() |> reefSteady() |> reefSteady() |> 
@@ -350,7 +359,7 @@ density-dependent refuge dynamics.
 **Why switch methods?** The competitive method provides more realistic 
 refuge dynamics but requires a stable baseline to work from.
 
-```{r switch-refuge-method, eval=FALSE}
+```{r switch-refuge-method, eval=TRUE}
 # Switch to competitive refuge method
 params <- newRefuge(params,
                     new_method = "competitive", 
@@ -364,7 +373,7 @@ plotRefugeProfile(params) +
 After switching refuge methods, we need to re-match biomasses as the refuge 
 dynamics will have changed:
 
-```{r rematch-after-refuge, eval=FALSE}
+```{r rematch-after-refuge, eval=TRUE}
 # Re-match biomasses with new refuge method
 params <- params |>
     matchBiomasses() |> reefSteady() |> 
