@@ -14,3 +14,7 @@ test_i2.rda
 ^\.env$
 ^\.kilo$
 ^\.vscode$
+^LICENSE$
+^CITATION\.cff$
+^creating-extension-packages\.Rmd$
+^thesis-model\.RData$

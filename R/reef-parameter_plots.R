@@ -372,6 +372,7 @@ plotlyRefugeProfile <- function(object,
 #' @return A ggplot2 object (heatmap), or a data frame if
 #'   \code{return_data = TRUE}.
 #' @importFrom reshape2 melt
+#' @importFrom scales rescale
 #' @export
 #' @family plotting functions
 #' @concept refugePlots
@@ -520,6 +521,7 @@ plotlyDegradationScale <- function(object = NULL, trajectory = NULL, return_data
 #' @return A ggplot2 object, or a data frame if \code{return_data = TRUE}.
 #' @importFrom reshape2 melt
 #' @importFrom utils data
+#' @importFrom scales rescale
 #' @export
 #' @family plotting functions
 #' @concept refugePlots

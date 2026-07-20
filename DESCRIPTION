@@ -39,7 +39,8 @@ Imports:
     dplyr,
     plyr,
     lifecycle,
-    reshape2
+    reshape2,
+    scales
 Suggests: 
     knitr,
     patchwork,
