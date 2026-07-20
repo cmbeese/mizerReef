@@ -82,6 +82,28 @@ Recording the chain in `params@extensions` is what lets `project()` produce a
 class — and warn about missing or outdated extensions — when a saved object
 is reloaded in a later session.
 
+### A known gap: bundled example models and multiple extensions
+
+mizerReef ships two pre-built example models as package data
+(`caribbean_10_model`, `caribbean_3_model`). `.onLoad` also contains a
+`makeActiveBinding()` call intended to re-coerce these objects to the
+correct class if a *second* mizer extension is loaded alongside mizerReef,
+since a bundled `.rda` is fixed at save time and can't know in advance
+what else will be loaded in the same session. In the current mizer/
+mizerReef versions this mechanism does not fire — `exists()` on the
+bundled object inside `.onLoad` is always `FALSE` at that point, so the
+active binding is never installed. This is not mizerReef-specific: the
+identical dead-code pattern exists in mizerShelf's own current source for
+its bundled `NWMed_params` object.
+
+For everyday single-extension use this is harmless, since both bundled
+objects already carry the correct class from when they were saved. It
+would only matter if you loaded mizerReef together with a second
+dispatching extension on one of these two specific objects — for example,
+the mizerMR combination shown in the (currently unlisted)
+`multiple-resources` vignette. This is being worked on; see
+`inst/to-do-list.txt` for the current state.
+
 ## Methods dispatched on `mizerReef`
 
 | Method | What it adds |

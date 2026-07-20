@@ -8,6 +8,13 @@
 
 MizerReef is an R package that extends the [mizer](https://github.com/sizespectrum/mizer) framework to support modeling of structurally complex marine ecosystems—such as coral reefs, kelp forests, and rocky reefs. Predator-prey interactions are mediated by predation refuge to explicitly capture benthic habitat structure. It also adds features for benthic coupling, introducing additional resources such as detritus and algae that are not size-structured and can be consumed by all relevant species regardless of size. MizerReef is suitable for researchers studying any marine habitat where structural complexity influences ecosystem dynamics.
 
+> **Compatibility note:** MizerReef is not yet verified to work correctly
+> when loaded together with other mizer extension packages (e.g. mizerMR).
+> A mechanism meant to keep bundled example models correctly classed in
+> that situation is not currently active; this is being worked on. See
+> `vignette("extension_mechanism")` for details. MizerReef on its own is
+> unaffected.
+
 ## Features
 
 - Models structurally complex marine ecosystems
