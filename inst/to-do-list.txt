@@ -14,6 +14,20 @@ MizerSim branch this session, and neither function has assertions beyond
 "didn't error," so a similar latent bug elsewhere in that pair wouldn't be
 caught. Everything else below is genuinely lower priority.
 
+ALSO NOTE: DESCRIPTION's Depends now requires mizer (>= 3.2.0) (bumped
+from the dev-snapshot 3.1.0.9001, per user request - 3.2.0 is the actual
+current CRAN release). Only mizer 3.1.0.9001 is installed in this dev
+environment as of 20/07, which does NOT satisfy >= 3.2.0. This was a
+deliberate, informed choice (user picked "update DESCRIPTION only, leave
+local mizer as-is" over upgrading mizer immediately) - devtools::load_all()
+doesn't enforce Depends version constraints so interactive work is
+unaffected, but a real library(mizerReef) after install (what
+devtools::check()/test() and CI actually do) WILL error until mizer is
+upgraded locally. Before trusting any devtools::test()/check() run as
+"green" in this environment, first confirm mizer has actually been
+upgraded to >= 3.2.0 (packageVersion("mizer")) - if not, expect a
+Depends-version load error, not a real regression.
+
 ** For Major Update  - Manuscript version**
 
 - update caribbean_10_model data object, changing bad_pred to blocked_pred in species_params
