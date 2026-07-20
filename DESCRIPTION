@@ -24,9 +24,9 @@ Description: This package extends the mizer framework to support multi-species s
     flexible habitat structures and includes example parameters for a generic Caribbean
     coral reef system.
 License: GPL-3
-Depends: 
+Depends:
     R (>= 4.1.0),
-    mizer (>= 3.1.0.9001)
+    mizer (>= 3.2.0)
 Imports:
     mizerExperimental (>= 2.4.0),
     assertthat,
