@@ -40,6 +40,7 @@ removeSpecies.mizerReef <- function(params, species, ...) {
 #'
 #' @return TRUE or FALSE
 #' @concept helper
+#' @keywords internal
 different <- function(a, b) {
     !isTRUE(all.equal(a, b,
         check.attributes = FALSE, scale = 1,

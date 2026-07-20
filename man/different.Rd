@@ -23,3 +23,4 @@ in MizerParams is different from the existing value in order to give the
 appropriate messages.
 }
 \concept{helper}
+\keyword{internal}
