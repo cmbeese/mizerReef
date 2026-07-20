@@ -16,17 +16,32 @@ caught. Everything else below is genuinely lower priority.
 
 ALSO NOTE: DESCRIPTION's Depends now requires mizer (>= 3.2.0) (bumped
 from the dev-snapshot 3.1.0.9001, per user request - 3.2.0 is the actual
-current CRAN release). Only mizer 3.1.0.9001 is installed in this dev
-environment as of 20/07, which does NOT satisfy >= 3.2.0. This was a
-deliberate, informed choice (user picked "update DESCRIPTION only, leave
-local mizer as-is" over upgrading mizer immediately) - devtools::load_all()
-doesn't enforce Depends version constraints so interactive work is
-unaffected, but a real library(mizerReef) after install (what
-devtools::check()/test() and CI actually do) WILL error until mizer is
-upgraded locally. Before trusting any devtools::test()/check() run as
-"green" in this environment, first confirm mizer has actually been
-upgraded to >= 3.2.0 (packageVersion("mizer")) - if not, expect a
-Depends-version load error, not a real regression.
+current CRAN release). User upgraded the locally installed mizer to
+3.2.0 the same session, which surfaced one real, genuine regression:
+mizer 3.2.0 changed species_params<-.MizerParams to diff new vs. old
+values and only write changes into an internal given_species_params
+tracking table, rather than doing a plain column replacement. For any
+mizerReef-specific column (blocked_pred, refuge_user, satiation, etc.)
+that was never tracked in given_species_params (true for caribbean_3_model,
+set via direct S4 slot assignment when the object was built), species
+whose value didn't change from the object's current state get silently
+left as NA instead of the assigned value. Found via a genuinely re-run
+devtools::test() after the mizer upgrade (test-project-methods.R's
+"no species is blocked_pred" test, which used the vulnerable
+species_params(params)$col <- value replacement-function form). Fixed
+the test to use direct @species_params slot assignment instead (the
+pattern mizerReef's own R/ source, vignettes, and scripts already
+exclusively use - confirmed via grep this was the ONLY vulnerable call
+site in the whole codebase, not a systemic issue). Re-verified clean
+with mizer 3.2.0 actually installed: devtools::test() 0 fail/76 pass/3
+pre-documented benign warnings, devtools::check() 0 errors/0 warnings/
+same 4 pre-existing notes, vignette re-building OK. Worth keeping in
+mind for future work: if you ever write code (in mizerReef or a
+downstream script/vignette) that does
+species_params(params)$custom_col <- value on a column mizer doesn't
+know about, verify it actually applied to every species - don't assume
+the replacement-function form recycles correctly for mizerReef-specific
+columns under mizer >= 3.2.0.
 
 ** For Major Update  - Manuscript version**
 
