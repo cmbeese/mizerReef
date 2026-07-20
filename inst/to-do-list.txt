@@ -1,5 +1,19 @@
 MizerReef Major Package Update To Do List - 18/11/2025
 
+=== START HERE (updated 20/07) ===
+this-code-base-is-soft-feather.md (the conference-readiness plan) is DONE.
+See "COMPLETED TASKS" below, first entry, for the full account: what was
+fixed, what was verified for real (devtools::test()/check()/pkgdown, not
+assumed), and the major_update fast-forward/push. work/recover-december
+and major_update both hold the same tip; main is untouched, as instructed.
+Everything below "Outstanding for Manuscript/CRAN" and further down is
+genuinely still open - nothing there was silently done. Highest-priority
+open item right now: deepen reefDegrade()/getDegrade() test coverage (see
+that item below) - a real bug was found and fixed in getDegrade()'s
+MizerSim branch this session, and neither function has assertions beyond
+"didn't error," so a similar latent bug elsewhere in that pair wouldn't be
+caught. Everything else below is genuinely lower priority.
+
 ** For Major Update  - Manuscript version**
 
 - update caribbean_10_model data object, changing bad_pred to blocked_pred in species_params
@@ -64,19 +78,37 @@ MizerReef Major Package Update To Do List - 18/11/2025
   it stops showing up as an R CMD check NOTE, but never evaluated whether it
   should actually live somewhere else (inst/? archive/?) long term - left
   untouched since it may still be needed for reproducibility.
-- 20/07: Deepen the ~50 test files that currently only check
+- 20/07 [HIGHEST PRIORITY of the open items]: Deepen reefDegrade()/
+  getDegrade() test coverage specifically. Context: this session found and
+  fixed a real bug in getDegrade()'s MizerSim branch (3-comma array
+  indexing on a function that returns a 1D vector, not 2D/3D as its own
+  docs claimed) - previously masked for the entire life of the package by
+  a test wrapped in try()/succeed(), so it silently never ran. Fixing that
+  one test only checked that plotRefugeDensity(sim) doesn't error; it does
+  NOT assert reefDegrade()'s actual numeric output at specific timesteps
+  (before/at/after bleach_time, across all three built-in trajectories,
+  for both use_UR_cc TRUE/FALSE). Given a bug already hid successfully in
+  this exact pair of functions for the whole project's history, the
+  "didn't error" bar isn't enough here specifically - this is the one item
+  on this list where "genuinely didn't error" and "computed the right
+  numbers" might diverge. Test both getDegrade(params) and getDegrade(sim)
+  against hand-computed expected values, and reefDegrade()'s recursive
+  old_rd = reefDegrade(params, ..., t = t - 1) step across the bleach
+  boundary in particular.
+- 20/07: Deepen the ~50 other test files that currently only check
   expect_error(..., NA) ("didn't error," not "produced correct output").
-  Full tiered priority list from the test-suite audit, highest-value first:
-  newReefParams(), setRefuge(), newRefuge(), reefSteady(),
-  tuneUR()/tuneUR_cc() (the core setup/calibration functions), then the
-  rate functions reefEncounter/reefMort/reefPredMort/reefFeedingLevel/
-  reefRates/reefSenMort/getRefuge/getVulnerable/reefVulnerable (extend the
-  "compare dispatch vs. direct call" pattern already proven in
-  test-project-methods.R), then plotting functions (lower stakes, could use
-  return_data = TRUE where supported to check underlying values instead of
-  just the ggplot class). Also note: caribbean_10_model, karpata_refuge,
-  and the degradation data objects are currently exercised by zero tests -
-  worth adding coverage, not just deepening existing tests.
+  Full tiered priority list from the test-suite audit, highest-value first
+  (after reefDegrade()/getDegrade() above): newReefParams(), setRefuge(),
+  newRefuge(), reefSteady(), tuneUR()/tuneUR_cc() (the core setup/
+  calibration functions), then the rate functions reefEncounter/reefMort/
+  reefPredMort/reefFeedingLevel/reefRates/reefSenMort/getRefuge/
+  getVulnerable/reefVulnerable (extend the "compare dispatch vs. direct
+  call" pattern already proven in test-project-methods.R), then plotting
+  functions (lower stakes, could use return_data = TRUE where supported to
+  check underlying values instead of just the ggplot class). Also note:
+  caribbean_10_model, karpata_refuge, and the degradation data objects are
+  currently exercised by zero tests - worth adding coverage, not just
+  deepening existing tests.
 
 ######################################################################################
 ** Code updates for future (not necessary for manuscript submission/ next update) **
