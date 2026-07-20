@@ -8,7 +8,7 @@
 test2.rda
 test_sp2.rda
 test_i2.rda
-^vignettes/multiple-resources\.Rmd$
+^vignettes/_multiple-resources\.Rmd$
 ^ignore$
 ^check-results\.txt$
 ^\.env$

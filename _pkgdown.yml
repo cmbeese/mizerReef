@@ -149,4 +149,3 @@ articles:
   - title: "Package Internals"
     contents:
       - extension_mechanism
-
