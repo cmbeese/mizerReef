@@ -44,6 +44,7 @@ Before starting, ensure you have:
 ```{r load-packages, message=FALSE, warning=FALSE, eval=TRUE}
 library(mizerReef)
 library(mizer)
+library(mizerExperimental)
 library(ggplot2)
 library(dplyr)
 library(knitr)
