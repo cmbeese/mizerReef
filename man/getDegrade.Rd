@@ -27,14 +27,13 @@ from the returned array.}
 }
 \value{
 If a \code{MizerParams} object is passed in, the function returns a
-2 dimensional array (refuge size bin x refuge density) with the
-new refuge densities for each size bin
+numeric vector of the refuge density for each size bin.
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{     If a `MizerSim` object is passed in, the function returns a three
-     dimensional array (time step x refuge size bin x refuge density)
-     with the refuge density calculated at every time step in the
-     simulation. If \code{drop = TRUE} then the dimension of length 1
-     will be removed from the returned array.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{     If a `MizerSim` object is passed in, the function returns a two
+     dimensional array (time step x refuge size bin) with the refuge
+     density calculated at every time step in the simulation. If
+     \code{drop = TRUE} then the dimension of length 1 will be
+     removed from the returned array.
 }\if{html}{\out{</div>}}
 }
 \description{

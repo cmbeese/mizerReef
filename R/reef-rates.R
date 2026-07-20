@@ -18,14 +18,13 @@
 #'              from the returned array.
 #'
 #' @return  If a `MizerParams` object is passed in, the function returns a
-#'          2 dimensional array (refuge size bin x refuge density) with the
-#'          new refuge densities for each size bin
+#'          numeric vector of the refuge density for each size bin.
 #'
-#'          If a `MizerSim` object is passed in, the function returns a three
-#'          dimensional array (time step x refuge size bin x refuge density)
-#'          with the refuge density calculated at every time step in the
-#'          simulation. If \code{drop = TRUE} then the dimension of length 1
-#'          will be removed from the returned array.
+#'          If a `MizerSim` object is passed in, the function returns a two
+#'          dimensional array (time step x refuge size bin) with the refuge
+#'          density calculated at every time step in the simulation. If
+#'          \code{drop = TRUE} then the dimension of length 1 will be
+#'          removed from the returned array.
 #'
 #' @export
 #' @concept degradation
@@ -77,7 +76,11 @@ getDegrade <- function(object, n, n_pp, n_other,
         }, .drop = FALSE)
         # Before we drop dimensions we want to set the time dimname
         names(dimnames(deg_time))[[1]] <- "time"
-        degrade <- deg_time[, , , drop = drop]
+        # reefDegrade() returns a 1D vector (refuge density by size bin), so
+        # aaply()-ing it over time steps gives a 2D [time, size bin] array,
+        # not 3D - indexing with a third comma here always errored before
+        # this was caught (no test previously exercised this MizerSim path).
+        degrade <- deg_time[, , drop = drop]
         return(degrade)
     }
 }
