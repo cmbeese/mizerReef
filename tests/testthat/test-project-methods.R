@@ -46,7 +46,12 @@ test_that("projectMort.mizerReef matches reefMort", {
 test_that("project() gives identical results when no species is blocked_pred", {
     data(caribbean_3_model)
     params <- caribbean_3_model
-    species_params(params)$blocked_pred <- FALSE
+    # Direct slot assignment, not species_params(params)$blocked_pred <- FALSE:
+    # mizer 3.2.0's species_params<-.MizerParams only writes changed values
+    # into the given_species_params tracking table, and since blocked_pred
+    # was never tracked there for this object, species whose value didn't
+    # change (already FALSE) get silently left as NA instead of FALSE.
+    params@species_params$blocked_pred <- FALSE
 
     sim <- project(params, t_max = 2, progress_bar = FALSE)
     expect_false(anyNA(sim@n))
