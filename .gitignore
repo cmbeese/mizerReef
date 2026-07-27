@@ -56,3 +56,4 @@ docs
 ignore/
 .env
 .DS_Store
+.vscode/
