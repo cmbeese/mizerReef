@@ -12,6 +12,7 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
+mizerMR_available <- requireNamespace("mizerMR", quietly = TRUE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -19,8 +20,16 @@ knitr::opts_chunk$set(
   fig.height = 4,
   dpi = 300,
   message = FALSE,
-  warning = FALSE
+  warning = FALSE,
+  eval = mizerMR_available
 )
+```
+
+```{r mizerMR-missing, echo = FALSE, eval = !mizerMR_available, results = "asis"}
+cat("This vignette requires the [mizerMR](https://sizespectrum.org/mizerMR/) ",
+    "package, which is not installed. Install it with ",
+    "`remotes::install_github(\"sizespectrum/mizerMR\")` and re-build this ",
+    "vignette to see the full walkthrough.", sep = "")
 ```
 
 ## Overview

@@ -1,5 +1,12 @@
 # MizerReef 2.1.0
 
+## New features
+
+- New vignette "Combining mizerReef with mizerMR: multiple background
+  resources" showing how to chain mizerReef with
+  [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
+  size-structured background resources.
+
 ## Bug fixes
 
 - `getSenMort()` no longer errors when another extension (such as mizerMR)
@@ -12,6 +19,14 @@
   array from mizerMR) are no longer mis-reshaped into the table, which
   previously produced a "data length differs from size of matrix" warning and
   corrupted `plotBiomass()`.
+- Fixed the bundled `caribbean_3_model`/`caribbean_10_model` example models
+  so that projecting them alongside a second stacked mizer extension (such as
+  mizerMR) actually routes through mizerReef's composable rate dispatch,
+  instead of silently falling back to a non-composable path that assumed no
+  other extension was present. This is what caused `reefSteady()` to error
+  with "incorrect number of dimensions" when combining mizerReef with
+  mizerMR.
+- `getDegrade()` no longer errors when called on a `MizerSim` object.
 
 # MizerReef 2.0.0
 

@@ -41,13 +41,15 @@ Imports:
     lifecycle,
     reshape2,
     scales
-Suggests: 
+Suggests:
     knitr,
+    mizerMR,
     patchwork,
     rmarkdown,
     testthat (>= 3.0.0)
-Remotes: 
-    sizespectrum/mizerExperimental
+Remotes:
+    sizespectrum/mizerExperimental,
+    sizespectrum/mizerMR
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
