@@ -1,5 +1,102 @@
 MizerReef Major Package Update To Do List - 28/07 (updated)
 
+=== START HERE (updated 28/07, fifth session - PLAN ONLY, nothing
+below in this block has been executed yet. Target: Methods in Ecology
+and Evolution, submitted as an Application paper. Zenodo archival will
+be done by the user separately once ready to push to main - not part
+of this plan. This plan is meant to be picked up fresh in a NEW
+session.) ===
+
+** PRE-SUBMISSION CHECKLIST, IN ORDER **
+
+1. RESOLVE: caribbean_10_model vs. claude_10_model decision (see the
+   dedicated entry further down for full background). This blocks
+   item 2, since it determines which object's numbers go in the
+   manuscript figure. Needs the user's judgement, not something to
+   pick unilaterally - but it can no longer be left open once the
+   manuscript figure is being finalised.
+
+2. DONE (28/07, same session, right after this plan was written): the
+   manuscript figure has been regenerated. The user dropped the actual
+   generating script into inst/scripts/karpata_example_fig.R while
+   this plan was being written (it uses ggpubr::ggarrange(), not
+   patchwork, and predates the caribbean_10_model rename - it was
+   originally called `karpata_model`, confirmed by the user). Fixed
+   the stale variable name (karpata_model -> caribbean_10_model, the
+   current default bundled 10-group model - the caribbean_10_model
+   vs. claude_10_model decision in item 1 was NOT resolved as part of
+   this, so if that decision later favours claude_10_model this script
+   needs a one-line re-run with the substitution) and fixed a real bug
+   in the script itself: it built both a vertical (sum11, ncol=1 -
+   what the manuscript actually uses) and a horizontal (sum12, ncol=2)
+   layout, but both ggsave() calls wrote to the same filename, so the
+   horizontal one always silently overwrote the vertical one on disk -
+   swapped the order and gave the horizontal one its own filename
+   (karpata_example_horizontal.png, moved to ignore/dev-logs/ as a
+   reference copy, not tracked) so the vertical one is what's actually
+   saved as vignettes/figures/karpata_example.png now. Re-ran with
+   devtools::load_all() (not a stale installed library - see the
+   tooling note in the fourth-session COMPLETED TASKS entry) and
+   confirmed the numbers match what was already independently verified
+   for vignette("mizerReef")'s own Figure 3 and for claude_10_model
+   (ignore/dev-logs/claude_10_model_review.pdf): complex reef ~150
+   g/m^2 biomass / ~144 g/m^2/yr productivity vs. flat ~33/~44.
+   devtools::test() - 0 fail/503 pass, unaffected. Only the 8x "flux of
+   external detritus is negative" and 8x "erepro > 1" warnings fired,
+   both already-documented benign warnings from the abrupt
+   refuge-removal demo (same as mizerReef.Rmd's own equivalent
+   comparison), nothing new.
+
+3. MEE-SPECIFIC: prepare for double-anonymous peer review. Confirmed
+   via MEE's own author guidelines (28/07 web search) that MEE now
+   uses double-anonymous review, and Application papers specifically
+   require, at minimum: "a URL to see the source in an anonymous way
+   (no login required)", plus specification of language/version and
+   binary dependencies (the latter is already satisfied by
+   DESCRIPTION's Depends/Imports - R >= 4.1.0, mizer >= 3.2.0, etc.).
+   The public GitHub repo (github.com/cmbeese/mizerReef) directly
+   reveals authorship in its URL, so it cannot be linked as-is during
+   review. Concrete options to look into: an anonymous mirror service
+   (e.g. anonymous.4open.science, which mirrors a GitHub repo behind
+   an anonymised URL), or checking whether Wiley's ScholarOne
+   submission portal has a private/anonymised file upload path for
+   code (mentioned in MEE's guidelines as an alternative - "authors
+   can submit ... an anonymised version of your data/code for
+   review"). Also worth a quick check that README.md/DESCRIPTION/
+   CITATION.cff don't need temporary redaction for whatever anonymous
+   route is chosen (MEE explicitly calls out checking scripts/
+   metadata/READMEs for identifying information). This is a genuinely
+   easy item to miss and should not be left until the last minute
+   before submission - the anonymisation route may need lead time to
+   set up (e.g. an anonymous.4open.science mirror needs to be created
+   and kept in sync with the real repo throughout review).
+
+4. NOT NEEDED for this submission: deepening R/reef-setParams.R's test
+   coverage (76.22%, the lowest in the package). Looked at this
+   specifically per the user's question (28/07): the remaining
+   uncovered lines in that file are input-validation/error-handling
+   branches (e.g. malformed method_params, missing required
+   arguments), not the core profile-building computational logic -
+   setRefuge()/newRefuge()'s actual numeric behaviour is already
+   thoroughly covered with real hand-derived assertions from the
+   third session's coverage sweep (test-setRefuge.R, test-newRefuge.R).
+   Unlike JOSS (which explicitly reviews test coverage as part of its
+   checklist), MEE's own review criteria (per the 28/07 search) are
+   about reproducibility of the specific analyses in the paper and
+   overall code quality/usability/functionality - not a coverage
+   percentage. Agreed with the user's own instinct that this isn't
+   worth the effort for this submission; parking it back under
+   "Outstanding, genuinely open" below as a true someday-item, not a
+   pre-submission blocker.
+
+** Lower priority, can slip past submission without consequence **
+   (already logged in more detail further down - not repeating full
+   detail here): confirming the pkgdown GitHub Actions favicon
+   generation succeeded, compressing man/figures/logo.png, and all of
+   the CRAN-only items (non-portable filenames, moving
+   mizerExperimental from Imports to Suggests) - none of these matter
+   for a GitHub-only release accompanying a journal paper.
+
 === START HERE (updated 28/07, fourth/overnight session - the vignette
 audit is now COMPLETE) ===
 
@@ -676,9 +773,9 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
   unfixed.
 - recordExtension() version-stamping not adopted in mizerReef's
   setters - a modernization, not a bug.
-- Confirm with the supervisor exactly which file was meant by "AI
-  generated mizerReef.Rmd" - most likely model-description.Rmd, not a
-  real conflict, but worth confirming.
+- RESOLVED (28/07): the "confirm with supervisor which file was meant
+  by AI generated mizerReef.Rmd" item is moot - the user confirmed no
+  supervisor confirmation is needed. Removing from the open list.
 - Dropping mizerExperimental from Imports/Remotes to Suggests - only
   relevant if/when CRAN submission is pursued (a half-drafted plan for
   this used to live in .kilo/plans/, deleted along with the rest of
