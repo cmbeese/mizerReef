@@ -81,10 +81,16 @@ plotVulnerable <- function(object,
         return.logical = TRUE,
         error_on_empty = TRUE
     )
+    # Species with refuge_user = FALSE have nothing meaningful to show on a
+    # vulnerability-by-size plot (they are always fully vulnerable), so
+    # exclude them. sel_sp stays a logical vector over the *original*
+    # species order throughout, so it can be used to subset both `species`
+    # and `vul` consistently -- recomputing it from an already-filtered
+    # vector (as a previous version of this code did) silently misaligns
+    # species labels with the wrong data once the excluded species isn't
+    # last in the species order.
+    sel_sp <- sel_sp & params@species_params$refuge_user
     species <- dimnames(params@initial_n)$sp[sel_sp]
-    species <- gsub("inverts", NA, species)
-    species <- species[!is.na(species)]
-    sel_sp <- which(!is.na(species))
     vul <- vul[sel_sp, , drop = FALSE]
 
     ## data frame from selected species -----
@@ -229,10 +235,16 @@ plotRefugeProfile <- function(object,
         return.logical = TRUE,
         error_on_empty = TRUE
     )
+    # Species with refuge_user = FALSE have no refuge profile to show (see
+    # the matching comment in plotVulnerable()). sel_sp stays a logical
+    # vector over the *original* species order throughout, used to subset
+    # `species`, `refuge`, and sp$a/sp$b consistently -- recomputing it
+    # from an already-filtered vector (as a previous version of this code
+    # did, for both `refuge` and `sp$a[i]`/`sp$b[i]` below) silently
+    # misaligns species labels with the wrong data once the excluded
+    # species isn't last in the species order.
+    sel_sp <- sel_sp & params@species_params$refuge_user
     species <- dimnames(params@initial_n)$sp[sel_sp]
-    species <- gsub("inverts", NA, species)
-    species <- species[!is.na(species)]
-    sel_sp <- which(!is.na(species))
     refuge <- refuge[sel_sp, , drop = FALSE]
 
     # Convert length bins in to weight bins for each functional group
@@ -240,10 +252,11 @@ plotRefugeProfile <- function(object,
         nrow = length(species),
         ncol = length(params@w)
     )
+    a_sel <- sp$a[sel_sp]
+    b_sel <- sp$b[sel_sp]
     for (i in seq_along(species)) {
-        group_length_bins[i, ] <- (params@w / sp$a[i])^(1 / sp$b[i])
+        group_length_bins[i, ] <- (params@w / a_sel[i])^(1 / b_sel[i])
     }
-    group_length_bins <- group_length_bins[sel_sp, , drop = FALSE]
 
     # Set x axis limit for plots
     x_limit <- max(sp$l_max)

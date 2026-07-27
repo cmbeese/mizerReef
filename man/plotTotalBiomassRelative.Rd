@@ -27,9 +27,9 @@ plotlyTotalBiomassRelative(object1, object2, diff_method, ...)
 \item{object2}{Second MizerParams or MizerSim object.}
 
 \item{diff_method}{The method to calculate the relative change between
-models. If \code{percent.change}, the percent change is
+models. If \code{percent_change}, the percent change is
 calculated relative to the value from object 1 with
-formula 100*(new-old)/old. If \code{rel.diff} the relative
+formula 100*(new-old)/old. If \code{rel_diff} the relative
 difference is returned given by (new - old)/(old + new).}
 
 \item{species}{The species to be selected. Optional. By default all target

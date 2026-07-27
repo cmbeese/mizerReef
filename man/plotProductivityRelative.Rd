@@ -27,9 +27,9 @@ plotlyProductivityRelative(object1, object2, diff_method, ...)
 \item{object2}{Second MizerParams or MizerSim object.}
 
 \item{diff_method}{The method to calculate the relative change between
-models. If \code{percent.change}, the percent change is
+models. If \code{percent_change}, the percent change is
 calculated relative to the value from object 1 with
-formula 100*(new-old)/old. If \code{rel.diff} the relative
+formula 100*(new-old)/old. If \code{rel_diff} the relative
 difference is returned given by (new - old)/(old + new).}
 
 \item{species}{The species to be selected. Optional. By default all target
@@ -71,6 +71,11 @@ series.}
 species group. Defaults to TRUE.}
     \item{\code{total}}{A boolean value that determines whether the total productivity
 from all species is plotted as well. Default is TRUE.}
+    \item{\code{include_inverts}}{A boolean value that determines whether the
+"inverts" species group is included. Default is
+FALSE, since invertebrate productivity is typically
+not relevant to fishing yield. Only takes effect
+when \code{species} is not explicitly provided.}
     \item{\code{include_repro}}{A boolean value that indicates whether to include
 energy for reproduction in productivity estimates.
 Defaults to using \code{\link[=getEGrowthTime]{getEGrowthTime()}} if FALSE or

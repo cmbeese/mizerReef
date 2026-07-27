@@ -229,6 +229,12 @@ plotlySpectraChange <- function(object1, object2, ...) {
 #' @param total   A boolean value that determines whether the total productivity
 #'                from all species is plotted as well. Default is TRUE.
 #'
+#' @param include_inverts   A boolean value that determines whether the
+#'                      "inverts" species group is included. Default is
+#'                      FALSE, since invertebrate productivity is typically
+#'                      not relevant to fishing yield. Only takes effect
+#'                      when `species` is not explicitly provided.
+#'
 #' @param return_data   A boolean value that determines whether the formatted
 #'                      data used for the plot is returned instead of the
 #'                      plot itself. Default value is FALSE.
@@ -255,7 +261,7 @@ plotProductivity <- function(object,
                              start_time = NULL, end_time = NULL,
                              facet = TRUE, species = NULL, total = TRUE,
                              min_fishing_l = NULL, max_fishing_l = NULL,
-                             include_repro = FALSE,
+                             include_repro = FALSE, include_inverts = FALSE,
                              return_data = FALSE, ...) {
     if (is(object, "MizerSim")) {
         # sim values
@@ -268,6 +274,9 @@ plotProductivity <- function(object,
 
         if (missing(species)) {
             species <- params@species_params$species
+            if (!isTRUE(include_inverts)) {
+                species <- setdiff(species, "inverts")
+            }
         }
 
         if (missing(start_time)) {
@@ -358,10 +367,16 @@ plotProductivity <- function(object,
             return.logical = TRUE,
             error_on_empty = TRUE
         )
+        # sel_sp stays a logical vector over the *original* species order
+        # throughout, so it can subset both `species` and `prod`
+        # consistently -- recomputing it from an already-filtered vector
+        # (as a previous version of this code did) silently misaligns
+        # species labels with the wrong data once the excluded species
+        # isn't last in the species order.
+        if (missing(species) && !isTRUE(include_inverts)) {
+            sel_sp <- sel_sp & (dimnames(params@initial_n)$sp != "inverts")
+        }
         species <- dimnames(params@initial_n)$sp[sel_sp]
-        species <- gsub("inverts", NA, species)
-        species <- species[!is.na(species)]
-        sel_sp <- which(!is.na(species))
         prod <- prod[sel_sp, drop = FALSE]
 
         ### data frame from selected species
@@ -601,9 +616,9 @@ plotly2Productivity <- function(object1, object2, ...) {
 #'                  (TRUE) or not.
 #'
 #' @param diff_method   The method to calculate the relative change between
-#'                      models. If `percent.change`, the percent change is
+#'                      models. If `percent_change`, the percent change is
 #'                      calculated relative to the value from object 1 with
-#'                      formula 100*(new-old)/old. If `rel.diff` the relative
+#'                      formula 100*(new-old)/old. If `rel_diff` the relative
 #'                      difference is returned given by (new - old)/(old + new).
 #'
 #' @param min_fishing_l1    Optional.  The minimum length (cm) of fished
@@ -665,7 +680,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     # Calculate relative difference
     if (diff_method == "percent_change") {
         sf <- dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-            dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
+            dplyr::mutate(rel_diff = 100 * (value.y - value.x) / value.x)
         yLabel <- "% Change in Productivity"
     } else if (diff_method == "rel_diff") {
         sf <- dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
@@ -952,13 +967,20 @@ plotTotalBiomass <- function(object,
     }
 
     ## species selector -
+    # sel_sp stays a logical vector over the *original* species order so it
+    # subsets `species` and `biom` consistently -- a previous version of
+    # this code recomputed sel_sp <- which(!is.na(species)) on the already-
+    # sliced `species` vector, which is always a no-op is.na() check with
+    # nothing upstream ever introducing an NA, so it silently collapsed to
+    # 1:length(species) and misaligned biom values with the wrong species
+    # labels whenever `species` selected a non-contiguous subset (e.g.
+    # species = c("predators", "inverts"), skipping "herbivores" in the
+    # middle of the original species order).
     sel_sp <- mizer::valid_species_arg(params, species,
         return.logical = TRUE,
         error_on_empty = TRUE
     )
     species <- dimnames(params@initial_n)$sp[sel_sp]
-    species <- species[!is.na(species)]
-    sel_sp <- which(!is.na(species))
     biom <- biom[sel_sp, drop = FALSE]
 
     ## data frame from selected species -
@@ -1186,7 +1208,7 @@ plotTotalBiomassRelative <- function(object1, object2,
     # Calculate relative difference
     if (diff_method == "percent_change") {
         sf <- dplyr::left_join(sf1, sf2, by = c("Species", "Legend")) |>
-            dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
+            dplyr::mutate(rel_diff = 100 * (value.y - value.x) / value.x)
 
         yLabel <- "% Change in Total Biomass"
     } else if (diff_method == "rel_diff") {
@@ -1278,6 +1300,11 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 #' @inheritDotParams plotTotalAbundance
 #' @inheritDotParams plotProductivity
 #'
+#' @param include_inverts   A boolean value that determines whether the
+#'                      "inverts" species group is included. Default is
+#'                      FALSE, since invertebrate productivity is typically
+#'                      not relevant to fishing yield.
+#'
 #' @import ggplot2
 #' @export
 #'
@@ -1287,6 +1314,7 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 plotRelativeContribution <- function(object,
                                      min_size = NULL,
                                      min_fishing_l = NULL,
+                                     include_inverts = FALSE,
                                      return_data = FALSE, ...) {
     abd <- plotTotalAbundance(object,
         min_fishing_l = min_size,
@@ -1302,6 +1330,7 @@ plotRelativeContribution <- function(object,
 
     prod <- plotProductivity(object,
         min_fishing_l = min_fishing_l,
+        include_inverts = include_inverts,
         return_data = TRUE, ...
     )
     prod$Metric <- "Productivity"
@@ -1322,10 +1351,13 @@ plotRelativeContribution <- function(object,
         names(group_names) <- params@species_params$species
     }
 
-    # Remove invertebrates
-    abd <- subset(abd, Species != "inverts")
-    biom <- subset(biom, Species != "inverts")
-    prod <- subset(prod, Species != "inverts")
+    # Remove invertebrates (prod is already filtered via plotProductivity()'s
+    # own include_inverts argument above; abd/biom need it applied here since
+    # plotTotalAbundance()/plotTotalBiomass() don't filter species by name)
+    if (!isTRUE(include_inverts)) {
+        abd <- subset(abd, Species != "inverts")
+        biom <- subset(biom, Species != "inverts")
+    }
 
     # Relative Contribution
     abd <- dplyr::mutate(abd, rel = value / sum(value))

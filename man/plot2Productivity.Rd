@@ -79,6 +79,11 @@ series.}
 species group. Defaults to TRUE.}
     \item{\code{total}}{A boolean value that determines whether the total productivity
 from all species is plotted as well. Default is TRUE.}
+    \item{\code{include_inverts}}{A boolean value that determines whether the
+"inverts" species group is included. Default is
+FALSE, since invertebrate productivity is typically
+not relevant to fishing yield. Only takes effect
+when \code{species} is not explicitly provided.}
     \item{\code{include_repro}}{A boolean value that indicates whether to include
 energy for reproduction in productivity estimates.
 Defaults to using \code{\link[=getEGrowthTime]{getEGrowthTime()}} if FALSE or

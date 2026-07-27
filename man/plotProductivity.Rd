@@ -15,6 +15,7 @@ plotProductivity(
   min_fishing_l = NULL,
   max_fishing_l = NULL,
   include_repro = FALSE,
+  include_inverts = FALSE,
   return_data = FALSE,
   ...
 )
@@ -52,6 +53,12 @@ productivity estimates. Defaults to max length.}
 energy for reproduction in productivity estimates.
 Defaults to using \code{\link[=getEGrowthTime]{getEGrowthTime()}} if FALSE or
 mizer's \code{\link[mizer:getEReproAndGrowth]{mizer::getEReproAndGrowth()}} if TRUE.}
+
+\item{include_inverts}{A boolean value that determines whether the
+"inverts" species group is included. Default is
+FALSE, since invertebrate productivity is typically
+not relevant to fishing yield. Only takes effect
+when \code{species} is not explicitly provided.}
 
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the

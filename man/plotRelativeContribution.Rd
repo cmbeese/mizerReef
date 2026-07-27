@@ -10,6 +10,7 @@ plotRelativeContribution(
   object,
   min_size = NULL,
   min_fishing_l = NULL,
+  include_inverts = FALSE,
   return_data = FALSE,
   ...
 )
@@ -27,6 +28,11 @@ smallest size in the model.}
 \item{min_fishing_l}{parameters be passed to \code{\link[=getProductivity]{getProductivity()}}. The
 minimum length (cm) of fished individuals for
 productivity estimates. Defaults to 7 cm.}
+
+\item{include_inverts}{A boolean value that determines whether the
+"inverts" species group is included. Default is
+FALSE, since invertebrate productivity is typically
+not relevant to fishing yield.}
 
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot

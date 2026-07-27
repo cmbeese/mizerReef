@@ -6,6 +6,10 @@
   resources" showing how to chain mizerReef with
   [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
   size-structured background resources.
+- New `include_inverts` argument (default `FALSE`) for `plotProductivity()`
+  and `plotRelativeContribution()`, so users can choose whether to include
+  the "inverts" species group (previously always excluded unconditionally
+  -- see "Bug fixes" below).
 - `plotSpectraPercentChange()`/`plotlySpectraPercentChange()` are renamed to
   `plotSpectraChange()`/`plotlySpectraChange()` and gain a `use_percent`
   argument (default `TRUE`) so you can choose between a percentage change
@@ -30,12 +34,55 @@
 
 ## Bug fixes
 
+- `plotVulnerable()`, `plotRefugeProfile()`, and `plotProductivity()`
+  (and therefore `plotRelativeContribution()`, which calls it) excluded any
+  species literally named `"inverts"` unconditionally, with no way to opt
+  out, via a hardcoded `gsub("inverts", NA, species)`. For
+  `plotVulnerable()`/`plotRefugeProfile()` this is now based on
+  `species_params$refuge_user` instead (species that don't use refuge have
+  nothing meaningful to show on those plots -- this is what the bundled
+  models' `"inverts"` group actually has `refuge_user = FALSE` for) rather
+  than matching a specific name. For `plotProductivity()`/
+  `plotRelativeContribution()`, a new `include_inverts` argument (default
+  `FALSE`, preserving prior behaviour) lets you opt back in.
+
+  The exclusion mechanism itself also had a real data-corruption bug in all
+  four functions: the species-index vector used to subset the underlying
+  result matrix was recomputed *after* the excluded species had already
+  been dropped from the species-name vector, so it no longer matched the
+  original species positions. This silently mislabelled data whenever the
+  excluded species wasn't the last one in a model's species order (it
+  happened to look correct for both bundled models purely because
+  `"inverts"` is positioned last in each) -- e.g. `plotVulnerable()` could
+  label a line `"herbivores"` while actually plotting a *different*
+  species' vulnerability values. Fixed by keeping the selection as a single
+  logical vector over the original species order throughout, rather than
+  recomputing indices from an already-filtered vector.
+- `plotTotalBiomass()` had the same species-index-misalignment bug
+  described above, but unrelated to the `"inverts"` exclusion -- it would
+  trigger for *any* explicit `species` selection that skips a species in
+  the middle of a model's species order (e.g.
+  `species = c("predators", "inverts")` on a 3-species model, skipping
+  `"herbivores"`), silently attaching the wrong species' biomass value to
+  the requested species' label. Fixed the same way, by removing the
+  vestigial index-recomputation and keeping `sel_sp` as a single logical
+  vector throughout.
 - `plotSpectraPercentChange()`'s documentation and y-axis label promised a
   percentage (`100*(N2(w) - N1(w))/N1(w)`), but the code never actually
   multiplied by 100, so values plotted as raw fractions (e.g. `-0.057`
   instead of `-5.7`). Renamed to `plotSpectraChange()` (see "New features")
   and fixed to actually apply the `*100` when `use_percent = TRUE`
   (the default).
+- `plotProductivityRelative()`/`plotTotalBiomassRelative()`'s
+  `diff_method = "percent_change"` option had the identical missing-`*100`
+  bug as `plotSpectraPercentChange()` above: the axis was labelled
+  `"% Change in Productivity"`/`"% Change in Total Biomass"` but the value
+  plotted was the raw fraction. Fixed to actually multiply by 100; the
+  separate `diff_method = "rel_diff"` option (documented and implemented as
+  a genuine, non-percentage relative difference) is unaffected. Also fixed
+  `diff_method`'s documentation, which described the valid values as
+  `` `percent.change` ``/`` `rel.diff` `` (dots) when the code has always
+  only accepted `"percent_change"`/`"rel_diff"` (underscores).
 - Fixed `setExtMortParams()` (and therefore `newReefParams(ext_mort_params =
   ...)`, which calls it) so that custom `ext_mort_params` actually works.
   Previously it was completely broken for both ways a user would reasonably
