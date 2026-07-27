@@ -10,7 +10,7 @@ plotRefugeDensity(sim, return_data = FALSE, ...)
 plotlyRefugeDensity(sim, ...)
 }
 \arguments{
-\item{sim}{A \linkS4class{MizerSim} object}
+\item{sim}{A \link[mizer:MizerSim]{MizerSim} object}
 
 \item{return_data}{A boolean value that determines whether the formatted
 data used for the plot is returned instead of the plot

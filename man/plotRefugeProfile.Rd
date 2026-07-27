@@ -16,7 +16,7 @@ plotRefugeProfile(
 plotlyRefugeProfile(object, species = NULL, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams}}
+\item{object}{An object of class \link[mizer:MizerParams]{MizerParams}}
 
 \item{species}{The species to be selected. Optional. By default all species
 are selected. A vector of species names, or a numeric vector with the
@@ -36,7 +36,7 @@ value is FALSE.}
 A ggplot2 object
 }
 \description{
-When called with a \linkS4class{MizerParams} object the initial refuge
+When called with a \link[mizer:MizerParams]{MizerParams} object the initial refuge
 profile is plotted. The complement of vulnerability.
 }
 \seealso{

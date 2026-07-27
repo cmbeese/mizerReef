@@ -27,9 +27,9 @@
 #'  maximum weight in the model. 
 #'
 #' @param object    An object of class `MizerParams` or `MizerSim`. If given a
-#'                  \linkS4class{MizerSim} object, uses the growth rates at the 
+#'                  [MizerSim] object, uses the growth rates at the 
 #'                  final time of a simulation to calculate productivity. If 
-#'                  given a \linkS4class{MizerParams} object, uses the initial 
+#'                  given a [MizerParams] object, uses the initial 
 #'                  growth rates.
 #'                  
 #' @param include_repro A boolean value that indicates whether to include
@@ -46,7 +46,7 @@
 #' @param time_range The time range (either a vector of values, a vector of min
 #'                   and max time, or a single value) to provide productivity
 #'                   for. Default is the final time step. Ignored when called 
-#'                   with a \linkS4class{MizerParams} object.
+#'                   with a [MizerParams] object.
 #'                   
 #' @inheritDotParams mizer::get_size_range_array
 #'

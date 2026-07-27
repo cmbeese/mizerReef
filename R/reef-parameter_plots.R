@@ -2,11 +2,11 @@ utils::globalVariables(c("Year", "SizeBin", "Scaling"))
 
 #' Plot the vulnerability to predation of species by weight
 #'
-#' When called with a \linkS4class{MizerParams} object the initial
+#' When called with a [MizerParams] object the initial
 #' vulnerability is plotted. The complement of refuge.
 #'
-#' @param object An object of class \linkS4class{MizerParams} or
-#'   \linkS4class{MizerSim}. If a \linkS4class{MizerSim} object is provided, the
+#' @param object An object of class [MizerParams] or
+#'   [MizerSim]. If a [MizerSim] object is provided, the
 #'   abundance at the last time step is used.
 #'
 #' @param species The species to be selected. Optional. By default all species
@@ -17,7 +17,7 @@ utils::globalVariables(c("Year", "SizeBin", "Scaling"))
 #' @param all.sizes If TRUE, then vulnerability is plotted also for sizes
 #'   outside a species' size range. Default FALSE.
 #'
-#' @param time_step If `object` is a \linkS4class{MizerSim} object, this
+#' @param time_step If `object` is a [MizerSim] object, this
 #'   optional parameter specifies which time step to use for calculating
 #'   vulnerability. Default is the last time step.
 #'
@@ -166,10 +166,10 @@ plotlyVulnerable <- function(object,
 
 #' Plot the refuge profile, species by length
 #'
-#' When called with a \linkS4class{MizerParams} object the initial refuge
+#' When called with a [MizerParams] object the initial refuge
 #' profile is plotted. The complement of vulnerability.
 #'
-#' @param object An object of class \linkS4class{MizerParams}
+#' @param object An object of class [MizerParams]
 #'
 #' @param species The species to be selected. Optional. By default all species
 #'   are selected. A vector of species names, or a numeric vector with the
@@ -350,15 +350,15 @@ plotlyRefugeProfile <- function(object,
 #'         first column, remaining columns as refuge size bins).
 #'     }
 #'   \item If \code{trajectory} is not provided, \code{object} must be
-#'     supplied and can be a \linkS4class{MizerParams} or
-#'     \linkS4class{MizerSim} object. The function will extract the
+#'     supplied and can be a [MizerParams] or
+#'     [MizerSim] object. The function will extract the
 #'     degradation scaling or trajectory from
 #'     \code{object@other_params$refuge_params$trajectory} or
 #'     \code{object@other_params$refuge_params$deg_scale}.
 #' }
 #'
-#' @param object An optional object of class \linkS4class{MizerParams} or
-#'   \linkS4class{MizerSim}. If provided, the function will attempt to extract
+#' @param object An optional object of class [MizerParams] or
+#'   [MizerSim]. If provided, the function will attempt to extract
 #'   the degradation scaling or trajectory from its \code{@other_params$refuge_params} slot.
 #'
 #' @param trajectory Optional. Either a character string (\code{"rubble"},

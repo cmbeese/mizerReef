@@ -1390,7 +1390,7 @@ setDegradation <- function(params, trajectory = NULL, deg_scale,
 #'
 #' See [algae_dynamics_cc()] and [detritus_dynamics_cc()] for additional detail.
 #'
-#' @param params a \linkS4class{MizerParams} object
+#' @param params a [MizerParams] object
 #' @param cap   Numeric. Value to scale the steady state biomass by. Defaults to
 #'              1.5, setting the carrying capacity 50% higher than the current
 #'              standing biomass.

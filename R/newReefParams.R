@@ -58,7 +58,7 @@
 #' @param ... Extra parameters to be passed to [newMultispeciesParams()]
 #'
 #' @concept setup
-#' @return An object of type \linkS4class{MizerParams}
+#' @return An object of type [MizerParams]
 newReefParams <- function( # Original mizer parameters
                           species_params, interaction = NULL,
                           crit_feed = NULL,

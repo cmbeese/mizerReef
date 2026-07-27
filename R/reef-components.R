@@ -172,7 +172,7 @@ tuneUR <- function(params, ...) {
 #'   \item  A number that gives the factor for all foreground species.
 #'   }
 #'
-#' @return An object of type \linkS4class{MizerParams}
+#' @return An object of type [MizerParams]
 #' @concept calibration
 #' @export
 scaleReefAbundance <- function(params, factor) {

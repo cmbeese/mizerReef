@@ -12,8 +12,8 @@ plotlyDegradationScale(
 )
 }
 \arguments{
-\item{object}{An optional object of class \linkS4class{MizerParams} or
-\linkS4class{MizerSim}. If provided, the function will attempt to extract
+\item{object}{An optional object of class \link[mizer:MizerParams]{MizerParams} or
+\link[mizer:MizerSim]{MizerSim}. If provided, the function will attempt to extract
 the degradation scaling or trajectory from its \code{@other_params$refuge_params} slot.}
 
 \item{trajectory}{Optional. Either a character string (\code{"rubble"},

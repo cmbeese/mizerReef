@@ -5,7 +5,7 @@
 #' This function tunes the detritus and algae parameters after running
 #' mizer's default projectToSteady function.
 #'
-#' @param params A \linkS4class{MizerParams} object
+#' @param params A [MizerParams] object
 #'
 #' @param d_func    Optional. A function that will be called after every t_per
 #'                  years with both the previous and the new state and that
@@ -43,7 +43,7 @@
 #'
 #' @param ... unused
 #'
-#' @return An object of type \linkS4class{MizerParams}
+#' @return An object of type [MizerParams]
 #' @concept setup
 #' @include reef-components.R
 #' @export

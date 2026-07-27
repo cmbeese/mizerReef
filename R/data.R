@@ -213,7 +213,7 @@
 #' community structure. PhD Thesis, Newcastle University.
 #' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
 #'   https://doi.org/10.26686/wgtn.26421523
-#' @format A \code{mizerReef} object (extends \linkS4class{MizerParams}) with
+#' @format A \code{mizerReef} object (extends [MizerParams]) with
 #'   10 species, competitive refuge, and algae/detritus components.
 #' @source PhD Thesis, FORCE dataset
 "caribbean_10_model"

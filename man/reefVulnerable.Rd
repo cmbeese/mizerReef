@@ -8,7 +8,7 @@ at each time step}
 reefVulnerable(params, n, n_pp, n_other, t, new_rd = NULL, ...)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams]{MizerParams} object}
 
 \item{n}{A matrix of species abundances (species x size).}
 

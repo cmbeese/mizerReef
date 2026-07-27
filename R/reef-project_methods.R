@@ -128,7 +128,7 @@ projectMort.mizerReef <- function(params, n, n_pp, n_other, t = 0,
 #' following the `NextMethod()`-based composition pattern used throughout
 #' this file so that other extension packages keep working.
 #'
-#' @param params A \linkS4class{MizerParams} object
+#' @param params A [MizerParams] object
 #'
 #' @param n A matrix of species abundances (species x size).
 #'

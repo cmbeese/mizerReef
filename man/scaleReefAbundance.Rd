@@ -19,7 +19,7 @@ affected.
 }}
 }
 \value{
-An object of type \linkS4class{MizerParams}
+An object of type \link[mizer:MizerParams]{MizerParams}
 }
 \description{
 Multiplies the abundances of all or of selected species by given factors and

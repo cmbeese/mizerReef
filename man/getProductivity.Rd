@@ -15,15 +15,15 @@ getProductivity(
 }
 \arguments{
 \item{object}{An object of class \code{MizerParams} or \code{MizerSim}. If given a
-\linkS4class{MizerSim} object, uses the growth rates at the
+\link[mizer:MizerSim]{MizerSim} object, uses the growth rates at the
 final time of a simulation to calculate productivity. If
-given a \linkS4class{MizerParams} object, uses the initial
+given a \link[mizer:MizerParams]{MizerParams} object, uses the initial
 growth rates.}
 
 \item{time_range}{The time range (either a vector of values, a vector of min
 and max time, or a single value) to provide productivity
 for. Default is the final time step. Ignored when called
-with a \linkS4class{MizerParams} object.}
+with a \link[mizer:MizerParams]{MizerParams} object.}
 
 \item{include_repro}{A boolean value that indicates whether to include
 energy for reproduction in productivity estimates.

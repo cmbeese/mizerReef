@@ -224,7 +224,7 @@ z0pre defaults to 0.2.}
 \item{...}{Extra parameters to be passed to \code{\link[mizer:newMultispeciesParams]{newMultispeciesParams()}}}
 }
 \value{
-An object of type \linkS4class{MizerParams}
+An object of type \link[mizer:MizerParams]{MizerParams}
 }
 \description{
 Sets up a multi-species size spectrum model with additional unstructured

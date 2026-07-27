@@ -188,15 +188,15 @@ plotlySpectraPercentChange <- function(object1, object2, ...) {
 
 #' Plot the total productivity for each species Group
 #'
-#' When called with a \linkS4class{MizerParams} object the total steady
+#' When called with a [MizerParams] object the total steady
 #' state productivity is plotted for each group. When called with a
-#' \linkS4class{MizerSim} object the productivity of each species
+#' [MizerSim] object the productivity of each species
 #' through time is plotted.
 #'
 #' @inheritSection getProductivity Potential fisheries productivity
 #'
-#' @param object An object of class \linkS4class{MizerParams} or
-#'                  \linkS4class{MizerSim}
+#' @param object An object of class [MizerParams] or
+#'                  [MizerSim]
 #'
 #' @param species The species to be selected. Optional. By default all species
 #'   are selected. A vector of species names, or a numeric vector with the
@@ -396,7 +396,7 @@ plotlyProductivity <- function(object,
 #' Plot the fisheries productivity of two models or two different size ranges
 #'  in the same plot
 #'
-#' When called with a \linkS4class{MizerParams}
+#' When called with a [MizerParams]
 #' object the steady state productivities are plotted.
 #'
 #' @param object1 First MizerParams or MizerSim object.
@@ -720,8 +720,8 @@ plotlyProductivityRelative <- function(object1, object2,
 #' This functions creates a barplot with the abundance of each species
 #' within a given size range.
 #'
-#' @param object An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
-#'               If a \linkS4class{MizerSim} object is provided, the abundance at the
+#' @param object An object of class [MizerParams] or [MizerSim].
+#'               If a [MizerSim] object is provided, the abundance at the
 #'              last time step is used. 
 #'
 #' @param species   The species to be selected. Optional. By default all
@@ -860,8 +860,8 @@ plotlyTotalAbundance <- function(object, ...) {
 #' within a size range. Usually used in conjunction with [plotProductivity()]
 #' to check for decoupling.
 #'
-#' @param object An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
-#'               If a \linkS4class{MizerSim} object is provided, the biomass at the
+#' @param object An object of class [MizerParams] or [MizerSim].
+#'               If a [MizerSim] object is provided, the biomass at the
 #'               last time step is used. 
 #'
 #' @param species   The species to be selected. Optional. By default all
@@ -988,7 +988,7 @@ plotlyTotalBiomass <- function(object, ...) {
 #' Plot the total biomass of two models or of two different size ranges in
 #' the same plot
 #'
-#' When called with a \linkS4class{MizerParams}
+#' When called with a [MizerParams]
 #' object the steady state biomasses are plotted.
 #'
 #' @inheritParams plot2Productivity
@@ -1245,7 +1245,7 @@ plotlyTotalBiomassRelative <- function(object1, object2,
 #'  [plotTotalAbundance()], [plotTotalBiomass()] and [plotProductivity()]
 #'  for more details.
 #'
-#' @param object An object of class \linkS4class{MizerParams}
+#' @param object An object of class [MizerParams]
 #'
 #' @param min_size  parameters be passed to [plotTotalAbundance()] and
 #'                  [plotTotalBiomass()]. The minimum length (cm) of
@@ -1361,7 +1361,7 @@ plotlyRelativeContribution <- function(object, ...) {
 #' showing how refuge degrades over the course of a simulation. Uses viridis
 #' color scale to represent temporal succession.
 #'
-#' @param sim A \linkS4class{MizerSim} object
+#' @param sim A [MizerSim] object
 #' @param return_data A boolean value that determines whether the formatted
 #'                    data used for the plot is returned instead of the plot
 #'                    itself. Default value is FALSE.

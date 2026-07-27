@@ -5,7 +5,7 @@
 \alias{caribbean_10_model}
 \title{mizerReef model for a generic Caribbean reef (10 functional groups)}
 \format{
-A \code{mizerReef} object (extends \linkS4class{MizerParams}) with
+A \code{mizerReef} object (extends \link[mizer:MizerParams]{MizerParams}) with
 10 species, competitive refuge, and algae/detritus components.
 }
 \source{

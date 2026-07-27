@@ -69,8 +69,8 @@ itself. Default value is FALSE.}
 \item{...}{
   Arguments passed on to \code{\link{plotProductivity}}
   \describe{
-    \item{\code{object}}{An object of class \linkS4class{MizerParams} or
-\linkS4class{MizerSim}}
+    \item{\code{object}}{An object of class \link[mizer:MizerParams]{MizerParams} or
+\link[mizer:MizerSim]{MizerSim}}
     \item{\code{start_time}}{The first time to be plotted. Default is the beginning
 of the time series.}
     \item{\code{end_time}}{The last time to be plotted. Default is the end of the time
@@ -95,7 +95,7 @@ frame with the the productivity for each Species Group
 by model is returned.
 }
 \description{
-When called with a \linkS4class{MizerParams}
+When called with a \link[mizer:MizerParams]{MizerParams}
 object the steady state productivities are plotted.
 }
 \seealso{

@@ -17,7 +17,7 @@ plotRelativeContribution(
 plotlyRelativeContribution(object, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams}}
+\item{object}{An object of class \link[mizer:MizerParams]{MizerParams}}
 
 \item{min_size}{parameters be passed to \code{\link[=plotTotalAbundance]{plotTotalAbundance()}} and
 \code{\link[=plotTotalBiomass]{plotTotalBiomass()}}. The minimum length (cm) of

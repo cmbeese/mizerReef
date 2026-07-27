@@ -18,7 +18,7 @@ reefSteady(
 )
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams]{MizerParams} object}
 
 \item{d_func}{Optional. A function that will be called after every t_per
 years with both the previous and the new state and that
@@ -57,7 +57,7 @@ shiny app. Default FALSE.}
 \item{...}{unused}
 }
 \value{
-An object of type \linkS4class{MizerParams}
+An object of type \link[mizer:MizerParams]{MizerParams}
 }
 \description{
 This function tunes the detritus and algae parameters after running

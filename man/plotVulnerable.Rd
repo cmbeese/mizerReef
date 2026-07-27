@@ -23,8 +23,8 @@ plotlyVulnerable(
 )
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams} or
-\linkS4class{MizerSim}. If a \linkS4class{MizerSim} object is provided, the
+\item{object}{An object of class \link[mizer:MizerParams]{MizerParams} or
+\link[mizer:MizerSim]{MizerSim}. If a \link[mizer:MizerSim]{MizerSim} object is provided, the
 abundance at the last time step is used.}
 
 \item{species}{The species to be selected. Optional. By default all species
@@ -35,7 +35,7 @@ it is to be selected (TRUE) or not.}
 \item{all.sizes}{If TRUE, then vulnerability is plotted also for sizes
 outside a species' size range. Default FALSE.}
 
-\item{time_step}{If \code{object} is a \linkS4class{MizerSim} object, this
+\item{time_step}{If \code{object} is a \link[mizer:MizerSim]{MizerSim} object, this
 optional parameter specifies which time step to use for calculating
 vulnerability. Default is the last time step.}
 
@@ -53,7 +53,7 @@ frame the vulnerability at each size
 Plot the vulnerability to predation of species by weight
 }
 \details{
-When called with a \linkS4class{MizerParams} object the initial
+When called with a \link[mizer:MizerParams]{MizerParams} object the initial
 vulnerability is plotted. The complement of refuge.
 }
 \seealso{

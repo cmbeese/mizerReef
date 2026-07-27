@@ -7,8 +7,8 @@
 plotDegradationScale(object = NULL, trajectory = NULL, return_data = FALSE)
 }
 \arguments{
-\item{object}{An optional object of class \linkS4class{MizerParams} or
-\linkS4class{MizerSim}. If provided, the function will attempt to extract
+\item{object}{An optional object of class \link[mizer:MizerParams]{MizerParams} or
+\link[mizer:MizerSim]{MizerSim}. If provided, the function will attempt to extract
 the degradation scaling or trajectory from its \code{@other_params$refuge_params} slot.}
 
 \item{trajectory}{Optional. Either a character string (\code{"rubble"},
@@ -40,8 +40,8 @@ This function is flexible in its input:
 first column, remaining columns as refuge size bins).
 }
 \item If \code{trajectory} is not provided, \code{object} must be
-supplied and can be a \linkS4class{MizerParams} or
-\linkS4class{MizerSim} object. The function will extract the
+supplied and can be a \link[mizer:MizerParams]{MizerParams} or
+\link[mizer:MizerSim]{MizerSim} object. The function will extract the
 degradation scaling or trajectory from
 \code{object@other_params$refuge_params$trajectory} or
 \code{object@other_params$refuge_params$deg_scale}.

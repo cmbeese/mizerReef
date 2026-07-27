@@ -22,8 +22,8 @@ plotProductivity(
 plotlyProductivity(object, species = NULL, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams} or
-\linkS4class{MizerSim}}
+\item{object}{An object of class \link[mizer:MizerParams]{MizerParams} or
+\link[mizer:MizerSim]{MizerSim}}
 
 \item{start_time}{The first time to be plotted. Default is the beginning
 of the time series.}
@@ -65,9 +65,9 @@ frame with the the productivity for each Species Group
 is returned.
 }
 \description{
-When called with a \linkS4class{MizerParams} object the total steady
+When called with a \link[mizer:MizerParams]{MizerParams} object the total steady
 state productivity is plotted for each group. When called with a
-\linkS4class{MizerSim} object the productivity of each species
+\link[mizer:MizerSim]{MizerSim} object the productivity of each species
 through time is plotted.
 }
 \section{Potential fisheries productivity}{

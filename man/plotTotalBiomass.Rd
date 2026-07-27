@@ -17,8 +17,8 @@ plotTotalBiomass(
 plotlyTotalBiomass(object, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerParams} or \linkS4class{MizerSim}.
-If a \linkS4class{MizerSim} object is provided, the biomass at the
+\item{object}{An object of class \link[mizer:MizerParams]{MizerParams} or \link[mizer:MizerSim]{MizerSim}.
+If a \link[mizer:MizerSim]{MizerSim} object is provided, the biomass at the
 last time step is used.}
 
 \item{species}{The species to be selected. Optional. By default all
