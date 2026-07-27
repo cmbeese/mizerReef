@@ -436,8 +436,7 @@ Changing the refuge profile allows you to explore how habitat structure affects 
 2. Run `reefSteady()` several times to reach a new steady state.
 3. Compare results (e.g., biomass and productivity) using built-in plotting functions.
 
-```{r change-refuge, echo = TRUE, eval=FALSE, fig.cap="The biomass (left) and productivity (right) for a model with no predation refuge (non-complex) and a model with predation refuge based on data from Karpata Reef in Bonaire (complex). Colours represent species groups.", fig.alt="Two-panel plot showing total biomass and productivity for complex and non-complex refuge profiles."}
-
+```{r change-refuge, echo = TRUE, eval=TRUE, warning=FALSE, message=FALSE, fig.cap="Figure 3. The biomass (left) and productivity (right) for a model with no predation refuge (non-complex) and a model with predation refuge based on data from Karpata Reef in Bonaire (complex). Colours represent species groups.", fig.alt="Two-panel plot: left panel shows total biomass for flat vs complex reef, right panel shows productivity for flat vs complex reef. Each panel compares model output for two habitat types.", out.width="80%"}
 # Change to a non-complex (no refuge) profile
 non_complex <- newRefuge(caribbean_10_model, new_method = "noncomplex")
 
@@ -446,22 +445,20 @@ non_complex <- non_complex |> reefSteady() |> reefSteady() |> reefSteady()
 
 # Compare biomass and productivity between models
 all_biom11 <- plot2TotalBiomass(non_complex, caribbean_10_model,
-                                name1 = "Flat", 
+                                name1 = "Flat",
                                 name2 = "Complex",
                                 stack = TRUE)
 
 all_prod11 <- plot2Productivity(non_complex, caribbean_10_model,
-                                name1 = "Flat", 
+                                name1 = "Flat",
                                 name2 = "Complex",
-                                stack = TRUE) 
+                                stack = TRUE) +
+    ggplot2::theme(legend.position = "none")
+
+patchwork::wrap_plots(all_biom11, all_prod11)
 ```
 
-
-```{r fig-refuge-effects, echo=FALSE, fig.cap="Figure 4 The biomass (left) and productivity (right) for a model with no predation refuge (non-complex) and a model with predation refuge based on data from Karpata reef (complex). Colours represent species groups.", fig.alt="Two-panel plot: left panel shows productivity for flat vs complex reef, right panel shows biomass for flat vs complex reef. Each panel compares model output for two habitat types.", out.width="80%"}
-knitr::include_graphics("figures/karpata_example.png")
-```
-
-As we can see in Figure 4, removing refuge availability reduces both biomass and productivity across all species.
+As we can see in Figure 3, removing refuge availability reduces both biomass and productivity across all species.
 
 > <details><summary>💡 **Tip:** If your results look odd after changing the refuge profile, run `reefSteady()`.</summary> It needs to run enough times to reach a new steady state. To learn more about modifying refuge profiles and their parameters, see [setRefuge()].</details>
 
@@ -535,6 +532,12 @@ for (i in seq_along(L_seq)) {
 
 # Total biomass at the end of each year as refuge shrinks
 biomass_trend
+```
+
+```{r plot-degradation-trend, echo=TRUE, eval=TRUE, fig.cap="Total biomass over five years as refuge shrinks (habitat complexity declining).", fig.alt="Line plot of total biomass declining over five years as the refuge threshold length and maximum protected proportion shrink each year."}
+plot(seq_along(biomass_trend), biomass_trend, type = "b",
+    xlab = "Year", ylab = "Total biomass (g)",
+    main = "Biomass decline as habitat complexity degrades")
 ```
 
 > <details><summary>💡 **Tip:** This is a mechanism demo, not a calibrated
