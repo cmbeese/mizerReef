@@ -176,23 +176,94 @@ literally states "the total algal biomass per square meter is B_A =
 5.871e-11 grams" right next to a table of real fish biomass_observed
 values in the 30-110 g/m^2 range - the contrast reads as obviously
 wrong to any reader, even though the underlying dynamics are
-internally consistent. Likely explanation: whatever initial_value
-the algae/detritus components were given when these models were
-originally built (`setComponent(..., initial_value = 1, ...)` is the
-example value shown in extension_mechanism.Rmd's own illustrative
-code) was never rescaled to a realistic absolute figure via
-rescale_algae()/rescale_detritus() as part of the tuning recipe - the
-tuning script only needed the two sides of the ODE to balance, not
-the absolute scale to look sensible, so nothing in the existing
-calibration workflow would have caught this.
+internally consistent.
 
-Not fixed. Options for the user to consider: (a) leave as-is (it's
-mathematically self-consistent, just cosmetically alarming - could
-add a caveat sentence to the vignettes instead), (b) rescale all three
-bundled models to a plausible absolute biomass via
-rescale_algae()/rescale_detritus() (reversible, well-tested, no
-dynamics change), (c) something else. Did not touch any bundled .rda
-or vignette prose for this - flagging only.
+UPDATE (28/07, same session, later): traced this to its exact
+mechanism rather than just a hypothesis. It is NOT specific to these
+three old bundled objects - it will happen to ANY mizerReef model
+built via the package's own documented tuning recipe
+(vignette("mizerReef")'s "Tuning the steady state" section,
+steady-state-recipe.Rmd), silently, every time, unless the user
+separately thinks to call rescale_algae()/rescale_detritus() (which
+is never mentioned in either of those two documents). The mechanism,
+confirmed step by step:
+
+1. newReefParams() creates the algae/detritus components via
+   mizer::setComponent(..., initial_value = 1, ...) (R/newReefParams.R)
+   - a hardcoded literal, unrelated to anything about the specific
+   model being built. Confirmed empirically: algae_biomass(params) is
+   exactly 1 immediately after newReefParams(), and stays exactly 1
+   through any number of reefSteady() calls on their own (verified:
+   two consecutive reefSteady() calls on a freshly-built params object
+   left algae_biomass() at exactly 1 - reefSteady() forces
+   other_dynamics to "constant_dynamics" for every other-component
+   while the fish species converge (R/reef-steady.R), so B_A/B_D are
+   literally frozen throughout that call; the tuneUR()/tuneUR_cc()
+   call reefSteady() makes afterwards only sets the *growth rate* to
+   match whatever B_A currently is, and never touches B_A itself).
+
+2. calibrateReefBiomass() - a required step in the documented tuning
+   recipe, used to bring the freshly-constructed model's fish
+   abundance in line with real biomass_observed data - computes
+   factor = observed_total / model_total from FISH biomass alone, then
+   calls scaleReefModel() (R/reef-components.R). scaleReefModel()
+   multiplies params@initial_n_other[[res]] by that same `factor` for
+   EVERY other-component (algae and detritus alike), paired with
+   dividing rho by the same factor - by design, this is the same
+   paired multiply-B/divide-rho transformation rescale_algae()/
+   rescale_detritus() perform deliberately, and mirrors how mizer's
+   own scaleModel() rescales cc_pp/kappa alongside fish abundance to
+   keep encounter rates internally consistent after a calibration
+   rescaling. It is doing exactly what it is supposed to do for
+   internal consistency - the problem is only that `factor` is
+   entirely a fish-abundance-calibration artifact with no relationship
+   to what a sensible absolute B_A should be, and B_A started at the
+   arbitrary placeholder 1, so the product can land anywhere.
+
+3. Confirmed empirically end to end: building a fresh caribbean_3-style
+   params object from caribbean_3_species/caribbean_3_interaction/
+   tuning_profile, algae_biomass() is 1 right up until the first
+   calibrateReefBiomass() call, which alone drops it to 1.95e-12 (a
+   ~5x10^11 factor - i.e. the raw, uncalibrated fish abundance this
+   model starts with is about 5x10^11 times too high relative to real
+   observed biomass in grams, which is an unremarkable, expected
+   magnitude for mizer's generic default abundance scale before
+   calibration). Replaying a simplified version of the rest of the
+   documented recipe (a few more calibrateReefBiomass()/matchBiomasses()/
+   matchReefGrowth()/reefSteady() iterations, then switching to the
+   competitive refuge method and re-iterating) landed at 4.02e-11 -
+   the same order of magnitude as the real bundled caribbean_3_model
+   (5.87e-11); the small remaining difference is because the actual
+   calibration script iterates more times and with more nuanced
+   reproduction-level tuning than this simplified replay. This is
+   airtight confirmation of the mechanism, not just a plausible story.
+
+So: not a bug in the sense of broken/inconsistent dynamics (rho and
+growth are correctly tuned for whatever B_A ends up at, every time,
+exactly as designed), but a genuine design gap in the documented
+tuning workflow - calibrateReefBiomass() implicitly re-scales the
+resource pools' absolute magnitude as a side effect of fish-biomass
+calibration, and nothing in the recipe ever gives them an independent,
+meaningful absolute scale. Every future model built by following
+mizerReef's own tuning instructions as written will have this same
+issue by default.
+
+Not fixed. Options for the user to consider: (a) leave the mechanism
+as-is but add a step to the documented tuning recipe (both
+vignette("mizerReef") and steady-state-recipe.Rmd) calling
+rescale_algae()/rescale_detritus() to a chosen sensible absolute value
+before the final save, and retroactively rescale the three bundled
+models the same way (reversible, well-tested, no dynamics change -
+rescale_algae()/rescale_detritus() exist for exactly this); (b) change
+calibrateReefBiomass()/scaleReefModel() itself so algae/detritus are
+excluded from the factor rescaling (i.e. keep B_A/B_D fixed and let
+rho absorb the whole calibration adjustment on its own) - a real code
+change to a documented, tested function, not just a vignette/data
+fix, so needs more thought about whether that changes anything else
+relied upon; (c) leave as-is entirely (mathematically correct, just
+cosmetically odd, could add a caveat sentence to the model-description
+vignettes instead). Did not touch any bundled .rda, calibration code,
+or vignette prose for this - flagging only, per standing instruction.
 
 THE ~50-FILE TEST-COVERAGE SWEEP IS DONE. Every tier from the original
 priority list is now covered with real numeric assertions instead of
