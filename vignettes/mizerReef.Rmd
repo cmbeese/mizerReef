@@ -246,11 +246,11 @@ varies with prey size:
   - a smooth declining function controlled by a threshold length (L_refuge) and a maximum proportion protected
   - `method_params` should be a **list** or **data frame** with:
     - `L_refuge`: numeric, threshold length (cm) at which refuge protection starts to decline.
-    - `max_protection`: numeric, maximum proportion of individuals protected by refuge (0–1).
+    - `prop_protect`: numeric, maximum proportion of individuals protected by refuge (0–1).
 
   **Example:**
   ```r
-  method_params = list(L_refuge = 10, max_protection = 0.8)
+  method_params = list(L_refuge = 10, prop_protect = 0.8)
   ```
   </details>
 
