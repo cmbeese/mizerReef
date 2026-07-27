@@ -53,6 +53,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 URL: https://cmbeese.github.io/mizerReef/
+BugReports: https://github.com/cmbeese/mizerReef/issues
 Language: en-GB
 Collate:
     'MizerReefParams-class.R'
