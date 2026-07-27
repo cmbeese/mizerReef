@@ -1,143 +1,205 @@
-MizerReef Major Package Update To Do List - 18/11/2025
+MizerReef Major Package Update To Do List - 27/07 (updated)
 
-=== START HERE (updated 20/07) ===
-this-code-base-is-soft-feather.md (the conference-readiness plan) is DONE.
-See "COMPLETED TASKS" below, first entry, for the full account: what was
-fixed, what was verified for real (devtools::test()/check()/pkgdown, not
-assumed), and the major_update fast-forward/push. work/recover-december
-and major_update both hold the same tip; main is untouched, as instructed.
-Everything below "Outstanding for Manuscript/CRAN" and further down is
-genuinely still open - nothing there was silently done. Highest-priority
-open item right now: deepen reefDegrade()/getDegrade() test coverage (see
-that item below) - a real bug was found and fixed in getDegrade()'s
-MizerSim branch this session, and neither function has assertions beyond
-"didn't error," so a similar latent bug elsewhere in that pair wouldn't be
-caught. Everything else below is genuinely lower priority.
+=== START HERE (updated 27/07) ===
+Public GitHub release prep session complete and pushed (major_update,
+a2c060e..e0a3bf8, 15 commits). See "COMPLETED TASKS" below, first entry,
+for the full account. devtools::check() is clean (0 errors, 0 warnings,
+3 notes, all pre-existing) and devtools::test() is 0 fail/121 pass/3
+pre-documented benign warnings. Nothing below is a hard blocker for a
+public GitHub release (not CRAN - the mizerExperimental Remotes:
+dependency is fine as-is for that).
 
-ALSO NOTE: DESCRIPTION's Depends now requires mizer (>= 3.2.0) (bumped
-from the dev-snapshot 3.1.0.9001, per user request - 3.2.0 is the actual
-current CRAN release). User upgraded the locally installed mizer to
-3.2.0 the same session, which surfaced one real, genuine regression:
-mizer 3.2.0 changed species_params<-.MizerParams to diff new vs. old
-values and only write changes into an internal given_species_params
-tracking table, rather than doing a plain column replacement. For any
-mizerReef-specific column (blocked_pred, refuge_user, satiation, etc.)
-that was never tracked in given_species_params (true for caribbean_3_model,
-set via direct S4 slot assignment when the object was built), species
-whose value didn't change from the object's current state get silently
-left as NA instead of the assigned value. Found via a genuinely re-run
-devtools::test() after the mizer upgrade (test-project-methods.R's
-"no species is blocked_pred" test, which used the vulnerable
-species_params(params)$col <- value replacement-function form). Fixed
-the test to use direct @species_params slot assignment instead (the
-pattern mizerReef's own R/ source, vignettes, and scripts already
-exclusively use - confirmed via grep this was the ONLY vulnerable call
-site in the whole codebase, not a systemic issue). Re-verified clean
-with mizer 3.2.0 actually installed: devtools::test() 0 fail/76 pass/3
-pre-documented benign warnings, devtools::check() 0 errors/0 warnings/
-same 4 pre-existing notes, vignette re-building OK. Worth keeping in
-mind for future work: if you ever write code (in mizerReef or a
-downstream script/vignette) that does
-species_params(params)$custom_col <- value on a column mizer doesn't
-know about, verify it actually applied to every species - don't assume
-the replacement-function form recycles correctly for mizerReef-specific
-columns under mizer >= 3.2.0.
+ONE thing worth a conscious decision before making the repo public,
+not because anything is broken but because it wasn't chosen with "a
+stranger will browse this on GitHub" in mind: `ignore/` is excluded
+from the R package build via .Rbuildignore, but NOT gitignored - it is
+fully tracked and publicly visible once the repo goes public, including
+ignore/AI-session-summaries/ (AI-assisted dev session notes),
+old thesis materials, superseded code, and ~4.1MB of draft logo files.
+Same story for a tracked-but-empty .env at the repo root, and for
+check-results.txt/thesis-model.RData also sitting at the root. See the
+"Repo visibility cleanup" section below for specifics.
 
-** For Major Update  - Manuscript version**
+Highest-priority item now that reefDegrade()/getDegrade() have real
+test coverage: the ~50-file test-coverage sweep (see that section
+below) - still the same tiered priority list as before, still
+deliberately out of scope for the session that just landed.
 
-- update caribbean_10_model data object, changing bad_pred to blocked_pred in species_params
-- add degradation scale data objects
-- add degradation related tests
+** Before publication - recommended, not blocking **
 
-# Outstanding for Manuscript/CRAN:
-- Update remaining data files and documentation (if any)
-- Finish/polish the vignettes and articles for Mizer Reef
-	- Clean referencing, links, and document structure
-    - apply getting started vignette template formatting
-    - Getting started vignette: put notes in boxes, add emojis, mention scaling background resource step
-	- Steady state recipe: add more thorough descriptions of each step
-	- Karpata and Bonaire model descriptions: mimic mizer shelf model description structure, bring back in skips and stops, add description for three group Bonaire model
-	- Simulations with degradation: add thorough description of all degradation parameters, add descriptions of built-in degradation trajectories (with sources and plots), add section on new plotting functions for simulations
-- Update or remove non-portable file names (e.g., in ignore/) for CRAN compliance
-- Add VignetteBuilder field to DESCRIPTION if vignettes are to be included
-- Ensure all S4 classes and methods are fully documented (especially MizerReefParams)
-- Clean up any remaining Rd cross-reference notes (add package anchors for external links)
-  -- 20/07: scoped this precisely - 24 Rd files missing package anchors on
-     MizerParams-class/MizerSim-class \link{} targets. Confirmed pre-existing
-     (present in a stale check-results.txt from before this whole session),
-     not a check() blocker (NOTE only). Mechanical fix: add [MizerParams-class]
-     -> [mizer::MizerParams-class] style anchors throughout, or switch those
-     @seealso entries to use \code{\link[mizer]{MizerParams}} form.
+- Repo visibility cleanup (see below) - a public-facing hygiene pass,
+  not a functionality issue. Nobody's blocked by skipping this, but
+  it's easiest to do before the repo is actually public rather than
+  after.
+- Confirm the pkgdown GitHub Actions deploy succeeded for the
+  major_update push (e0a3bf8) and that the site's favicons actually
+  generated - pkgdown::build_site() failed to reach
+  realfavicongenerator.net during this session (HTTP 500, their side,
+  not a code issue) so favicons were never actually produced. If the
+  Action also fails on this, either retry later or generate favicons
+  manually (they only need doing once, from man/figures/logo.png).
+- Consider compressing man/figures/logo.png (currently 1.4MB - large
+  for a hex-sticker logo typically shown at ~120x139px). Cosmetic/perf,
+  not broken.
 
-- 20/07: makeActiveBinding() dead code in .onLoad - bundled data/ model
-  objects (caribbean_10_model, caribbean_3_model) don't get re-coerced to
-  the right S4 class when a second mizer extension is loaded alongside
-  mizerReef. Confirmed harmless for single-extension use; confirmed to be an
-  upstream pattern bug shared with mizerShelf's own current source (fetched
-  from GitHub directly) - worth flagging to Gustav, not just fixing locally.
-  Documented as a visible caveat on README.md and in
-  vignette("extension_mechanism") this session; the underlying mechanism
-  itself is still unfixed.
-- 20/07: recordExtension() version-stamping not adopted - available in
-  installed mizer 3.1.0.9001, never used in mizerReef's setters; a
-  modernization, not a bug.
-- 20/07: Add mizerMR as a real Suggests/Remotes dependency and re-enable
-  vignettes/_multiple-resources.Rmd (renamed with a leading underscore this
-  session specifically so pkgdown's vignette scanner skips it - rename back
-  when re-enabling) post-conference, once the makeActiveBinding gap above is
-  actually fixed. IMPORTANT: also found a second, separate blocker while
-  trying to get pkgdown to build the site - actually attempting to render
-  this vignette (mizerMR happens to already be installed in this dev
-  environment) fails with a real error unrelated to the missing-dependency
-  concern: "incorrect number of dimensions" at unnamed-chunk-13. Not
-  investigated - out of scope this week - but whoever re-enables this
-  vignette should expect to debug that too, not just add the DESCRIPTION
-  dependency.
-- 20/07: CRAN-compliance cleanup of ignore/ (non-portable filenames,
-  oversized logo-pieces/) - deferred, not a blocker.
-- 20/07: Ask the supervisor exactly which file they meant by "AI generated
-  mizerReef.Rmd" - most likely model-description.Rmd (his own PR's
-  addition), not a real conflict, but worth confirming.
-- 20/07: Decide whether to fully execute all remaining eval=FALSE chunks in
-  steady-state-recipe.Rmd/reef-degradation-simulations.Rmd beyond the
-  representative subset enabled this session, post-conference.
-- 20/07: thesis-model.RData is a stray top-level tracked file (from commit
-  39311dc, "recover thesis model params since the calibration script isn't
-  on github"). Excluded from the R build via .Rbuildignore this session so
-  it stops showing up as an R CMD check NOTE, but never evaluated whether it
-  should actually live somewhere else (inst/? archive/?) long term - left
-  untouched since it may still be needed for reproducibility.
-- 20/07 [HIGHEST PRIORITY of the open items]: Deepen reefDegrade()/
-  getDegrade() test coverage specifically. Context: this session found and
-  fixed a real bug in getDegrade()'s MizerSim branch (3-comma array
-  indexing on a function that returns a 1D vector, not 2D/3D as its own
-  docs claimed) - previously masked for the entire life of the package by
-  a test wrapped in try()/succeed(), so it silently never ran. Fixing that
-  one test only checked that plotRefugeDensity(sim) doesn't error; it does
-  NOT assert reefDegrade()'s actual numeric output at specific timesteps
-  (before/at/after bleach_time, across all three built-in trajectories,
-  for both use_UR_cc TRUE/FALSE). Given a bug already hid successfully in
-  this exact pair of functions for the whole project's history, the
-  "didn't error" bar isn't enough here specifically - this is the one item
-  on this list where "genuinely didn't error" and "computed the right
-  numbers" might diverge. Test both getDegrade(params) and getDegrade(sim)
-  against hand-computed expected values, and reefDegrade()'s recursive
-  old_rd = reefDegrade(params, ..., t = t - 1) step across the bleach
-  boundary in particular.
-- 20/07: Deepen the ~50 other test files that currently only check
-  expect_error(..., NA) ("didn't error," not "produced correct output").
-  Full tiered priority list from the test-suite audit, highest-value first
-  (after reefDegrade()/getDegrade() above): newReefParams(), setRefuge(),
-  newRefuge(), reefSteady(), tuneUR()/tuneUR_cc() (the core setup/
-  calibration functions), then the rate functions reefEncounter/reefMort/
-  reefPredMort/reefFeedingLevel/reefRates/reefSenMort/getRefuge/
-  getVulnerable/reefVulnerable (extend the "compare dispatch vs. direct
-  call" pattern already proven in test-project-methods.R), then plotting
-  functions (lower stakes, could use return_data = TRUE where supported to
-  check underlying values instead of just the ggplot class). Also note:
-  caribbean_10_model, karpata_refuge, and the degradation data objects are
-  currently exercised by zero tests - worth adding coverage, not just
-  deepening existing tests.
+** Repo visibility cleanup (planned for a dedicated future session - not urgent, just newly relevant) **
+
+Deliberately deferred out of the 27/07 session (context was getting full).
+Plan for next time, so a fresh session doesn't have to re-derive this:
+
+- Decide the *scope* first, in this order, since each is a bigger
+  commitment than the last:
+  1. Untrack going forward only (cheap, safe, reversible): stop new
+     commits from including these paths, leave existing git history
+     alone. `git rm -r --cached <path>` + add to .gitignore, then
+     commit. Anyone who already cloned still has the old content in
+     their local history, and it's still in GitHub's history/old
+     commits/any forks, but new clones's working tree won't have it
+     and it won't show in the default file browser at HEAD.
+  2. Scrub from history too (bigger, riskier, not reversible without
+     backups): needed only if something in there is actually sensitive
+     (not just "untidy") - e.g. check ignore/AI-session-summaries/ and
+     ignore/corrected thesis bibliography.bib for anything you wouldn't
+     want permanently in git history even after step 1. Requires
+     git filter-repo or BFG Repo-Cleaner, a force-push, and - since
+     this is already pushed and public - telling anyone with a clone
+     to re-clone rather than pull. Don't do this without deciding it's
+     actually necessary; it's disruptive and hard to fully undo.
+  - Recommendation: do step 1 for everything below unless the history
+    scrub in step 2 turns out to matter for a specific file.
+
+- `ignore/` (5.4MB total) is tracked in git, not gitignored - only
+  excluded from the R build via .Rbuildignore. Options, cheapest first:
+  - Leave as-is (defensible - it's dev history, not a security issue,
+    and some of it, like the AI-session-summaries, could even be
+    interesting/transparent to have public).
+  - Trim it first (drop what's genuinely not worth keeping - old
+    superseded code, duplicate logo drafts - keep what has real
+    reference value), then leave the rest tracked.
+  - Untrack entirely (step 1 above): `git rm -r --cached ignore/`,
+    add `ignore/` to .gitignore, commit. .Rbuildignore's `^ignore$`
+    line becomes redundant at that point (harmless to leave, or
+    remove it).
+- `ignore/logo-pieces/` (4.1MB of draft logo files) specifically -
+  same options as above, already flagged in earlier sessions as
+  deferred. If keeping `ignore/` otherwise, this is the single biggest
+  chunk of low-value weight in it and the easiest first cut.
+- `.env` is tracked (0 bytes, currently empty and harmless) - still
+  odd to ship a tracked .env in a public repo, and the filename itself
+  invites the question "was there ever anything in it?" even though
+  there wasn't. `git rm --cached .env`, add `.env` to .gitignore,
+  commit.
+- `check-results.txt` (old R CMD check output dump - was already
+  confirmed stale/superseded by this session's real check() runs) -
+  candidate for a straight `git rm check-results.txt` (not just
+  untrack - it has no ongoing reference value once its content is
+  captured in this to-do file, which it now is).
+- `thesis-model.RData` - kept deliberately for reproducibility (per
+  earlier session notes), so don't remove without checking that's
+  still true. If keeping it, consider whether it reads better moved
+  into inst/ or an archive/ folder than sitting bare at the repo root -
+  a "someday" tidiness call, not urgent either way.
+- Do this cleanup as its own small session/PR, separate from any
+  further feature work, so the diff is easy to review and easy to
+  revert in isolation if something turns out to still be needed.
+
+** Outstanding, genuinely open **
+
+- Deepen the ~50 other test files that currently only check
+  expect_error(..., NA) ("didn't error," not "produced correct
+  output"). Now that reefDegrade()/getDegrade() are covered (this
+  session), this is the next highest-value test-coverage gap. Same
+  tiered priority as before, highest-value first: newReefParams(),
+  setRefuge(), newRefuge(), reefSteady(), tuneUR()/tuneUR_cc() (the
+  core setup/calibration functions), then the rate functions
+  reefEncounter/reefMort/reefPredMort/reefFeedingLevel/reefRates/
+  reefSenMort/getRefuge/getVulnerable/reefVulnerable (extend the
+  "compare dispatch vs. direct call" pattern already proven in
+  test-project-methods.R), then plotting functions (lower stakes,
+  could use return_data = TRUE where supported to check underlying
+  values instead of just the ggplot class). caribbean_10_model,
+  karpata_refuge, and the degradation data objects are still
+  exercised by zero tests.
+- 27/07: NEW - broader stale-bundled-.rda-metadata audit. This
+  session found and fixed TWO separate instances of the same bug
+  class on caribbean_3_model/caribbean_10_model: stale field names
+  (rates_funcs holding legacy "reef*" strings instead of mizer's
+  defaults; algae_params holding algae_growth_initial instead of
+  algae_growth) left over from an old manual porting event
+  (commit bf97e25) that predates several refactors. Both were found
+  by chasing specific bugs, not by a systematic sweep - there could be
+  other stale fields on these two objects from the same porting event
+  that haven't caused a visible symptom yet. Worth a deliberate,
+  full diff of caribbean_3_model/caribbean_10_model's other_params
+  structure against what a freshly-built newReefParams() + full
+  tuning-recipe object looks like, field by field.
+- 27/07: NEW - caribbean_10_model's algae_growth value is exactly
+  2000, which is reef-setParams.R's raw default (not a tuned value
+  like caribbean_3_model's 86.87579). Suggests caribbean_10_model's
+  algae dynamics may never have actually been tuned via
+  tuneUR()/tuneUR_cc() during its calibration, unlike caribbean_3_model.
+  Not clearly broken (no test failure, no check() issue), just
+  suspicious - worth checking whether this is intentional or another
+  symptom of the same old-porting-event staleness above.
+- Update or remove non-portable file names for CRAN compliance -
+  deferred, not a blocker for a GitHub-only release (see "Repo
+  visibility cleanup" above for the more relevant near-term concern).
+- Ensure all S4 classes and methods are fully documented (especially
+  MizerReefParams) - not specifically re-verified this session.
+- Clean up remaining Rd cross-reference notes (add package anchors for
+  external links). Scoped precisely in an earlier session: 24 Rd files
+  missing package anchors on MizerParams-class/MizerSim-class
+  \link{} targets. Confirmed still present, still NOTE-only (not a
+  check() blocker). Mechanical fix: add [MizerParams-class] ->
+  [mizer::MizerParams-class] style anchors throughout, or switch those
+  @seealso entries to use \code{\link[mizer]{MizerParams}} form.
+- makeActiveBinding() dead code in .onLoad - bundled data/ model
+  objects don't get re-coerced to the right S4 class via this specific
+  mechanism when a second mizer extension is loaded alongside
+  mizerReef (a DIFFERENT mechanism - mizer's own extension-chain
+  class promotion - does correctly handle this in practice, confirmed
+  working this session via the mizerMR vignette). Confirmed to be an
+  upstream pattern bug shared with mizerShelf's own current source -
+  worth flagging to Gustav, not just fixing locally. Documented in
+  vignette("extension_mechanism"); the underlying dead code is still
+  unfixed.
+- recordExtension() version-stamping not adopted in mizerReef's
+  setters - a modernization, not a bug.
+- No R-CMD-check / covr GitHub Actions workflow exists yet (only
+  pkgdown deploy). Worth adding for a public repo but not blocking.
+- Confirm with the supervisor exactly which file was meant by "AI
+  generated mizerReef.Rmd" - most likely model-description.Rmd, not a
+  real conflict, but worth confirming.
+- .kilo/plans/1784244794096-remove-mizer-experimental-dependency.md -
+  a half-drafted plan for dropping mizerExperimental from
+  Imports/Remotes to Suggests. Only relevant if/when CRAN submission
+  is pursued; stale (still references mizer >= 3.1.0, DESCRIPTION now
+  requires 3.2.0) and not needed for a GitHub-only release.
+- Getting-started vignette formatting polish: put notes in boxes, add
+  emojis - the vignette already has substantial `<details>`/skip-link
+  structure and a Tip-callout convention from earlier sessions; this
+  is incremental polish on top of that, not a rewrite.
+
+** Decided / no longer open **
+
+- Steady state recipe vignette: explicitly does NOT need updating
+  (confirmed with the user this session) - previously flagged as
+  needing "more thorough descriptions of each step," now decided not
+  necessary.
+- Simulations with degradation: the vignette describing this
+  (formerly reef-degradation-simulations.Rmd) has been moved to
+  ignore/ untouched and deliberately excluded from the built
+  package/site. The built-in degradation trajectories
+  (rubble_scale/algae_scale/recovery_scale) are the novel part of a
+  forthcoming collaboration paper the user doesn't want scooped -
+  ship the data objects, not the narrative describing what they
+  represent, until that paper is out. A generic "how to run a
+  degrading-habitat simulation" demo now lives in the getting-started
+  vignette instead, using the sigmoidal method with synthetic values
+  so it doesn't touch the real trajectories at all.
+- "Decide whether to fully execute remaining eval=FALSE chunks in
+  steady-state-recipe.Rmd/reef-degradation-simulations.Rmd" - moot now
+  that both vignettes have a clear disposition (above).
 
 ######################################################################################
 ** Code updates for future (not necessary for manuscript submission/ next update) **
@@ -149,10 +211,6 @@ columns under mizer >= 3.2.0.
 - creat function to compute and plot trophic level
 
 - create versions of calibrateReef, calibrateReefYield, and CalibrateReefNumber that use scaleReefModel
-
-- check on algae growth and boosting mechanics to make sure they are actually implemented during simulations (because the params object doesn't get updated?)
--- make sure the right algae parameters are being called and stored in tune_UR, tune_UR_cc, and all algae functions
--- possibly move algae boosting to the algae growth function??
 
 ###########################################################################################
 ** Ideas for the future **
@@ -166,6 +224,142 @@ columns under mizer >= 3.2.0.
 COMPLETED TASKS:
 
 ============================================================================
+
+- 27/07 [Public GitHub release prep session. 15 commits on major_update,
+  pushed to origin (a2c060e..e0a3bf8). Full verification: devtools::test()
+  0 fail/121 pass/3 pre-documented benign warnings, devtools::check() 0
+  errors/0 warnings/3 notes (all pre-existing), pkgdown::build_site()
+  clean aside from an external favicon-service outage (see "Before
+  publication" above).]
+
+  Metadata/branding: fixed NEWS.md (removed a premature feature entry,
+  then restored it once actually true - see mizerMR below), synced
+  README.md/CITATION.cff version strings to 2.1.0, added DESCRIPTION's
+  BugReports field, fixed a broken README logo path (was referencing
+  logo.png at repo root; actual file lives in man/figures/), added a
+  logo: field to _pkgdown.yml (later confirmed pkgdown's Bootstrap 5
+  navbar template has no logo image slot at all regardless of config -
+  the field is harmless but currently inert for the navbar; the logo
+  does render correctly on the pkgdown home page via README's own
+  embedded image). Removed a stray 2.5MB vignettes/mizerReef-tutorials.zip
+  that R CMD build/check would see as a non-standard file.
+
+  Vignettes: moved reef-degradation-simulations.Rmd to ignore/ untouched
+  (see "Decided / no longer open" above for why), added a "Running a
+  simulation" section to the getting-started vignette (fishing effort
+  projection + a generic sigmoidal refuge-decline demo using
+  mizer::finalParams() to carry state between per-year project() calls,
+  deliberately not touching the real degradation trajectories), and
+  fixed a real bug in that same vignette's own sigmoidal example
+  (method_params used "max_protection", but setRefuge()/newRefuge()
+  require the field to be named "prop_protect" - copy-pasting the
+  vignette's own example would have errored). Restructured
+  karpata_model-description.Rmd and caribbean_3_model-description.Rmd
+  with the skip-link navigation and collapsible-section pattern already
+  used throughout mizerReef.Rmd and mizerShelf's own model-description
+  vignette (fetched from sizespectrum.org as a structural reference);
+  added explicit content to caribbean_3_model-description.Rmd noting
+  both example models share the same Bonaire marine-reserve dataset,
+  chosen specifically to avoid needing to correct for fishing effects.
+
+  Core bug found and fixed: caribbean_3_model/caribbean_10_model's
+  bundled @rates_funcs held legacy "reefEncounter"/"reefFeedingLevel"/
+  "reefPredMort"/"reefMort" strings instead of mizer's own default
+  names, left over from before the package switched to S3 dispatch
+  (project*.mizerReef methods in R/reef-project_methods.R) for
+  composing with other mizer extensions. Because mizer's
+  projectRateFunctions() only routes through the composable
+  project*() generics when rates_funcs still holds mizer's own
+  default names, every simulation of these two bundled objects was
+  silently calling the raw standalone reef* functions directly -
+  correct for mizerReef alone, but unable to compose with a second
+  stacked extension like mizerMR. This is what caused
+  "incorrect number of dimensions" when combining mizerReef with
+  mizerMR. Fixed by resetting the four load-bearing fields (plus Rates,
+  cosmetic) to mizer's defaults on both bundled .rda objects - a data-
+  only change, zero source code touched. Verified byte-identical
+  steady-state and 10-year projection biomass for both models
+  before/after (single-extension behaviour provably unaffected).
+
+  Second core bug found and fixed, while building test coverage for
+  the algae_boost feature: it never actually worked, for two
+  independent reasons. First, mizer's project_simple() treats params
+  as read-only for an entire project() call (only n/n_pp/n_other are
+  threaded forward between timesteps) - reefDegrade()'s algae_boost
+  branch tried to persist a boosted algae_growth/algae_capacity value
+  by mutating params, which could never survive to the next timestep.
+  Second, the bundled models stored their baseline algae growth rate
+  under the stale field name algae_growth_initial (same old-porting-
+  event pattern as the rates_funcs bug above) instead of algae_growth,
+  which made the boost code's own null-check on algae_growth silently
+  fail via R's ambiguous $ partial-matching once a sibling
+  algae_growth_boost field existed. Fixed by renaming the stale field
+  (data-only, same technique as above) and rebuilding the boost as a
+  pure function of time: new getAlgaeBoost(params, t, boost_vector)
+  returns the cumulative product of the boost vector up to the current
+  post-bleaching year, applied fresh to the untouched baseline every
+  call - mirroring how reefDegrade() itself recomputes refuge density
+  fresh from t rather than mutating params. getAlgaeProduction() and
+  algae_dynamics_cc() now take a t argument (already delivered by
+  mizer's dynamics_fun contract, previously just swallowed by ...) and
+  apply the boost. Removed the now-dead mutation-based code from
+  reefDegrade(). algae_boost stays exactly as togglable/independent
+  from degrade as before - confirmed with the user this doesn't change
+  when boosting fires, only how "how much boost right now" is computed
+  and where it's applied.
+
+  mizerMR vignette re-enabled (renamed vignettes/_multiple-resources.Rmd
+  -> vignettes/using-multiple-resources.Rmd, dropped the
+  .Rbuildignore exclusion, added mizerMR to Suggests/Remotes, listed
+  under _pkgdown.yml's Package Internals articles). The
+  "incorrect number of dimensions" error from an earlier session is
+  fixed by the rates_funcs fix above. Along the way, a real, separate
+  R CMD check failure was found and fixed: R CMD build/check builds
+  all package vignettes in one shared R session, and because
+  mizer::registerExtension() has no public "unregister" API, once
+  this vignette calls library(mizerMR), every mizerReef example object
+  in any vignette built afterward in that same session - regardless of
+  file order intent - silently picked up the mizerMR class too and
+  mis-dispatched to methods (like mizerMR's plotSpectra()) assuming a
+  structure the object doesn't have. Tried fixing this from inside the
+  vignette (mizer:::clearExtensionChain() plus explicit
+  re-registration) - worked in every manual reproduction attempted,
+  including deliberately re-rendering the same vignette multiple times
+  in one session, but did not prevent the failure specifically inside
+  R CMD check's own vignette-rebuild step for reasons that didn't
+  reproduce outside that exact harness despite extensive isolated
+  testing. Settled on the reliable fix: renamed the vignette file so
+  it sorts alphabetically after every other vignette (using- > steady-
+  > mizerReef > model- > karpata- > extension_ > caribbean_), so
+  nothing else builds after it in the shared session regardless of
+  what state it leaves behind. Also hardened the vignette's own setup
+  chunk to smoke-test the combined mizerReef/mizerMR mechanism and
+  degrade to an explanatory message rather than hard-failing the whole
+  vignette if it doesn't work in a given build environment.
+
+  Also fixed: getDegrade()'s MizerSim branch never actually extracted
+  n_pp from sim@n_pp[x, ] inside its per-timestep loop - it silently
+  closed over whatever (possibly missing) n_pp was passed to the outer
+  call, matching the pattern n/n_other already used correctly on the
+  surrounding lines (and getVulnerable()'s equivalent branch). Barely
+  exercised by any existing test before this session.
+
+  Added real numeric test coverage for reefDegrade()/getDegrade() (the
+  to-do list's own top-priority item going into this session): exact
+  refuge-density assertions at the bleach year across all three
+  built-in trajectories, across several post-bleaching years, and at/
+  after trajectory exhaustion, computed independently of reefDegrade()'s
+  own recursion via a small reference helper. getDegrade(params) vs.
+  reefDegrade() equivalence, getDegrade(sim) vs. reefDegrade() at each
+  saved timestep, and drop = TRUE/FALSE shape behaviour. Plus full new
+  coverage for everything touched by the algae_boost fix
+  (getAlgaeBoost(), getAlgaeProduction()'s new t parameter,
+  algae_dynamics_cc()'s use of the boosted capacity).
+
+  One untracked file sitting in the repo root throughout, not part of
+  this work and intentionally not touched: creating-extension-packages.Rmd
+  (reference material from the mizer maintainer, not meant to be
+  committed to the package).
 
 - 20/07 [PLAN COMPLETE - this-code-base-is-soft-feather.md executed in full
   across two sessions. All commits landed on work/recover-december, each
@@ -259,10 +453,12 @@ COMPLETED TASKS:
     pkgdown's own documented workaround (an "internal" section) only
     hides a vignette from the nav, not from being rendered - and actually
     rendering multiple-resources.Rmd hit a real, unrelated
-    "incorrect number of dimensions" error (recorded above as a to-do for
-    whoever re-enables it). Fixed by renaming to _multiple-resources.Rmd
-    (git mv, preserves history) - pkgdown's vignette scanner explicitly
-    skips underscore-prefixed files, so it's now never discovered at all.
+    "incorrect number of dimensions" error (fixed this session - see
+    the 27/07 entry above). Fixed at the time by renaming to
+    _multiple-resources.Rmd (git mv, preserves history) - pkgdown's
+    vignette scanner explicitly skips underscore-prefixed files, so it
+    was never discovered at all. (Superseded this session: renamed again
+    to using-multiple-resources.Rmd once actually re-enabled.)
   - Final verified baseline: devtools::test() - 0 fail, 0 skip, 76 pass,
     3 pre-documented benign warnings. devtools::check() - 0 errors,
     0 warnings, 4 notes, all four confirmed pre-existing against a stale
@@ -305,7 +501,7 @@ COMPLETED TASKS:
 - 8/12 fixed plotDegradation plot to match thesis
 - 8/12 added CSVs for built-in degradation trajectories to inst/data-csvs
 - 8/12 updated data objects to match new parameter names and slots
--- deg_scales should have the first column be bleaching 
+-- deg_scales should have the first column be bleaching
 -- species parameter data frames need to have bad_pred column renamed to blocked_pred
 
 - 7/12 Systematically updated all roxygen2 documentation blocks for exported functions
