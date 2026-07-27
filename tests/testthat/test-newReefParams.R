@@ -1,14 +1,174 @@
-test_that("newReefParams returns correct class", {
+test_that("newReefParams returns a mizerReef object for the binned method", {
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    result <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile
+    ))
+    expect_s4_class(result, "mizerReef")
+    expect_identical(result@other_params$refuge_params$method, "binned")
+})
+
+test_that("newReefParams returns a mizerReef object for the competitive method", {
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(caribbean_3_model)
+    competitive_mp <- caribbean_3_model@other_params$refuge_params$method_params
+    result <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "competitive",
+        method_params = competitive_mp
+    ))
+    expect_s4_class(result, "mizerReef")
+    expect_identical(result@other_params$refuge_params$method, "competitive")
+})
+
+test_that("newReefParams's refuge matrix matches setRefuge + getRefuge called directly on the base params", {
+    # newReefParams() internally calls newMultispeciesParams() then
+    # setRefuge()/getRefuge() -- reproduce that low-level path by hand and
+    # confirm the high-level wrapper doesn't diverge from it.
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    result <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile
+    ))
+
+    base <- suppressMessages(newMultispeciesParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        min_w_pp = NA, w_pp_cutoff = 1, n = 0.75, p = 0.75
+    ))
+    base@other_params$refuge_params <- list()
+    base@other_params$algae_params <- list()
+    base@other_params$detritus_params <- list()
+    direct <- getRefuge(setRefuge(base, method = "binned", method_params = tuning_profile))
+
+    expect_equal(
+        result@other_params$refuge_params$refuge,
+        direct@other_params$refuge_params$refuge,
+        ignore_attr = TRUE
+    )
+    expect_equal(
+        result@other_params$refuge_params$refuge_lengths,
+        direct@other_params$refuge_params$refuge_lengths,
+        ignore_attr = TRUE
+    )
+})
+
+test_that("newReefParams computes rho_algae/rho_detritus using the documented formula", {
+    # rho = pmax(0, f0 * h / (1 - f0) - E) * interaction_{algae,detritus},
+    # hand-computed independently from newReefParams()'s own code, using
+    # mizer::getEncounter() on the plain (pre-reef) params object.
     data(caribbean_3_species)
     data(caribbean_3_interaction)
     data(tuning_profile)
     sp <- caribbean_3_species
-    int <- caribbean_3_interaction
-    result <- newReefParams(
+
+    base <- suppressMessages(newMultispeciesParams(
+        species_params = sp, interaction = caribbean_3_interaction,
+        min_w_pp = NA, w_pp_cutoff = 1, n = 0.75, p = 0.75
+    ))
+    f0 <- mizer::set_species_param_default(base@species_params, "f0", 0.7)$f0
+    E <- mizer::getEncounter(base)[, length(base@w)] / (base@w[length(base@w)]^0.75)
+    expected_rho_algae <- pmax(0, f0 * base@species_params$h / (1 - f0) - E) *
+        sp$interaction_algae
+    expected_rho_detritus <- pmax(0, f0 * base@species_params$h / (1 - f0) - E) *
+        sp$interaction_detritus
+
+    result <- suppressMessages(newReefParams(
         species_params = sp,
-        interaction = int,
+        interaction = caribbean_3_interaction,
         method = "binned",
         method_params = tuning_profile
+    ))
+
+    expect_equal(unname(result@species_params$rho_algae), unname(expected_rho_algae))
+    expect_equal(unname(result@species_params$rho_detritus), unname(expected_rho_detritus))
+})
+
+test_that("newReefParams computes external mortality using the allometric z0pre formula when include_ext_mort = FALSE", {
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    result <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile,
+        include_ext_mort = FALSE,
+        z0pre = 0.15,
+        n = 0.75
+    ))
+    expected_mort <- outer(rep(0.15, 3), result@w^0.25)
+    expect_equal(mizer::ext_mort(result), expected_mort, ignore_attr = TRUE)
+})
+
+test_that("newReefParams computes external mortality using nat_mort = 0.2 default when include_ext_mort = TRUE", {
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    result <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile,
+        include_ext_mort = TRUE,
+        n = 0.75
+    ))
+    expected_mort <- outer(rep(0.2, 3), result@w^0.25)
+    expect_equal(mizer::ext_mort(result), expected_mort, ignore_attr = TRUE)
+})
+
+test_that("newReefParams stores degradation parameters when degrade = TRUE", {
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    data(rubble_scale)
+    result <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile,
+        degrade = TRUE,
+        deg_scale = rubble_scale,
+        bleach_time = 3
+    ))
+    expect_true(result@other_params$refuge_params$degrade)
+    expect_equal(result@other_params$refuge_params$t_bleach, 3)
+    expect_equal(result@other_params$refuge_params$deg_scale, as.matrix(rubble_scale), ignore_attr = TRUE)
+})
+
+test_that("newReefParams sets degrade = FALSE by default", {
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    result <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile
+    ))
+    expect_false(result@other_params$refuge_params$degrade)
+})
+
+test_that("newReefParams errors when method is missing", {
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    expect_error(
+        newReefParams(
+            species_params = caribbean_3_species,
+            interaction = caribbean_3_interaction,
+            method_params = tuning_profile
+        ),
+        "method"
     )
-    expect_s4_class(result, "mizerReef")
 })

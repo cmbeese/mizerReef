@@ -1226,19 +1226,19 @@ newRefuge <- function(params, new_refuge = FALSE,
                 ## Binned or Competitive
             } else if (new_method == "binned" || new_method == "competitive") {
                 # Find number of bins used in old method
-                no_bins <- length(method_params)
+                no_bins <- nrow(method_params)
                 if (is.null(scale_bin)) {
                     stop("You must provide either a value or vector of values
                              for scale_bin or a new method_params data frame.")
                 }
                 # Make sure scaling vector is the right length
-                if (!(length(scale_bin) == 1) ||
+                if (!(length(scale_bin) == 1) &&
                     !(length(scale_bin) == no_bins)) {
                     stop("scale_bin must have length 1 or have an value
                              for every bin.")
                 }
                 # Check that scale_bin_prop is positive
-                if (scale_bin < 0) {
+                if (any(scale_bin < 0)) {
                     stop("scale_bin must be non-negative.")
                 }
                 # Calculate new bins
