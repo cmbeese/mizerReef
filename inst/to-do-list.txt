@@ -34,6 +34,67 @@ deliberately out of scope for the session that just landed.
 === RESUME HERE (27/07, third session - the ~50-file test-coverage
 sweep is now COMPLETE. Next task is the vignette audit below.) ===
 
+*** FLAGGED FOR USER REVIEW (27/07, fourth/overnight session) - NOT
+fixed, per standing instruction to surface rather than silently fix
+numeric surprises. Found while re-rendering caribbean_3_model-
+description.Rmd/extension_mechanism.Rmd, NOT caused by any fix from
+the third session (confirmed present even in the stale pre-session
+installed package build from 20/07, so this predates the whole
+test-coverage sweep): ***
+
+ALGAE/DETRITUS STANDING BIOMASS IS ESSENTIALLY ZERO ON ALL THREE
+BUNDLED MODELS. algae_biomass(caribbean_3_model) and
+detritus_biomass(caribbean_3_model) both return 5.870785e-11 (grams
+per square meter). caribbean_10_model and claude_10_model both return
+1.143228e-10 for both resources. detritus_lifetime(caribbean_3_model)
+is 2.18e-13 years (~6.9 microseconds) - called directly in
+extension_mechanism.Rmd's own demo chunk, so this number is already
+visible in that vignette's rendered output.
+
+Confirmed this is NOT simply "not converged": dB/dt = 0 exactly for
+both resources on caribbean_3_model (checked via the same
+production-vs-consumption balance the test suite already uses -
+getAlgaeProduction() and getAlgaeConsumption() agree to full displayed
+precision: both 86.87579; detritus's is 1.7e-13, i.e. numerical
+noise). The reason it's self-consistent despite the absurd absolute
+value: getAlgaeConsumption()/getDetritusConsumption() multiply a
+mass-specific rate by params@other_params$algae_params$rho, which is
+tuned to ~1e13-1e14 (checked directly - e.g. rho values for inverts'
+detritus consumption range from 3.3e13 to 5e14 across the size range)
+- i.e. rho and the standing biomass are exactly inversely
+proportional, and whatever tiny placeholder the biomass got left at,
+rho was tuned to compensate, so the encounter rate rho*B (the only
+thing that's dynamically meaningful) stays sane even though B itself
+does not. rescale_algae()/rescale_detritus() exist specifically to
+correct this (multiply biomass by a factor, divide rho by the same
+factor, leaving all dynamics unchanged) - so this looks fixable in
+principle, but changes what's stored in the bundled .rda files, so
+not something to do without sign-off.
+
+Why this matters: caribbean_3_model-description.Rmd's rendered output
+literally states "the total algal biomass per square meter is B_A =
+5.87e-11 grams" and "total detrital biomass per square meter is B_D =
+5.871e-11 grams" right next to a table of real fish biomass_observed
+values in the 30-110 g/m^2 range - the contrast reads as obviously
+wrong to any reader, even though the underlying dynamics are
+internally consistent. Likely explanation: whatever initial_value
+the algae/detritus components were given when these models were
+originally built (`setComponent(..., initial_value = 1, ...)` is the
+example value shown in extension_mechanism.Rmd's own illustrative
+code) was never rescaled to a realistic absolute figure via
+rescale_algae()/rescale_detritus() as part of the tuning recipe - the
+tuning script only needed the two sides of the ODE to balance, not
+the absolute scale to look sensible, so nothing in the existing
+calibration workflow would have caught this.
+
+Not fixed. Options for the user to consider: (a) leave as-is (it's
+mathematically self-consistent, just cosmetically alarming - could
+add a caveat sentence to the vignettes instead), (b) rescale all three
+bundled models to a plausible absolute biomass via
+rescale_algae()/rescale_detritus() (reversible, well-tested, no
+dynamics change), (c) something else. Did not touch any bundled .rda
+or vignette prose for this - flagging only.
+
 THE ~50-FILE TEST-COVERAGE SWEEP IS DONE. Every tier from the original
 priority list is now covered with real numeric assertions instead of
 expect_error(...,NA)/bare-class checks: core setup/calibration
