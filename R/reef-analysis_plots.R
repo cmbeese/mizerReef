@@ -24,7 +24,7 @@
 #'   [mizer::plotBiomass()] \tab Plots the biomass of species and unstructured components through time (mizerReef extends this via a `getBiomass.mizerReefSim` method). \cr
 #'   [mizer::plotSpectra2()] \tab Compare two size spectra (e.g., models or scenarios) in one plot. \cr
 #'   [mizer::plotSpectraRelative()] \tab Plots relative difference between two spectra. \cr
-#'   [plotSpectraPercentChange()] \tab Plots percent change between two spectra. \cr
+#'   [plotSpectraChange()] \tab Plots the change (percent or relative proportion) between two spectra. \cr
 #'   [plotRelativeContribution()] \tab Relative contribution of each species group to total abundance, biomass, and productivity. \cr
 #'   [plotProductivity()] \tab Plots productivity for each species through time or at steady state. \cr
 #'   [plot2Productivity()] \tab Productivity of two models or two size ranges in one plot. \cr
@@ -77,12 +77,15 @@ utils::globalVariables(c(
     "Productivity", "time"
 ))
 
-#' Plot the percent change between two spectra
+#' Plot the change between two spectra
 #'
-#' This plots the percent change between the steady state spectra of two
-#' mizer objects. Let the spectra of the two objects be represented as
-#' \eqn{N_1(w)} and \eqn{N_2(w)}. This function plots the percent change,
-#' given by \deqn{ 100*(N_2(w) - N_1(w)) / (N_1(w)).}
+#' This plots the change between the steady state spectra of two mizer
+#' objects. Let the spectra of the two objects be represented as
+#' \eqn{N_1(w)} and \eqn{N_2(w)}. This function plots
+#' \deqn{ \frac{N_2(w) - N_1(w)}{N_1(w)}}
+#' expressed as a percentage (multiplied by 100) when `use_percent = TRUE`
+#' (the default), or as the raw relative proportion when `use_percent =
+#' FALSE`.
 #'
 #' For the difference calculated relative to the average of the two spectra,
 #' \eqn{2 (N_2(w) - N_1(w)) / (N_2(w) + N_1(w))}, use mizer's own
@@ -106,13 +109,19 @@ utils::globalVariables(c(
 #'   raised to this power. The default power = 1 gives the biomass density,
 #'   whereas power = 2 gives the biomass density with respect to logarithmic
 #'   size bins.
+#' @param use_percent Logical. If TRUE (default), the change is expressed as
+#'   a percentage (e.g. 50 for a 50% increase). If FALSE, the raw relative
+#'   proportion is plotted instead (e.g. 0.5).
+#' @param return_data Logical. If TRUE, returns the data frame underlying the
+#'   plot instead of the plot itself. Default FALSE.
 #' @param ... Parameters passed to `plotSpectra()`
 #' @concept sumplots
 #' @family plotting functions
-#' @return A ggplot2 object
+#' @return A ggplot2 object, or a data frame if `return_data = TRUE`.
 #' @export
-plotSpectraPercentChange <- function(object1, object2, species = NULL,
-                                     power, ...) {
+plotSpectraChange <- function(object1, object2, species = NULL,
+                              power, use_percent = TRUE,
+                              return_data = FALSE, ...) {
     sf1 <- mizer::plotSpectra(object1,
         power = power,
         species = species,
@@ -128,18 +137,16 @@ plotSpectraPercentChange <- function(object1, object2, species = NULL,
     names(sf1)[2] <- "value"
     names(sf2)[2] <- "value"
 
+    multiplier <- if (isTRUE(use_percent)) 100 else 1
     sf <- dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
-        dplyr::mutate(rel_diff = (value.y - value.x) / value.x)
-    yLabel <- "% Change in Biomass"
+        dplyr::mutate(rel_diff = multiplier * (value.y - value.x) / value.x)
+    yLabel <- if (isTRUE(use_percent)) "% Change in Biomass" else "Relative Change in Biomass"
 
     if (is(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
     }
-
-    min_size <- min(sf$w)
-    max_size <- max(sf$w)
 
     # group names -
     if (is.null(params@species_params$group_names)) {
@@ -155,6 +162,13 @@ plotSpectraPercentChange <- function(object1, object2, species = NULL,
     sf$Legend <- factor(sf$Legend,
         levels = c(params@species_params$species, "Resource")
     )
+
+    if (isTRUE(return_data)) {
+        return(sf)
+    }
+
+    min_size <- min(sf$w)
+    max_size <- max(sf$w)
 
     legend_levels <- intersect(
         names(params@linecolour),
@@ -177,10 +191,10 @@ plotSpectraPercentChange <- function(object1, object2, species = NULL,
 }
 
 #' @importFrom plotly ggplotly
-#' @rdname plotSpectraPercentChange
+#' @rdname plotSpectraChange
 #' @export
-plotlySpectraPercentChange <- function(object1, object2, ...) {
-    ggplotly(plotSpectraPercentChange(object1, object2, ...),
+plotlySpectraChange <- function(object1, object2, ...) {
+    ggplotly(plotSpectraChange(object1, object2, ...),
         tooltip = c("Legend", "w", "rel_diff")
     )
 }

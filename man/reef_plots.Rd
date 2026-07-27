@@ -29,7 +29,7 @@ Plot \tab Description \cr
 \code{\link[mizer:plotBiomass]{mizer::plotBiomass()}} \tab Plots the biomass of species and unstructured components through time (mizerReef extends this via a \code{getBiomass.mizerReefSim} method). \cr
 \code{\link[mizer:plotSpectra2]{mizer::plotSpectra2()}} \tab Compare two size spectra (e.g., models or scenarios) in one plot. \cr
 \code{\link[mizer:plotSpectraRelative]{mizer::plotSpectraRelative()}} \tab Plots relative difference between two spectra. \cr
-\code{\link[=plotSpectraPercentChange]{plotSpectraPercentChange()}} \tab Plots percent change between two spectra. \cr
+\code{\link[=plotSpectraChange]{plotSpectraChange()}} \tab Plots the change (percent or relative proportion) between two spectra. \cr
 \code{\link[=plotRelativeContribution]{plotRelativeContribution()}} \tab Relative contribution of each species group to total abundance, biomass, and productivity. \cr
 \code{\link[=plotProductivity]{plotProductivity()}} \tab Plots productivity for each species through time or at steady state. \cr
 \code{\link[=plot2Productivity]{plot2Productivity()}} \tab Productivity of two models or two size ranges in one plot. \cr

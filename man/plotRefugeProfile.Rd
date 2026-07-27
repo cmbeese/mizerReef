@@ -51,7 +51,7 @@ Other plotting functions:
 \code{\link[=plotProductivityRelative]{plotProductivityRelative()}},
 \code{\link[=plotRefugeDensity]{plotRefugeDensity()}},
 \code{\link[=plotRelativeContribution]{plotRelativeContribution()}},
-\code{\link[=plotSpectraPercentChange]{plotSpectraPercentChange()}},
+\code{\link[=plotSpectraChange]{plotSpectraChange()}},
 \code{\link[=plotTotalAbundance]{plotTotalAbundance()}},
 \code{\link[=plotTotalBiomass]{plotTotalBiomass()}},
 \code{\link[=plotTotalBiomassRelative]{plotTotalBiomassRelative()}},

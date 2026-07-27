@@ -6,6 +6,12 @@
   resources" showing how to chain mizerReef with
   [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
   size-structured background resources.
+- `plotSpectraPercentChange()`/`plotlySpectraPercentChange()` are renamed to
+  `plotSpectraChange()`/`plotlySpectraChange()` and gain a `use_percent`
+  argument (default `TRUE`) so you can choose between a percentage change
+  (e.g. `50` for a 50% increase) and the raw relative proportion (e.g.
+  `0.5`), plus a `return_data` argument to get the underlying data frame
+  instead of the plot. See "Bug fixes" below for why the rename happened.
 - New `use_dummy_fish_bins` parameter for `setRefuge()`/`getRefuge()`/
   `newRefuge()`/`newReefParams()` (`sigmoidal`, `binned`, and `competitive`
   refuge methods). Both settings give species-specific refuge profiles, but
@@ -24,6 +30,12 @@
 
 ## Bug fixes
 
+- `plotSpectraPercentChange()`'s documentation and y-axis label promised a
+  percentage (`100*(N2(w) - N1(w))/N1(w)`), but the code never actually
+  multiplied by 100, so values plotted as raw fractions (e.g. `-0.057`
+  instead of `-5.7`). Renamed to `plotSpectraChange()` (see "New features")
+  and fixed to actually apply the `*100` when `use_percent = TRUE`
+  (the default).
 - Fixed `setExtMortParams()` (and therefore `newReefParams(ext_mort_params =
   ...)`, which calls it) so that custom `ext_mort_params` actually works.
   Previously it was completely broken for both ways a user would reasonably
