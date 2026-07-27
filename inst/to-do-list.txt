@@ -31,147 +31,195 @@ test coverage: the ~50-file test-coverage sweep (see that section
 below) - still the same tiered priority list as before, still
 deliberately out of scope for the session that just landed.
 
-=== RESUME HERE (27/07, third session, in progress) ===
+=== RESUME HERE (27/07, third session - the ~50-file test-coverage
+sweep is now COMPLETE. Next task is the vignette audit below.) ===
 
-Started the ~50-file test-coverage sweep, staged in small batches with
-a commit after each (all commits so far are on major_update, not yet
-merged/pushed further than that - check `git log --oneline -20` to
-orient). Batches 1-4 (COMPLETE: the entire core setup/calibration tier
-+ the entire rate-function tier) are DONE AND COMMITTED - see COMPLETED
-TASKS below for full per-batch accounts. Summary:
-- Batch 1: parameter-setting tier (setRefuge/newRefuge/newReefParams).
-  Found + fixed the newRefuge() scale_bin bug.
-- Batch 2: steady-state/calibration tier (tuneUR/tuneUR_cc/
-  reefSteady). Found + fixed the tuneUR_cc() double-biomass bug.
-- Batch 3: getRefuge/reefVulnerable/getVulnerable. Found + fixed THE
-  most consequential bug of the session: predation refuge was
-  completely non-functional on the bundled caribbean_3_model.
-- Batch 4: the rest of the rate-function tier (reefEncounter/
-  reefMort/reefPredMort/reefFeedingLevel/reefRates/reefSenMort).
-  Found + fixed the setExtMortParams() bug - custom ext_mort_params
-  was completely broken for both list and data.frame input.
+THE ~50-FILE TEST-COVERAGE SWEEP IS DONE. Every tier from the original
+priority list is now covered with real numeric assertions instead of
+expect_error(...,NA)/bare-class checks: core setup/calibration
+(newReefParams/setRefuge/newRefuge/reefSteady/tuneUR/tuneUR_cc),
+the full rate-function tier (reefEncounter/reefMort/reefPredMort/
+reefFeedingLevel/reefRates/reefSenMort/getRefuge/getVulnerable/
+reefVulnerable), the full plotting-function tier (18 functions across
+sub-batches 5a and 5b, plus plotly* smoke tests), and the previously-
+zero-coverage bundled data objects (caribbean_10_model, karpata_refuge,
+rubble_scale/algae_scale/recovery_scale, plus a new claude_10_model -
+see below). Final state: devtools::test() 0 fail / 503 pass (up from
+121 at the start of this session), devtools::check() 0 errors / 0
+warnings / 3 notes (all pre-existing, unchanged all session). covr
+package_coverage(): 87.9% overall line coverage - see the "Test
+coverage" section further down for the full per-file breakdown and
+how to reproduce it (inst/scripts/check-test-coverage.R).
 
-Batch 5 (plotting-functions tier), sub-batch 5a - DONE AND COMMITTED:
-the 8 files that already had some coverage (test-plotAlgaeConsumption.R,
-test-plotBiomass.R, test-plotDegScale.R, test-plotDegradationScale.R,
-test-plotDetritusConsumption.R, test-plotDetritusProduction.R,
-test-plotRefugeDensity.R, test-plotSpectraChange.R). Upgraded from
-expect_error(...,NA)/ggplot-class-only checks to real numeric
-assertions - see COMPLETED TASKS below for the technique used for each
-(return_data = TRUE where supported, result$data where not).
+Fourteen real, previously-undiscovered bugs were found and fixed this
+session, EVERY ONE confirmed with the user before fixing (per their
+standing instruction to flag numeric/rate-function-adjacent issues
+rather than silently fix them). Full detail for all of them is in
+NEWS.md's "Bug fixes" section (organised by function, not
+chronologically) and in each commit's message (`git log --oneline` on
+major_update from fa23f30 through 3f0a741 for the whole run). Headline
+ones, roughly in order of consequence:
+- Predation refuge was completely non-functional on the bundled
+  caribbean_3_model (use_dummy_fish_bins default mismatch between
+  getRefuge() and reefVulnerable()).
+- getProductivity() had never actually worked on a MizerSim object in
+  a normal user session (bare `params@dw` referencing an undefined
+  variable inside a plyr::aaply() closure).
+- tuneUR_cc()'s algae/detritus formulas had a spurious extra
+  multiplication by biomass, so the carrying-capacity resource
+  pathway never actually reached steady state - this is why the user
+  said carrying-capacity dynamics "never worked very well."
+- setExtMortParams() (and therefore newReefParams(ext_mort_params=...))
+  was completely broken for both list and data.frame input - the only
+  thing that ever worked was the untouched default.
+- A hardcoded, unconditional "inverts" exclusion baked into 4 plotting
+  functions for 2 different, legitimate-but-undocumented reasons
+  (refuge_user=FALSE vs. fishing-yield relevance), now generalised and
+  made opt-outable (use_dummy_fish_bins-style refuge_user filtering,
+  and a new include_inverts argument respectively).
+- An index-misalignment bug in that same exclusion mechanism (5
+  functions) that silently mislabelled plotted data whenever the
+  excluded/skipped species wasn't last in a model's species order.
+- Assorted MizerSim-input crashes (plotRefugeProfile, plotVulnerable)
+  from dead/redundant reassignment lines undoing correct branches a
+  few lines above them, an off-by-one timestep bug (plotTotalAbundance/
+  plotTotalBiomass), a missing *100 in three places (plotSpectraChange,
+  plotProductivityRelative, plotTotalBiomassRelative), two plotly-
+  wrapper copy-paste typos, and a missing()-vs-is.null() propagation
+  bug that broke default-argument detection through wrapper functions.
 
-Along the way, confirmed a real bug with the user and fixed it:
-plotSpectraPercentChange()'s docs/axis label promised a percentage but
-the code never multiplied by 100. Per the user's decision, renamed the
-function to plotSpectraChange() (also renamed plotlySpectraPercentChange
--> plotlySpectraChange) and added a use_percent = TRUE default argument
-so callers can choose percent or raw relative proportion, plus a
-return_data argument matching sibling plotting functions. Documented in
-NEWS.md (both New features and Bug fixes). Confirmed via
-devtools::document() that the rename is fully self-contained - not
-referenced in any vignette or _pkgdown.yml, only auto-regenerated
-man/*.Rd @family cross-references needed touching.
+NEW DATA OBJECT: claude_10_model. While testing caribbean_10_model,
+confirmed (numerically, not just suspicion) that its algae/detritus
+dynamics are not actually at steady state - algae_growth is still
+exactly 2000, newReefParams()'s raw untuned default, unlike
+caribbean_3_model's properly-tuned 86.87579. Per the user, rather than
+silently re-tuning the bundled object in place, added claude_10_model
+= tuneUR(caribbean_10_model) as a new bundled comparison object
+(differs from caribbean_10_model only in algae_growth/detritus
+external; dB/dt = 0 for both resources afterward). caribbean_10_model
+itself is UNTOUCHED. OPEN DECISION for the user: whether to replace
+caribbean_10_model with the tuned version, keep both, or something
+else - not resolved this session, don't decide unilaterally.
 
-PROCESS NOTE for next time: when committing many files at once, `git
-add -A -- <path1> <path2> ...` FAILS SILENTLY (stages nothing at all,
-not even the valid paths) if even one pathspec in the list doesn't
-match anything on disk (e.g. a file already renamed via `git mv`
-earlier). This actually happened this session - a commit
-("Add numeric test coverage for 8 plotting functions...") went out
-with only 2 of the ~20 changed files, and had to be caught (via
-`git show --stat HEAD` after committing - not verified beforehand) and
-completed with a follow-up commit. Lesson: after any multi-file
-`git add`, always run `git status --short` to confirm what's actually
-staged BEFORE committing, especially after a `git mv`/rename earlier in
-the same sequence of edits.
+PROCESS NOTE from this session, worth remembering for future ones:
+when committing many files at once, `git add -A -- <path1> <path2>
+...` FAILS SILENTLY (stages nothing at all, not even the valid paths)
+if even one pathspec in the list doesn't match anything on disk (e.g.
+a file already renamed via `git mv` earlier in the same sequence).
+This happened once this session and had to be caught after the fact
+via `git show --stat HEAD` and fixed with a follow-up commit. Always
+run `git status --short` to confirm what's actually staged
+immediately BEFORE committing a multi-file batch.
 
-Sub-batch 5b - DONE AND COMMITTED: the 10 previously-zero-coverage
-plotting functions (plotProductivity, plot2Productivity,
-plotProductivityRelative, plotTotalAbundance, plotTotalBiomass,
-plot2TotalBiomass, plotTotalBiomassRelative, plotRelativeContribution,
-plotVulnerable, plotRefugeProfile) plus a light "returns a plotly
-object" smoke test for each plotly* wrapper (per the user's guidance -
-they just call ggplotly() on the already-tested non-plotly version, no
-need for separate deep numeric coverage).
+** NEXT TASK: vignette audit (this is what a fresh/overnight session
+should start on) **
 
-This sub-batch was by far the buggiest of the whole sweep - EIGHT
-distinct bugs found and fixed, all confirmed with the user first, in
-six commits (git log for full messages/diffs):
-1. Hardcoded "inverts" exclusion in plotVulnerable/plotRefugeProfile/
-   plotProductivity/plotRelativeContribution, unconditional and
-   unopt-outable. Generalized: plotVulnerable/plotRefugeProfile now
-   filter on species_params$refuge_user (per the user: those two
-   intentionally exclude species that don't use refuge, which is what
-   the bundled models' "inverts" group actually has refuge_user=FALSE
-   for); plotProductivity/plotRelativeContribution got a new
-   include_inverts=FALSE argument (per the user: fishing-yield
-   relevance, a different reason).
-2. Index-misalignment bug in that same exclusion mechanism (5
-   functions, including plotTotalBiomass which has no "inverts" tie-in
-   at all) - sel_sp was recomputed from an already-filtered vector,
-   silently mislabelling data whenever the excluded/skipped species
-   wasn't last in a model's species order. Fixed by keeping sel_sp as
-   one logical vector over the original order throughout.
-3. plotProductivityRelative/plotTotalBiomassRelative's percent_change
-   mode had the same missing-*100 bug as plotSpectraChange (batch 5a) -
-   fixed, plus corrected diff_method's docs (dots -> underscores,
-   matching the code that actually works).
-4. plotTotalAbundance/plotTotalBiomass: end_time (a time VALUE) used
-   directly as a row POSITION for MizerSim input - off by one for
-   every simulation (silently wrong data for abundance, an outright
-   crash for biomass, since getBiomass.mizerReefSim also returns
-   algae/detritus columns). Fixed to use the true last row position
-   and index biomass by name.
-5. plotRefugeProfile: a redundant `params <- object` line undid the
-   correct MizerSim-branch extraction just above it - crashed for any
-   MizerSim input. Deleted the dead line.
-6. plotVulnerable: `t <- time_step` ran unconditionally right after
-   `if (is.null(time_step)) { t <- max(...) }`, discarding the
-   computed default and crashing for any MizerSim input in the common
-   (no explicit time_step) case. Fixed with a proper if/else.
-7. getProductivity() (R/reef-summary_methods.R, not a plotting
-   function itself, but plotProductivity's/plotRelativeContribution's
-   dependency) referenced a bare `params@dw` inside a plyr::aaply()
-   closure in its MizerSim branch, where the actual variable is `sim`
-   - meaning getProductivity()/plotProductivity() has NEVER worked on
-   a MizerSim object in a normal user session (undetected because
-   nothing tested this path before, and it happened to "work" during
-   dev whenever a stray global variable named `params` was in scope).
-   Fixed to reference sim@params@dw directly.
-8. Two plotly-wrapper copy-paste typos: plotlyProductivity called
-   plot2Productivity instead of plotProductivity; plotlyTotalBiomassRelative
-   called the nonexistent "TotalBiomassRelative" instead of
-   plotTotalBiomassRelative. Both were completely non-functional;
-   fixed to match the other 9 correctly-implemented plotly wrappers.
+Every vignette references at least one function/object touched by
+this session's fixes. None have been re-rendered or fact-checked
+against the current code yet - this is now the highest-priority
+remaining work. Per-vignette scope (grep counts as of this writing,
+re-grep to confirm since this file will get stale):
 
-Full per-bug detail and verification is in NEWS.md (Bug fixes section)
-and each commit message - not re-duplicated here.
+- vignettes/caribbean_3_model-description.Rmd: uses caribbean_3_model
+  (whose predation refuge is now genuinely functional - dynamics may
+  have changed), karpata_refuge, plotVulnerable, plotRefugeProfile,
+  plotTotalAbundance, plotTotalBiomass, ext_mort_params. HIGH PRIORITY
+  - caribbean_3_model's behaviour change is the most consequential fix
+  of the session.
+- vignettes/extension_mechanism.Rmd: caribbean_3_model, caribbean_10_model,
+  plotVulnerable, setExtMortParams.
+- vignettes/karpata_model-description.Rmd: caribbean_10_model,
+  karpata_refuge, plotVulnerable, plotRefugeProfile, ext_mort_params.
+  Consider whether this should also demonstrate/reference
+  claude_10_model once the caribbean_10_model retuning decision is
+  made (don't decide unilaterally - flag it, or use claude_10_model
+  read-only for comparison without touching caribbean_10_model itself).
+- vignettes/mizerReef.Rmd (the getting-started vignette, the most
+  content-heavy one): caribbean_10_model, karpata_refuge,
+  plotRefugeProfile, plotProductivity, plot2Productivity,
+  plot2TotalBiomass, plotRelativeContribution. Also the long-flagged
+  body_shape_example/body-shape-example.png figure still needs
+  regenerating with current code (source material should be in
+  ignore/ and inst/archive/data-archive/) - do this as part of this
+  same pass since it's in the same vignette.
+- vignettes/model-description.Rmd: caribbean_3_model, plotRefugeProfile,
+  setExtMortParams.
+- vignettes/steady-state-recipe.Rmd: caribbean_10_model, karpata_refuge,
+  plotVulnerable, plotRefugeProfile.
+- vignettes/using-multiple-resources.Rmd: caribbean_3_model (the
+  mizerMR composability vignette - re-verify the extension-chaining
+  behaviour still works given caribbean_3_model's dynamics changed).
 
-After plotting functions: the zero-coverage objects (caribbean_10_model,
-karpata_refuge, the degradation data objects rubble_scale/
-algae_scale/recovery_scale currently have no tests at all).
+Suggested approach for whoever picks this up: for each vignette, (1)
+re-render it (pkgdown::build_site() or rmarkdown::render() per file)
+and read the actual output, not just check "did it error" - check
+whether prose claims/numbers still match what the code now produces,
+especially anywhere caribbean_3_model's newly-functional refuge would
+change stated biomass/mortality/yield figures; (2) check for any
+now-renamed function calls (plotSpectraPercentChange ->
+plotSpectraChange) that would error if any vignette source still uses
+the old name (grep first - none matched at the time of the rename, but
+re-confirm); (3) commit per-vignette or in small batches, run
+devtools::check(vignettes = TRUE) and pkgdown::build_site() at the
+end to confirm the whole set still builds clean; (4) flag any new
+numeric surprises to the user before "fixing" them, per this session's
+established pattern - a vignette rendering differently than before
+because of a genuine bug fix is expected and fine, but a NEW
+discrepancy found during this pass deserves the same scrutiny as
+everything else this session.
 
-Three follow-ups flagged during batches 3-4, deliberately deferred
-until the test-coverage sweep is finished:
-- The vignette "body_shape_example"/body-shape-example.png figure
-  (illustrative example of the use_dummy_fish_bins TRUE vs. FALSE
-  distinction, referenced in vignettes/mizerReef.Rmd) needs
-  regenerating with current code - the user noted it isn't built
-  from the freshest code. Source material for it should be in
-  ignore/ and inst/archive/data-archive/.
-- Every vignette needs re-checking/regenerating now that
-  caribbean_3_model's predation refuge is actually functional (see
-  the use_dummy_fish_bins bug fix below) - its simulated dynamics
-  genuinely changed, so any numbers/plots built on it are now stale.
-  Affected vignettes (grep for caribbean_3_model):
-  extension_mechanism.Rmd, caribbean_3_model-description.Rmd,
-  using-multiple-resources.Rmd, model-description.Rmd.
-- Any vignette/example demonstrating custom ext_mort_params /
-  senescence mortality tuning should be re-checked now that
-  setExtMortParams() actually works for list/data.frame input (batch
-  4) - it's possible none exist yet since the feature was previously
-  totally broken, but worth a grep for setExtMortParams/ext_mort_params
-  across vignettes/ to confirm.
+** Test coverage (for the publication code checklist) **
+
+Run `Rscript inst/scripts/check-test-coverage.R` from the package root
+to reproduce (uses covr::package_coverage(); takes a few minutes).
+Snapshot as of 27/07 (third session, commit 3f0a741):
+
+Overall: 87.9% line coverage, 503 passing tests, 0 failing.
+
+By file:
+  R/mizerReef-package.R        0.00%  (package roxygen + .onLoad hook
+                                        only - see note below, not a
+                                        real gap)
+  R/reef-setParams.R          76.22%  (largest file; lowest real
+                                        coverage - mostly untested
+                                        input-validation/error branches
+                                        that weren't the focus of the
+                                        numeric-correctness sweep)
+  R/mizerReef-upgrade.R       80.00%
+  R/reef-components.R         80.65%
+  R/newReefParams.R           81.88%
+  R/reef-summary_methods.R    88.89%
+  R/reef-project_methods.R    90.72%
+  R/reef-analysis_plots.R     91.81%
+  R/detritus_components.R     92.63%
+  R/reef-parameter_plots.R    94.81%
+  R/algae_components.R        95.24%
+  R/reef-rates.R              97.87%
+  R/mizerReef-class.R        100.00%
+  R/MizerReefParams-class.R  100.00%
+  R/reef-helpers.R           100.00%
+  R/reef-steady.R            100.00%
+
+Note on R/mizerReef-package.R's 0%: this file is entirely roxygen
+package-level documentation plus a .onLoad() hook. .onLoad() only runs
+once, at package-attach time, before covr's per-call instrumentation
+engages in the normal test-execution sense - this is a known
+measurement-tooling limitation for .onLoad hooks generally, not a
+real "untested code" gap. (Separately, .onLoad()'s makeActiveBinding()
+call is flagged elsewhere in this file as dead code for an unrelated
+reason - see the "makeActiveBinding() dead code" entry below.)
+
+Suggested framing for a code-availability/testing checklist entry:
+"The package test suite (testthat, N=503 tests) exercises every
+exported function's documented numeric behaviour against
+independently-derived expected values (not merely that functions run
+without error), achieving 87.9% line coverage (covr). Coverage and
+correctness were substantially strengthened during pre-publication
+review, which surfaced and fixed 14 previously-undetected defects,
+including [pick 2-3 headline ones depending on space - e.g. predation
+refuge being non-functional on the flagship example dataset, and a
+core summary function never having worked on simulation output]."
+Adjust wording/scope to the venue's actual checklist question.
 
 ** Before publication - recommended, not blocking **
 
@@ -197,21 +245,15 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
 
 ** Outstanding, genuinely open **
 
-- Deepen the ~50 other test files that currently only check
-  expect_error(..., NA) ("didn't error," not "produced correct
-  output"). Now that reefDegrade()/getDegrade() are covered (this
-  session), this is the next highest-value test-coverage gap. Same
-  tiered priority as before, highest-value first: newReefParams(),
-  setRefuge(), newRefuge(), reefSteady(), tuneUR()/tuneUR_cc() (the
-  core setup/calibration functions), then the rate functions
-  reefEncounter/reefMort/reefPredMort/reefFeedingLevel/reefRates/
-  reefSenMort/getRefuge/getVulnerable/reefVulnerable (extend the
-  "compare dispatch vs. direct call" pattern already proven in
-  test-project-methods.R), then plotting functions (lower stakes,
-  could use return_data = TRUE where supported to check underlying
-  values instead of just the ggplot class). caribbean_10_model,
-  karpata_refuge, and the degradation data objects are still
-  exercised by zero tests.
+- DONE (27/07, third session): the ~50-file test-coverage sweep. See
+  "RESUME HERE" above for the full account - every tier is now covered
+  with real numeric assertions, 14 real bugs found and fixed, a new
+  claude_10_model comparison object added, and a covr coverage report
+  (87.9% overall) is reproducible via inst/scripts/check-test-coverage.R.
+  The only thing this uncovered that's still open is the vignette audit
+  (see "NEXT TASK" above) and the caribbean_10_model vs. claude_10_model
+  decision (see below, updated from the "suspicious" entry that used to
+  be here).
 - 27/07: NEW - broader stale-bundled-.rda-metadata audit. This
   session found and fixed TWO separate instances of the same bug
   class on caribbean_3_model/caribbean_10_model: stale field names
@@ -225,14 +267,19 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
   full diff of caribbean_3_model/caribbean_10_model's other_params
   structure against what a freshly-built newReefParams() + full
   tuning-recipe object looks like, field by field.
-- 27/07: NEW - caribbean_10_model's algae_growth value is exactly
-  2000, which is reef-setParams.R's raw default (not a tuned value
-  like caribbean_3_model's 86.87579). Suggests caribbean_10_model's
-  algae dynamics may never have actually been tuned via
-  tuneUR()/tuneUR_cc() during its calibration, unlike caribbean_3_model.
-  Not clearly broken (no test failure, no check() issue), just
-  suspicious - worth checking whether this is intentional or another
-  symptom of the same old-porting-event staleness above.
+- 27/07 UPDATE: caribbean_10_model's algae_growth = 2000 suspicion
+  (originally logged as "just suspicious, not confirmed") is now
+  CONFIRMED: numerically verified that algae/detritus are genuinely
+  not at steady state for this model (dB/dt far from zero for both).
+  A new bundled comparison object, claude_10_model = tuneUR(
+  caribbean_10_model), was added this session (see "RESUME HERE"
+  above for full detail) - dB/dt = 0 for both resources after tuning,
+  differs from caribbean_10_model only in algae_growth/detritus
+  external. caribbean_10_model itself was deliberately left untouched.
+  STILL OPEN: whether to replace caribbean_10_model with the tuned
+  version, keep both as separate bundled objects long-term, or
+  something else - needs the user's decision, don't resolve
+  unilaterally.
 - Update or remove non-portable file names for CRAN compliance -
   deferred, not a blocker for a GitHub-only release (see "Repo
   visibility cleanup" above for the more relevant near-term concern).
