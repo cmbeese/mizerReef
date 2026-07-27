@@ -70,8 +70,8 @@ The rate $E_{i}(w)$ at which a predator of species $i$ and weight $w$ encounters
 
 The $\theta_{ij}$ matrix sets the interaction strength between predator group $i$ prey group $j$. The predator/prey interaction matrix has entries between 0 (if the groups can not interact) and 1, see the figure below.
 
-```{r, echo = FALSE}
-p <- ggplot(melt(params@interaction),
+```{r, echo = FALSE, fig.height = 3.5, fig.width = 5, fig.cap = "Interaction strength between each predator group (rows) and prey group (columns). Predators consume all three groups, at different strengths; herbivores and invertebrates do not prey on fish."}
+ggplot(melt(params@interaction),
        aes(x = prey, y = reorder(predator, desc(predator)), fill = value)) +
     geom_tile(colour = "black", linewidth = 0.25) +
     scale_fill_gradient(low = "white", high = "blue", limit = c(0, 1),
@@ -143,10 +143,10 @@ params@species_params %>%
 
 </details>
 
-The figure below shows the density-dependent refuge profile produced by the competitive method for the simple trait-based Caribbean 3-group model at steady state.
+The figure below shows the density-dependent refuge profile produced by the competitive method for the simple trait-based Caribbean 3-group model at steady state. Invertebrates are not shown as they do not use refuge (`refuge_user = FALSE`, see the table above).
 
-```{r, echo = FALSE, fig.height = 3, fig.width = 7}
-q <- plotRefugeProfile(params)
+```{r, echo = FALSE, fig.height = 3, fig.width = 7, fig.cap = "Proportion of each refuge-using group protected from predation, by body length, at steady state."}
+plotRefugeProfile(params)
 ```
 
 \newpage
