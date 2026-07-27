@@ -224,13 +224,19 @@ COMPLETED TASKS:
   nat_mort = 0.2 path (include_ext_mort = TRUE), degrade = TRUE/FALSE
   parameter storage, and the missing-method error path.
 
-  Noted but deliberately deferred (not part of this batch): all three
-  new test files trigger mizer's benign "missing a `w_inf` column,
+  Follow-up, done immediately after this batch: all three new test
+  files were triggering mizer's benign "missing a `w_inf` column,
   using `w_max` instead" message on every newMultispeciesParams() call
-  (suppressMessages()'d in the tests). The user suggested just adding
-  w_inf = w_max to the bundled species_params data objects to silence
-  this at the source - a good idea, logged here as a quick follow-up
-  rather than done inline to avoid tangling with the test-writing work.
+  (suppressMessages()'d in the tests as a workaround). Fixed at the
+  source per the user's suggestion: added w_inf = a * l_max^b to both
+  caribbean_3_species and caribbean_10_species (.rda + inst/data-csv/
+  source CSVs), cross-checked exactly against the already-built
+  caribbean_3_model/caribbean_10_model's own independently-derived
+  w_inf values before writing. Message confirmed gone; model outputs
+  confirmed unaffected (caribbean_3_model.rda/caribbean_10_model.rda
+  themselves untouched). Incidental: rewriting the CSVs dropped a
+  leading UTF-8 BOM from both header lines - cosmetic, confirmed no
+  parsing effect.
 
   Verification: devtools::test() - 0 fail, 176 pass (up from 121), 3
   pre-documented benign warnings (unchanged - matchReefGrowth erepro,
