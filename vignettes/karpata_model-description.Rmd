@@ -66,16 +66,16 @@ The rate $E_{i}(w)$ at which a predator of species $i$ and weight $w$ encounters
 
 #### Interaction Matrix  
   
-The $\theta_{ij}$ matrix sets the interaction strength between predator group $i$ prey group $j$. The predator/prey interaction matrix has entries between 0 (if the groups can not interact) and 1, see the figure below. All organisms were assumed to interact equally, with the exception of nocturnal invertivores which are known to hunt off the reef at night. 
+The $\theta_{ij}$ matrix sets the interaction strength between predator group $i$ prey group $j$. The predator/prey interaction matrix has entries between 0 (if the groups can not interact) and 1, see the figure below. All organisms were assumed to interact equally, with the exception of nocturnal invertivores which are known to hunt off the reef at night.
 
-```{r, echo = FALSE}
-p <- ggplot(melt(params@interaction),
-       aes(x = prey, y = reorder(predator, desc(predator)), fill = value)) + 
+```{r, echo = FALSE, fig.height = 6, fig.width = 7, fig.cap = "Interaction strength between each predator group (rows) and prey group (columns) in the 10-group Karpata Reef model."}
+ggplot(melt(params@interaction),
+       aes(x = prey, y = reorder(predator, desc(predator)), fill = value)) +
     geom_tile(colour = "black", linewidth = 0.25) +
     scale_fill_gradient(low = "white", high = "blue", limit = c(0, 1),
                         guide = "legend") +
-    labs(y = "Predator", x = "Prey", fill = "Interaction") + 
-    theme_minimal() + 
+    labs(y = "Predator", x = "Prey", fill = "Interaction") +
+    theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 ```
 
@@ -141,8 +141,8 @@ params@species_params %>%
 
 the figure below shows the density-dependent refuge profile produced by the competitive method for the simple trait-based Bonaire model at steady state.
 
-```{r, echo = FALSE}
-q <- plotRefugeProfile(params)
+```{r, echo = FALSE, fig.height = 6, fig.width = 7, fig.cap = "Proportion of each refuge-using group protected from predation, by body length, at steady state, for the 10-group Karpata Reef model."}
+plotRefugeProfile(params)
 ```
 
 \newpage
@@ -348,7 +348,7 @@ The rate at which algal biomass is produced by the ecosystem is given by a const
 
 
 ### Detritus
-Detritus is consumed by herbivores and benthic invertebrates. Feeding on detritus is not size-based as fish can feed on detritus particles of any size. The detritus resource is described only by its total biomass $B_D$. In the steady state the total detrital biomass per square meter is $B_A = `r signif(detritus_biomass(params), digits = 4)`$ grams.
+Detritus is consumed by herbivores and benthic invertebrates. Feeding on detritus is not size-based as fish can feed on detritus particles of any size. The detritus resource is described only by its total biomass $B_D$. In the steady state the total detrital biomass per square meter is $B_D = `r signif(detritus_biomass(params), digits = 4)`$ grams.
 
 #### Detrital consumption  
   
