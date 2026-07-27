@@ -1,5 +1,6 @@
 url: https://cmbeese.github.io/mizerReef/
 mathjax: true
+logo: man/figures/logo.png
 template:
   bootstrap: 5
   # bslib:
