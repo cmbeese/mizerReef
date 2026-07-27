@@ -1,1020 +1,0 @@
-══ Documenting ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-══ Building ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-Setting env vars:
-• CFLAGS    : -Wall -pedantic
-• CXXFLAGS  : -Wall -pedantic
-• CXX11FLAGS: -Wall -pedantic
-• CXX14FLAGS: -Wall -pedantic
-• CXX17FLAGS: -Wall -pedantic
-• CXX20FLAGS: -Wall -pedantic
-── R CMD build ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-         checking for file 'C:\Users\DELL\OneDrive - Victoria University of Wellington - STAFF\mizerReef-changed\mizerReef/DESCRIPTION' ...     checking for file 'C:\Users\DELL\OneDrive - Victoria University of Wellington - STAFF\mizerReef-changed\mizerReef/DESCRIPTION' ...   ✔  checking for file 'C:\Users\DELL\OneDrive - Victoria University of Wellington - STAFF\mizerReef-changed\mizerReef/DESCRIPTION' (339ms)
-      ─  preparing 'mizerReef': (1.4s)
-   checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-  Warning:     Warning: C:/Users/DELL/AppData/Local/Temp/RtmpCwCtbJ/Rbuild7c3847c778ae/mizerReef/man/tuning_profile.Rd:33: unknown macro '\linkVignette'
-      ─  checking for LF line-endings in source and make files and shell scripts (842ms)
-      ─  checking for empty or unneeded directories
-  Removed empty directory      Removed empty directory 'mizerReef/vignettes/mizerReef_files/libs/bootstrap'
-     Removed empty directory 'mizerReef/vignettes/mizerReef_files/libs/clipboard'
-     Removed empty directory 'mizerReef/vignettes/mizerReef_files/libs/quarto-html/axe'
-  Removed empty directory      Removed empty directory 'mizerReef/vignettes/mizerReef_files/libs/quarto-html/tabsets'
-   Removed empty directory 'mizerReef/vignettes/mizerReef_files/libs/quarto-html'
-   Removed empty directory 'mizerReef/vignettes/mizerReef_files/libs'
-   Removed empty directory 'mizerReef/vignettes/mizerReef_files'
-  Warning:     Warning: C:/Users/DELL/AppData/Local/Temp/RtmpCwCtbJ/Rbuild7c3847c778ae/mizerReef/man/tuning_profile.Rd:33: unknown macro '\linkVignette'
-      ─  building 'mizerReef_2.0.0.tar.gz'
-     
-══ Checking ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-Setting env vars:
-• _R_CHECK_CRAN_INCOMING_REMOTE_               : FALSE
-• _R_CHECK_CRAN_INCOMING_                      : FALSE
-• _R_CHECK_FORCE_SUGGESTS_                     : FALSE
-• _R_CHECK_PACKAGES_USED_IGNORE_UNUSED_IMPORTS_: FALSE
-• NOT_CRAN                                     : true
-── R CMD check ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
--    \  ─  using log directory 'C:/Users/DELL/AppData/Local/Temp/Rtmpkr0wIG/file39e85f593000/mizerReef.Rcheck'
-─  using R version 4.5.2 (2025-10-31 ucrt)
-─  using platform: x86_64-w64-mingw32
-─  R was compiled by
-|         gcc.exe (GCC) 14.3.0
-       GNU Fortran (GCC) 14.3.0
-─  running under: Windows 11 x64 (build 26200)
-─  using session charset: UTF-8
-/-\|/    -  ─  using options '--no-manual --as-cran' (875ms)
-\     checking for file 'mizerReef/DESCRIPTION' ...|  ✔  checking for file 'mizerReef/DESCRIPTION'
-─  this is package 'mizerReef' version '2.0.0'
-  /  ─  package encoding: UTF-8
-   checking package namespace information ...-     checking package namespace information ... \  ✔  checking package namespace information
-   checking package dependencies ...|/-\|/-\|/-\|/-\|/-\|     checking package dependencies ... /  ✔  checking package dependencies (4.3s)
-   checking if this is a source package ...-     checking if this is a source package ... \  ✔  checking if this is a source package
-✔  checking if there is a namespace
-|/    -     checking for executable files ...\|/-\|/-\|/-\|/     checking for executable files ... -  ✔  checking for executable files (3.2s)
-   checking for hidden files and directories ...\     checking for hidden files and directories ... |  N  checking for hidden files and directories
-   Found the following hidden files and directories:
-     .vscode
-/     These were most likely included in error. See section 'Package
-   structure' in the 'Writing R Extensions' manual.
-   checking for portable file names ...-     checking for portable file names ... \  W  checking for portable file names
-   Found the following file with a non-portable file name:
-     ignore/corrected thesis bibliography.bib
-|     These are not fully portable file names.
-   See section 'Package structure' in the 'Writing R Extensions' manual.
-/    -     checking whether package 'mizerReef' can be installed ...\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\     checking whether package 'mizerReef' can be installed ... |  W  checking whether package 'mizerReef' can be installed (9.9s)
-   Found the following significant warnings:
-     Note: possible error in 'plotDegradationScale(trajectory = trajectory, ': unused argument (file = file) 
-     Warning: C:/Users/DELL/AppData/Local/Temp/Rtmpkr0wIG/file39e85f593000/mizerReef.Rcheck/00_pkg_src/mizerReef/man/tuning_profile.Rd:33: unknown macro '\linkVignette'
-   See 'C:/Users/DELL/AppData/Local/Temp/Rtmpkr0wIG/file39e85f593000/mizerReef.Rcheck/00install.out' for details.
-   Information on the location(s) of code generating the 'Note's can be
-   obtained by re-running with environment variable R_KEEP_PKG_SOURCE set
-   to 'yes'.
-/     checking installed package size ...-\     checking installed package size ... |  ─  checking installed package size ... INFO
-     installed size is  6.4Mb
-     sub-directories of 1Mb or more:
-/         logo-pieces   4.1Mb
--\    |  ✔  checking package directory
-   checking for future file timestamps .../-\     checking for future file timestamps ... |  ✔  checking for future file timestamps (436ms)
-   checking DESCRIPTION meta-information .../-\|     checking DESCRIPTION meta-information ...Warning:/  ─  checking DESCRIPTION meta-information ...Warning: C:/Users/DELL/AppData/Local/Temp/Rtmpkr0wIG/file39e85f593000/mizerReef.Rcheck/00_pkg_src/mizerReef/man/tuning_profile.Rd:33: unknown macro '\linkVignette' (706ms)
--    \      OK
-N  checking top-level files
-|     File
-     inst/LICENSE
-   will install at top-level and is not mentioned in the DESCRIPTION file.
-   Non-standard files/directories found at top level:
-     'check-results.txt' 'ignore'
-   checking for left-over files .../     checking for left-over files ... -  ✔  checking for left-over files
-✔  checking index information
-   checking package subdirectories ...\|/     checking package subdirectories ... -  ✔  checking package subdirectories (542ms)
-   checking code files for non-ASCII characters ...\     checking code files for non-ASCII characters ... |  ✔  checking code files for non-ASCII characters
-   checking R files for syntax errors .../-     checking R files for syntax errors ... \  ✔  checking R files for syntax errors
-   checking whether the package can be loaded ...|/-\|/-\     checking whether the package can be loaded ... |  ✔  checking whether the package can be loaded (1.6s)
-   checking whether the package can be loaded with stated dependencies .../-\|/-\     checking whether the package can be loaded with stated dependencies ... |  ✔  checking whether the package can be loaded with stated dependencies (1.4s)
-   checking whether the package can be unloaded cleanly .../-\|/-\|     checking whether the package can be unloaded cleanly ... /  ✔  checking whether the package can be unloaded cleanly (1.5s)
-   checking whether the namespace can be loaded with stated dependencies ...-\|/-\|     checking whether the namespace can be loaded with stated dependencies ... /  ✔  checking whether the namespace can be loaded with stated dependencies (1.4s)
-   checking whether the namespace can be unloaded cleanly ...-\|/-\|/     checking whether the namespace can be unloaded cleanly ... -  ✔  checking whether the namespace can be unloaded cleanly (1.6s)
-   checking loading without being on the library search path ...\|/-\|/-\     checking loading without being on the library search path ... |  ✔  checking loading without being on the library search path (1.8s)
-/-\|/-\|/    -     checking dependencies in R code ...\|/-\|/-\|     checking dependencies in R code ... /  W  checking dependencies in R code (3.6s)
-   '::' or ':::' import not declared from: 'scales'
-   checking S3 generic/method consistency ...-\|/-\|/-     checking S3 generic/method consistency ... \  ✔  checking S3 generic/method consistency (1.7s)
-   checking replacement functions ...|/-\|/-     checking replacement functions ... \  ✔  checking replacement functions (1.4s)
-   checking foreign function calls ...|/-\|/-\     checking foreign function calls ... |  ✔  checking foreign function calls (1.5s)
-   checking R code for possible problems .../-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|     checking R code for possible problems ... [13s]/  ─  checking R code for possible problems ... [13s] NOTE (13.2s)
-   newReefParams: no visible binding for global variable 'carry_capacity'
-   newReefParams: no visible binding for global variable 'external'
-   plotDegradationScale: no visible global function definition for 'data'
-   plotDegradationScale: no visible binding for global variable 'Scaling'
-   plotProductivity: no visible binding for global variable 'Productivity'
-   plotRefugeDensity: no visible binding for global variable 'time'
-   plotlyDegradationScale: possible error in
-     plotDegradationScale(trajectory = trajectory, file = file): unused
-     argument (file = file)
-   reefSteady: no visible global function definition for 'tuneUR_cc'
-   reefSteady: no visible global function definition for 'tuneUR'
-   Undefined global functions or variables:
-     Productivity Scaling carry_capacity data external time tuneUR
-     tuneUR_cc
-   Consider adding
-     importFrom("stats", "time")
-     importFrom("utils", "data")
-   to your NAMESPACE file.
-   
-   Found the following calls to data() loading into the global environment:
-   File 'mizerReef/R/reef-parameter_plots.R':
-     data(list = data_name, package = "mizerReef", envir = .GlobalEnv)
--     See section 'Good practice' in '?data'.
-   checking Rd files ...\|/-\|     checking Rd files ... /  W  checking Rd files (1s)
-   prepare_Rd: ./man/tuning_profile.Rd:33: unknown macro '\linkVignette'
-   checkRd: (-1) tuning_profile.Rd:33: Lost braces
-       33 | \linkVignette{Getting Started}
-          |              ^
-   checking Rd metadata ...-     checking Rd metadata ... \  ✔  checking Rd metadata
-   checking Rd line widths ...|/     checking Rd line widths ... -  ✔  checking Rd line widths
-   checking Rd cross-references ...\|/-     checking Rd cross-references ...Warning:\  ─  checking Rd cross-references ...Warning: C:/Users/DELL/AppData/Local/Temp/Rtmpkr0wIG/file39e85f593000/mizerReef.Rcheck/00_pkg_src/mizerReef/man/tuning_profile.Rd:33: unknown macro '\linkVignette' (696ms)
-|    /      NOTE
-   Found the following Rd file(s) with Rd \link{} targets missing package
-   anchors:
-     getProductivity.Rd: MizerSim-class, MizerParams-class
-     newReefParams.Rd: MizerParams-class
-     plot2Productivity.Rd: MizerParams-class, MizerSim-class
-     plot2TotalBiomass.Rd: MizerParams-class, MizerSim-class
-     plotBiomass.Rd: MizerSim-class
-     plotDegradationScale.Rd: MizerParams-class, MizerSim-class
-     plotProductivity.Rd: MizerParams-class, MizerSim-class
-     plotProductivityRelative.Rd: MizerParams-class, MizerSim-class
-     plotRefugeDensity.Rd: MizerSim-class
-     plotRefugeProfile.Rd: MizerParams-class
-     plotRelativeContribution.Rd: MizerParams-class
-     plotTotalAbundance.Rd: MizerParams-class, MizerSim-class
-     plotTotalBiomass.Rd: MizerParams-class, MizerSim-class
-     plotTotalBiomassRelative.Rd: MizerParams-class, MizerSim-class
-     plotVulnerable.Rd: MizerParams-class, MizerSim-class
-     reefDegrade.Rd: MizerParams-class
-     reefEncounter.Rd: MizerParams-class
-     reefFeedingLevel.Rd: MizerParams-class
-     reefPredMort.Rd: MizerParams-class
-     reefRates.Rd: MizerParams-class
-     reefSteady.Rd: MizerParams-class
-     reefVulnerable.Rd: MizerParams-class
-     scaleReefAbundance.Rd: MizerParams-class
-     setURcapacity.Rd: MizerParams-class
-   Please provide package anchors for all Rd \link{} targets not in the
-   package itself and the base packages.
-   checking for missing documentation entries ...-\|/-\|/     checking for missing documentation entries ... -  W  checking for missing documentation entries (1.6s)
-   Undocumented S4 classes:
-     'MizerReefParams'
-   All user-level objects in a package (including S4 classes and methods)
-   should have documentation entries.
-   See chapter 'Writing R documentation files' in the 'Writing R
-   Extensions' manual.
-\     checking for code/documentation mismatches ...|/-\|/-\|/-\|/-\|/-\|     checking for code/documentation mismatches ... /  ✔  checking for code/documentation mismatches (4.3s)
-   checking Rd \usage sections ...-\|     checking Rd \usage sections ... /  W  checking Rd \usage sections (435ms)
-   Undocumented arguments in Rd file 'getSenMort.Rd'
-     'n' 'n_pp' 'n_other' 't'
-   
-   Undocumented arguments in Rd file 'newReefParams.Rd'
-     'new_refuge' 'bad_pred' 'degrade' 'initial_algae_growth'
-     'initial_d_external'
-   
-   Undocumented arguments in Rd file 'plotProductivity.Rd'
-     'species'
-   
-   Undocumented arguments in Rd file 'plotlyDegradationScale.Rd'
-     'file'
-   
-   Undocumented arguments in Rd file 'reefVulnerable.Rd'
-     'new_rd'
-   
-   Undocumented arguments in Rd file 'setDegradation.Rd'
-     'degrade'
-   
-   Functions with \usage entries need to have the appropriate \alias
-   entries, and all their arguments documented.
-   The \usage entries must correspond to syntactically valid R code.
--     See chapter 'Writing R documentation files' in the 'Writing R
-   Extensions' manual.
-\|/-\|/-\|    /     checking Rd contents ...-\|     checking Rd contents ... /  ✔  checking Rd contents (2.3s)
-   checking for unstated dependencies in examples ...-\|     checking for unstated dependencies in examples ... /  ✔  checking for unstated dependencies in examples (433ms)
-   checking contents of 'data' directory ...-     checking contents of 'data' directory ... \  ✔  checking contents of 'data' directory
-   checking data for non-ASCII characters ...|/-     checking data for non-ASCII characters ... \  ✔  checking data for non-ASCII characters (438ms)
-|  ✔  checking LazyData
-   checking data for ASCII and uncompressed saves .../-     checking data for ASCII and uncompressed saves ... \  ✔  checking data for ASCII and uncompressed saves
-|    /     checking files in 'vignettes' ...-     checking files in 'vignettes' ... \  W  checking files in 'vignettes'
-   Files in the 'vignettes' directory but no files in 'inst/doc':
-     'ecology.csl' 'figures/body-shape-example.png'
-     'figures/karpata_example.png' 'figures/refuge_profile.png'
-     'karpata_model-description.Rmd' 'karpata_model-description.html'
-     'mizerReef-fancy.qmd' 'mizerReef-tutorials.zip' 'mizerReef.Rmd'
-     'mizerReef.html' 'reef-degradation-simulations.Rmd'
-     'reef-degradation-simulations.html' 'references.bib'
-     'steady-state-recipe.Rmd' 'steady-state-recipe.html'
-|     Package has no Sweave vignette sources and no VignetteBuilder field.
-/-    \     checking examples ...|/-\|/-\|/-\|     checking examples ... /  E  checking examples (3s)
-   Running examples in 'mizerReef-Ex.R' failed
--     The error most likely occurred in:
-   
-   > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-   > ### Name: MizerReefParams
-   > ### Title: Extension of MizerParams for reef-specific model parameters
-   > ### Aliases: MizerReefParams
-   > 
-   > ### ** Examples
-   > 
-   > # Example usage:
-   > data(karpata_species)
-   Warning in data(karpata_species) : data set 'karpata_species' not found
-   > params <- MizerReefParams(
-   +   species_params = karpata_species,
-   +   refuge_params = list(),
-   +   algae_params = list(),
-   +   detritus_params = list()
-   + )
-   Error: object 'karpata_species' not found
-   Execution halted
-   checking for unstated dependencies in 'tests' ...\|     checking for unstated dependencies in 'tests' ... /  ✔  checking for unstated dependencies in 'tests'
-   checking tests ...-\  ─  checking tests
-|     Running 'testthat.R'/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|  /    -  ─  Running 'testthat.R' (7.3s)
-E  Some test files failed
-\     Running the tests in 'tests/testthat.R' failed.
-   Last 13 lines of output:
-      4.     └─base::nrow(species_params)
-     ── Error ('test-tuneUR_cc.R:2:5'): tuneUR_cc runs without error ────────────────
-     <getvarError/missingArgError/error/condition>
-     Error in `newReefParams()`: argument "species_params" is missing, with no default
-     Backtrace:
-         ▆
-      1. └─mizerReef::newReefParams() at test-tuneUR_cc.R:2:5
-      2.   └─mizer::newMultispeciesParams(...)
-      3.     ├─base::withCallingHandlers(...)
-      4.     └─base::nrow(species_params)
-     
-     [ FAIL 57 | WARN 1 | SKIP 0 | PASS 1 ]
-     Error:
-     ! Test failures.
-     Execution halted
-|    /  N  checking package vignettes
-   Package has 'vignettes' subdirectory but apparently no vignettes.
-   Perhaps the 'VignetteBuilder' information is missing from the
-   DESCRIPTION file?
--  ✔  checking for non-standard things in the check directory
-✔  checking for detritus in the temp directory
-\     
-   See
-     'C:/Users/DELL/AppData/Local/Temp/Rtmpkr0wIG/file39e85f593000/mizerReef.Rcheck/00check.log'
-   for details.
-   
-|/-\     ERROR: Unknown command "TMPDIR=C:/Users/DELL/AppData/Local/Temp/Rtmp8qxIQ8/file6dc861b13377". Did you mean command "install"?
-|  Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=",  :/     Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=",  :
-     running command '"quarto" TMPDIR=C:/Users/DELL/AppData/Local/Temp/Rtmp8qxIQ8/file6dc861b13377 -V' had status 1
--\|/-\|/-      
-── R CMD check results ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── mizerReef 2.0.0 ────
-Duration: 1m 18.4s
-
-❯ checking examples ... ERROR
-  Running examples in 'mizerReef-Ex.R' failed
-  The error most likely occurred in:
-  
-  > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-  > ### Name: MizerReefParams
-  > ### Title: Extension of MizerParams for reef-specific model parameters
-  > ### Aliases: MizerReefParams
-  > 
-  > ### ** Examples
-  > 
-  > # Example usage:
-  > data(karpata_species)
-  Warning in data(karpata_species) : data set 'karpata_species' not found
-  > params <- MizerReefParams(
-  +   species_params = karpata_species,
-  +   refuge_params = list(),
-  +   algae_params = list(),
-  +   detritus_params = list()
-  + )
-  Error: object 'karpata_species' not found
-  Execution halted
-
-❯ checking tests ...
-  See below...
-
-❯ checking for portable file names ... WARNING
-  Found the following file with a non-portable file name:
-    ignore/corrected thesis bibliography.bib
-  These are not fully portable file names.
-  See section 'Package structure' in the 'Writing R Extensions' manual.
-
-❯ checking whether package 'mizerReef' can be installed ... WARNING
-  See below...
-
-❯ checking dependencies in R code ... WARNING
-  '::' or ':::' import not declared from: 'scales'
-
-❯ checking Rd files ... WARNING
-  prepare_Rd: ./man/tuning_profile.Rd:33: unknown macro '\linkVignette'
-  checkRd: (-1) tuning_profile.Rd:33: Lost braces
-      33 | \linkVignette{Getting Started}
-         |              ^
-
-❯ checking for missing documentation entries ... WARNING
-  Undocumented S4 classes:
-    'MizerReefParams'
-  All user-level objects in a package (including S4 classes and methods)
-  should have documentation entries.
-  See chapter 'Writing R documentation files' in the 'Writing R
-  Extensions' manual.
-
-❯ checking Rd \usage sections ... WARNING
-  Undocumented arguments in Rd file 'getSenMort.Rd'
-    'n' 'n_pp' 'n_other' 't'
-  
-  Undocumented arguments in Rd file 'newReefParams.Rd'
-    'new_refuge' 'bad_pred' 'degrade' 'initial_algae_growth'
-    'initial_d_external'
-  
-  Undocumented arguments in Rd file 'plotProductivity.Rd'
-    'species'
-  
-  Undocumented arguments in Rd file 'plotlyDegradationScale.Rd'
-    'file'
-  
-  Undocumented arguments in Rd file 'reefVulnerable.Rd'
-    'new_rd'
-  
-  Undocumented arguments in Rd file 'setDegradation.Rd'
-    'degrade'
-  
-  Functions with \usage entries need to have the appropriate \alias
-  entries, and all their arguments documented.
-  The \usage entries must correspond to syntactically valid R code.
-  See chapter 'Writing R documentation files' in the 'Writing R
-  Extensions' manual.
-
-❯ checking files in 'vignettes' ... WARNING
-  Files in the 'vignettes' directory but no files in 'inst/doc':
-    'ecology.csl' 'figures/body-shape-example.png'
-    'figures/karpata_example.png' 'figures/refuge_profile.png'
-    'karpata_model-description.Rmd' 'karpata_model-description.html'
-    'mizerReef-fancy.qmd' 'mizerReef-tutorials.zip' 'mizerReef.Rmd'
-    'mizerReef.html' 'reef-degradation-simulations.Rmd'
-    'reef-degradation-simulations.html' 'references.bib'
-    'steady-state-recipe.Rmd' 'steady-state-recipe.html'
-  Package has no Sweave vignette sources and no VignetteBuilder field.
-
-❯ checking for hidden files and directories ... NOTE
-  Found the following hidden files and directories:
-    .vscode
-  These were most likely included in error. See section 'Package
-  structure' in the 'Writing R Extensions' manual.
-
-❯ checking top-level files ... NOTE
-  File
-    inst/LICENSE
-  will install at top-level and is not mentioned in the DESCRIPTION file.
-  Non-standard files/directories found at top level:
-    'check-results.txt' 'ignore'
-
-❯ checking R code for possible problems ... [13s] NOTE
-  newReefParams: no visible binding for global variable 'carry_capacity'
-  newReefParams: no visible binding for global variable 'external'
-  plotDegradationScale: no visible global function definition for 'data'
-  plotDegradationScale: no visible binding for global variable 'Scaling'
-  plotProductivity: no visible binding for global variable 'Productivity'
-  plotRefugeDensity: no visible binding for global variable 'time'
-  plotlyDegradationScale: possible error in
-    plotDegradationScale(trajectory = trajectory, file = file): unused
-    argument (file = file)
-  reefSteady: no visible global function definition for 'tuneUR_cc'
-  reefSteady: no visible global function definition for 'tuneUR'
-  Undefined global functions or variables:
-    Productivity Scaling carry_capacity data external time tuneUR
-    tuneUR_cc
-  Consider adding
-    importFrom("stats", "time")
-    importFrom("utils", "data")
-  to your NAMESPACE file.
-  
-  Found the following calls to data() loading into the global environment:
-  File 'mizerReef/R/reef-parameter_plots.R':
-    data(list = data_name, package = "mizerReef", envir = .GlobalEnv)
-  See section 'Good practice' in '?data'.
-
-❯ checking Rd cross-references ...Warning: C:/Users/DELL/AppData/Local/Temp/Rtmpkr0wIG/file39e85f593000/mizerReef.Rcheck/00_pkg_src/mizerReef/man/tuning_profile.Rd:33: unknown macro '\linkVignette'
-   NOTE
-  Found the following Rd file(s) with Rd \link{} targets missing package
-  anchors:
-    getProductivity.Rd: MizerSim-class, MizerParams-class
-    newReefParams.Rd: MizerParams-class
-    plot2Productivity.Rd: MizerParams-class, MizerSim-class
-    plot2TotalBiomass.Rd: MizerParams-class, MizerSim-class
-    plotBiomass.Rd: MizerSim-class
-    plotDegradationScale.Rd: MizerParams-class, MizerSim-class
-    plotProductivity.Rd: MizerParams-class, MizerSim-class
-    plotProductivityRelative.Rd: MizerParams-class, MizerSim-class
-    plotRefugeDensity.Rd: MizerSim-class
-    plotRefugeProfile.Rd: MizerParams-class
-    plotRelativeContribution.Rd: MizerParams-class
-    plotTotalAbundance.Rd: MizerParams-class, MizerSim-class
-    plotTotalBiomass.Rd: MizerParams-class, MizerSim-class
-    plotTotalBiomassRelative.Rd: MizerParams-class, MizerSim-class
-    plotVulnerable.Rd: MizerParams-class, MizerSim-class
-    reefDegrade.Rd: MizerParams-class
-    reefEncounter.Rd: MizerParams-class
-    reefFeedingLevel.Rd: MizerParams-class
-    reefPredMort.Rd: MizerParams-class
-    reefRates.Rd: MizerParams-class
-    reefSteady.Rd: MizerParams-class
-    reefVulnerable.Rd: MizerParams-class
-    scaleReefAbundance.Rd: MizerParams-class
-    setURcapacity.Rd: MizerParams-class
-  Please provide package anchors for all Rd \link{} targets not in the
-  package itself and the base packages.
-
-❯ checking package vignettes ... NOTE
-  Package has 'vignettes' subdirectory but apparently no vignettes.
-  Perhaps the 'VignetteBuilder' information is missing from the
-  DESCRIPTION file?
-
-── Test failures ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── testthat ────
-
-> library(testthat)
-> library(mizerReef)
-> test_check("mizerReef")
-Saving _problems/test-MizerReefParams-2.R
-Saving _problems/test-algae_biomass-2.R
-Saving _problems/test-algae_consumption-2.R
-Saving _problems/test-algae_dynamics-2.R
-Saving _problems/test-algae_dynamics_cc-2.R
-Saving _problems/test-calibrateReefBiomass-2.R
-Saving _problems/test-calibrateReefNumber-2.R
-Saving _problems/test-constant_dynamics-2.R
-Saving _problems/test-detritus_biomass-2.R
-Saving _problems/test-detritus_consumption-2.R
-Saving _problems/test-detritus_dynamics-2.R
-Saving _problems/test-detritus_dynamics_cc-2.R
-Saving _problems/test-detritus_lifetime-2.R
-Saving _problems/test-encounter_contribution-2.R
-Saving _problems/test-getAlgaeConsumption-2.R
-Saving _problems/test-getAlgaeProduction-2.R
-Saving _problems/test-getDegrade-2.R
-Saving _problems/test-getDetritusConsumption-2.R
-Saving _problems/test-getDetritusProduction-2.R
-Saving _problems/test-getEGrowthTime-2.R
-Saving _problems/test-getProductivity-2.R
-Saving _problems/test-getRefuge-2.R
-Saving _problems/test-getSenMort-2.R
-Saving _problems/test-getVulnerable-2.R
-Saving _problems/test-matchReefGrowth-2.R
-Saving _problems/test-newReefParams-2.R
-Saving _problems/test-newRefuge-2.R
-Saving _problems/test-plotAlgaeConsumption-2.R
-Saving _problems/test-plotBiomass-2.R
-Saving _problems/test-plotDegScale-2.R
-Saving _problems/test-plotDetritusConsumption-2.R
-Saving _problems/test-plotDetritusProduction-2.R
-Saving _problems/test-plotRefugeDensity-2.R
-Saving _problems/test-reefDegrade-2.R
-Saving _problems/test-reefEncounter-2.R
-Saving _problems/test-reefFeedingLevel-2.R
-Saving _problems/test-reefMort-2.R
-Saving _problems/test-reefPredMort-2.R
-Saving _problems/test-reefRates-2.R
-Saving _problems/test-reefSenMort-2.R
-Saving _problems/test-reefSteady-2.R
-Saving _problems/test-reefVulnerable-2.R
-Saving _problems/test-removeSpecies-2.R
-Saving _problems/test-rescaleComponents-2.R
-Saving _problems/test-rescale_algae-2.R
-Saving _problems/test-rescale_detritus-2.R
-Saving _problems/test-scaleReefAbundance-2.R
-Saving _problems/test-scaleReefBackground-2.R
-Saving _problems/test-scaleReefModel-2.R
-Saving _problems/test-setAlgaeParams-2.R
-Saving _problems/test-setDegradation-2.R
-Saving _problems/test-setDetritusParams-2.R
-Saving _problems/test-setExtMortParams-2.R
-Saving _problems/test-setRefuge-2.R
-Saving _problems/test-setURcapacity-2.R
-Saving _problems/test-tuneUR-2.R
-Saving _problems/test-tuneUR_cc-2.R
-[ FAIL 57 | WARN 1 | SKIP 0 | PASS 1 ]
-
-══ Warnings ════════════════════════════════════════════════════════════════════
-── Warning ('test-MizerReefParams.R:2:5'): MizerReefParams returns correct class ──
-`set_multispecies_model()` was deprecated in mizer 2.0.0.
-i Please use `newMultispeciesParams()` instead.
-Backtrace:
-    ▆
- 1. └─mizerReef::MizerReefParams() at test-MizerReefParams.R:2:5
- 2.   └─mizer::MizerParams(...)
-
-══ Failed tests ════════════════════════════════════════════════════════════════
-── Error ('test-MizerReefParams.R:2:5'): MizerReefParams returns correct class ──
-<getvarError/missingArgError/error/condition>
-Error in `MizerParams(...)`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::MizerReefParams() at test-MizerReefParams.R:2:5
- 2.   └─mizer::MizerParams(...)
- 3.     └─"w_inf" %in% names(species_params)
-── Error ('test-algae_biomass.R:2:5'): algae_biomass runs without error ────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-algae_biomass.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-algae_consumption.R:2:5'): algae_consumption runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-algae_consumption.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-algae_dynamics.R:2:5'): algae_dynamics runs without error ──────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-algae_dynamics.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-algae_dynamics_cc.R:2:5'): algae_dynamics_cc runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-algae_dynamics_cc.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-calibrateReefBiomass.R:2:5'): calibrateReefBiomass runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-calibrateReefBiomass.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-calibrateReefNumber.R:2:5'): calibrateReefNumber runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-calibrateReefNumber.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-constant_dynamics.R:2:5'): constant_dynamics runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-constant_dynamics.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-detritus_biomass.R:2:5'): detritus_biomass runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-detritus_biomass.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-detritus_consumption.R:2:5'): detritus_consumption runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-detritus_consumption.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-detritus_dynamics.R:2:5'): detritus_dynamics runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-detritus_dynamics.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-detritus_dynamics_cc.R:2:5'): detritus_dynamics_cc runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-detritus_dynamics_cc.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-detritus_lifetime.R:2:5'): detritus_lifetime runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-detritus_lifetime.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-encounter_contribution.R:2:5'): encounter_contribution runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-encounter_contribution.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getAlgaeConsumption.R:2:5'): getAlgaeConsumption runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getAlgaeConsumption.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getAlgaeProduction.R:2:5'): getAlgaeProduction runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getAlgaeProduction.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getDegrade.R:2:5'): getDegrade runs without error ──────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getDegrade.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getDetritusConsumption.R:2:5'): getDetritusConsumption runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getDetritusConsumption.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getDetritusProduction.R:2:5'): getDetritusProduction runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getDetritusProduction.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getEGrowthTime.R:2:5'): getEGrowthTime runs without error ──────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getEGrowthTime.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getProductivity.R:2:5'): getProductivity runs without error ────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getProductivity.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getRefuge.R:2:5'): getRefuge runs without error ────────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getRefuge.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getSenMort.R:2:5'): getSenMort runs without error ──────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getSenMort.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-getVulnerable.R:2:5'): getVulnerable runs without error ────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-getVulnerable.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-matchReefGrowth.R:2:5'): matchReefGrowth runs without error ────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-matchReefGrowth.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-newReefParams.R:2:5'): newReefParams returns correct class ─────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-newReefParams.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-newRefuge.R:2:5'): newRefuge runs without error ────────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-newRefuge.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-plotAlgaeConsumption.R:2:5'): plotAlgaeConsumption runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-plotAlgaeConsumption.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-plotBiomass.R:2:5'): plotBiomass returns a ggplot object ───────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-plotBiomass.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-plotDegScale.R:2:5'): plotDegScale returns a ggplot object ─────
-Error in `plotDegScale()`: could not find function "plotDegScale"
-── Error ('test-plotDetritusConsumption.R:2:5'): plotDetritusConsumption runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-plotDetritusConsumption.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-plotDetritusProduction.R:2:5'): plotDetritusProduction runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-plotDetritusProduction.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-plotRefugeDensity.R:2:5'): plotRefugeDensity returns a ggplot object ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-plotRefugeDensity.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefDegrade.R:2:5'): reefDegrade runs without error ────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefDegrade.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefEncounter.R:2:5'): reefEncounter runs without error ────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefEncounter.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefFeedingLevel.R:2:5'): reefFeedingLevel runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefFeedingLevel.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefMort.R:2:5'): reefMort runs without error ──────────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefMort.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefPredMort.R:2:5'): reefPredMort runs without error ──────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefPredMort.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefRates.R:2:5'): reefRates runs without error ────────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefRates.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefSenMort.R:2:5'): reefSenMort runs without error ────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefSenMort.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefSteady.R:2:5'): reefSteady runs without error ──────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefSteady.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-reefVulnerable.R:2:5'): reefVulnerable runs without error ──────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-reefVulnerable.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-removeSpecies.R:2:5'): removeSpecies runs without error ────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-removeSpecies.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-rescaleComponents.R:2:5'): rescaleComponents runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-rescaleComponents.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-rescale_algae.R:2:5'): rescale_algae runs without error ────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-rescale_algae.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-rescale_detritus.R:2:5'): rescale_detritus runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-rescale_detritus.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-scaleReefAbundance.R:2:5'): scaleReefAbundance runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-scaleReefAbundance.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-scaleReefBackground.R:2:5'): scaleReefBackground runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-scaleReefBackground.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-scaleReefModel.R:2:5'): scaleReefModel runs without error ──────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-scaleReefModel.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-setAlgaeParams.R:2:5'): setAlgaeParams runs without error ──────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-setAlgaeParams.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-setDegradation.R:2:5'): setDegradation runs without error ──────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-setDegradation.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-setDetritusParams.R:2:5'): setDetritusParams runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-setDetritusParams.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-setExtMortParams.R:2:5'): setExtMortParams runs without error ──
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-setExtMortParams.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-setRefuge.R:2:5'): setRefuge runs without error ────────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-setRefuge.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-setURcapacity.R:2:5'): setURcapacity runs without error ────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-setURcapacity.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-tuneUR.R:2:5'): tuneUR runs without error ──────────────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-tuneUR.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-── Error ('test-tuneUR_cc.R:2:5'): tuneUR_cc runs without error ────────────────
-<getvarError/missingArgError/error/condition>
-Error in `newReefParams()`: argument "species_params" is missing, with no default
-Backtrace:
-    ▆
- 1. └─mizerReef::newReefParams() at test-tuneUR_cc.R:2:5
- 2.   └─mizer::newMultispeciesParams(...)
- 3.     ├─base::withCallingHandlers(...)
- 4.     └─base::nrow(species_params)
-
-[ FAIL 57 | WARN 1 | SKIP 0 | PASS 1 ]
-Error:
-! Test failures.
-Execution halted
-
-2 errors ✖ | 7 warnings ✖ | 5 notes ✖

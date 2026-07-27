@@ -51,3 +51,8 @@ docs
 
 # Kilo Code AI assistant workspace
 .kilo/
+
+# Local dev scratch/reference material (never meant to be public/tracked)
+ignore/
+.env
+.DS_Store

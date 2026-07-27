@@ -1,8 +1,0 @@
-Session summary for November 16, 2025:
-
-- Completed a thorough review and refactor of all resource parameter functions in `reef-setParams.R`.
-- Ensured all parameters are stored in their correct slots: `algae_params`, `detritus_params`, `refuge_params`, and global flags in `other_params`.
-- Refactored `setDegradation` to store degradation parameters in `refuge_params` and algae adjustment parameters in `algae_params`.
-- Updated documentation for all affected functions to reflect new storage logic and improve clarity.
-- Performed a consistency check across the entire script to confirm robust slot usage and documentation.
-- Ready for staging and commit.
