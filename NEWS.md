@@ -117,6 +117,26 @@
   unconditional overwrite was actually correct.) Fixed by making the
   second assignment an `else` branch instead of a second unconditional
   statement.
+- `getProductivity()` (and therefore `plotProductivity()` and
+  `plotRelativeContribution()`) has never actually worked on a `MizerSim`
+  object in a normal user session. Inside its `plyr::aaply()` loop over
+  timesteps, it referenced a bare `params@dw`, but the local variable
+  holding the params object in that branch is `sim` (`sim <- object`,
+  with `sim@params` used correctly a few lines above) -- `params` was
+  never defined anywhere in scope, so every call failed with `"object
+  'params' not found"`. This had gone undetected because no test
+  previously exercised `getProductivity()`/`plotProductivity()` on a
+  `MizerSim` object, and it happened to appear to work during interactive
+  development whenever an unrelated variable literally named `params`
+  was sitting in scope. Fixed by referencing `sim@params@dw` directly.
+- `plotlyProductivity()` called `do.call("plot2Productivity", ...)`
+  instead of `do.call("plotProductivity", ...)`, and
+  `plotlyTotalBiomassRelative()` called `do.call("TotalBiomassRelative",
+  ...)` -- not a real function name at all (missing the `plot` prefix)
+  -- instead of `do.call("plotTotalBiomassRelative", ...)`. Both were
+  copy-paste errors that made the two functions entirely non-functional;
+  fixed to match every other `plotly*()` wrapper's already-correct
+  pattern of calling its own non-plotly counterpart.
 - `plotProductivity()`'s `species` argument default handling (both for the
   pre-existing "no species given -> use all species" behaviour on the
   `MizerSim` branch, and the new `include_inverts` default filtering added

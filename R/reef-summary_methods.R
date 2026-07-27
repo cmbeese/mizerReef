@@ -121,7 +121,7 @@ getProductivity <- function(object,
             dimnames(n) <- dimnames(sim@n)[2:3]
             energy <- array(e_time[x,,], dim = dim(e_time)[2:3])
             dimnames(energy) <- dimnames(e_time)[2:3]
-            prod <- ((energy * n * size_range) %*% params@dw)[,, drop = TRUE]
+            prod <- ((energy * n * size_range) %*% sim@params@dw)[,, drop = TRUE]
             return(prod)
             }, .drop = FALSE)
             

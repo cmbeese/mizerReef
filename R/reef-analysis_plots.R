@@ -426,7 +426,7 @@ plotProductivity <- function(object,
 plotlyProductivity <- function(object,
                                species = NULL, ...) {
     argg <- as.list(environment())
-    ggplotly(do.call("plot2Productivity", argg),
+    ggplotly(do.call("plotProductivity", argg),
         tooltip = c("Species", "value")
     )
 }
@@ -1286,7 +1286,7 @@ plotTotalBiomassRelative <- function(object1, object2,
 plotlyTotalBiomassRelative <- function(object1, object2,
                                        diff_method, ...) {
     argg <- as.list(environment())
-    ggplotly(do.call("TotalBiomassRelative", argg),
+    ggplotly(do.call("plotTotalBiomassRelative", argg),
         tooltip = c("Species", "value")
     )
 }
