@@ -32,13 +32,16 @@ below) - still the same tiered priority list as before, still
 deliberately out of scope for the session that just landed.
 
 === RESUME HERE (27/07, third session, in progress - hit a session
-length limit mid-batch, this note is for picking the work back up) ===
+length limit mid-batch-5-investigation, this note is for picking the
+work back up) ===
 
 Started the ~50-file test-coverage sweep, staged in small batches with
 a commit after each (all commits so far are on major_update, not yet
 merged/pushed further than that - check `git log --oneline -15` to
-orient). Batches 1-4 are DONE - see COMPLETED TASKS below for full
-per-batch accounts:
+orient, latest is "Log batch 4 of the test-coverage sweep..."). This
+completes the ENTIRE core setup/calibration tier AND the entire
+rate-function tier. Batches 1-4 are DONE AND COMMITTED - see COMPLETED
+TASKS below for full per-batch accounts:
 - Batch 1: parameter-setting tier (setRefuge/newRefuge/newReefParams).
   Found + fixed the newRefuge() scale_bin bug.
 - Batch 2: steady-state/calibration tier (tuneUR/tuneUR_cc/
@@ -50,23 +53,90 @@ per-batch accounts:
   non-functional on the bundled caribbean_3_model.
 - Batch 4: the rest of the rate-function tier (reefEncounter/
   reefMort/reefPredMort/reefFeedingLevel/reefRates/reefSenMort).
-  Found + fixed the setExtMortParams() bug (see COMPLETED TASKS) -
-  custom ext_mort_params was completely broken for both list and
-  data.frame input. All six functions' tests are written, passing,
-  and verified (devtools::test() 0 fail/298 pass, devtools::check()
-  0 errors/0 warnings/3 baseline notes) - STILL NEED TO COMMIT this
-  batch's changes (NEWS.md, R/reef-setParams.R's setExtMortParams()
-  fix, and the 6 new/rewritten test files) and log it in COMPLETED
-  TASKS below, the same way batches 1-3 were logged, before moving on.
-  Files changed but not yet committed as of this note: NEWS.md,
-  R/reef-setParams.R, tests/testthat/test-reefSenMort.R,
-  test-reefMort.R, test-reefFeedingLevel.R, test-reefPredMort.R,
-  test-reefEncounter.R, test-reefRates.R.
+  Found + fixed the setExtMortParams() bug - custom ext_mort_params
+  was completely broken for both list and data.frame input. Only one
+  bug this batch (down from 2-3 per prior batch). COMMITTED (git log:
+  "Add numeric test coverage for reefEncounter/reefMort/..." +
+  "Log batch 4..."). devtools::test() 0 fail/298 pass, devtools::check()
+  0 errors/0 warnings/3 baseline notes, confirmed at commit time.
 
-Next up after committing batch 4: the plotting-functions tier (lower
-stakes per the original priority order - use return_data = TRUE where
-supported to check underlying values instead of just the ggplot
-class), then the zero-coverage objects (caribbean_10_model,
+Batch 5 (plotting-functions tier) - STARTED, investigation only so
+far, NO CODE CHANGES MADE YET (git status was clean when this session
+ended - nothing to lose, just resume the investigation below):
+
+Inventory taken. Existing weak (expect_error(...,NA) or bare
+ggplot-class-only) test files, 8 total: test-plotAlgaeConsumption.R,
+test-plotBiomass.R, test-plotDegScale.R, test-plotDegradationScale.R,
+test-plotDetritusConsumption.R, test-plotDetritusProduction.R,
+test-plotRefugeDensity.R, test-plotSpectraPercentChange.R. PLUS many
+plotting functions with ZERO test coverage/no test file at all:
+plotProductivity, plot2Productivity, plotProductivityRelative,
+plotTotalAbundance, plotTotalBiomass, plot2TotalBiomass,
+plotTotalBiomassRelative, plotRelativeContribution, plotVulnerable,
+plotRefugeProfile (all in R/reef-analysis_plots.R and
+R/reef-parameter_plots.R), plus every plotly* wrapper of all of the
+above (plotlyProductivity, plotlyTotalAbundance, etc. - these mostly
+just call ggplotly() on the non-plotly version, so probably don't need
+their own separate deep numeric tests, just a "returns a plotly
+object" smoke check once the underlying plot* function is covered).
+Given this is explicitly "lower stakes" in the original priority
+order and the scope is large (~20+ functions total), this tier will
+need its own sub-batching - haven't yet agreed a first sub-batch with
+the user. Reasonable first cut: the 8 files that already have SOME
+test coverage (upgrade expect_error/class-only checks to real
+return_data = TRUE / result$data numeric checks), deferring the
+currently-zero-coverage functions to a later sub-batch - but confirm
+with the user before starting, per the established pattern of always
+agreeing scope first.
+
+Return_data / testability survey done for the 8 existing files:
+- plotDegradationScale(), plotDegScale(), plotRefugeDensity() all
+  support return_data = TRUE - use that directly.
+- plotAlgaeConsumption(), plotDetritusConsumption(),
+  plotDetritusProduction() do NOT have a return_data parameter, but
+  the ggplot object's underlying data frame is accessible via
+  result$data without needing one - already confirmed this works
+  (result$data has the Consumer/Rate or Source/Rate columns built from
+  getAlgaeConsumption()/getDetritusConsumption()/getDetritusProduction(),
+  all three already independently tested in earlier batches, so those
+  can serve as the ground truth for comparison).
+- plotSpectraPercentChange() also has no return_data param but
+  result$data works (confirmed: it's the `sf` data frame with a
+  rel_diff column).
+- plotBiomass() is NOT reef-specific (dispatches to mizer's own
+  plotBiomass() via S3 - mizerReef only extends getBiomass() for the
+  mizerReefSim method, which test-plotBiomass.R's first test already
+  covers reasonably; the actual plotBiomass() ggplot-class check is
+  low-value to deepen further since it's mizer's own tested code, not
+  mizerReef's).
+
+POSSIBLE BUG FOUND, NOT YET CONFIRMED WITH THE USER - this is exactly
+where the investigation stopped when the session limit hit, resume by
+verifying/discussing this first: plotSpectraPercentChange()'s roxygen
+@description explicitly states the formula as
+"100*(N2(w) - N1(w))/N1(w)" (i.e. a percentage), and the y-axis is
+labelled "% Change in Biomass" - but the actual code
+(R/reef-analysis_plots.R ~line 132) computes
+`rel_diff = (value.y - value.x) / value.x` with NO `* 100` anywhere in
+the function. Confirmed numerically: calling it on
+caribbean_3_model (t_max=2 vs. t_max=2 + effort=0.5) gives rel_diff
+values like -0.057, -0.157, -0.231 (i.e. fractions), not -5.7, -15.7,
+-23.1 (percentages) - so either the documentation/axis label is wrong
+(should say "Relative Change" / "Proportional Change", not "%"), or
+the code is missing a `* 100`. This needs the same
+flag-before-fixing treatment as every other bug this session
+(newRefuge scale_bin, tuneUR_cc, use_dummy_fish_bins default,
+setExtMortParams) - do NOT silently fix either the code or the label
+without asking the user which one is "correct" first. Note this is a
+*display/labelling* bug at worst (doesn't corrupt any stored data or
+affect simulations), so lower urgency than the four fixed this
+session, but still worth resolving before writing a numeric test for
+this specific function (once resolved, the test can hand-derive
+rel_diff from mizer::plotSpectra(return_data=TRUE) calls on both
+objects directly, matching the pattern already used successfully
+elsewhere).
+
+After plotting functions: the zero-coverage objects (caribbean_10_model,
 karpata_refuge, the degradation data objects rubble_scale/
 algae_scale/recovery_scale currently have no tests at all).
 
