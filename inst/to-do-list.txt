@@ -85,17 +85,67 @@ completed with a follow-up commit. Lesson: after any multi-file
 staged BEFORE committing, especially after a `git mv`/rename earlier in
 the same sequence of edits.
 
-Still to do in the plotting tier (sub-batch 5b, scope not yet agreed
-with the user): the currently-zero-coverage plotting functions -
-plotProductivity, plot2Productivity, plotProductivityRelative,
-plotTotalAbundance, plotTotalBiomass, plot2TotalBiomass,
-plotTotalBiomassRelative, plotRelativeContribution, plotVulnerable,
-plotRefugeProfile (all in R/reef-analysis_plots.R and
-R/reef-parameter_plots.R), plus their plotly* wrappers. The user
-confirmed the plotly wrappers don't need their own deep numeric tests
-since they just call ggplotly() on the already-tested non-plotly
-version - a light "returns a plotly object" smoke check is enough for
-those once the underlying plot* function has real coverage.
+Sub-batch 5b - DONE AND COMMITTED: the 10 previously-zero-coverage
+plotting functions (plotProductivity, plot2Productivity,
+plotProductivityRelative, plotTotalAbundance, plotTotalBiomass,
+plot2TotalBiomass, plotTotalBiomassRelative, plotRelativeContribution,
+plotVulnerable, plotRefugeProfile) plus a light "returns a plotly
+object" smoke test for each plotly* wrapper (per the user's guidance -
+they just call ggplotly() on the already-tested non-plotly version, no
+need for separate deep numeric coverage).
+
+This sub-batch was by far the buggiest of the whole sweep - EIGHT
+distinct bugs found and fixed, all confirmed with the user first, in
+six commits (git log for full messages/diffs):
+1. Hardcoded "inverts" exclusion in plotVulnerable/plotRefugeProfile/
+   plotProductivity/plotRelativeContribution, unconditional and
+   unopt-outable. Generalized: plotVulnerable/plotRefugeProfile now
+   filter on species_params$refuge_user (per the user: those two
+   intentionally exclude species that don't use refuge, which is what
+   the bundled models' "inverts" group actually has refuge_user=FALSE
+   for); plotProductivity/plotRelativeContribution got a new
+   include_inverts=FALSE argument (per the user: fishing-yield
+   relevance, a different reason).
+2. Index-misalignment bug in that same exclusion mechanism (5
+   functions, including plotTotalBiomass which has no "inverts" tie-in
+   at all) - sel_sp was recomputed from an already-filtered vector,
+   silently mislabelling data whenever the excluded/skipped species
+   wasn't last in a model's species order. Fixed by keeping sel_sp as
+   one logical vector over the original order throughout.
+3. plotProductivityRelative/plotTotalBiomassRelative's percent_change
+   mode had the same missing-*100 bug as plotSpectraChange (batch 5a) -
+   fixed, plus corrected diff_method's docs (dots -> underscores,
+   matching the code that actually works).
+4. plotTotalAbundance/plotTotalBiomass: end_time (a time VALUE) used
+   directly as a row POSITION for MizerSim input - off by one for
+   every simulation (silently wrong data for abundance, an outright
+   crash for biomass, since getBiomass.mizerReefSim also returns
+   algae/detritus columns). Fixed to use the true last row position
+   and index biomass by name.
+5. plotRefugeProfile: a redundant `params <- object` line undid the
+   correct MizerSim-branch extraction just above it - crashed for any
+   MizerSim input. Deleted the dead line.
+6. plotVulnerable: `t <- time_step` ran unconditionally right after
+   `if (is.null(time_step)) { t <- max(...) }`, discarding the
+   computed default and crashing for any MizerSim input in the common
+   (no explicit time_step) case. Fixed with a proper if/else.
+7. getProductivity() (R/reef-summary_methods.R, not a plotting
+   function itself, but plotProductivity's/plotRelativeContribution's
+   dependency) referenced a bare `params@dw` inside a plyr::aaply()
+   closure in its MizerSim branch, where the actual variable is `sim`
+   - meaning getProductivity()/plotProductivity() has NEVER worked on
+   a MizerSim object in a normal user session (undetected because
+   nothing tested this path before, and it happened to "work" during
+   dev whenever a stray global variable named `params` was in scope).
+   Fixed to reference sim@params@dw directly.
+8. Two plotly-wrapper copy-paste typos: plotlyProductivity called
+   plot2Productivity instead of plotProductivity; plotlyTotalBiomassRelative
+   called the nonexistent "TotalBiomassRelative" instead of
+   plotTotalBiomassRelative. Both were completely non-functional;
+   fixed to match the other 9 correctly-implemented plotly wrappers.
+
+Full per-bug detail and verification is in NEWS.md (Bug fixes section)
+and each commit message - not re-duplicated here.
 
 After plotting functions: the zero-coverage objects (caribbean_10_model,
 karpata_refuge, the degradation data objects rubble_scale/
