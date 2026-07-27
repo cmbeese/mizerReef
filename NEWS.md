@@ -6,6 +6,17 @@
   resources" showing how to chain mizerReef with
   [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
   size-structured background resources.
+- New bundled data object `claude_10_model`: `caribbean_10_model` with
+  [tuneUR()] applied to its algae/detritus resource dynamics. While adding
+  test coverage for `caribbean_10_model`, its `algae_growth` turned out to
+  still be exactly `2000` -- `newReefParams()`'s raw untuned default, unlike
+  `caribbean_3_model`'s tuned `86.87579` -- meaning algae and detritus were
+  not actually at steady state for the model's calibrated abundances
+  (confirmed numerically: `dB/dt` far from zero for both). `claude_10_model`
+  differs from `caribbean_10_model` only in `algae_growth` and the
+  detritus `external` flux, both computed via `tuneUR()`; `dB/dt = 0` for
+  both resources afterward. Provided alongside the original for comparison
+  before deciding whether `caribbean_10_model` itself should be replaced.
 - New `include_inverts` argument (default `FALSE`) for `plotProductivity()`
   and `plotRelativeContribution()`, so users can choose whether to include
   the "inverts" species group (previously always excluded unconditionally
