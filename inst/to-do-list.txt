@@ -13,7 +13,13 @@ untracked (reorganized into topical subfolders first), `.env`/
 inst/archive/, the 32 broken Rd cross-reference links are fixed,
 citation metadata was brought up to date, R-CMD-check/test-coverage
 GitHub Actions workflows were added, and an important extension-chaining
-caveat was documented. Current verified baseline after all of that:
+caveat was documented. The same session also extended into content
+work on the getting-started vignette (mizerReef.Rmd): Figure 3
+converted from a static image to live code, a new habitat-decline
+demo extended to 15 years that surfaced a real finding (aggregate
+biomass/productivity trends mask a 4-species functional-extinction
+event), and a new fishing-yield plot. Current verified baseline after
+all of that:
 devtools::check() 0 errors/0 warnings/2 notes (both pre-existing -
 inst/LICENSE top-level placement, tuneUR/data() style note),
 devtools::test() 0 fail/121 pass/3 pre-documented benign warnings.
@@ -211,20 +217,60 @@ COMPLETED TASKS:
 
   Documentation: added a caveat to using-multiple-resources.Rmd (and a
   shorter cross-reference in extension_mechanism.Rmd) making clear that
-  mizer's extension chaining only combines extensions that are
-  "polite" about calling NextMethod() in every overriding method - not
-  automatic just from being registered as an extension. mizerReef and
-  mizerMR compose because both are polite; mizerReef and therMizer
-  (both modify the encounter rate) currently do not, so whichever is
-  loaded last simply wins with no combination and no warning.
+  mizer's extension chaining only combines extensions that use the
+  same (S3 dispatch + NextMethod()) mechanism. Verified directly
+  against installed mizer/mizerMR/therMizer source: mizerMR really
+  does call NextMethod() (confirmed composes with mizerReef); therMizer
+  has no .onLoad/registerExtension() at all and instead uses the
+  older, non-chaining mizer::setRateFunction() hook - so combining it
+  with mizerReef isn't "load order wins", it's "whichever mechanism
+  currently governs that rate for the object, the other has zero
+  effect" (getEncounter() picks one full code path or the other, never
+  both).
+
+  Additional .vscode/tasks.json was also tracked despite being
+  Rbuildignore'd (same pattern as the rest of the repo-visibility
+  cleanup) - untracked and gitignored. Local .quarto/vdoc (empty
+  RStudio Quarto Visual Editor cache, never tracked) deleted.
+
+  Getting-started vignette (mizerReef.Rmd) content additions, prompted
+  by reviewing the rendered output together: added a plot for the
+  habitat-decline biomass trend (previously numbers only); converted
+  Figure 3 (karpata_example.png) from a static image to live-generated
+  code using the real bundled caribbean_10_model - the vignette already
+  had working example code for this, just not executed. Figures 1
+  (refuge_profile.png, hand-made in PowerPoint) and 2
+  (body-shape-example.png, illustrative example not backed by bundled
+  package data) confirmed to stay as static images. Renumbered the
+  former "Figure 4" to "Figure 3" (no "Figure 3" ever existed in this
+  vignette's history) and labeled the fishing-simulation biomass plot
+  "Figure 4"; added a yield-over-time plot alongside it.
+
+  Extended the habitat-decline demo from 5 to 15 years (5 years of
+  refuge loss + 10 more at the final degraded state, to reach a new
+  steady state) after discovering the 5-year aggregate trend was
+  misleading: total biomass/productivity looked like a modest decline,
+  but the longer run revealed productivity actually settles at a NEW,
+  HIGHER steady state (~125% of year-1) while biomass ends lower
+  (~90%) - confirmed stable for 10+ years, not transient. Investigated
+  why: four of ten species groups (all refuge-dependent) collapse to
+  functional extinction (biomass values like 1e-5 to 1e-10), while a
+  few survivors (especially a 6x increase in Invertebrates) dominate
+  and mask this in the aggregate totals. Added a log-scale per-species
+  biomass comparison and a plotRelativeContribution() comparison
+  (year 1 vs year 15) to show this directly - the latter shows
+  Planktivores' entire share of total abundance vanishing. Rebuilt the
+  trend plot in ggplot2 (was base R) for a legend that doesn't overlap
+  the data, with distinct colors/shapes/linetypes per metric.
 
   Verification: devtools::document() + devtools::check() +
-  devtools::test() all re-run clean after the above. devtools::test():
-  0 fail/121 pass/3 pre-documented benign warnings (unchanged).
-  devtools::check(): 0 errors/0 warnings/2 notes - down from the prior
-  baseline of 3 (the Rd cross-reference anchors NOTE is now resolved),
-  remaining 2 are the same pre-existing ones as before (inst/LICENSE
-  top-level placement; tuneUR/tuneUR_cc codetools quirk + data() into
+  devtools::test() all re-run clean after the above, including after
+  the vignette content additions. devtools::test(): 0 fail/121 pass/3
+  pre-documented benign warnings (unchanged). devtools::check(): 0
+  errors/0 warnings/2 notes - down from the prior baseline of 3 (the
+  Rd cross-reference anchors NOTE is now resolved), remaining 2 are
+  the same pre-existing ones as before (inst/LICENSE top-level
+  placement; tuneUR/tuneUR_cc codetools quirk + data() into
   .GlobalEnv style note).
 
 - 27/07 [Public GitHub release prep session. 15 commits on major_update,
