@@ -69,7 +69,7 @@ getDegrade <- function(object, n, n_pp, n_other,
             names(n_other) <- dimnames(sim@n_other)$component
             t <- as.numeric(dimnames(sim@n)$time[[x]])
             deg <- getDegrade(sim@params,
-                n = n, n_pp = n_pp,
+                n = n, n_pp = sim@n_pp[x, ],
                 n_other = n_other, time_range = t
             )
             return(deg)
