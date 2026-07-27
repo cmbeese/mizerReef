@@ -309,6 +309,33 @@ resources' encounter both end up in the final rate, and why a single
 together. Neither package needs to know about the other; they only need to be
 polite about calling `NextMethod()`.
 
+### An important caveat: chaining only combines "polite" extensions
+
+The composability shown above is *not* automatic just because two packages are
+both registered as mizer extensions — it works here because **both** mizerReef
+and mizerMR are written to call `NextMethod()` inside every method that
+overrides a shared generic. The chaining mechanism itself does not merge two
+extensions' contributions to the same rate; it only walks the class hierarchy
+and calls whichever method is next. If an extension overrides a generic
+*without* calling `NextMethod()` — for example by replacing the rate function
+directly rather than dispatching through the S3 chain — then loading it
+alongside another extension that modifies the same rate does not combine the
+two contributions. Whichever extension was loaded **last** simply wins, and
+the other extension's modification to that rate is silently dropped.
+
+A concrete example: both mizerReef and
+[therMizer](https://sizespectrum.org/therMizer/) (temperature effects) modify
+the encounter rate. Because they don't yet compose through the chaining
+mechanism the way mizerReef and mizerMR do, combining them does not apply both
+effects together — it applies whichever extension's encounter rate was loaded
+last, silently overriding the other. Truly composable behaviour across *any*
+pair of mizer extensions is still an evolving part of the mizer ecosystem, not
+something the chaining mechanism guarantees on its own. Before combining
+mizerReef with a third-party extension, check whether that extension's methods
+call `NextMethod()` for any generic you expect both packages to contribute to
+— if it doesn't, expect last-loaded-wins rather than combination for that
+specific rate.
+
 ```{r, include = FALSE}
 # Loading mizerMR registers it in this R session's extension chain for as
 # long as the session lasts (mizer::registerExtension() has no matching

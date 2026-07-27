@@ -120,9 +120,19 @@ still unfixed upstream; see `inst/to-do-list.txt` for the current state.
 
 Every one of these methods calls `NextMethod()` at least once, so multiple
 extension packages can modify the same rate or generic without silently
-overwriting each other's contribution. The next two sections look at the
-rate methods in detail, because they illustrate both the easy case (a purely
-additive modification) and a harder case that needed more thought.
+overwriting each other's contribution — *provided every extension involved
+follows the same convention*. This is not automatic just because a package is
+registered as a mizer extension: the chaining mechanism only walks the class
+hierarchy and calls whichever method comes next, it does not merge two
+extensions' contributions on its own. An extension that overrides a rate
+without calling `NextMethod()` (rather than dispatching through the chain)
+will simply overwrite whichever extension was loaded before it, with no
+combination and no warning. See the caveat in
+`vignette("using-multiple-resources")` for a concrete example (mizerReef and
+therMizer both modify the encounter rate, but do not currently compose).
+The next two sections look at mizerReef's own rate methods in detail, because
+they illustrate both the easy case (a purely additive modification) and a
+harder case that needed more thought.
 
 # Predation refuge: a multiplicative rate modification
 
