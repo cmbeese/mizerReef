@@ -99,6 +99,29 @@
   `plotProductivity()`'s own `MizerSim` branch), and switched
   `plotTotalBiomass()`'s species subsetting to index by name instead of by
   position so it's robust to the extra algae/detritus columns.
+- `plotRefugeProfile()` crashed outright (`"no slot of name
+  'species_params' for this object of class 'mizerReefSim'"`) for any
+  `MizerSim` input. It correctly extracted `params <- object@params` in an
+  if/else block for the `MizerSim`/`MizerParams` cases, but the very next
+  line unconditionally did `params <- object` again -- dead code left over
+  from a refactor that silently undid the `MizerSim` branch's correct
+  extraction. Deleted the redundant line.
+- `plotProductivity()`'s `species` argument default handling (both for the
+  pre-existing "no species given -> use all species" behaviour on the
+  `MizerSim` branch, and the new `include_inverts` default filtering added
+  above) used `missing(species)`, which only reflects whether an argument
+  was *syntactically passed*, not whether it's meaningfully absent.
+  `plot2Productivity()`/`plotProductivityRelative()`/
+  `plotRelativeContribution()` all forward `species = species` to their
+  inner `plotProductivity()` call unconditionally (their own `species`
+  argument also defaults to `NULL`), which makes `missing(species)` FALSE
+  inside `plotProductivity()` even when nobody, anywhere in the call
+  chain, ever specified a species -- silently breaking the "all species"
+  default (`plot2Productivity()` on two `MizerSim` objects errored
+  outright with `"object 'params' not found"`) and making
+  `include_inverts` a no-op through any of those three wrapper functions.
+  Switched both checks to `is.null(species)`, which correctly reflects
+  intent through any number of wrapper layers.
 - Fixed `setExtMortParams()` (and therefore `newReefParams(ext_mort_params =
   ...)`, which calls it) so that custom `ext_mort_params` actually works.
   Previously it was completely broken for both ways a user would reasonably

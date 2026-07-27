@@ -272,7 +272,15 @@ plotProductivity <- function(object,
             is.flag(return_data)
         )
 
-        if (missing(species)) {
+        if (is.null(species)) {
+            # is.null(), not missing(): wrapper functions like
+            # plot2Productivity()/plotProductivityRelative() always forward
+            # species = species (their own default is also NULL), which
+            # makes missing() FALSE even when the top-level caller never
+            # specified a species -- silently breaking both the "all
+            # species" default and the include_inverts default below
+            # whenever plotProductivity() is called via one of those
+            # wrappers rather than directly.
             species <- params@species_params$species
             if (!isTRUE(include_inverts)) {
                 species <- setdiff(species, "inverts")
@@ -373,7 +381,9 @@ plotProductivity <- function(object,
         # (as a previous version of this code did) silently misaligns
         # species labels with the wrong data once the excluded species
         # isn't last in the species order.
-        if (missing(species) && !isTRUE(include_inverts)) {
+        if (is.null(species) && !isTRUE(include_inverts)) {
+            # is.null(), not missing() -- see the matching comment in the
+            # MizerSim branch above.
             sel_sp <- sel_sp & (dimnames(params@initial_n)$sp != "inverts")
         }
         species <- dimnames(params@initial_n)$sp[sel_sp]

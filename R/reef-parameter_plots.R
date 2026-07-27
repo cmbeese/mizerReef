@@ -217,7 +217,6 @@ plotRefugeProfile <- function(object,
 
     # make plot_dat ----
     ## params values ----
-    params <- object
     sp <- params@species_params
 
     if (is.null(params@species_params$group_names)) {
