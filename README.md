@@ -52,7 +52,7 @@ For questions, bug reports, or support, please open an issue on [GitHub](https:/
 
 If you use MizerReef in your research, please cite:
 
-Beese C. M., Mumby P. J., Rogers A. (2025). _MizerReef: an R package to create multi-species size spectrum models for structurally complex habitats_. R package version 2.0.0, <https://github.com/cmbeese/mizerReef>.
+Beese C. M., Mumby P. J., Rogers A. (2026). _MizerReef: an R package to create multi-species size spectrum models for structurally complex habitats_. R package version 2.1.0, <https://github.com/cmbeese/mizerReef>.
 
 > A peer-reviewed publication and DOI for MizerReef will be available soon. Please check back for the updated citation.
 

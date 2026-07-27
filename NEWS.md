@@ -1,12 +1,5 @@
 # MizerReef 2.1.0
 
-## New features
-
-- New vignette "Combining mizerReef with mizerMR: multiple background
-  resources" showing how to chain mizerReef with
-  [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
-  size-structured background resources.
-
 ## Bug fixes
 
 - `getSenMort()` no longer errors when another extension (such as mizerMR)
