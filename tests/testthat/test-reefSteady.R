@@ -1,4 +1,112 @@
-test_that("reefSteady runs without error", {
+test_that("reefSteady returns a valid mizerReef object with finite, non-negative abundances", {
+    # Mirrors mizer's own test-steady.R pattern (all(is.finite(...)),
+    # all(... >= 0)) applied to the mizerReef-extended object.
     data(caribbean_3_model)
-    expect_error(reefSteady(caribbean_3_model), NA)
+    result <- reefSteady(caribbean_3_model, progress_bar = FALSE)
+    expect_s4_class(result, "mizerReef")
+    expect_true(all(is.finite(result@initial_n)))
+    expect_true(all(result@initial_n >= 0))
+})
+
+test_that("reefSteady reaches a genuine fixed point: one more t_per step barely moves the state", {
+    # Stronger than trusting reefSteady()'s own internal convergence check:
+    # project one further t_per (1.5 years) step from the result and confirm
+    # mizer's own distanceSSLogN() (used by projectToSteady() to *define*
+    # convergence) stays below the same default tolerance (tol = 0.1*dt).
+    data(caribbean_3_model)
+    result <- reefSteady(caribbean_3_model, progress_bar = FALSE)
+
+    previous <- list(
+        n = result@initial_n, n_pp = result@initial_n_pp,
+        n_other = result@initial_n_other
+    )
+    sim <- project(result, t_max = 1.5, t_save = 1.5, dt = 0.1, progress_bar = FALSE)
+    last <- dim(sim@n)[1]
+    current <- list(
+        n = array(sim@n[last, , ], dim = dim(sim@n)[2:3], dimnames = dimnames(sim@n)[2:3]),
+        n_pp = sim@n_pp[last, ],
+        n_other = list(
+            algae = sim@n_other[last, "algae"],
+            detritus = sim@n_other[last, "detritus"]
+        )
+    )
+    d <- distanceSSLogN(result, current, previous)
+    expect_lt(d, 0.1 * 0.1)
+})
+
+test_that("reefSteady preserves reproduction_level by default", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    old_level <- mizer::getReproductionLevel(params)
+    result <- reefSteady(params, progress_bar = FALSE)
+    expect_equal(unname(mizer::getReproductionLevel(result)), unname(old_level))
+})
+
+test_that("reefSteady preserves R_max when preserve = 'R_max'", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    old_R_max <- params@species_params$R_max
+    result <- reefSteady(params, preserve = "R_max", progress_bar = FALSE)
+    expect_equal(unname(result@species_params$R_max), unname(old_R_max))
+})
+
+test_that("reefSteady preserves erepro when preserve = 'erepro', except where mizer must clamp it upward", {
+    # setBevertonHolt() can bump erepro above the requested value (with a
+    # warning) when the requested value can't sustain the given reproduction
+    # rate -- the same benign warning documented for matchReadyGrowth() in
+    # test-matchReefGrowth.R. So the meaningful assertion is "unchanged or
+    # increased", not exact equality.
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    old_erepro <- params@species_params$erepro
+    result <- suppressWarnings(reefSteady(params, preserve = "erepro", progress_bar = FALSE))
+    expect_true(all(result@species_params$erepro >= old_erepro - 1e-10))
+})
+
+test_that("reefSteady retunes algae/detritus to a genuine steady state when new_refuge = FALSE", {
+    data(caribbean_3_model)
+    result <- reefSteady(caribbean_3_model, progress_bar = FALSE)
+
+    P_A <- sum(getAlgaeProduction(result))
+    c_A <- algae_consumption(result, n = result@initial_n, rates = getRates(result))
+    expect_equal(P_A - c_A * algae_biomass(result), 0)
+
+    P_D <- sum(getDetritusProduction(result))
+    c_D <- detritus_consumption(result, n = result@initial_n, rates = getRates(result))
+    expect_equal(P_D - c_D * detritus_biomass(result), 0)
+})
+
+test_that("reefSteady does not retune algae/detritus when new_refuge = TRUE", {
+    data(caribbean_3_model)
+    mp <- data.frame(L_refuge = 0.5, prop_protect = 0.3)
+    new_refuge_params <- newRefuge(caribbean_3_model,
+        new_refuge = TRUE, new_method = "sigmoidal", new_method_params = mp
+    )
+    old_growth <- new_refuge_params@other_params$algae_params$algae_growth
+    old_external <- new_refuge_params@other_params$detritus_params$external
+
+    result <- reefSteady(new_refuge_params, progress_bar = FALSE)
+    expect_equal(result@other_params$algae_params$algae_growth, old_growth)
+    expect_equal(result@other_params$detritus_params$external, old_external)
+})
+
+test_that("reefSteady dispatches to tuneUR_cc when use_UR_cc is TRUE", {
+    data(caribbean_3_model)
+    cc_params <- setURcapacity(caribbean_3_model, cap = 1.5)
+    result <- suppressWarnings(reefSteady(cc_params, progress_bar = FALSE))
+
+    ba <- algae_biomass(result)
+    ka <- result@other_params$algae_params$algae_capacity
+    c_A <- algae_consumption(result, n = result@initial_n, rates = getRates(result))
+    P_A <- sum(getAlgaeProduction(result))
+    expect_equal(P_A * (1 - ba / ka) - c_A * ba, 0)
+})
+
+test_that("reefSteady with return_sim = TRUE returns a MizerSim-like object wrapping the tuned params", {
+    data(caribbean_3_model)
+    sim <- reefSteady(caribbean_3_model, return_sim = TRUE, progress_bar = FALSE)
+    expect_s4_class(sim@params, "mizerReef")
+
+    expected_growth <- sum(getAlgaeConsumption(sim@params))
+    expect_equal(sim@params@other_params$algae_params$algae_growth, expected_growth)
 })

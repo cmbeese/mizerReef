@@ -98,12 +98,17 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' @export
 tuneUR_cc <- function(params, ...) {
     # algae
+    # getAlgaeConsumption() already returns the total (biomass-multiplied)
+    # consumption rate c_A * B_A, so the steady-state condition
+    # P_A * (1 - B_A/K_A) = c_A * B_A rearranges to P_A = aout / (1 - ba/ka)
+    # (no extra factor of ba -- aout already carries it).
     ba <- algae_biomass(params)
     ka <- params@other_params$algae_params$algae_capacity
     aout <- sum(getAlgaeConsumption(params))
-    params@other_params$algae_params$algae_growth <- (aout * ba) / (1 - ba / ka)
+    params@other_params$algae_params$algae_growth <- aout / (1 - ba / ka)
 
     # detritus
+    # Same reasoning: getDetritusConsumption() already returns c_D * B_D.
     params@other_params$detritus_params$external <- 0
     bd <- detritus_biomass(params)
     kd <- params@other_params$detritus_params$detritus_capacity
@@ -115,7 +120,7 @@ tuneUR_cc <- function(params, ...) {
         # water) rather than flowing in from external sources.
         warning("The flux of external detritus is negative.")
     }
-    params@other_params$detritus_params$external <- ((dout * bd) / (1 - bd / kd)) - din
+    params@other_params$detritus_params$external <- (dout / (1 - bd / kd)) - din
 
     params
 }
