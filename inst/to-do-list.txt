@@ -3,22 +3,22 @@ MizerReef Major Package Update To Do List - 27/07 (updated)
 === START HERE (updated 27/07) ===
 Public GitHub release prep session complete and pushed (major_update,
 a2c060e..e0a3bf8, 15 commits). See "COMPLETED TASKS" below, first entry,
-for the full account. devtools::check() is clean (0 errors, 0 warnings,
-3 notes, all pre-existing) and devtools::test() is 0 fail/121 pass/3
-pre-documented benign warnings. Nothing below is a hard blocker for a
-public GitHub release (not CRAN - the mizerExperimental Remotes:
-dependency is fine as-is for that).
+for the full account.
 
-ONE thing worth a conscious decision before making the repo public,
-not because anything is broken but because it wasn't chosen with "a
-stranger will browse this on GitHub" in mind: `ignore/` is excluded
-from the R package build via .Rbuildignore, but NOT gitignored - it is
-fully tracked and publicly visible once the repo goes public, including
-ignore/AI-session-summaries/ (AI-assisted dev session notes),
-old thesis materials, superseded code, and ~4.1MB of draft logo files.
-Same story for a tracked-but-empty .env at the repo root, and for
-check-results.txt/thesis-model.RData also sitting at the root. See the
-"Repo visibility cleanup" section below for specifics.
+Repo cleanup + hygiene pass (27/07, second session) is also DONE - see
+COMPLETED TASKS below for the full account. `ignore/` is now
+untracked (reorganized into topical subfolders first), `.env`/
+`check-results.txt`/personal photos are gone from the repo, unreferenced
+`inst/scripts/` files were moved out, `thesis-model.RData` moved into
+inst/archive/, the 32 broken Rd cross-reference links are fixed,
+citation metadata was brought up to date, R-CMD-check/test-coverage
+GitHub Actions workflows were added, and an important extension-chaining
+caveat was documented. Current verified baseline after all of that:
+devtools::check() 0 errors/0 warnings/2 notes (both pre-existing -
+inst/LICENSE top-level placement, tuneUR/data() style note),
+devtools::test() 0 fail/121 pass/3 pre-documented benign warnings.
+Nothing below is a hard blocker for a public GitHub release (not CRAN -
+the mizerExperimental Remotes: dependency is fine as-is for that).
 
 Highest-priority item now that reefDegrade()/getDegrade() have real
 test coverage: the ~50-file test-coverage sweep (see that section
@@ -27,10 +27,6 @@ deliberately out of scope for the session that just landed.
 
 ** Before publication - recommended, not blocking **
 
-- Repo visibility cleanup (see below) - a public-facing hygiene pass,
-  not a functionality issue. Nobody's blocked by skipping this, but
-  it's easiest to do before the repo is actually public rather than
-  after.
 - Confirm the pkgdown GitHub Actions deploy succeeded for the
   major_update push (e0a3bf8) and that the site's favicons actually
   generated - pkgdown::build_site() failed to reach
@@ -42,66 +38,14 @@ deliberately out of scope for the session that just landed.
   for a hex-sticker logo typically shown at ~120x139px). Cosmetic/perf,
   not broken.
 
-** Repo visibility cleanup (planned for a dedicated future session - not urgent, just newly relevant) **
+** Repo visibility cleanup - DONE (27/07, second session) **
 
-Deliberately deferred out of the 27/07 session (context was getting full).
-Plan for next time, so a fresh session doesn't have to re-derive this:
-
-- Decide the *scope* first, in this order, since each is a bigger
-  commitment than the last:
-  1. Untrack going forward only (cheap, safe, reversible): stop new
-     commits from including these paths, leave existing git history
-     alone. `git rm -r --cached <path>` + add to .gitignore, then
-     commit. Anyone who already cloned still has the old content in
-     their local history, and it's still in GitHub's history/old
-     commits/any forks, but new clones's working tree won't have it
-     and it won't show in the default file browser at HEAD.
-  2. Scrub from history too (bigger, riskier, not reversible without
-     backups): needed only if something in there is actually sensitive
-     (not just "untidy") - e.g. check ignore/AI-session-summaries/ and
-     ignore/corrected thesis bibliography.bib for anything you wouldn't
-     want permanently in git history even after step 1. Requires
-     git filter-repo or BFG Repo-Cleaner, a force-push, and - since
-     this is already pushed and public - telling anyone with a clone
-     to re-clone rather than pull. Don't do this without deciding it's
-     actually necessary; it's disruptive and hard to fully undo.
-  - Recommendation: do step 1 for everything below unless the history
-    scrub in step 2 turns out to matter for a specific file.
-
-- `ignore/` (5.4MB total) is tracked in git, not gitignored - only
-  excluded from the R build via .Rbuildignore. Options, cheapest first:
-  - Leave as-is (defensible - it's dev history, not a security issue,
-    and some of it, like the AI-session-summaries, could even be
-    interesting/transparent to have public).
-  - Trim it first (drop what's genuinely not worth keeping - old
-    superseded code, duplicate logo drafts - keep what has real
-    reference value), then leave the rest tracked.
-  - Untrack entirely (step 1 above): `git rm -r --cached ignore/`,
-    add `ignore/` to .gitignore, commit. .Rbuildignore's `^ignore$`
-    line becomes redundant at that point (harmless to leave, or
-    remove it).
-- `ignore/logo-pieces/` (4.1MB of draft logo files) specifically -
-  same options as above, already flagged in earlier sessions as
-  deferred. If keeping `ignore/` otherwise, this is the single biggest
-  chunk of low-value weight in it and the easiest first cut.
-- `.env` is tracked (0 bytes, currently empty and harmless) - still
-  odd to ship a tracked .env in a public repo, and the filename itself
-  invites the question "was there ever anything in it?" even though
-  there wasn't. `git rm --cached .env`, add `.env` to .gitignore,
-  commit.
-- `check-results.txt` (old R CMD check output dump - was already
-  confirmed stale/superseded by this session's real check() runs) -
-  candidate for a straight `git rm check-results.txt` (not just
-  untrack - it has no ongoing reference value once its content is
-  captured in this to-do file, which it now is).
-- `thesis-model.RData` - kept deliberately for reproducibility (per
-  earlier session notes), so don't remove without checking that's
-  still true. If keeping it, consider whether it reads better moved
-  into inst/ or an archive/ folder than sitting bare at the repo root -
-  a "someday" tidiness call, not urgent either way.
-- Do this cleanup as its own small session/PR, separate from any
-  further feature work, so the diff is easy to review and easy to
-  revert in isolation if something turns out to still be needed.
+See COMPLETED TASKS below for the full account. Note: this was an
+untrack-only pass (git rm -r --cached + .gitignore) - files remain on
+local disk and in prior commit history. Nothing in ignore/ turned out
+to need a full history scrub (git filter-repo/BFG + force-push); if
+that's ever revisited, the file to double check first is
+ignore/thesis-materials/corrected thesis bibliography.bib.
 
 ** Outstanding, genuinely open **
 
@@ -146,13 +90,6 @@ Plan for next time, so a fresh session doesn't have to re-derive this:
   visibility cleanup" above for the more relevant near-term concern).
 - Ensure all S4 classes and methods are fully documented (especially
   MizerReefParams) - not specifically re-verified this session.
-- Clean up remaining Rd cross-reference notes (add package anchors for
-  external links). Scoped precisely in an earlier session: 24 Rd files
-  missing package anchors on MizerParams-class/MizerSim-class
-  \link{} targets. Confirmed still present, still NOTE-only (not a
-  check() blocker). Mechanical fix: add [MizerParams-class] ->
-  [mizer::MizerParams-class] style anchors throughout, or switch those
-  @seealso entries to use \code{\link[mizer]{MizerParams}} form.
 - makeActiveBinding() dead code in .onLoad - bundled data/ model
   objects don't get re-coerced to the right S4 class via this specific
   mechanism when a second mizer extension is loaded alongside
@@ -165,16 +102,14 @@ Plan for next time, so a fresh session doesn't have to re-derive this:
   unfixed.
 - recordExtension() version-stamping not adopted in mizerReef's
   setters - a modernization, not a bug.
-- No R-CMD-check / covr GitHub Actions workflow exists yet (only
-  pkgdown deploy). Worth adding for a public repo but not blocking.
 - Confirm with the supervisor exactly which file was meant by "AI
   generated mizerReef.Rmd" - most likely model-description.Rmd, not a
   real conflict, but worth confirming.
-- .kilo/plans/1784244794096-remove-mizer-experimental-dependency.md -
-  a half-drafted plan for dropping mizerExperimental from
-  Imports/Remotes to Suggests. Only relevant if/when CRAN submission
-  is pursued; stale (still references mizer >= 3.1.0, DESCRIPTION now
-  requires 3.2.0) and not needed for a GitHub-only release.
+- Dropping mizerExperimental from Imports/Remotes to Suggests - only
+  relevant if/when CRAN submission is pursued (a half-drafted plan for
+  this used to live in .kilo/plans/, deleted along with the rest of
+  the local .kilo/ AI-assistant workspace in the 27/07 cleanup session;
+  not needed for a GitHub-only release).
 - Getting-started vignette formatting polish: put notes in boxes, add
   emojis - the vignette already has substantial `<details>`/skip-link
   structure and a Tip-callout convention from earlier sessions; this
@@ -224,6 +159,73 @@ Plan for next time, so a fresh session doesn't have to re-derive this:
 COMPLETED TASKS:
 
 ============================================================================
+
+- 27/07 (second session) [Repo cleanup + hygiene pass before merging
+  major_update into main.]
+
+  Repo visibility cleanup: reorganized ignore/ into topical subfolders
+  (AI-session-summaries-old/, draft-vignettes/, refactor-notes/,
+  thesis-materials/, unpublished-research/, dev-logs/, inst-scripts/,
+  plus additions to the existing base-mizer-files/ and for-the-future/)
+  before untracking the whole directory (git rm -r --cached + gitignore
+  - files remain on local disk and in prior commit history, just stop
+  being tracked/pushed going forward). Removed the empty tracked .env
+  file outright. Relocated thesis-model.RData into inst/archive/.
+  Deleted the local-only .kilo/ AI-assistant workspace and R/.Rhistory,
+  and git-rm'd a long-tracked .DS_Store (all three now gitignored).
+
+  Found and fixed two more visibility issues not on the original list:
+  two personal photo JPEGs sitting in inst/ (unreferenced anywhere,
+  but inst/ isn't Rbuildignore'd so they were shipping inside every
+  installed copy of the package) - moved to ignore/. And 11 of 13 files
+  in inst/scripts/ were unreferenced dev/analysis scripts also shipping
+  to every install - moved to ignore/inst-scripts/, except
+  Caribbean_3_model-calibration.R which stays put since
+  vignettes/caribbean_3_model-description.Rmd cites it by name as the
+  reproducibility reference for the steady-state tuning.
+
+  Rd cross-reference links: fixed all 32 occurrences (9 files) of the
+  package-unaware \linkS4class{MizerParams}/\linkS4class{MizerSim}
+  macro, replacing with plain markdown [MizerParams]/[MizerSim] (same
+  style already working elsewhere in this package, auto-resolves to
+  mizer's docs since mizer is a Depends). Regenerated man/*.Rd via
+  devtools::document().
+
+  CI: added .github/workflows/R-CMD-check.yaml and test-coverage.yaml
+  (only pkgdown.yaml existed before), matching the r-lib/actions@v2
+  conventions already used there.
+
+  Citation metadata: inst/CITATION was stale (version 2.0.0, year 2025,
+  placeholder "your@email.com" email, deprecated citEntry() format) and
+  both inst/CITATION and CITATION.cff were missing Gustav Delius as an
+  author despite DESCRIPTION listing him (aut, cph). Modernized
+  inst/CITATION to bibentry(), brought it in line with DESCRIPTION's
+  version/authors, and added Delius (plus ORCIDs for all four authors)
+  to CITATION.cff.
+
+  Also cleaned up .Rbuildignore: dropped entries for check-results.txt/
+  .env/creating-extension-packages.Rmd/thesis-model.RData (no longer
+  at repo root, so the lines matched nothing) and added .claude/
+  (local Claude Code session workspace, was showing up as a stray
+  "hidden files and directories" NOTE).
+
+  Documentation: added a caveat to using-multiple-resources.Rmd (and a
+  shorter cross-reference in extension_mechanism.Rmd) making clear that
+  mizer's extension chaining only combines extensions that are
+  "polite" about calling NextMethod() in every overriding method - not
+  automatic just from being registered as an extension. mizerReef and
+  mizerMR compose because both are polite; mizerReef and therMizer
+  (both modify the encounter rate) currently do not, so whichever is
+  loaded last simply wins with no combination and no warning.
+
+  Verification: devtools::document() + devtools::check() +
+  devtools::test() all re-run clean after the above. devtools::test():
+  0 fail/121 pass/3 pre-documented benign warnings (unchanged).
+  devtools::check(): 0 errors/0 warnings/2 notes - down from the prior
+  baseline of 3 (the Rd cross-reference anchors NOTE is now resolved),
+  remaining 2 are the same pre-existing ones as before (inst/LICENSE
+  top-level placement; tuneUR/tuneUR_cc codetools quirk + data() into
+  .GlobalEnv style note).
 
 - 27/07 [Public GitHub release prep session. 15 commits on major_update,
   pushed to origin (a2c060e..e0a3bf8). Full verification: devtools::test()
