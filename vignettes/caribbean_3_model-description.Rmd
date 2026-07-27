@@ -33,9 +33,13 @@ params@other_params$include_sen_mort <- TRUE
 
 # Model Description
 
-The model divides reef organisms into three broad functional groups based on diet: predators, herbivores, and a general group of benthic invertebrates. This simple trait-based model is a smaller, three-group counterpart to the [10-group Karpata Reef model](karpata_model-description.html), useful when a coarser resolution is sufficient or as a starting point for setting up a new reef model. Estimates of observed biomass for each group were used to tune reproduction and resource consumption parameters so that steady state abundances agree with empirical observations. The process of establishing a steady state that agrees with empirical observations is nontrivial. Steady state parameters were tuned following the procedure described on the [mizer blog](https://blog.mizer.sizespectrum.org/posts/2021-08-20-a-5-step-recipe-for-tuning-the-model-steady-state/). The R script used to tune the steady state parameters is included at the end of this file.
+::: {.content-visible when-format="html"}
+[Skip to Size Spectrum Dynamics](#size-spectrum-dynamics)
+:::
 
-Biomass estimates were based on data collected from relatively un-fished reefs within a marine reserve in Bonaire. This data was part of the FORCE dataset that categorised fish community structure and habitat complexity across Caribbean coral reefs [@Dryden2016; @Rogers_2014; @Newman_2015; @Williams_2015; @Williams_2016]. Visual surveys recorded fish up to 5 cm in length. The cutoff weight for observed biomass estimates was calculated using published length-weight relationships [@FishBase]. The cutoff size is given in the table below along with the observed biomass per square meter in grams.
+The model divides reef organisms into three broad functional groups based on diet: predators, herbivores, and a general group of benthic invertebrates. This simple trait-based model is a smaller, three-group counterpart to the [10-group Karpata Reef model](karpata_model-description.html), useful when a coarser resolution is sufficient or as a starting point for setting up a new reef model. Both models are parameterised from the same marine-reserve dataset (see below); the 10-group model splits these same three broad functional groups (predators, herbivores, invertebrates) into finer functional groups. Estimates of observed biomass for each group were used to tune reproduction and resource consumption parameters so that steady state abundances agree with empirical observations. The process of establishing a steady state that agrees with empirical observations is nontrivial. Steady state parameters were tuned following the procedure described on the [mizer blog](https://blog.mizer.sizespectrum.org/posts/2021-08-20-a-5-step-recipe-for-tuning-the-model-steady-state/). The R script used to tune the steady state parameters is included at the end of this file.
+
+Biomass estimates were based on data collected from relatively un-fished reefs within a marine reserve in Bonaire. This data was part of the FORCE dataset that categorised fish community structure and habitat complexity across Caribbean coral reefs [@Dryden2016; @Rogers_2014; @Newman_2015; @Williams_2015; @Williams_2016]. A marine-reserve site was chosen deliberately, for this model and for the 10-group Karpata Reef model alike, so that observed biomasses would not need to be corrected for fishing pressure before being used to calibrate the models. Visual surveys recorded fish up to 5 cm in length. The cutoff weight for observed biomass estimates was calculated using published length-weight relationships [@FishBase]. The cutoff size is given in the table below along with the observed biomass per square meter in grams.
 
 ```{r, echo = FALSE}
 params@species_params %>%
@@ -47,6 +51,10 @@ params@species_params %>%
 ```
 
 # Size Spectrum Dynamics
+
+::: {.content-visible when-format="html"}
+[Skip to Resources](#resources)
+:::
 
 These dynamics expand on those used in standard Mizer models, see @mizer.
 
@@ -102,6 +110,9 @@ The parameter $\tau$ is the proportion of fish with access to refuge that are ex
 
 All fish are assumed to utilize refuge ($\tau = 1$). Fish smaller than `r paste(refuge_params$w_settle,"g")` are assumed to be larval reef fish that have not yet settled to the reef. A maximum proportion of `r paste(100*refuge_params$max_protect,"%")` of fish are protected at any given time.
 
+<details>
+<summary>Refuge length bins and densities used in the steady state (same Bonaire FORCE data as the 10-group model)</summary>
+
 The following table gives the fish length bins and refuge densities that define the refuge profile used in the steady state. Length bins and refuge densities were garnered from the FORCE data in the same location as biomass estimates - the same [`karpata_refuge`](../reference/karpata_refuge.html) profile used by the 10-group model.
 
 ```{r, echo = FALSE}
@@ -112,6 +123,11 @@ params@other_params$method_params %>%
                         "End of Bin (cm)",
                         "Refuge Density (no./m^2)"))
 ```
+
+</details>
+
+<details>
+<summary>How each species group interacts with predation refuge</summary>
 
 Each species group can utilise benthic structures differently depending on their specific traits. The table below indicates how each species group interacts with structures that provide predation refuge.
 
@@ -124,6 +140,8 @@ params@species_params %>%
                                     blocked_pred == FALSE ~ 'Yes')) %>%
     kable(col.names = c("Group", "Uses refuge?", "Accesses prey in refuge?"))
 ```
+
+</details>
 
 The figure below shows the density-dependent refuge profile produced by the competitive method for the simple trait-based Caribbean 3-group model at steady state.
 
@@ -290,6 +308,10 @@ df %>%
 
 # Resources {#resources}
 
+::: {.content-visible when-format="html"}
+[Skip to Tuning the Steady State](#tuning-the-steady-state)
+:::
+
 The fish spectrum is fed by three background resources: plankton, algae, and detritus. Small individuals of all species will feed on plankton while only herbivorous groups and invertebrates feed on algae or detritus. The equations governing the flux of the algae and detritus resources were adapted from @mizerShelf [@deJuan2023].
 
 ### Plankton {#plankton}
@@ -360,6 +382,10 @@ External detritus is generated by unmodelled sources or sinks in from the pelagi
 
 # Tuning the Steady State
 The following R script was used to tune the steady state parameters for this model (see `inst/scripts/Caribbean_3_model-calibration.R` in the package source for the exact, currently-runnable version).
+
+<details>
+<summary>Show the full steady-state calibration script</summary>
+
 ```{r, echo = TRUE, eval = FALSE}
 # Setting up a generic Caribbean coral reef model with multiple resources
 # Three groups: Predators, Herbivores, Invertebrates
@@ -473,3 +499,5 @@ plotPredMort(params)
 caribbean_3_model <- reefSteady(params)
 save(caribbean_3_model, file = "data/caribbean_3_model.rda")
 ```
+
+</details>
