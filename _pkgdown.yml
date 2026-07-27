@@ -114,10 +114,14 @@ reference:
   desc: >
         A 10-functional-group model parameterised from field data at Karpata
         Reef in Bonaire, including competitive predation refuge.
+        `claude_10_model` is identical except for its algae/detritus resource
+        dynamics, which are properly tuned to steady state (see
+        `claude_10_model`'s own documentation for details).
 - contents:
     - caribbean_10_species
     - caribbean_10_interaction
     - caribbean_10_model
+    - claude_10_model
 - subtitle: Empirical refuge profiles
   desc: >
         Refuge density profiles from field data, reusable across any
