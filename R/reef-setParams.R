@@ -991,29 +991,45 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
 
         # Binned method ------------------------------------------------------------
     } else if (refuge_params$method == "binned") {
-        # Initialize storage
-        ref <- rep(0, no_w)
-        start_l.i <- list(1)
-        end_l.i <- list(1)
-        bin.id <- list(1)
         no_bins <- nrow(method_params)
+        bin.id <- list(1)
         if (isFALSE(use_dummy_fish_bins)) {
-            # Species-specific bin boundaries
-            for (k in 1:no_bins) {
-                for (i in 1:no_sp) {
+            # Species-specific bin boundaries: each species converts the same
+            # length bins to its OWN weight bins via its own a/b, so both the
+            # refuge proportions and the reported length equivalents are
+            # computed independently per species. (Contrast with the dummy
+            # fish branch below, where a single shared a_bar/b_bar conversion
+            # means every species gets the same weight-based profile, and
+            # only the reported length equivalents differ per species.)
+            # refuge/start_l.i/end_l.i must be built directly as per-species
+            # matrices here, not via a single vector shared across species/
+            # bins as in the dummy branch -- that pattern only produces
+            # correct output when the boundaries themselves don't vary by
+            # species.
+            refuge <- matrix(0, nrow = no_sp, ncol = no_w)
+            start_l.i <- matrix(NA_real_, nrow = no_sp, ncol = no_bins)
+            end_l.i <- matrix(NA_real_, nrow = no_sp, ncol = no_bins)
+            for (i in 1:no_sp) {
+                for (k in 1:no_bins) {
                     start_w <- sp[["a"]][i] * method_params$start_L[[k]]^sp[["b"]][i]
                     end_w <- sp[["a"]][i] * method_params$end_L[[k]]^sp[["b"]][i]
                     start_w[start_w < w_settle] <- w_settle
-                    bin.id[[paste0("sp", i, "_bin", k)]] <- which(w >= start_w & w <= end_w)
+                    idx <- which(w >= start_w & w <= end_w)
+                    bin.id[[paste0("sp", i, "_bin", k)]] <- idx
                     # Assign prop_protect for this bin/species
-                    ref[bin.id[[paste0("sp", i, "_bin", k)]]] <- method_params$prop_protect[k]
+                    refuge[i, idx] <- method_params$prop_protect[k]
                     # Calculate length bins for each species
-                    start_l.i[[paste0("sp", i, "_bin", k)]] <- (start_w / sp[["a"]][i])^(1 / sp[["b"]][i])
-                    end_l.i[[paste0("sp", i, "_bin", k)]] <- (end_w / sp[["a"]][i])^(1 / sp[["b"]][i])
+                    start_l.i[i, k] <- (start_w / sp[["a"]][i])^(1 / sp[["b"]][i])
+                    end_l.i[i, k] <- (end_w / sp[["a"]][i])^(1 / sp[["b"]][i])
                 }
             }
+            colnames(start_l.i) <- paste0("start", seq_len(no_bins))
+            colnames(end_l.i) <- paste0("end", seq_len(no_bins))
         } else {
             # Dummy fish bin boundaries
+            ref <- rep(0, no_w)
+            start_l.i <- list(1)
+            end_l.i <- list(1)
             for (k in 1:no_bins) {
                 start_w <- a_bar * method_params$start_L[[k]]^b_bar
                 end_w <- a_bar * method_params$end_L[[k]]^b_bar
@@ -1026,9 +1042,11 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
                 end_l.i[[k]] <- (end_w / sp[["a"]])^(1 / sp[["b"]])
                 names(end_l.i)[[k]] <- c(paste("end", k, sep = ""))
             }
+            # Create matrix to store proportions for each species
+            refuge <- matrix(rep(ref), nrow = no_sp, ncol = no_w, byrow = TRUE)
+            start_l.i <- t(do.call(rbind, start_l.i))
+            end_l.i <- t(do.call(rbind, end_l.i))
         }
-        # Create matrix to store proportions for each species
-        refuge <- matrix(rep(ref), nrow = no_sp, ncol = no_w, byrow = TRUE)
         rownames(refuge) <- rownames(params@initial_n)
         colnames(refuge) <- colnames(params@initial_n)
         # Make sure none of the values are higher than maximum protection allowed
@@ -1039,8 +1057,6 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
         params@other_params$refuge_params$refuge <- refuge
         params@other_params$refuge_params$bin.id <- bin.id
         # store length bins by functional group in params object
-        start_l.i <- t(do.call(rbind, start_l.i))
-        end_l.i <- t(do.call(rbind, end_l.i))
         refuge_lengths <- cbind(start_l.i, end_l.i)
         row.names(refuge_lengths) <- sp$species
         params@other_params$refuge_params$refuge_lengths <- refuge_lengths
@@ -1048,26 +1064,34 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
 
         ## Competitive method ------------------------------------------------------
     } else if (refuge_params$method == "competitive") {
-        # Initialize empty list to hold number of competitors for each bin
-        bin.id <- list(1)
-        start_l.i <- list(1)
-        end_l.i <- list(1)
         no_bins <- nrow(method_params)
+        bin.id <- list(1)
         if (isFALSE(use_dummy_fish_bins)) {
-            # Use species-specific a/b to convert length bins to weights
-            for (k in 1:no_bins) {
-                for (i in 1:no_sp) {
+            # Use species-specific a/b to convert length bins to weights;
+            # see the "binned" branch above for why start_l.i/end_l.i must be
+            # built as per-species matrices here rather than via rbind() of a
+            # flat named list (which only produces the right shape when
+            # every list entry is a scalar keyed by bin alone, not by
+            # species+bin).
+            start_l.i <- matrix(NA_real_, nrow = no_sp, ncol = no_bins)
+            end_l.i <- matrix(NA_real_, nrow = no_sp, ncol = no_bins)
+            for (i in 1:no_sp) {
+                for (k in 1:no_bins) {
                     start_w <- sp[["a"]][i] * method_params$start_L[[k]]^sp[["b"]][i]
                     end_w <- sp[["a"]][i] * method_params$end_L[[k]]^sp[["b"]][i]
                     start_w[start_w < w_settle] <- w_settle
                     bin.id[[paste0("sp", i, "_bin", k)]] <- which(params@w >= start_w & params@w <= end_w)
                     # Calculate length bins for each species
-                    start_l.i[[paste0("sp", i, "_bin", k)]] <- (start_w / sp[["a"]][i])^(1 / sp[["b"]][i])
-                    end_l.i[[paste0("sp", i, "_bin", k)]] <- (end_w / sp[["a"]][i])^(1 / sp[["b"]][i])
+                    start_l.i[i, k] <- (start_w / sp[["a"]][i])^(1 / sp[["b"]][i])
+                    end_l.i[i, k] <- (end_w / sp[["a"]][i])^(1 / sp[["b"]][i])
                 }
             }
+            colnames(start_l.i) <- paste0("start", seq_len(no_bins))
+            colnames(end_l.i) <- paste0("end", seq_len(no_bins))
         } else {
             # Use dummy fish parameters to convert length bins to weights, then convert to species-specific lengths
+            start_l.i <- list(1)
+            end_l.i <- list(1)
             for (k in 1:no_bins) {
                 start_w <- a_bar * method_params$start_L[[k]]^b_bar
                 end_w <- a_bar * method_params$end_L[[k]]^b_bar
@@ -1079,12 +1103,12 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
                 end_l.i[[k]] <- (end_w / sp[["a"]])^(1 / sp[["b"]])
                 names(end_l.i)[[k]] <- c(paste("end", k, sep = ""))
             }
+            start_l.i <- t(do.call(rbind, start_l.i))
+            end_l.i <- t(do.call(rbind, end_l.i))
         }
         # Store indices of each bin
         params@other_params$refuge_params$bin.id <- bin.id
         # Store length bins by species group in a data frame
-        start_l.i <- t(do.call(rbind, start_l.i))
-        end_l.i <- t(do.call(rbind, end_l.i))
         refuge_lengths <- cbind(start_l.i, end_l.i)
         row.names(refuge_lengths) <- sp$species
         params@other_params$refuge_params$refuge_lengths <- refuge_lengths

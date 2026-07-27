@@ -6,9 +6,51 @@
   resources" showing how to chain mizerReef with
   [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
   size-structured background resources.
+- New `use_dummy_fish_bins` parameter for `setRefuge()`/`getRefuge()`/
+  `newRefuge()`/`newReefParams()` (`sigmoidal`, `binned`, and `competitive`
+  refuge methods). Both settings give species-specific refuge profiles, but
+  compute the underlying length-to-weight bin boundaries differently:
+  - `TRUE` (default, matching this package's historical behaviour before
+    this parameter existed): every species' refuge length bins are
+    converted to weight bins using one shared reference conversion
+    (`a_bar`/`b_bar`), so all species become vulnerable/protected at the
+    same *weight* -- but since species have different body shapes, the
+    *length* at which each one crosses that threshold differs (reported
+    per-species in `refuge_lengths`).
+  - `FALSE`: each species converts the same refuge length bins to weight
+    bins using its own `a`/`b`, so the weight boundaries themselves --
+    and therefore the refuge profile in weight space -- are
+    species-specific.
 
 ## Bug fixes
 
+- Fixed two bugs in `getRefuge()`'s `use_dummy_fish_bins = FALSE` branch
+  (`binned` and `competitive` methods) that made it unusable: `refuge_lengths`
+  was built from scalar values stored in a flat named list, which crashed
+  with `"length of 'dimnames' [1] not equal to array extent"` for any model
+  with more than one species; and (`binned` only) the refuge proportions
+  were accumulated into a single vector shared across every species/bin
+  combination instead of a per-species matrix, so even without the crash,
+  every species would have ended up with an identical refuge profile,
+  defeating the purpose of species-specific bins.
+- Fixed a default-handling mismatch between `getRefuge()` and
+  `reefVulnerable()` for a missing/`NULL` `use_dummy_fish_bins`:
+  `getRefuge()` defaulted it to the dummy (`TRUE`) branch via `isFALSE()`,
+  but `reefVulnerable()` defaulted the same missing value to the
+  species-specific (`FALSE`) branch via `isTRUE()`. On the bundled
+  `caribbean_3_model` -- which predates this parameter and has no
+  `use_dummy_fish_bins` field at all -- this meant `reefVulnerable()` tried
+  to match `bin.id` against species-specific `"sp<i>_bin<k>"` keys that
+  don't exist (its `bin.id` was built the dummy way), silently found no
+  matches, and left the refuge matrix at its all-zero initial value:
+  **every fish was 100% vulnerable to predation, with the competitive
+  refuge profile having no effect at all.** `reefVulnerable()` now
+  defaults a missing value to `TRUE`, matching `getRefuge()` and the
+  package's pre-2.1.0 behaviour; the bundled `caribbean_3_model` now also
+  stores `use_dummy_fish_bins = TRUE` explicitly. `reefVulnerable()` also
+  now warns if `use_dummy_fish_bins = FALSE` but `bin.id` has no
+  species-specific keys to match against, so a mismatch like this can't
+  silently produce a no-op refuge again.
 - `getSenMort()` no longer errors when another extension (such as mizerMR)
   changes what `initialNResource()` returns. Its `n_pp` default now uses
   `params@initial_n_pp` directly, which is what the internal length check

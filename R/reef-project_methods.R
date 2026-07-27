@@ -402,7 +402,12 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
         # Determine bin.id structure
         bin_id_list <- params@other_params$refuge_params$bin.id
         bin_names <- names(bin_id_list)
-        use_dummy_fish_bins <- isTRUE(params@other_params$refuge_params$use_dummy_fish_bins)
+        # Missing/NULL use_dummy_fish_bins must default to dummy (TRUE), the
+        # same way getRefuge() defaults it via isFALSE() -- a plain isTRUE()
+        # here would instead default a missing value to the species-specific
+        # branch below, silently mismatching bin.id's actual structure
+        # whenever it was built (or bundled) under the dummy convention.
+        use_dummy_fish_bins <- !isFALSE(params@other_params$refuge_params$use_dummy_fish_bins)
 
         # Initialize storage for the array of refuge proportions
         refuge <- matrix(0, nrow = no_sp, ncol = no_w)
@@ -416,11 +421,13 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
             if (is.null(bin_keys)) {
                 bin_keys <- seq_along(bin_id_list)
             }
+            matched_any <- FALSE
             for (idx in seq_along(bin_keys)) {
                 key <- bin_keys[idx]
                 # Parse species and bin from key
                 sp_match <- regmatches(key, regexec("sp([0-9]+)_bin([0-9]+)", key))[[1]]
                 if (length(sp_match) == 3) {
+                    matched_any <- TRUE
                     i <- as.integer(sp_match[2])
                     k <- as.integer(sp_match[3])
                     bin.id <- bin_id_list[[key]]
@@ -437,6 +444,16 @@ reefVulnerable <- function(params, n, n_pp, n_other, t, new_rd = NULL, ...) {
                         tau * new_rd[k] / competitor_density[idx]
                     )
                 }
+            }
+            if (!matched_any) {
+                warning("use_dummy_fish_bins is FALSE but bin.id has no \"sp<i>_bin<k>\"-",
+                    "named entries to match against -- no predation refuge is being ",
+                    "applied. This usually means bin.id was built with use_dummy_fish_bins ",
+                    "= TRUE (or by a version of getRefuge() that predates this parameter); ",
+                    "re-run getRefuge() with the same use_dummy_fish_bins value stored in ",
+                    "params@other_params$refuge_params.",
+                    call. = FALSE
+                )
             }
         } else if (use_dummy_fish_bins) {
             # Handle non-species-specific bins
