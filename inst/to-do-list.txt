@@ -33,11 +33,14 @@ deliberately out of scope for the session that just landed.
 
 27/07 (third session, in progress): started the ~50-file sweep,
 staged in small batches with a commit after each. Batch 1 (parameter-
-setting tier: setRefuge/newRefuge/newReefParams) is DONE - see
-COMPLETED TASKS below. Next up: the steady-state/calibration tier
-(reefSteady, tuneUR, tuneUR_cc), same tier as setRefuge/newRefuge/
-newReefParams in the priority list below, split out as its own batch
-per the user's request.
+setting tier: setRefuge/newRefuge/newReefParams) and batch 2 (steady-
+state/calibration tier: tuneUR/tuneUR_cc/reefSteady) are both DONE -
+see COMPLETED TASKS below. This completes the "core setup/calibration
+functions" priority tier in full. Next up: the rate-function tier
+(reefEncounter/reefMort/reefPredMort/reefFeedingLevel/reefRates/
+reefSenMort/getRefuge/getVulnerable/reefVulnerable), extending the
+"compare dispatch vs. direct call" pattern already proven in
+test-project-methods.R.
 
 ** Before publication - recommended, not blocking **
 
@@ -173,6 +176,58 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
 COMPLETED TASKS:
 
 ============================================================================
+
+- 27/07 (third session, batch 2 of the ~50-file test-coverage sweep)
+  [Steady-state/calibration tier: test-tuneUR.R, test-tuneUR_cc.R,
+  test-reefSteady.R rewritten from expect_error(..., NA)-only checks to
+  real numeric assertions. Where possible these go beyond re-deriving
+  the source formula: after tuning, the result is plugged back into
+  algae_dynamics()/detritus_dynamics()'s own documented ODE
+  (dB/dt = P - c*B, or with carrying capacity dB/dt = P*(1-B/K) - c*B)
+  and checked to equal exactly zero - a genuine steady-state balance
+  check, not just a formula re-derivation.]
+
+  That dB/dt = 0 check surfaced a real, previously-undetected bug in
+  tuneUR_cc(): getAlgaeConsumption()/getDetritusConsumption() already
+  return the *total* (biomass-multiplied) rate c*B, but the code
+  computed algae_growth <- (aout * ba) / (1 - ba/ka) and
+  external <- ((dout * bd) / (1 - bd/kd)) - din - an extra, spurious
+  factor of ba/bd, effectively squaring the biomass dependence.
+  Confirmed numerically (dB/dt was wildly nonzero with the old code,
+  exactly zero after removing the extra multiplication) and with the
+  user before fixing, per their mid-session instruction to flag
+  numeric/rate-function failures rather than silently fix them. Fixed
+  both formulas in R/reef-components.R to match the already-correct
+  roxygen-documented formula. Neither bundled model (caribbean_3_model/
+  caribbean_10_model) uses the use_UR_cc carrying-capacity pathway
+  (confirmed both have use_UR_cc = FALSE), so no bundled-data fallout -
+  but this is the formula behind reefSteady()'s use_UR_cc dispatch and
+  the algae_boost feature from the second 27/07 session, so anyone who
+  opted into setURcapacity()/use_UR_cc = TRUE was silently never
+  reaching a true steady state. The user confirmed this explains
+  carrying-capacity dynamics "never working very well."
+
+  test-reefSteady.R additionally follows patterns from mizer's own
+  test-steady.R (fetched from github.com/sizespectrum/mizer per the
+  user's suggestion for inspiration): finite/non-negative abundance
+  checks (all(is.finite(...)), all(... >= 0)), and independently
+  confirming genuine convergence via mizer::distanceSSLogN() - project
+  one further t_per step past reefSteady()'s result and confirm the
+  distance stays under the same tolerance reefSteady() itself uses,
+  rather than just trusting its internal convergence check. Also covers
+  reproduction_level/erepro/R_max preservation (erepro checked as
+  "unchanged or clamped upward", since setBevertonHolt() can legitimately
+  bump erepro with a warning when the requested value can't sustain the
+  given reproduction rate - the same benign pattern documented for
+  matchReefGrowth()), the new_refuge = TRUE skip-retuning path, the
+  use_UR_cc = TRUE dispatch to tuneUR_cc(), and return_sim = TRUE.
+
+  Verification: devtools::test() - 0 fail, 199 pass (up from 176), 1
+  leaked warning (the pre-existing matchReefGrowth erepro one; the two
+  tuneUR/tuneUR_cc negative-external-flux warnings are now properly
+  captured via expect_warning() in the new tests instead of leaking to
+  the top-level reporter). devtools::check() - 0 errors, 0 warnings,
+  same notes as baseline.
 
 - 27/07 (third session, batch 1 of the ~50-file test-coverage sweep)
   [Parameter-setting tier: test-setRefuge.R, test-newRefuge.R,
