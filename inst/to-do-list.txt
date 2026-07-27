@@ -31,6 +31,14 @@ test coverage: the ~50-file test-coverage sweep (see that section
 below) - still the same tiered priority list as before, still
 deliberately out of scope for the session that just landed.
 
+27/07 (third session, in progress): started the ~50-file sweep,
+staged in small batches with a commit after each. Batch 1 (parameter-
+setting tier: setRefuge/newRefuge/newReefParams) is DONE - see
+COMPLETED TASKS below. Next up: the steady-state/calibration tier
+(reefSteady, tuneUR, tuneUR_cc), same tier as setRefuge/newRefuge/
+newReefParams in the priority list below, split out as its own batch
+per the user's request.
+
 ** Before publication - recommended, not blocking **
 
 - Confirm the pkgdown GitHub Actions deploy succeeded for the
@@ -165,6 +173,72 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
 COMPLETED TASKS:
 
 ============================================================================
+
+- 27/07 (third session, batch 1 of the ~50-file test-coverage sweep)
+  [Parameter-setting tier: test-setRefuge.R, test-newRefuge.R,
+  test-newReefParams.R rewritten from expect_error(..., NA)-only checks
+  to real numeric assertions, following the reefDegrade()/getDegrade()
+  pattern from the prior session (hand-derived/independently-computed
+  expected values, not re-derivations of the function's own code path).]
+
+  test-setRefuge.R: stored defaults (a_bar/b_bar/w_settle/max_protect/
+  tau/use_dummy_fish_bins), list-vs-data.frame method_params equivalence,
+  user-supplied overrides, sigmoidal slope default, the refuge_user/
+  blocked_pred/satiation/a/b default-fill-and-warn logic (satiation's
+  default formula hand-computed from the interaction matrix and
+  interaction_* columns - confirmed the default rule gives a genuinely
+  different answer than the curated real dataset value for one species,
+  which is an intentional domain override, not a bug), and method/
+  method_params validation error paths.
+
+  test-newRefuge.R: sigmoidal-method equivalence against calling
+  setRefuge()+getRefuge() directly, new_refuge flag passthrough,
+  scale_bin scaling for both the binned (prop_protect) and competitive
+  (refuge_density) methods, and error paths (no input, switching method
+  without new_method_params, bad scale_bin length/sign).
+
+  Writing the scale_bin tests surfaced a real, previously-untested bug
+  in newRefuge(): `no_bins <- length(method_params)` used length() on a
+  data frame (returns column count, e.g. 3) instead of nrow() (actual
+  bin count, e.g. 10), and the validation condition used `||` where it
+  needed `&&` - by De Morgan's, the old code only let execution continue
+  when scale_bin's length was simultaneously 1 AND equal to no_bins,
+  which is only possible when there's exactly one bin. In practice this
+  meant scale_bin always errored for any real multi-bin binned/
+  competitive profile, including the documented "single value applies
+  to all bins" case. Confirmed with the user before fixing (per their
+  mid-session instruction: numeric-test failures, especially anything
+  rate-related, get flagged before being fixed). Fixed both issues in
+  R/reef-setParams.R; also hardened the `scale_bin < 0` check to
+  `any(scale_bin < 0)` since the original scalar-only comparison would
+  silently only check the first element of a vector scale_bin.
+
+  test-newReefParams.R: mizerReef class/method for both the binned and
+  competitive methods (the two methods used by the bundled Caribbean
+  models), refuge matrix/refuge_lengths equivalence against the
+  setRefuge()+getRefuge() low-level path, rho_algae/rho_detritus
+  computed via the documented pmax(0, f0*h/(1-f0) - E) * interaction_*
+  formula (hand-derived independently using mizer::getEncounter() on
+  the plain pre-reef params object), external mortality under both the
+  z0pre allometric path (include_ext_mort = FALSE) and the default
+  nat_mort = 0.2 path (include_ext_mort = TRUE), degrade = TRUE/FALSE
+  parameter storage, and the missing-method error path.
+
+  Noted but deliberately deferred (not part of this batch): all three
+  new test files trigger mizer's benign "missing a `w_inf` column,
+  using `w_max` instead" message on every newMultispeciesParams() call
+  (suppressMessages()'d in the tests). The user suggested just adding
+  w_inf = w_max to the bundled species_params data objects to silence
+  this at the source - a good idea, logged here as a quick follow-up
+  rather than done inline to avoid tangling with the test-writing work.
+
+  Verification: devtools::test() - 0 fail, 176 pass (up from 121), 3
+  pre-documented benign warnings (unchanged - matchReefGrowth erepro,
+  tuneUR/tuneUR_cc negative external flux). devtools::check() - 0
+  errors, 0 warnings, same notes as the existing baseline (inst/LICENSE
+  top-level placement, tuneUR/tuneUR_cc + data() style note; a third
+  "unable to verify current time" NOTE is a known sandbox-clock
+  artifact, not a real issue).
 
 - 27/07 (second session) [Repo cleanup + hygiene pass before merging
   major_update into main.]
