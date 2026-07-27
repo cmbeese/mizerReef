@@ -173,7 +173,7 @@ mizerReef extends mizer by modeling reef-specific dynamics. To utilise the preda
 vulnerability and unstructured resource dynamics in MizerReef, add these
 columns to your species parameter data frame:
 
-```{r reef-params-table, echo=FALSE, eval=FALSE}
+```{r reef-params-table, echo=FALSE, eval=TRUE}
 library(knitr)
 kable(
   data.frame(
@@ -213,7 +213,7 @@ assemblage data from a Caribbean reef site with relatively low fishing pressure.
 shown below:
 
 
-```{r setup, message=FALSE, echo = FALSE, eval=FALSE}
+```{r species-params-table, message=FALSE, echo = FALSE, eval=TRUE}
 data("caribbean_10_species")
 knitr::kable(caribbean_10_species[colnames(caribbean_10_species) %in% c("species", "l_max", "w_mat",
 "age_mat", "biomass_cutoff", "biomass_observed", "beta", "sigma", "a", "b", "refuge_user",
