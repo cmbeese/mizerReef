@@ -24,6 +24,20 @@
 
 ## Bug fixes
 
+- Fixed `setExtMortParams()` (and therefore `newReefParams(ext_mort_params =
+  ...)`, which calls it) so that custom `ext_mort_params` actually works.
+  Previously it was completely broken for both ways a user would reasonably
+  supply it: a `data.frame` passed `setExtMortParams()`'s own validation but
+  was then stored as a matrix, which crashed with `"$ operator is invalid
+  for atomic vectors"` the moment it was used (either immediately, inside
+  `newReefParams()` itself when `include_ext_mort = TRUE`, or later in
+  `reefSenMort()`); a named `list` failed `setExtMortParams()`'s own
+  validation outright with a misleading "needs a column called 'nat_mort'"
+  error even when `nat_mort` was provided, because converting a list with
+  `as.matrix()` puts its names in the row names, not the column names.
+  `setExtMortParams()` now normalises list/data-frame/matrix input to a
+  plain named list before validating or storing it, matching what every
+  downstream consumer already expected.
 - Fixed two bugs in `getRefuge()`'s `use_dummy_fish_bins = FALSE` branch
   (`binned` and `competitive` methods) that made it unusable: `refuge_lengths`
   was built from scalar values stored in a flat named list, which crashed

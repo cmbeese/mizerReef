@@ -322,29 +322,42 @@ setExtMortParams <- function(params,
 
     # mort_params - Check if user provided valid mortality parameters
     if (!is.null(ext_mort_params)) {
+        # Accept a named list, data frame, or matrix (as documented) but
+        # normalise all three to a plain named list before validating or
+        # storing it -- every downstream consumer (newReefParams(),
+        # reefSenMort()) accesses this with `$`, which is invalid on a
+        # matrix. A matrix input previously passed validation (its columns
+        # ARE named) but then crashed the first time it was actually used;
+        # a plain named list previously failed validation outright, because
+        # as.matrix() on a named list puts the names in rownames, not
+        # colnames, so the colnames()-based checks below always failed.
+        if (is.matrix(ext_mort_params)) {
+            ext_mort_params <- as.data.frame(ext_mort_params)
+        }
+        if (is.data.frame(ext_mort_params)) {
+            ext_mort_params <- as.list(ext_mort_params)
+        }
         if (!all(sapply(ext_mort_params, is.numeric))) {
             stop("The external mortality parameters should be numeric.")
         }
-        if (!is.matrix(ext_mort_params)) {
-            ext_mort_params <- as.matrix(ext_mort_params)
-            if (!all(ext_mort_params >= 0)) {
-                stop("The external mortality parameters should be
-                     nonnegative")
-            }
+        if (!all(unlist(ext_mort_params) >= 0)) {
+            stop("The external mortality parameters should be
+                 nonnegative")
         }
-        if (!("nat_mort" %in% colnames(ext_mort_params))) {
+        if (!("nat_mort" %in% names(ext_mort_params))) {
             stop("The external mortality parameters dataframe needs a column
                  called 'nat_mort' with the residual natural mortality rate.")
         }
-        if (!("sen_prop" %in% colnames(ext_mort_params))) {
+        if (!("sen_prop" %in% names(ext_mort_params))) {
             stop("The external mortality parameters dataframe needs a column
                  called 'sen_prop' with the external mortality rate.")
         }
-        if (!("sen_curve" %in% colnames(ext_mort_params))) {
+        if (!("sen_curve" %in% names(ext_mort_params))) {
             stop("The external mortality parameters dataframe needs a column
                  called 'sen_curve' with the exponent for the external
                  curve.")
         }
+        ext_mort_params <- ext_mort_params[c("nat_mort", "sen_prop", "sen_curve")]
     } else {
         ext_mort_params <- vector("list", 3)
         names(ext_mort_params) <- c("nat_mort", "sen_prop", "sen_curve")
