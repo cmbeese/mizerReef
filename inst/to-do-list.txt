@@ -86,12 +86,21 @@ session...) ===" and in COMPLETED TASKS, but headline results:
   doing hands-on numerical verification (not just devtools::test()/
   check(), which build their own temp library) should confirm the
   installed copy is current first.
-- FLAGGED, not fixed (see the dedicated entry further down, "ALGAE/
-  DETRITUS STANDING BIOMASS..."): algae_biomass()/detritus_biomass()
-  return ~1e-10 to 1e-11 g/m^2 on all three bundled models - confirmed
-  mathematically self-consistent (not a convergence bug) but predates
-  this session entirely and needs the user's judgement on whether/how
-  to rescale.
+- CONFIRMED, DEFERRED to a future release (see the dedicated entry
+  further down, "ALGAE/DETRITUS STANDING BIOMASS...", plus the
+  "FUTURE WORK PLAN: give algae/detritus a real absolute biomass
+  scale" write-up right after it): algae_biomass()/detritus_biomass()
+  return ~1e-10 to 1e-11 g/m^2 on all three bundled models. Root cause
+  confirmed end to end (calibrateReefBiomass()'s fish-only rescaling
+  factor gets applied to the resource pools too, with no relationship
+  to a sensible absolute value) - not a convergence bug, and the user
+  confirmed their own thesis models show the same pattern, so this
+  predates the package entirely. Explicitly out of scope for the
+  current release per the user; full fix plan (literature-informed
+  target values - EAM standing biomass ~10-100 g DW/m^2, production
+  ~0.3-1.3 g DW/m^2/day - unit resolution, rescaling the bundled
+  models, and closing the gap in the documented tuning recipe) is
+  written up and ready for whenever this gets picked up.
 
 Nothing is currently blocking. Next up, per the user's own priority
 order if picked up fresh: deepen R/reef-setParams.R's test coverage
@@ -248,13 +257,13 @@ meaningful absolute scale. Every future model built by following
 mizerReef's own tuning instructions as written will have this same
 issue by default.
 
-Not fixed. Options for the user to consider: (a) leave the mechanism
-as-is but add a step to the documented tuning recipe (both
-vignette("mizerReef") and steady-state-recipe.Rmd) calling
-rescale_algae()/rescale_detritus() to a chosen sensible absolute value
-before the final save, and retroactively rescale the three bundled
-models the same way (reversible, well-tested, no dynamics change -
-rescale_algae()/rescale_detritus() exist for exactly this); (b) change
+Not fixed. Options considered: (a) leave the mechanism as-is but add a
+step to the documented tuning recipe (both vignette("mizerReef") and
+steady-state-recipe.Rmd) calling rescale_algae()/rescale_detritus() to
+a chosen sensible absolute value before the final save, and
+retroactively rescale the three bundled models the same way
+(reversible, well-tested, no dynamics change - rescale_algae()/
+rescale_detritus() exist for exactly this); (b) change
 calibrateReefBiomass()/scaleReefModel() itself so algae/detritus are
 excluded from the factor rescaling (i.e. keep B_A/B_D fixed and let
 rho absorb the whole calibration adjustment on its own) - a real code
@@ -262,8 +271,128 @@ change to a documented, tested function, not just a vignette/data
 fix, so needs more thought about whether that changes anything else
 relied upon; (c) leave as-is entirely (mathematically correct, just
 cosmetically odd, could add a caveat sentence to the model-description
-vignettes instead). Did not touch any bundled .rda, calibration code,
-or vignette prose for this - flagging only, per standing instruction.
+vignettes instead).
+
+*** USER DECISION (28/07, same session): confirmed the user's own
+thesis models showed similarly low steady-state algae/detritus
+biomass in the reviewed documents too - so this is a longstanding
+characteristic of the tuning methodology itself, not something
+introduced by porting to a package, and not a surprise sprung by this
+session's fixes. WANTS TO FIX IT EVENTUALLY, but explicitly OUT OF
+SCOPE for the current publication/release - deferred to a future
+release. Detailed plan below so a future session (or the user
+directly) can pick this up without re-deriving the mechanism above. ***
+
+** FUTURE WORK PLAN: give algae/detritus a real absolute biomass scale **
+
+Reference values the user supplied for calibrating a real target (EAM
+= epilithic algal matrix, the dominant turf/algae component on
+Caribbean reefs):
+  - Standing biomass: ~10-100 g dry weight (DW) per m^2.
+  - Net production: ~0.3-1.3 g DW per m^2 per day (~110-475 g DW per
+    m^2 per year).
+No equivalent literature figures were supplied for detritus in this
+conversation - that side needs its own literature pass before picking
+a target (see step 1c).
+
+Step 1 - decide on target values and resolve the units question
+(needs the user's judgement, not something to guess at):
+  (a) Pick a target algae_biomass() for each bundled model somewhere
+      in the 10-100 g DW/m^2 range (could be a single round number for
+      all three, e.g. ~30-50 g/m^2, or something more specific per
+      site if the FORCE/Karpata field data actually distinguishes
+      algal cover between sites).
+  (b) Resolve wet vs. dry weight: fish biomass in mizer/mizerReef is
+      the standard a*L^b allometric WET mass. EAM literature figures
+      are conventionally DRY weight. Turf algae is typically ~10-20%
+      dry matter by mass (i.e. wet mass is roughly 5-10x dry mass),
+      so a literature DW target may need converting to a wet-mass
+      equivalent before being used as algae_biomass()'s target -
+      unless the intention is for mizerReef's algae units to be
+      dry-weight-denominated specifically (in which case document
+      that explicitly, since nothing currently states either
+      convention). This is exactly the kind of unit-consistency
+      decision that should NOT be made unilaterally by a future
+      session - flag it back to the user if picked up without this
+      being resolved first.
+  (c) Separately research/decide a detritus target (no literature
+      figures were provided this round). Detritus turnover in reef
+      systems is generally much faster than algae standing stock, so
+      it plausibly deserves a different absolute scale than algae
+      rather than reusing the same number.
+  (d) Optionally, cross-check the chosen target's implied production
+      rate against the "~0.3-1.3 g DW/m^2/day" figure: once
+      algae_biomass() is rescaled, getAlgaeProduction()/pA (already
+      printed in caribbean_3_model-description.Rmd/
+      karpata_model-description.Rmd as "algal production... grams per
+      square meter per year") should land in a plausible range once
+      converted to the same units and time base - this is a free
+      sanity check on whether the chosen target biomass is
+      self-consistent with the model's own tuned growth rate, not an
+      independent thing to tune.
+
+Step 2 - rescale the three bundled models (low-risk, mechanical, once
+step 1's targets are picked):
+  - rescale_algae(params, factor)/rescale_detritus(params, factor),
+    where factor = target_biomass / algae_biomass(params) (or
+    detritus_biomass(params)). Both functions already exist, are
+    already tested (test-rescale_algae.R et al. from the third
+    session's coverage sweep - check those still pass unchanged
+    afterward), and are specifically designed to leave all dynamics
+    unchanged (they divide rho by the same factor, so the encounter
+    rate rho*B and therefore every downstream rate/growth/mortality
+    calculation is provably untouched - confirm this the same way the
+    rates_funcs/algae_growth_initial .rda fixes were verified earlier
+    this project: all.equal() on a before/after steady-state
+    projection, or a direct dB/dt = 0 check at the new scale).
+  - Do this for caribbean_3_model, caribbean_10_model, AND
+    claude_10_model (and karpata_refuge-based models generally, if any
+    others get added later) - the mechanism affects any model built
+    through the standard recipe, not just these three.
+  - Once rescaled, the caribbean_3_model-description.Rmd/
+    karpata_model-description.Rmd prose numbers ($B_A = ...$, detrital
+    production, etc.) will automatically read correctly since they are
+    all inline `r`-computed from the live object, not hardcoded - no
+    vignette text changes needed after this step.
+
+Step 3 - close the gap in the documented tuning recipe so future
+models built from scratch don't reintroduce this (this is the part
+that actually prevents recurrence, not just patches the three bundled
+objects):
+  - Add an explicit step to vignette("mizerReef")'s "Tuning the steady
+    state" section and to steady-state-recipe.Rmd: after the
+    calibrateReefBiomass()/matchBiomasses()/matchReefGrowth() iteration
+    loop concludes (i.e. once fish biomasses/growth are matched to
+    observations), call rescale_algae()/rescale_detritus() to bring
+    the resource pools to a literature-informed absolute value, BEFORE
+    the final reefSteady() + save. Frame it as its own numbered step,
+    not a footnote, since skipping it silently reproduces this whole
+    issue.
+  - Bigger, riskier alternative (explicitly a "maybe, later" option,
+    not a recommendation): change calibrateReefBiomass()/
+    scaleReefModel() itself so the fish-biomass calibration factor no
+    longer applies to other-components by default - e.g. a new
+    rescale_resources = TRUE/FALSE argument, defaulting to TRUE for
+    backward compatibility (so old code/models keep working
+    identically) but documented so a new user can opt out and handle
+    resource scaling separately via step 1-2's approach. This touches
+    a core, tested, documented function used throughout the
+    calibration workflow, so it needs its own dedicated review pass
+    (existing tests, NEWS.md entry, version bump) - treat as a
+    separate, larger unit of work from steps 1-2, and a good candidate
+    for "next major version" rather than a quick patch.
+
+Step 4 - add a regression guard: once target values are settled, add
+a test (new file or appended to test-newReefParams.R/test-tuneUR.R)
+asserting algae_biomass()/detritus_biomass() fall within a documented
+plausible range for the bundled models, so this can't silently
+re-drift to near-zero in a future re-tuning without at least a test
+failure calling attention to it.
+
+Not started. No code, data, or vignette prose touched for this plan -
+purely a write-up for whenever the user wants to pick it up, per their
+explicit instruction that this is out of scope for the current
+release.
 
 THE ~50-FILE TEST-COVERAGE SWEEP IS DONE. Every tier from the original
 priority list is now covered with real numeric assertions instead of
@@ -487,6 +616,23 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
   algae/detritus near-zero standing biomass finding (both below), and
   the next-priority item (reef-setParams.R test coverage, see "Test
   coverage" section).
+- CONFIRMED, DEFERRED (28/07, same session): the algae/detritus
+  near-zero standing biomass finding above has a confirmed root cause
+  (calibrateReefBiomass()'s fish-only rescaling factor gets applied to
+  the resource pools too via scaleReefModel(), dragging them away from
+  their arbitrary initial_value = 1 with no relationship to a
+  sensible absolute biomass) - see the "*** FLAGGED FOR USER
+  REVIEW..." entry above for the full mechanism, confirmed
+  empirically end to end. The user confirmed their own thesis models
+  show the same low steady-state biomass, so this predates the
+  package entirely and is a longstanding property of the tuning
+  methodology, not a porting artifact. Explicitly deferred - not
+  needed for the current publication/release. A full step-by-step fix
+  plan (target values from the literature, unit resolution, rescaling
+  the bundled models, closing the gap in the documented tuning recipe,
+  and a regression test) is written up in the "FUTURE WORK PLAN: give
+  algae/detritus a real absolute biomass scale" section above, ready
+  for a future release.
 - 27/07: NEW - broader stale-bundled-.rda-metadata audit. This
   session found and fixed TWO separate instances of the same bug
   class on caribbean_3_model/caribbean_10_model: stale field names
