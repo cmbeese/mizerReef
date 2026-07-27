@@ -83,6 +83,22 @@
   `diff_method`'s documentation, which described the valid values as
   `` `percent.change` ``/`` `rel.diff` `` (dots) when the code has always
   only accepted `"percent_change"`/`"rel_diff"` (underscores).
+- `plotTotalAbundance()`/`plotTotalBiomass()` computed `end_time <-
+  max(as.numeric(dimnames(object@n)$time))` for a `MizerSim` object -- a
+  *time value* -- and then used it directly as a *row position*
+  (`abd[end_time, ]`). Since time starts at 0, row 1 is time 0, so this was
+  off by one for every simulation: `plotTotalAbundance()` silently plotted
+  the second-to-last saved timestep instead of the true last one, with no
+  error or warning. `plotTotalBiomass()` had it worse -- it crashed
+  outright for any `mizerReefSim` (`"arguments imply differing number of
+  rows"`), because `getBiomass.mizerReefSim()` includes `algae`/`detritus`
+  columns alongside the species, and the downstream species-only
+  subsetting indexed that longer vector with a species-only logical vector
+  instead of by name. Fixed both to use the actual last row position
+  (matching the correct approach already used a few lines away in
+  `plotProductivity()`'s own `MizerSim` branch), and switched
+  `plotTotalBiomass()`'s species subsetting to index by name instead of by
+  position so it's robust to the extra algae/detritus columns.
 - Fixed `setExtMortParams()` (and therefore `newReefParams(ext_mort_params =
   ...)`, which calls it) so that custom `ext_mort_params` actually works.
   Previously it was completely broken for both ways a user would reasonably

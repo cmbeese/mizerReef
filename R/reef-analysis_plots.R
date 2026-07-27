@@ -798,14 +798,18 @@ plotTotalAbundance <- function(object, stack = FALSE,
         ## sim values -
         # get total abundance at last timestep
         params <- object@params
-        end_time <- max(as.numeric(dimnames(object@n)$time))
 
         abd <- mizer::getN(object,
             min_l = min_fishing_l,
             max_l = max_fishing_l
         )
 
-        abd <- abd[end_time, , drop = TRUE]
+        # Use the last *row position*, not the numeric time value as an
+        # index -- row 1 is time 0, so treating the time value itself as a
+        # positional index is off by one (e.g. abd[2, ] would grab the row
+        # for time = 1, not time = 2). Matches the correct approach already
+        # used in plotProductivity()'s own MizerSim branch.
+        abd <- abd[dim(abd)[1], , drop = TRUE]
 
     } else {
         # params -
@@ -932,14 +936,15 @@ plotTotalBiomass <- function(object,
         ## sim values -
         # get total biomass at last timestep
         params <- object@params
-        end_time <- max(as.numeric(dimnames(object@n)$time))
 
         biom <- mizer::getBiomass(object,
             min_l = min_fishing_l,
             max_l = max_fishing_l
         )
 
-        biom <- biom[end_time, , drop = TRUE]
+        # Use the last *row position*, not the numeric time value as an
+        # index -- see the matching comment in plotTotalAbundance().
+        biom <- biom[dim(biom)[1], , drop = TRUE]
 
     } else {
         # params -
@@ -981,7 +986,12 @@ plotTotalBiomass <- function(object,
         error_on_empty = TRUE
     )
     species <- dimnames(params@initial_n)$sp[sel_sp]
-    biom <- biom[sel_sp, drop = FALSE]
+    # Index by name, not by the sel_sp logical vector directly: for a
+    # MizerSim, biom comes from getBiomass.mizerReefSim(), which also
+    # includes algae/detritus columns alongside the species -- indexing
+    # that longer, differently-shaped vector with a species-only logical
+    # vector recycles it incorrectly instead of erroring.
+    biom <- biom[species, drop = FALSE]
 
     ## data frame from selected species -
     plot_dat <- data.frame(value = biom, Species = species)
