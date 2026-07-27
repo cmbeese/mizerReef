@@ -309,32 +309,43 @@ resources' encounter both end up in the final rate, and why a single
 together. Neither package needs to know about the other; they only need to be
 polite about calling `NextMethod()`.
 
-### An important caveat: chaining only combines "polite" extensions
+### An important caveat: chaining only combines extensions that use the same mechanism
 
-The composability shown above is *not* automatic just because two packages are
-both registered as mizer extensions — it works here because **both** mizerReef
-and mizerMR are written to call `NextMethod()` inside every method that
-overrides a shared generic. The chaining mechanism itself does not merge two
-extensions' contributions to the same rate; it only walks the class hierarchy
-and calls whichever method is next. If an extension overrides a generic
-*without* calling `NextMethod()` — for example by replacing the rate function
-directly rather than dispatching through the S3 chain — then loading it
-alongside another extension that modifies the same rate does not combine the
-two contributions. Whichever extension was loaded **last** simply wins, and
-the other extension's modification to that rate is silently dropped.
+The composability shown above is *not* automatic just because two packages
+both touch mizer models — it works here because **both** mizerReef and
+mizerMR are *dispatching extensions*: each registers itself with
+`registerExtension()`, defines an S4 marker class, and calls `NextMethod()`
+inside every method that overrides a shared generic. mizer still supports an
+older, simpler mechanism for changing a single rate calculation:
+`mizer::setRateFunction(params, "Encounter", "my_fun")` swaps in one named
+function, with no chaining at all. A params object uses *one mechanism or the
+other* for a given rate, never both: `getEncounter()` (and the other rate
+generics) checks whether the object has been coerced to a dispatching
+extension's class at all, and if so walks the full `NextMethod()` chain — a
+path that computes the encounter rate directly and never consults
+`rates_funcs` — otherwise it calls the single function named in
+`rates_funcs$Encounter` directly.
 
-A concrete example: both mizerReef and
-[therMizer](https://sizespectrum.org/therMizer/) (temperature effects) modify
-the encounter rate. Because they don't yet compose through the chaining
-mechanism the way mizerReef and mizerMR do, combining them does not apply both
-effects together — it applies whichever extension's encounter rate was loaded
-last, silently overriding the other. Truly composable behaviour across *any*
-pair of mizer extensions is still an evolving part of the mizer ecosystem, not
-something the chaining mechanism guarantees on its own. Before combining
-mizerReef with a third-party extension, check whether that extension's methods
-call `NextMethod()` for any generic you expect both packages to contribute to
-— if it doesn't, expect last-loaded-wins rather than combination for that
-specific rate.
+A concrete example: [therMizer](https://github.com/sizespectrum/therMizer)
+(temperature effects) modifies the encounter rate via
+`setRateFunction(params, "Encounter", "therMizerEncounter")` — the older,
+non-chaining mechanism; it does not register itself as a dispatching
+extension. Once mizerReef has coerced a params object to its own dispatching
+class (which happens automatically inside `newReefParams()`), that object's
+encounter rate is computed by walking mizerReef's `NextMethod()` chain, and
+`rates_funcs$Encounter` — including a `therMizerEncounter` registration — is
+never consulted at all. The reverse is equally true: on an object still
+carrying the base `MizerParams` class, `rates_funcs$Encounter` runs alone and
+mizerReef's refuge correction never applies. So combining mizerReef with an
+extension like therMizer does not currently give you both effects together —
+whichever mechanism happens to govern that rate for the object determines
+the outcome, regardless of the order the two were set up in. Getting genuine
+composition (as demonstrated above for mizerReef + mizerMR) requires *both*
+extensions to be written as dispatching extensions that call `NextMethod()`
+— even then, if either method skips `NextMethod()`, the extension loaded
+**first** (further down the chain) is the one that gets shadowed. Truly
+composable behaviour across *any* pair of mizer extensions, regardless of
+which mechanism each uses, is still an evolving part of the mizer ecosystem.
 
 ```{r, include = FALSE}
 # Loading mizerMR registers it in this R session's extension chain for as
