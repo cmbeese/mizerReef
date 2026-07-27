@@ -56,8 +56,9 @@ plotVulnerable <- function(object,
         # Get time for end of simulation
         if (is.null(time_step)) {
             t <- max(as.numeric(dimnames(object@n)$time))
+        } else {
+            t <- time_step
         }
-        t <- time_step
         vul <- getVulnerable(object, time_range = t)
     } else if (is(object, "MizerParams")) {
         ## params values ----

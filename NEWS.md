@@ -106,6 +106,17 @@
   line unconditionally did `params <- object` again -- dead code left over
   from a refactor that silently undid the `MizerSim` branch's correct
   extraction. Deleted the redundant line.
+- `plotVulnerable()` crashed for any `MizerSim` input in the common case
+  (no explicit `time_step` given): `t <- max(as.numeric(dimnames(object@n)
+  $time))` correctly computed the last simulation time inside
+  `if (is.null(time_step))`, but the very next line, `t <- time_step`, ran
+  unconditionally and reset `t` back to `NULL`, causing
+  `getVulnerable(object, time_range = t)` to fail with `"The time range
+  does not contain any simulation results."` (Explicitly passing
+  `time_step` happened to work, since that's the one case where the
+  unconditional overwrite was actually correct.) Fixed by making the
+  second assignment an `else` branch instead of a second unconditional
+  statement.
 - `plotProductivity()`'s `species` argument default handling (both for the
   pre-existing "no species given -> use all species" behaviour on the
   `MizerSim` branch, and the new `include_inverts` default filtering added
