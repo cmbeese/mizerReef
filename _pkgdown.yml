@@ -149,4 +149,4 @@ articles:
   - title: "Package Internals"
     contents:
       - extension_mechanism
-      - multiple-resources
+      - using-multiple-resources

@@ -100,9 +100,11 @@ For everyday single-extension use this is harmless, since both bundled
 objects already carry the correct class from when they were saved. It
 would only matter if you loaded mizerReef together with a second
 dispatching extension on one of these two specific objects — for example,
-the mizerMR combination shown in the (currently unlisted)
-`multiple-resources` vignette. This is being worked on; see
-`inst/to-do-list.txt` for the current state.
+the mizerMR combination shown in `vignette("using-multiple-resources")`.
+That combination does work (mizer's extension chain, a separate mechanism,
+correctly promotes the object's class when both extensions are
+registered), but the underlying `.onLoad` dead-code gap described above is
+still unfixed upstream; see `inst/to-do-list.txt` for the current state.
 
 ## Methods dispatched on `mizerReef`
 
