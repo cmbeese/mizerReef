@@ -33,14 +33,34 @@ deliberately out of scope for the session that just landed.
 
 27/07 (third session, in progress): started the ~50-file sweep,
 staged in small batches with a commit after each. Batch 1 (parameter-
-setting tier: setRefuge/newRefuge/newReefParams) and batch 2 (steady-
-state/calibration tier: tuneUR/tuneUR_cc/reefSteady) are both DONE -
-see COMPLETED TASKS below. This completes the "core setup/calibration
-functions" priority tier in full. Next up: the rate-function tier
+setting tier: setRefuge/newRefuge/newReefParams), batch 2 (steady-
+state/calibration tier: tuneUR/tuneUR_cc/reefSteady), and batch 3
+(getRefuge/reefVulnerable/getVulnerable, the user's requested
+priority sub-batch of the rate-function tier since these are
+foundational for the rest of it) are all DONE - see COMPLETED TASKS
+below. Batch 3 found and fixed the most consequential bug of the
+session so far: predation refuge was completely non-functional on
+the bundled caribbean_3_model (see that entry below for the full
+account). Next up: the remaining rate-function tier
 (reefEncounter/reefMort/reefPredMort/reefFeedingLevel/reefRates/
-reefSenMort/getRefuge/getVulnerable/reefVulnerable), extending the
-"compare dispatch vs. direct call" pattern already proven in
-test-project-methods.R.
+reefSenMort), extending the "compare dispatch vs. direct call"
+pattern already proven in test-project-methods.R.
+
+Two follow-ups flagged during batch 3, deliberately deferred until
+the test-coverage sweep is finished:
+- The vignette "body_shape_example"/body-shape-example.png figure
+  (illustrative example of the use_dummy_fish_bins TRUE vs. FALSE
+  distinction, referenced in vignettes/mizerReef.Rmd) needs
+  regenerating with current code - the user noted it isn't built
+  from the freshest code. Source material for it should be in
+  ignore/ and inst/archive/data-archive/.
+- Every vignette needs re-checking/regenerating now that
+  caribbean_3_model's predation refuge is actually functional (see
+  the use_dummy_fish_bins bug fix below) - its simulated dynamics
+  genuinely changed, so any numbers/plots built on it are now stale.
+  Affected vignettes (grep for caribbean_3_model):
+  extension_mechanism.Rmd, caribbean_3_model-description.Rmd,
+  using-multiple-resources.Rmd, model-description.Rmd.
 
 ** Before publication - recommended, not blocking **
 
@@ -176,6 +196,103 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
 COMPLETED TASKS:
 
 ============================================================================
+
+- 27/07 (third session, batch 3 of the ~50-file test-coverage sweep,
+  done as its own sub-batch ahead of the rest of the rate-function
+  tier per the user's request: getRefuge/reefVulnerable/getVulnerable
+  are foundational to the other rate functions.]
+
+  test-getRefuge.R, test-reefVulnerable.R, test-getVulnerable.R
+  rewritten from expect_error(..., NA)-only checks to real numeric
+  assertions, hand-derived independently from the documented formulas
+  (sigmoidal/binned proportion formulas, competitive competitor-
+  density formula, dispatch-vs-direct-call for getVulnerable() vs.
+  reefVulnerable() following test-project-methods.R's pattern).
+  Deliberately exercised both use_dummy_fish_bins = TRUE and FALSE for
+  every method (per the user's explicit request), using
+  caribbean_10_species (whose species have genuinely different a/b)
+  rather than caribbean_3_species (whose 3 species all share
+  a = 0.025, b = 3, so it can't distinguish species-specific bins from
+  dummy bins) wherever the species-specific branch needed a real test.
+
+  This surfaced two rounds of bugs, both fixed with the user's
+  explicit sign-off before writing tests against the corrected
+  behaviour (per their standing instruction to flag numeric/rate-
+  function failures rather than silently fix them):
+
+  Round 1 - getRefuge() crash + silent logic bug, both in the
+  use_dummy_fish_bins = FALSE branch (binned and competitive methods):
+  (a) start_l.i/end_l.i were built from scalar per-species-per-bin
+  values stored in a flat list keyed by "sp<i>_bin<k>", then
+  do.call(rbind, ...) + t() -- but the list also carried a leftover
+  unnamed placeholder element (list(1), never overwritten because
+  string-keyed assignment doesn't reuse position 1 the way the dummy
+  branch's purely-numeric-keyed list does), so refuge_lengths ended up
+  as a single-row matrix and row.names(refuge_lengths) <- sp$species
+  crashed with "length of 'dimnames' [1] not equal to array extent"
+  for any model with more than one species. (b) (binned only, masked
+  by the crash) the refuge proportions were accumulated into ref, a
+  single vector shared across the whole species x bin loop, then
+  broadcast identically to every species row -- so even with the crash
+  fixed, every species would get an identical refuge profile,
+  defeating the entire point of use_dummy_fish_bins = FALSE. Fixed by
+  rebuilding both branches to construct refuge/start_l.i/end_l.i as
+  proper per-species matrices directly (R/reef-setParams.R). Confirmed
+  with caribbean_10_species: the fixed output is genuinely
+  species-specific (rows differ) and matches an independent
+  hand-calculation exactly.
+
+  Round 2 - the session's most consequential finding: predation refuge
+  was completely non-functional on the bundled caribbean_3_model.
+  Root cause: getRefuge() and reefVulnerable() disagreed on what a
+  missing/NULL use_dummy_fish_bins should default to.
+  getRefuge()'s isFALSE(use_dummy_fish_bins) check defaults a missing
+  value to the dummy (TRUE) branch; reefVulnerable()'s
+  isTRUE(use_dummy_fish_bins) check defaulted the same missing value
+  to the species-specific (FALSE) branch instead. caribbean_3_model
+  predates use_dummy_fish_bins entirely (confirmed against main: it
+  never had this parameter, always behaved as "dummy") and has no
+  such field at all, but its bin.id was built the dummy way (plain
+  numeric keys, not "sp<i>_bin<k>"). So reefVulnerable() took the
+  species-specific branch, tried to regex-match bin.id's numeric keys
+  against the "sp<i>_bin<k>" pattern, never matched a single one, and
+  silently left the refuge matrix at its all-zero initial value --
+  meaning getVulnerable(caribbean_3_model) returned 1 (100%
+  vulnerable) everywhere, confirmed to change reefEncounter() by up to
+  134% relative to the correct behaviour. Every simulation/steady-state
+  run of caribbean_3_model has been running with a completely
+  non-functional competitive refuge profile. caribbean_10_model was
+  NOT affected -- confirmed it has use_dummy_fish_bins = TRUE stored
+  explicitly (the user noted both bundled models were originally built
+  on main before this parameter existed, so caribbean_10_model's
+  explicit TRUE must have been added afterward; caribbean_3_model
+  should have the same, so this is the fix applied). Fixed
+  reefVulnerable() to default a missing value to TRUE via
+  !isFALSE(...), matching getRefuge()'s convention and main's legacy
+  behaviour (R/reef-project_methods.R); added use_dummy_fish_bins =
+  TRUE explicitly to the bundled caribbean_3_model.rda (confirmed via
+  all.equal() that this is the only field that changed, using bzip2
+  compression to match the original file). Also added a defensive
+  warning (per the user's request) when the species-specific branch
+  never finds a single "sp<i>_bin<k>"-keyed match, so a mismatch like
+  this can't silently ship again.
+
+  use_dummy_fish_bins is a new parameter added during this update (did
+  not exist on main) - documented in NEWS.md under both "New features"
+  (what TRUE vs. FALSE mean, the two valid-but-different approaches to
+  species-specific refuge bins per the user's explanation) and
+  "Bug fixes" (both rounds above), per the user's explicit request.
+
+  Verification: devtools::test() - 0 fail, 269 pass (up from 199), 0
+  leaked warnings (down from 1 -- the matchReefGrowth erepro-clamping
+  warning no longer fires now that caribbean_3_model's refuge is
+  genuinely functional and its steady state no longer needs erepro
+  clamped to the minimum; confirmed this is a real, expected downstream
+  consequence, not a regression, and that test-matchReefGrowth.R still
+  passes). devtools::check() - 0 errors, 0 warnings, same notes as
+  baseline. Note: reefSteady() on caribbean_3_model now converges in
+  15 years instead of 34.5 -- also an expected consequence of the
+  refuge fix genuinely changing the model's dynamics, not a bug.
 
 - 27/07 (third session, batch 2 of the ~50-file test-coverage sweep)
   [Steady-state/calibration tier: test-tuneUR.R, test-tuneUR_cc.R,
