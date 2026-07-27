@@ -9,11 +9,8 @@ test2.rda
 test_sp2.rda
 test_i2.rda
 ^ignore$
-^check-results\.txt$
-^\.env$
 ^\.kilo$
 ^\.vscode$
+^\.claude$
 ^LICENSE$
 ^CITATION\.cff$
-^creating-extension-packages\.Rmd$
-^thesis-model\.RData$
