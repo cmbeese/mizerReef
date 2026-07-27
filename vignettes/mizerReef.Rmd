@@ -25,6 +25,7 @@ your first MizerReef model, including:
 5. [Tuning the steady state]
 6. [Exploring results]
 7. [Changing the refuge profile]
+8. [Running a simulation]
 
 > **Model context:**
 > Habitat structure mediates system dynamics by providing predation refuge.
@@ -424,7 +425,7 @@ For a full list of available summary and diagnostic plots, see [MizerReef summar
 ## Changing the refuge profile {.section-change-refuge}
 
 ::: {.content-visible when-format="html"}
-[Skip to Links and further reading](#links-and-further-reading)
+[Skip to Running a simulation](#running-a-simulation)
 :::
 
 Changing the refuge profile allows you to explore how habitat structure affects model dynamics, such as biomass and productivity. This is useful for simulating habitat degradation or restoration scenarios.
@@ -466,6 +467,84 @@ As we can see in Figure 4, removing refuge availability reduces both biomass and
 
 
 For more information on the example data used in this vignette, see the [mizerReef model description vignette](karpata_model-description.html).
+
+
+## Running a simulation {.section-running-simulation}
+
+::: {.content-visible when-format="html"}
+[Skip to Links and further reading](#links-and-further-reading)
+:::
+
+Once you have a tuned model at steady state, you can project it forward in
+time with mizer's `project()` function, exactly as you would for a standard
+mizer model. This section shows two common scenarios: adding fishing
+pressure, and letting a parameter (here, the refuge profile) change part-way
+through a simulation.
+
+### Simulating fishing pressure
+
+`caribbean_10_model` already has gear parameters set up, so you can project
+it forward at a chosen fishing effort. Comparing an unfished run (`effort =
+0`) against a fished run shows the effect of fishing on total biomass:
+
+```{r fishing-sim, echo=TRUE, eval=TRUE}
+sim_unfished <- project(caribbean_10_model, effort = 0, t_max = 20,
+                        progress_bar = FALSE)
+sim_fished <- project(caribbean_10_model, effort = 1, t_max = 20,
+                      progress_bar = FALSE)
+
+# Total biomass after 20 years, unfished vs. fished
+c(unfished = sum(mizer::getBiomass(sim_unfished)[21, ]),
+  fished = sum(mizer::getBiomass(sim_fished)[21, ]))
+```
+
+```{r plot-fished-biomass, echo=TRUE, eval=TRUE, fig.cap="Total biomass over time for the fished simulation.", fig.alt="Line plot of total biomass by species over 20 years of simulation with fishing effort 1."}
+plotBiomass(sim_fished)
+```
+
+See mizer's own [effort and fishing mortality
+articles](https://sizespectrum.org/mizer/articles/mizer.html) for more on
+setting up gears, selectivity, and effort schedules.
+
+### Simulating habitat decline
+
+Refuge parameters can also be changed between projection steps, so a
+simulation can represent a habitat that is gradually declining (or
+recovering) rather than staying fixed. The example below uses the
+sigmoidal method (the simplest of the three refuge methods) purely to
+illustrate the *mechanism*: shrink the refuge threshold length and the
+maximum protected proportion a little each year, projecting one year at a
+time and carrying the model's state forward with `mizer::finalParams()`.
+
+```{r degradation-mechanism, echo=TRUE, eval=TRUE}
+params <- newRefuge(caribbean_10_model, new_method = "sigmoidal",
+                    new_method_params = list(L_refuge = 10, prop_protect = 0.8))
+
+# Refuge threshold length and maximum protection shrinking over 5 years
+L_seq <- c(10, 8, 6, 4, 2)
+prop_seq <- c(0.8, 0.6, 0.4, 0.2, 0.05)
+
+biomass_trend <- numeric(length(L_seq))
+for (i in seq_along(L_seq)) {
+    params <- newRefuge(params, new_method = "sigmoidal",
+                        new_L_refuge = L_seq[i], new_prop_protect = prop_seq[i])
+    sim <- project(params, t_max = 1, progress_bar = FALSE)
+    params <- mizer::finalParams(sim)
+    biomass_trend[i] <- sum(mizer::getBiomass(sim)[dim(sim@n)[1], ])
+}
+
+# Total biomass at the end of each year as refuge shrinks
+biomass_trend
+```
+
+> <details><summary>💡 **Tip:** This is a mechanism demo, not a calibrated
+> analysis.</summary> Switching refuge methods abruptly (as done here) skips
+> the tuning workflow described in [Tuning the steady state]; for a real
+> analysis, follow that recipe after switching methods, not just after
+> creating the model. `MizerReef` also supports fully specified,
+> data-driven habitat-degradation trajectories via [setDegradation()] and
+> [reefDegrade()] for the `"competitive"` refuge method — see their
+> reference pages for details.</details>
 
 
 ## Links and further reading {.section-links}
