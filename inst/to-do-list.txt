@@ -31,23 +31,47 @@ test coverage: the ~50-file test-coverage sweep (see that section
 below) - still the same tiered priority list as before, still
 deliberately out of scope for the session that just landed.
 
-27/07 (third session, in progress): started the ~50-file sweep,
-staged in small batches with a commit after each. Batch 1 (parameter-
-setting tier: setRefuge/newRefuge/newReefParams), batch 2 (steady-
-state/calibration tier: tuneUR/tuneUR_cc/reefSteady), and batch 3
-(getRefuge/reefVulnerable/getVulnerable, the user's requested
-priority sub-batch of the rate-function tier since these are
-foundational for the rest of it) are all DONE - see COMPLETED TASKS
-below. Batch 3 found and fixed the most consequential bug of the
-session so far: predation refuge was completely non-functional on
-the bundled caribbean_3_model (see that entry below for the full
-account). Next up: the remaining rate-function tier
-(reefEncounter/reefMort/reefPredMort/reefFeedingLevel/reefRates/
-reefSenMort), extending the "compare dispatch vs. direct call"
-pattern already proven in test-project-methods.R.
+=== RESUME HERE (27/07, third session, in progress - hit a session
+length limit mid-batch, this note is for picking the work back up) ===
 
-Two follow-ups flagged during batch 3, deliberately deferred until
-the test-coverage sweep is finished:
+Started the ~50-file test-coverage sweep, staged in small batches with
+a commit after each (all commits so far are on major_update, not yet
+merged/pushed further than that - check `git log --oneline -15` to
+orient). Batches 1-4 are DONE - see COMPLETED TASKS below for full
+per-batch accounts:
+- Batch 1: parameter-setting tier (setRefuge/newRefuge/newReefParams).
+  Found + fixed the newRefuge() scale_bin bug.
+- Batch 2: steady-state/calibration tier (tuneUR/tuneUR_cc/
+  reefSteady). Found + fixed the tuneUR_cc() double-biomass bug.
+- Batch 3: getRefuge/reefVulnerable/getVulnerable (user-requested
+  priority sub-batch of the rate-function tier, since these are
+  foundational for the rest of it). Found + fixed THE most
+  consequential bug of the session: predation refuge was completely
+  non-functional on the bundled caribbean_3_model.
+- Batch 4: the rest of the rate-function tier (reefEncounter/
+  reefMort/reefPredMort/reefFeedingLevel/reefRates/reefSenMort).
+  Found + fixed the setExtMortParams() bug (see COMPLETED TASKS) -
+  custom ext_mort_params was completely broken for both list and
+  data.frame input. All six functions' tests are written, passing,
+  and verified (devtools::test() 0 fail/298 pass, devtools::check()
+  0 errors/0 warnings/3 baseline notes) - STILL NEED TO COMMIT this
+  batch's changes (NEWS.md, R/reef-setParams.R's setExtMortParams()
+  fix, and the 6 new/rewritten test files) and log it in COMPLETED
+  TASKS below, the same way batches 1-3 were logged, before moving on.
+  Files changed but not yet committed as of this note: NEWS.md,
+  R/reef-setParams.R, tests/testthat/test-reefSenMort.R,
+  test-reefMort.R, test-reefFeedingLevel.R, test-reefPredMort.R,
+  test-reefEncounter.R, test-reefRates.R.
+
+Next up after committing batch 4: the plotting-functions tier (lower
+stakes per the original priority order - use return_data = TRUE where
+supported to check underlying values instead of just the ggplot
+class), then the zero-coverage objects (caribbean_10_model,
+karpata_refuge, the degradation data objects rubble_scale/
+algae_scale/recovery_scale currently have no tests at all).
+
+Three follow-ups flagged during batches 3-4, deliberately deferred
+until the test-coverage sweep is finished:
 - The vignette "body_shape_example"/body-shape-example.png figure
   (illustrative example of the use_dummy_fish_bins TRUE vs. FALSE
   distinction, referenced in vignettes/mizerReef.Rmd) needs
@@ -61,6 +85,12 @@ the test-coverage sweep is finished:
   Affected vignettes (grep for caribbean_3_model):
   extension_mechanism.Rmd, caribbean_3_model-description.Rmd,
   using-multiple-resources.Rmd, model-description.Rmd.
+- Any vignette/example demonstrating custom ext_mort_params /
+  senescence mortality tuning should be re-checked now that
+  setExtMortParams() actually works for list/data.frame input (batch
+  4) - it's possible none exist yet since the feature was previously
+  totally broken, but worth a grep for setExtMortParams/ext_mort_params
+  across vignettes/ to confirm.
 
 ** Before publication - recommended, not blocking **
 
@@ -196,6 +226,86 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
 COMPLETED TASKS:
 
 ============================================================================
+
+- 27/07 (third session, batch 4 of the ~50-file test-coverage sweep)
+  [Remaining rate-function tier: test-reefEncounter.R, test-reefMort.R,
+  test-reefPredMort.R, test-reefFeedingLevel.R, test-reefRates.R,
+  test-reefSenMort.R rewritten from expect_error(..., NA)-only checks
+  to real numeric assertions. Followed the user's suggestion to check
+  mizer's own test-project_methods.R (github.com/sizespectrum/mizer)
+  for testing patterns, and adapted several: formula-reconstruction for
+  feeding level (encounter / (encounter + intake_max)), the
+  "interaction matrix orientation" check for predation mortality
+  (zeroing a prey column zeroes that species' mortality), and
+  reduces-to-baseline checks (comparing against mizer::mizerEncounter/
+  mizerPredMort/mizerFeedingLevel directly for the parts of the
+  calculation refuge doesn't modify).]
+
+  test-reefEncounter.R: confirmed reefEncounter() reduces exactly to
+  mizer::mizerEncounter() when no species is blocked_pred; that
+  unblocked-predator rows match the standard calculation even when
+  other species ARE blocked; and that blocked-predator rows match
+  mizerEncounter() called with vulnerability-reduced prey abundance
+  (vulnerable * n) -- verifying the refuge-blocking logic without
+  re-deriving the FFT-based convolution math itself, by treating
+  mizer's own (already-tested) encounter function as the ground-truth
+  building block.
+
+  test-reefFeedingLevel.R: formula reconstruction (encounter /
+  (encounter + intake_max), with intake_max patched to Inf for
+  satiation = FALSE species) mirroring mizer's own test pattern;
+  confirmed satiation = FALSE species get exactly 0 (unlimited intake
+  Capacity never satiates); confirmed satiation = TRUE species match
+  mizer::mizerFeedingLevel() directly (intake_max untouched for them).
+
+  test-reefPredMort.R: independent vectorized reimplementation of the
+  documented formula (sum_i pred_rate_i * V_i * theta_i, using outer()
+  instead of reefPredMort()'s row-replication loop); reduces to
+  mizer::mizerPredMort() when no species is blocked_pred; the
+  interaction-orientation check (zeroing a prey column zeroes that
+  species' predation mortality).
+
+  test-reefSenMort.R, test-reefMort.R, test-reefRates.R: hand-derived
+  senescence formula check plus a monotonicity/boundary structural
+  check (0 at the smallest size, non-decreasing towards w_max);
+  reefMort() checked against mizerMort() + reefSenMort() (and against
+  mizerMort() alone when include_sen_mort = FALSE); reefRates()
+  checked by replaying its whole internal call chain externally and
+  confirming every returned rate matches an independent call to the
+  same underlying function with the same chained inputs.
+
+  Writing a custom-ext_mort_params test for reefSenMort() (to exercise
+  something other than caribbean_3_model's default senescence
+  parameters) surfaced a third real bug this session, arguably as
+  fundamental as the use_dummy_fish_bins one: setExtMortParams() was
+  completely broken for BOTH ways a user would reasonably supply
+  custom ext_mort_params. A data.frame passed setExtMortParams()'s own
+  colnames()-based validation (data frames pass column names through
+  as.matrix() correctly) but was then stored as a plain matrix, and
+  every downstream consumer -- newReefParams() itself (unconditionally,
+  whenever include_ext_mort = TRUE, the default) and reefSenMort() --
+  accessed it with `$`, which is invalid on a matrix, so this crashed
+  immediately at newReefParams() construction time, not just later at
+  simulation time. A named list failed setExtMortParams()'s own
+  validation right away instead, with a misleading "needs a column
+  called 'nat_mort'" error even when nat_mort WAS provided, because
+  as.matrix() on a named list puts the names in row names, not column
+  names, so the colnames()-based presence checks always failed. Net
+  effect: there was no way to actually use custom ext_mort_params at
+  all before this fix - only the untouched default (NULL, which builds
+  a literal list via `$`-assignment and never touches as.matrix())
+  worked. Confirmed with the user before fixing (per their standing
+  instruction). Fixed setExtMortParams() to normalise list/data.frame/
+  matrix input to a plain named list up front (matching what every
+  downstream consumer already expected) before validating or storing
+  it, and switched the presence checks from colnames() to names()
+  accordingly. Verified all three input types (list, data.frame,
+  matrix) now work end-to-end, including a fresh newReefParams() call
+  with a custom ext_mort_params data.frame, which previously crashed
+  at construction time.
+
+  Verification: devtools::test() - 0 fail, 298 pass (up from 269).
+  devtools::check() - 0 errors, 0 warnings, same notes as baseline.
 
 - 27/07 (third session, batch 3 of the ~50-file test-coverage sweep,
   done as its own sub-batch ahead of the rest of the rate-function
