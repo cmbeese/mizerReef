@@ -4,20 +4,27 @@
 \alias{getAlgaeProduction}
 \title{Algae production rate}
 \usage{
-getAlgaeProduction(params)
+getAlgaeProduction(params, t = 0)
 }
 \arguments{
 \item{params}{MizerParams}
+
+\item{t}{The current time, used to determine the post-bleaching algae
+growth boost, if any (see \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}). Defaults to \code{0},
+which is always before any bleaching event, so no boost applies.}
 }
 \value{
 The annual growth rate of algae per square meter
 }
 \description{
 This is the rate in grams/year/m^-2 at which the system produces algae
-biomass. The rate is set so that production and consumption are equal for
-chosen steady state abundances.
+biomass. The baseline rate is set so that production and consumption are
+equal for chosen steady state abundances (see \code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}}).
+If post-bleaching algae boosting has been configured with
+\code{\link[=setDegradation]{setDegradation()}}, the baseline rate is scaled by the boost factor
+appropriate for time \code{t} (see \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}).
 }
 \seealso{
-\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}
+\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}
 }
 \concept{algae}

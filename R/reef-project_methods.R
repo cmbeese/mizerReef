@@ -274,8 +274,10 @@ reefRates <- function(params, n, n_pp, n_other, t = 0, effort, rates_fns, ...) {
 #' }
 #'
 #' At each timestep, the scaling factors are multiplied by the previous
-#' timestep's refuge density. Optional algae dynamics adjustments can be
-#' specified via [setDegradation()].
+#' timestep's refuge density. [setDegradation()] can also configure an
+#' independent, optional post-bleaching algae growth/capacity boost (see
+#' [getAlgaeBoost()]); that boost is unrelated to refuge density and is not
+#' computed by this function.
 #'
 #' @inheritParams reefRates
 #' @param ... Unused
@@ -316,22 +318,6 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
             scale_bin <- deg_scale[, 1]
             new_rd <- scale_bin * old_rd
 
-            # Apply algae dynamics if specified
-            if (isTRUE(params@other_params$algae_params$algae_boost)) {
-                growth_boosts <- params@other_params$algae_params$algae_growth_boost
-                capacity_boosts <- params@other_params$algae_params$algae_capacity_boost
-
-                # Apply first element of boost vectors (bleaching year = index 1)
-                if (length(growth_boosts) >= 1 && !is.null(params@other_params$algae_params$algae_growth)) {
-                    a_growth <- params@other_params$algae_params$algae_growth
-                    params@other_params$algae_params$algae_growth <- growth_boosts[1] * a_growth
-                }
-                if (length(capacity_boosts) >= 1 && !is.null(params@other_params$algae_params$algae_capacity)) {
-                    a_capacity <- params@other_params$algae_params$algae_capacity
-                    params@other_params$algae_params$algae_capacity <- capacity_boosts[1] * a_capacity
-                }
-            }
-
             params@time_modified <- lubridate::now()
             return(new_rd)
         }
@@ -348,24 +334,6 @@ reefDegrade <- function(params, n, n_pp, n_other, t, ...) {
                 scale_bin <- deg_scale[, years_post + 1]
                 # multiply bins by scaling values
                 new_rd <- scale_bin * old_rd
-
-                # Apply continued algae boost if within boost vector length
-                if (isTRUE(params@other_params$algae_params$algae_boost)) {
-                    growth_boosts <- params@other_params$algae_params$algae_growth_boost
-                    capacity_boosts <- params@other_params$algae_params$algae_capacity_boost
-
-                    # years_post = 1,2,3... maps to indices 2,3,4... in the boost vectors
-                    boost_idx <- years_post + 1
-
-                    if (boost_idx <= length(growth_boosts) && !is.null(params@other_params$algae_params$algae_growth)) {
-                        a_growth <- params@other_params$algae_params$algae_growth
-                        params@other_params$algae_params$algae_growth <- growth_boosts[boost_idx] * a_growth
-                    }
-                    if (boost_idx <= length(capacity_boosts) && !is.null(params@other_params$algae_params$algae_capacity)) {
-                        a_capacity <- params@other_params$algae_params$algae_capacity
-                        params@other_params$algae_params$algae_capacity <- capacity_boosts[boost_idx] * a_capacity
-                    }
-                }
                 return(new_rd)
             }
             return(old_rd)

@@ -37,8 +37,10 @@ The degradation is controlled by a scaling matrix \code{deg_scale} where:
 }
 
 At each timestep, the scaling factors are multiplied by the previous
-timestep's refuge density. Optional algae dynamics adjustments can be
-specified via \code{\link[=setDegradation]{setDegradation()}}.
+timestep's refuge density. \code{\link[=setDegradation]{setDegradation()}} can also configure an
+independent, optional post-bleaching algae growth/capacity boost (see
+\code{\link[=getAlgaeBoost]{getAlgaeBoost()}}); that boost is unrelated to refuge density and is not
+computed by this function.
 }
 \seealso{
 Other mizer rate functions:

@@ -4,7 +4,7 @@
 \alias{algae_dynamics}
 \title{Algae dynamics}
 \usage{
-algae_dynamics(params, n, n_other, rates, dt, ...)
+algae_dynamics(params, n, n_other, rates, dt, t = 0, ...)
 }
 \arguments{
 \item{params}{A \link[mizer:MizerParams]{MizerParams} object}
@@ -16,6 +16,10 @@ algae_dynamics(params, n, n_other, rates, dt, ...)
 \item{rates}{A list of rates as returned by \code{\link[mizer:getRates]{getRates()}}}
 
 \item{dt}{Time step size}
+
+\item{t}{The current time, used to determine the post-bleaching algae
+growth boost, if any (see \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}). Defaults to \code{0},
+which is always before any bleaching event.}
 
 \item{...}{Unused}
 }
@@ -49,6 +53,6 @@ method to solve the equation numerically.
 }
 \seealso{
 \code{\link[=detritus_dynamics]{detritus_dynamics()}}, \code{\link[=algae_consumption]{algae_consumption()}},
-\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}
+\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}, \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}
 }
 \concept{algae}

@@ -27,6 +27,19 @@
   with "incorrect number of dimensions" when combining mizerReef with
   mizerMR.
 - `getDegrade()` no longer errors when called on a `MizerSim` object.
+- The `algae_boost`/`algae_growth_boost`/`algae_capacity_boost` feature
+  (added in 2.0.0) now actually takes effect. Previously it silently did
+  nothing: it tried to persist a boosted value by mutating `params` inside
+  `reefDegrade()`, but a single `mizer::project()` call treats `params` as
+  read-only for its whole duration, so the mutation was always discarded
+  before the next timestep. On top of that, the bundled example models
+  stored their baseline algae growth rate under a stale field name
+  (`algae_growth_initial` instead of `algae_growth`), which made the
+  boost's own null-check silently fail too. The boost is now computed
+  fresh at each timestep as a pure function of time by `getAlgaeBoost()`,
+  applied in `getAlgaeProduction()` and `algae_dynamics_cc()` (which both
+  now take a `t` argument), the same way `reefDegrade()` itself recomputes
+  refuge density fresh from `t` rather than by mutating `params`.
 
 # MizerReef 2.0.0
 

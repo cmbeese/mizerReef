@@ -43,19 +43,26 @@ algae_biomass <- function(params) {
 #' @param n_other Other dynamic components.
 #' @param rates A list of rates as returned by [getRates()]
 #' @param dt Time step size
+#' @param t The current time, used to determine the post-bleaching algae
+#'          growth and capacity boosts, if any (see [getAlgaeBoost()]).
+#'          Defaults to `0`, which is always before any bleaching event.
 #' @param ... Unused
 #'
 #' @return A single number giving the algae biomass at next time step
 #' @seealso [detritus_dynamics()], [algae_consumption()],
-#'          [getAlgaeConsumption()], [getAlgaeProduction()]
+#'          [getAlgaeConsumption()], [getAlgaeProduction()], [getAlgaeBoost()]
 #' @concept algae
 #' @export
-algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
+algae_dynamics_cc <- function(params, n, n_other, rates, dt, t = 0, ...) {
 
     consumption <- algae_consumption(params, n, rates)
-    production <- sum(getAlgaeProduction(params))
-    ka <- params@other_params$algae_params$algae_capacity
-    
+    production <- sum(getAlgaeProduction(params, t))
+    capacity_boost <- getAlgaeBoost(
+        params, t,
+        params@other_params$algae_params$algae_capacity_boost
+    )
+    ka <- params@other_params$algae_params$algae_capacity * capacity_boost
+
     if(is.nan(consumption)){ 
         warning("The algae consumption function is producing NaNs.")
         }
@@ -102,17 +109,20 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 #' @param n_other Other dynamic components.
 #' @param rates A list of rates as returned by [getRates()]
 #' @param dt Time step size
+#' @param t The current time, used to determine the post-bleaching algae
+#'          growth boost, if any (see [getAlgaeBoost()]). Defaults to `0`,
+#'          which is always before any bleaching event.
 #' @param ... Unused
 #'
 #' @return A single number giving the algae biomass at next time step
-#' @seealso [detritus_dynamics()], [algae_consumption()], 
-#'          [getAlgaeConsumption()], [getAlgaeProduction()]
+#' @seealso [detritus_dynamics()], [algae_consumption()],
+#'          [getAlgaeConsumption()], [getAlgaeProduction()], [getAlgaeBoost()]
 #' @concept algae
 #' @export
-algae_dynamics <- function(params, n, n_other, rates, dt, ...) {
+algae_dynamics <- function(params, n, n_other, rates, dt, t = 0, ...) {
 
     consumption <- algae_consumption(params, n, rates)
-    production  <- sum(getAlgaeProduction(params))    
+    production  <- sum(getAlgaeProduction(params, t))
     
     if(is.nan(consumption)){ 
         warning("The algae consumption function is producing NaNs.")
@@ -217,17 +227,77 @@ plotAlgaeConsumption <- function(params) {
 #' Algae production rate
 #'
 #' This is the rate in grams/year/m^-2 at which the system produces algae
-#' biomass. The rate is set so that production and consumption are equal for
-#' chosen steady state abundances.
+#' biomass. The baseline rate is set so that production and consumption are
+#' equal for chosen steady state abundances (see [tuneUR()]/[tuneUR_cc()]).
+#' If post-bleaching algae boosting has been configured with
+#' [setDegradation()], the baseline rate is scaled by the boost factor
+#' appropriate for time `t` (see [getAlgaeBoost()]).
 #'
 #' @param params MizerParams
+#' @param t The current time, used to determine the post-bleaching algae
+#'          growth boost, if any (see [getAlgaeBoost()]). Defaults to `0`,
+#'          which is always before any bleaching event, so no boost applies.
 #'
 #' @return The annual growth rate of algae per square meter
-#' @seealso [getAlgaeConsumption()], [algae_dynamics()], [getAlgaeProduction()]
+#' @seealso [getAlgaeConsumption()], [algae_dynamics()], [getAlgaeBoost()]
 #' @concept algae
 #' @export
-getAlgaeProduction <- function(params) {
-    return(params@other_params$algae_params$algae_growth)
+getAlgaeProduction <- function(params, t = 0) {
+    boost <- getAlgaeBoost(
+        params, t,
+        params@other_params$algae_params$algae_growth_boost
+    )
+    params@other_params$algae_params$algae_growth * boost
+}
+
+#' Post-bleaching boost multiplier for algae growth or capacity
+#'
+#' Computes the multiplier that [getAlgaeProduction()] and
+#' [algae_dynamics_cc()] apply to the baseline algae growth rate or carrying
+#' capacity to represent a temporary post-bleaching boost in algal
+#' productivity, as configured by the `algae_boost`, `algae_growth_boost` and
+#' `algae_capacity_boost` arguments to [setDegradation()].
+#'
+#' This is a pure function of `t`: it returns the cumulative product of
+#' `boost_vector` up to the element for the current year post-bleaching,
+#' applied fresh to the untouched baseline value every time it is called.
+#' This mirrors how [reefDegrade()] recomputes refuge density fresh from the
+#' baseline and `deg_scale` at every timestep, rather than by mutating
+#' `params`: because a single `mizer::project()` call treats `params` as
+#' read-only across the whole simulation (only `n`/`n_pp`/`n_other` are
+#' threaded forward between timesteps), a rate function cannot rely on a
+#' mutation to `params` persisting into the next timestep.
+#'
+#' @param params A MizerParams object
+#' @param t The current time
+#' @param boost_vector The boost vector to use -- `algae_growth_boost` or
+#'   `algae_capacity_boost` from `params@other_params$algae_params`.
+#'   Element 1 gives the multiplier for the bleaching year itself, element 2
+#'   for one year post-bleaching, and so on. If `t` is later than the last
+#'   element of `boost_vector`, the cumulative product stays fixed at the
+#'   product of the whole vector (i.e. the boost plateaus rather than
+#'   continuing to compound).
+#'
+#' @return A single number: `1` (no boost) if `algae_boost` is not `TRUE`,
+#'   `boost_vector` is empty, or `t` is before the bleaching year; otherwise
+#'   the cumulative product of `boost_vector` up to the current post-bleach
+#'   year.
+#' @seealso [getAlgaeProduction()], [algae_dynamics_cc()], [setDegradation()],
+#'   [reefDegrade()]
+#' @concept algae
+#' @export
+getAlgaeBoost <- function(params, t, boost_vector) {
+    if (!isTRUE(params@other_params$algae_params$algae_boost) ||
+        is.null(boost_vector) || length(boost_vector) == 0) {
+        return(1)
+    }
+    t_bleach <- params@other_params$refuge_params$t_bleach
+    if (is.null(t_bleach) || t < t_bleach) {
+        return(1)
+    }
+    years_post <- t - t_bleach
+    idx <- min(years_post + 1, length(boost_vector))
+    prod(boost_vector[seq_len(idx)])
 }
 
 
