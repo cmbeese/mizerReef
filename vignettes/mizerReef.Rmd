@@ -465,7 +465,7 @@ As we can see in Figure 4, removing refuge availability reduces both biomass and
 > <details><summary>💡 **Tip:** If your results look odd after changing the refuge profile, run `reefSteady()`.</summary> It needs to run enough times to reach a new steady state. To learn more about modifying refuge profiles and their parameters, see [setRefuge()].</details>
 
 
-For more information on the example data used in this vignette, see the [mizerReef model description vignette](karpata_model-description.html). To learn more about running simulations with mizerReef, see the [mizerReef degradation vignette](reef-degradation-simulations.html).
+For more information on the example data used in this vignette, see the [mizerReef model description vignette](karpata_model-description.html).
 
 
 ## Links and further reading {.section-links}
@@ -480,7 +480,6 @@ For more information on the example data used in this vignette, see the [mizerRe
 
 - [MizerReef documentation](https://cmbeese.github.io/mizerReef/): Main package documentation and reference manual
 - [MizerReef model description vignette](karpata_model-description.html): Detailed explanation of model structure and example workflows
-- [MizerReef degradation vignette](reef-degradation-simulations.html): Simulating habitat degradation and its effects
 - [MizerReef Steady State recipe](steady-state-recipe.html): Step-by-step guide for tuning models to steady state
 - [Example models and built-in data](https://cmbeese.github.io/mizerReef/reference/index.html#example-models): Reference for example species, interaction matrices, and refuge profiles
 

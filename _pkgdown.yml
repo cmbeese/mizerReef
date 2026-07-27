@@ -141,7 +141,6 @@ articles:
   - title: "Tuning and Simulation"
     contents:
       - steady-state-recipe
-      - reef-degradation-simulations
   - title: "Model Description"
     contents:
       - karpata_model-description
