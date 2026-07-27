@@ -1,6 +1,105 @@
-MizerReef Major Package Update To Do List - 27/07 (updated)
+MizerReef Major Package Update To Do List - 28/07 (updated)
 
-=== START HERE (updated 27/07) ===
+=== START HERE (updated 28/07, fourth/overnight session - the vignette
+audit is now COMPLETE) ===
+
+All 7 vignettes have been re-rendered and fact-checked against the
+current code (the task the third session's "RESUME HERE" left queued
+up). Full account further down under "=== RESUME HERE (27/07, third
+session...) ===" and in COMPLETED TASKS, but headline results:
+
+- devtools::test(): 0 fail / 503 pass / 0 leaked warnings (unchanged).
+- devtools::check(vignettes = TRUE): 0 errors / 0 warnings / 3 notes,
+  all pre-existing (same as baseline) - "checking re-building of
+  vignette outputs" passes for all 7.
+- pkgdown::build_site(): builds clean end to end (built with CI=true
+  to skip favicon generation, which fails only because of the
+  already-documented realfavicongenerator.net outage, unrelated to any
+  code here).
+- Two rendering bugs fixed (caribbean_3_model-description.Rmd and
+  karpata_model-description.Rmd each had their interaction-matrix and
+  refuge-profile figures assigned to a variable instead of printed, so
+  neither figure ever actually appeared despite the prose saying "see
+  the figure below" - now printed directly, with captions/sizing
+  added), plus a $B_A$/$B_D$ copy-paste label typo in
+  karpata_model-description.Rmd's detritus section.
+- body-shape-example.png regenerated: the generating script
+  (ignore/draft-vignettes/body-shape-example-figure.R) used a
+  pre-2.1.0 API (group_params/bad_pred/plotRefuge()) that no longer
+  runs at all, and its own layout didn't actually match its figure
+  caption. Rewritten for the current API and restructured to match the
+  caption (facet by body shape, all three refuge methods overlaid per
+  panel, instead of facet by method).
+- mizerReef.Rmd: two content tables were stuck at eval=FALSE despite
+  the surrounding prose promising them "below" (the reef-specific
+  species-parameter description table, and the full caribbean_10_species
+  table) - both work fine, flipped to eval=TRUE.
+- A genuinely significant bug found and fixed in
+  using-multiple-resources.Rmd's own setup chunk (not package source):
+  its defensive "smoke test" for the mizerReef/mizerMR extension chain
+  was failing deterministically, every time, in a plain fresh R
+  session - meaning this vignette's real content (the whole point of
+  the vignette) had likely never actually rendered in any normal
+  build, always silently falling back to an "install mizerMR"
+  placeholder even when mizerMR is installed and works fine. Root
+  cause: requireNamespace("mizerMR", quietly = TRUE), used only to
+  check installation, has the side effect of loading (and
+  .onLoad-registering) mizerMR's namespace before mizerReef gets
+  loaded - since .onLoad only runs once per session, this permanently
+  put mizerMR ahead of mizerReef in the extension chain regardless of
+  later library() order, which is backwards from what
+  caribbean_3_model's bundled @extensions (mizerReef-only) expects, so
+  mizer's assertExtensionChain() correctly rejected the object as
+  incompatible. Fixed by checking installation via
+  nzchar(system.file(package = "mizerMR")) instead (doesn't load
+  anything), and by removing explicit mizer::registerExtension() calls
+  that turned out to make things worse (order-dependent in ways that
+  don't reliably reproduce what .onLoad itself builds - one variant
+  produced a distinct S4 "class already exists but does not contain"
+  error). Verified against a completely fresh R session: the vignette
+  now renders its full real content (3 figures, the split small/large
+  plankton spectra as described) instead of the placeholder.
+- _pkgdown.yml: added claude_10_model to the reference index (it was
+  added as bundled data last session but never wired in; pkgdown's own
+  sitrep flagged it as missing).
+- claude_10_model sanity-check PDF generated per the user's request
+  (growth curves, diet composition, refuge profile/vulnerability, and
+  the flat-vs-complex biomass/productivity comparison from
+  vignette("mizerReef")'s Figure 3, re-run on claude_10_model instead
+  of caribbean_10_model) - saved to
+  ignore/dev-logs/claude_10_model_review.pdf (+ the generating .Rmd
+  alongside it, both gitignored, not part of the package). Complexity
+  still clearly matters: complex reef ~150 g/m^2 biomass / ~144
+  g/m^2/year productivity vs. flat ~33 g/m^2 / ~44 g/m^2/year - nearly
+  identical to caribbean_10_model's own numbers, as expected since
+  claude_10_model only differs in algae/detritus tuning, not fish
+  parameters. Growth curves and diet composition both look
+  biologically reasonable. Did NOT touch caribbean_10_model itself or
+  decide the retuning question - still open, see below.
+- Note on tooling: this session confirmed the locally-installed copy
+  of mizerReef (rebuilt via devtools::install() partway through, to
+  get a true from-source baseline) predated the ENTIRE third-session
+  test-coverage sweep (installed build was from 20/07, a week before
+  that session's fixes) - a plain `library(mizerReef)` without
+  devtools::load_all() or a fresh install would have silently exercised
+  pre-fix behaviour. Reinstalled from current source; future sessions
+  doing hands-on numerical verification (not just devtools::test()/
+  check(), which build their own temp library) should confirm the
+  installed copy is current first.
+- FLAGGED, not fixed (see the dedicated entry further down, "ALGAE/
+  DETRITUS STANDING BIOMASS..."): algae_biomass()/detritus_biomass()
+  return ~1e-10 to 1e-11 g/m^2 on all three bundled models - confirmed
+  mathematically self-consistent (not a convergence bug) but predates
+  this session entirely and needs the user's judgement on whether/how
+  to rescale.
+
+Nothing is currently blocking. Next up, per the user's own priority
+order if picked up fresh: deepen R/reef-setParams.R's test coverage
+(currently the lowest at 76.22%, mostly untested validation/error
+branches) - see "Test coverage" section further down for the full
+per-file breakdown.
+
+=== START HERE (updated 27/07, from the prior session) ===
 Public GitHub release prep session complete and pushed (major_update,
 a2c060e..e0a3bf8, 15 commits). See "COMPLETED TASKS" below, first entry,
 for the full account.
@@ -172,14 +271,13 @@ via `git show --stat HEAD` and fixed with a follow-up commit. Always
 run `git status --short` to confirm what's actually staged
 immediately BEFORE committing a multi-file batch.
 
-** NEXT TASK: vignette audit (this is what a fresh/overnight session
-should start on) **
+** DONE (28/07, fourth/overnight session): vignette audit **
 
-Every vignette references at least one function/object touched by
-this session's fixes. None have been re-rendered or fact-checked
-against the current code yet - this is now the highest-priority
-remaining work. Per-vignette scope (grep counts as of this writing,
-re-grep to confirm since this file will get stale):
+See the "START HERE (updated 28/07...)" block at the very top of this
+file for the full account of what was found and fixed. Original scope
+notes below are kept for historical reference (per-vignette function/
+object lists were accurate at the time and matched what actually got
+checked).
 
 - vignettes/caribbean_3_model-description.Rmd: uses caribbean_3_model
   (whose predation refuge is now genuinely functional - dynamics may
@@ -311,10 +409,13 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
   with real numeric assertions, 14 real bugs found and fixed, a new
   claude_10_model comparison object added, and a covr coverage report
   (87.9% overall) is reproducible via inst/scripts/check-test-coverage.R.
-  The only thing this uncovered that's still open is the vignette audit
-  (see "NEXT TASK" above) and the caribbean_10_model vs. claude_10_model
-  decision (see below, updated from the "suspicious" entry that used to
-  be here).
+- DONE (28/07, fourth/overnight session): the vignette audit. See the
+  "START HERE (updated 28/07...)" block at the very top of this file
+  for the full account. The only things this uncovered that are still
+  open are the caribbean_10_model vs. claude_10_model decision, the
+  algae/detritus near-zero standing biomass finding (both below), and
+  the next-priority item (reef-setParams.R test coverage, see "Test
+  coverage" section).
 - 27/07: NEW - broader stale-bundled-.rda-metadata audit. This
   session found and fixed TWO separate instances of the same bug
   class on caribbean_3_model/caribbean_10_model: stale field names
@@ -415,6 +516,181 @@ ignore/thesis-materials/corrected thesis bibliography.bib.
 COMPLETED TASKS:
 
 ============================================================================
+
+- 28/07 (fourth/overnight session) [Vignette audit: re-rendered and
+  fact-checked all 7 vignettes against the current code, per the third
+  session's "NEXT TASK" handoff. Full per-vignette detail:]
+
+  vignettes/caribbean_3_model-description.Rmd (HIGH PRIORITY, done
+  first): rendered clean. Confirmed the newly-functional predation
+  refuge is genuinely visible in getVulnerable()/plotRefugeProfile()
+  output (proportion vulnerable now varies 0.02-1 by size/species,
+  instead of being flat at 1 as it would have been pre-fix). Found and
+  fixed a real rendering bug: the interaction-matrix plot and the
+  plotRefugeProfile() figure were each assigned to a variable (p <-,
+  q <-) instead of printed, so neither figure ever actually appeared in
+  the rendered output despite the prose saying "see the figure below."
+  Printed both directly, added fig.cap/sizing. Static prose numbers
+  (biomass_observed, growth/mortality parameter tables) are unaffected
+  by the refuge fix since they're stored steady-state values on the
+  bundled .rda, not recomputed at render time - confirmed the .rda
+  itself was only metadata-patched (use_dummy_fish_bins field added),
+  not re-tuned, so these numbers were already correct pre-session and
+  remain so.
+
+  vignettes/extension_mechanism.Rmd: rendered clean, no changes needed.
+  plotVulnerable(params) directly on the raw bundled caribbean_3_model
+  (no other mutations) confirmed correct, non-flat vulnerability once
+  rendered with a properly up-to-date package build (see the tooling
+  note below on the stale installed library).
+
+  vignettes/karpata_model-description.Rmd: same unprinted-plot bug as
+  caribbean_3_model-description.Rmd (p <-/q <- assignments), fixed the
+  same way. Also fixed a copy-paste typo: the detrital biomass
+  paragraph displayed the math label $B_A$ instead of $B_D$.
+
+  vignettes/mizerReef.Rmd (the getting-started vignette): rendered
+  clean. Regenerated body-shape-example.png - its generating script
+  (ignore/draft-vignettes/body-shape-example-figure.R) used a
+  pre-2.1.0 API (group_params/UR_interaction/bad_pred argument names,
+  plotRefuge() instead of plotRefugeProfile(), ggpubr::ggarrange()
+  instead of patchwork) that no longer runs at all against current
+  source. Rewrote it for the current API using the same archived
+  source data (inst/archive/body_shape_example_species_params.rda,
+  _int.rda - a stale dimnames mismatch on the interaction matrix
+  turned out to be positionally correct despite the outdated labels,
+  confirmed by checking which rows/species are blocked_pred). Also
+  restructured the plot layout: the OLD script (and therefore the old
+  PNG) faceted by refuge method with all four body shapes overlaid per
+  panel, which doesn't actually match the figure's own caption ("each
+  panel shows...a different species...comparing three refuge profile
+  methods") - rebuilt using plotRefugeProfile(..., return_data = TRUE)
+  to facet by body shape instead, with all three methods overlaid per
+  panel, matching the caption. Separately, found two content chunks
+  stuck at eval=FALSE despite the surrounding prose promising their
+  output "below" (the reef-specific species-parameter description
+  table, and the full caribbean_10_species parameter table) - both
+  render cleanly, flipped to eval=TRUE. Confirmed the flat-vs-complex
+  comparison (Figure 3) still shows the expected pattern post-session:
+  complex (refuge) model has both higher biomass (~150 vs. ~33 g/m^2)
+  and higher productivity (~140 vs. ~44 g/m^2/yr) than the flat one.
+
+  vignettes/model-description.Rmd: rendered clean, no changes needed -
+  its single plotRefugeProfile(params) call was already printed
+  directly (not assigned), unlike the other two model-description
+  vignettes.
+
+  vignettes/steady-state-recipe.Rmd: rendered clean. Per the user's
+  prior decision (see "Decided / no longer open" below), this
+  vignette's content was NOT touched. The rendered plotVulnerable()
+  figure looks nearly flat (~1.0, mostly unprotected) for most of the
+  size range - confirmed this is identical to the already-committed,
+  pre-session vignettes/steady-state-recipe.html, i.e. an existing,
+  already-accepted characteristic of this vignette's deliberately
+  abbreviated execution path (calibrateReefBiomass()/matchBiomasses()/
+  matchReefGrowth() are all eval=FALSE placeholders in this vignette,
+  so the executed portion switches to the competitive refuge method
+  without ever having calibrated biomasses to it) - not a new bug, not
+  caused by anything this session touched.
+
+  vignettes/using-multiple-resources.Rmd: this is the one vignette
+  that needed a real, non-cosmetic fix. Its setup chunk runs a
+  defensive "smoke test" of the mizerReef/mizerMR extension-chain
+  mechanism and silently falls back to an "install mizerMR" placeholder
+  message if the smoke test fails, on the theory (per its own code
+  comments) that this only happens in specific, hard-to-reproduce build
+  harnesses. Tracing an initial render that unexpectedly hit the
+  fallback (despite mizerMR being installed) found the smoke test was
+  actually failing deterministically, every single time, in a
+  completely fresh R session - meaning this vignette's real content
+  (three figures demonstrating mizerReef+mizerMR composability, the
+  entire point of the vignette) had likely never actually rendered in
+  any normal build. Root cause, found by direct experimentation
+  (isSuffixChain()/assertExtensionChain() from mizer's source):
+  requireNamespace("mizerMR", quietly = TRUE), used only to check
+  whether mizerMR is installed, has the side effect of loading (and
+  therefore .onLoad-registering) mizerMR's namespace immediately -
+  before the chunk's own library(mizerReef) call runs. Since a
+  package's .onLoad only fires once per R session, this permanently
+  placed mizerMR ahead of mizerReef in mizer's global extension-chain
+  registry regardless of the library() call order later in the same
+  chunk - the opposite of what caribbean_3_model's bundled
+  @extensions slot (which only ever recorded mizerReef as its base
+  extension) expects, so mizer's own assertExtensionChain() correctly
+  - if unhelpfully - rejected the object as incompatible every time.
+  Fixed by checking installation via
+  nzchar(system.file(package = "mizerMR")) instead, which doesn't load
+  anything. A second, compounding issue: the chunk also called
+  mizer::registerExtension() explicitly on both packages after
+  library()ing them, apparently to force chain order - this turned out
+  to be actively counterproductive, since re-registering an
+  already-registered extension is order-dependent in ways that don't
+  reliably reproduce what .onLoad itself builds (one variation of the
+  fix attempt produced a distinct S4 "class already exists but does
+  not contain" error from redefining a class with a different
+  superclass mid-session). Removed these calls entirely -
+  library(mizerReef); library(mizerMR), in that order (matching the
+  vignette body's own instructions), is sufficient. Verified against a
+  completely fresh R session (not just devtools::load_all()): the
+  vignette now renders its full real content instead of the
+  placeholder, including the described small/large plankton spectra
+  correctly tiling the size axis.
+
+  Also fixed along the way: _pkgdown.yml was missing claude_10_model
+  from its reference index (pkgdown's own sitrep flagged this - the
+  object was added as bundled data last session but the reference page
+  was never updated). Added alongside caribbean_10_model.
+
+  Tooling note: partway through, discovered the locally-installed copy
+  of mizerReef predated the ENTIRE third-session test-coverage sweep
+  (installed build timestamped 20/07, a week before that session's
+  fixes) - this surfaced when a manual plotVulnerable() check via plain
+  library(mizerReef) (no devtools::load_all()) showed the OLD, broken,
+  flat-at-1.0 behaviour, contradicting what the same check via
+  devtools::load_all() showed correctly. Reinstalled from current
+  source (devtools::install()) partway through this session to get a
+  trustworthy from-source baseline for the remaining hands-on checks;
+  devtools::test()/check() were unaffected throughout since both build
+  their own temporary library regardless.
+
+  Also generated, per the user's specific request, a standalone
+  (non-package, gitignored) PDF sanity-check of claude_10_model:
+  growth curves, diet composition, refuge profile/vulnerability, and
+  the same flat-vs-complex biomass/productivity comparison as
+  vignette("mizerReef")'s Figure 3, run on claude_10_model instead of
+  caribbean_10_model. Saved to ignore/dev-logs/claude_10_model_review.pdf
+  (+ the generating .Rmd alongside it). No LaTeX engine was available
+  locally (tinytex::install_tinytex() was attempted but killed
+  immediately on discovering it tries to modify /etc/paths.d/ via an
+  osascript admin-privilege prompt - not something to do
+  autonomously; no system state was changed) - rendered to HTML instead
+  and converted with headless Chrome (already installed, no privilege
+  escalation needed). Growth curves and diet composition both look
+  biologically reasonable; complexity still clearly matters (complex
+  ~150 g/m^2 biomass / ~144 g/m^2/yr productivity vs. flat ~33/~44),
+  numbers nearly identical to caribbean_10_model's own since the two
+  models only differ in algae/detritus tuning, not fish parameters.
+
+  New finding, FLAGGED not fixed per the user's standing instruction
+  (see the dedicated "ALGAE/DETRITUS STANDING BIOMASS..." entry near
+  the top of this file for full detail): algae_biomass()/
+  detritus_biomass() return ~1e-10 to 1e-11 g/m^2 (effectively zero) on
+  all three bundled models, right next to real fish biomass_observed
+  values in the 30-110 g/m^2 range in the rendered vignette prose.
+  Confirmed mathematically self-consistent (dB/dt = 0 exactly; rho is
+  tuned to compensate for whatever scale the biomass ended up at) and
+  confirmed present even on the stale pre-session installed package
+  build, i.e. this predates the whole session and isn't caused by any
+  fix made here - just never previously surfaced because nobody had
+  actually read a freshly-rendered vignette's numeric output in a
+  while.
+
+  Verification: devtools::test() - 0 fail, 503 pass, 0 leaked warnings
+  (unchanged). devtools::check(vignettes = TRUE) - 0 errors, 0
+  warnings, 3 notes (same pre-existing notes as baseline, unchanged -
+  "checking re-building of vignette outputs" passes for all 7).
+  pkgdown::build_site() - builds clean end to end (CI=true to skip the
+  already-documented favicon-service outage).
 
 - 27/07 (third session, batch 5a of the ~50-file test-coverage sweep)
   [Plotting-functions tier, first sub-batch: the 8 files that already
