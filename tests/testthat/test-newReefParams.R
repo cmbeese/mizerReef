@@ -212,3 +212,32 @@ test_that("newReefParams's mizer::setComponent() bookkeeping copy matches the re
         )
     }
 })
+
+test_that("newReefParams stores the algae/detritus consumption matrix under the correct field name", {
+    # Regression check for the same migration-gap bug class as Finding 2:
+    # newReefParams() used to write the consumption matrix to
+    # other_params$algae_params$rho_algae / detritus_params$rho_detritus,
+    # while every consumer (algae_components.R, detritus_components.R,
+    # reef-components.R, reef-helpers.R) reads/writes the bare `rho` field.
+    # This only worked by accident of R's `$` partial name-matching (`rho`
+    # uniquely prefix-matches `rho_algae`), which would silently break under
+    # `[[` access or if a second field starting with `rho` were ever added.
+    # Guard the exact field name on a freshly built object.
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+
+    result <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile
+    ))
+
+    ap_names <- names(result@other_params$algae_params)
+    dp_names <- names(result@other_params$detritus_params)
+    expect_true("rho" %in% ap_names)
+    expect_false("rho_algae" %in% ap_names)
+    expect_true("rho" %in% dp_names)
+    expect_false("rho_detritus" %in% dp_names)
+})

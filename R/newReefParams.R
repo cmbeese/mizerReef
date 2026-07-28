@@ -223,8 +223,8 @@ newReefParams <- function( # Original mizer parameters
     rho_det <- outer(params@species_params$rho_detritus, params@w^n)
 
     # Store rho values in new params slots
-    params@other_params$algae_params$rho_algae <- rho_alg
-    params@other_params$detritus_params$rho_detritus <- rho_det
+    params@other_params$algae_params$rho <- rho_alg
+    params@other_params$detritus_params$rho <- rho_det
 
     ### Add components ----
 

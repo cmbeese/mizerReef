@@ -123,3 +123,18 @@ test_that("caribbean_10_model's detritus_params external flux is stored under th
     expect_false("d_external" %in% dp_names)
     expect_false(is.null(caribbean_10_model@other_params$detritus_params$external))
 })
+
+test_that("caribbean_10_model's algae/detritus consumption matrix is stored under the correct field name", {
+    # Same migration-gap bug class as Finding 2, but for the algae/detritus
+    # consumption matrix: newReefParams() used to write it to other_params$
+    # algae_params$rho_algae / detritus_params$rho_detritus, while every
+    # consumer reads/writes the bare `rho` field, only working by accident
+    # of R's `$` partial name-matching. Guard the exact field name.
+    data(caribbean_10_model)
+    ap_names <- names(caribbean_10_model@other_params$algae_params)
+    dp_names <- names(caribbean_10_model@other_params$detritus_params)
+    expect_true("rho" %in% ap_names)
+    expect_false("rho_algae" %in% ap_names)
+    expect_true("rho" %in% dp_names)
+    expect_false("rho_detritus" %in% dp_names)
+})
