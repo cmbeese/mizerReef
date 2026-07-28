@@ -1,5 +1,160 @@
 MizerReef Major Package Update To Do List - 28/07 (updated)
 
+=== STOP AND READ FIRST (28/07, same day, seventh session/continuation)
+- the caribbean_10_model rename is DONE, both blocking findings are FIXED
+and VERIFIED, everything is committed. Nothing is paused; there is no
+uncommitted work. ===
+
+** What happened this session, in order **
+
+Picked up exactly where the sixth session paused (see the git log for
+the full account -- commits c3e7694, a296a2c, d46c23c, 83b4dc4 on
+major_update, all pushed... actually NOT yet pushed, see "Still open"
+below):
+
+1. Finding 1 (negative-production fragility in
+   detritus_dynamics()/algae_dynamics()) -- presented the three options
+   from the prior session's writeup to the user, got explicit sign-off on
+   option (a): floor production at zero in both functions before it
+   enters the analytic ODE update. Implemented with concrete roxygen
+   documentation of the floor's rationale (the user specifically asked
+   for this to be well-documented, not just a bare `max(production, 0)`).
+   Verified against the exact reproduction case: `project(caribbean_10_model,
+   effort = 1, t_max = 20, t_save = 0.1)` no longer crashes, detritus and
+   algae both stay non-negative throughout (detritus asymptotes to
+   exactly 0, as expected -- it doesn't go below). Committed as c3e7694.
+
+2. Finding 2 (caribbean_3_model's stale `d_external` field) -- fixed
+   using the same technique as the earlier `algae_growth_initial` ->
+   `algae_growth` fix (b5407a9): loaded the .rda, renamed the field to
+   `external`, re-saved with matching bzip2 compression, confirmed via
+   `all.equal()` that nothing else on the object changed. Verified
+   dB_D/dt is now genuinely ~1.7e-13 (was 120.1861), and confirmed the
+   20-year effort=1 fishing scenario does NOT reproduce Finding 1's crash
+   on caribbean_3_model now that Finding 1's floor is in place. Committed
+   as a296a2c.
+
+3. Stale-bundled-.rda-metadata audit (the "time-permitting" item from
+   the outstanding list) -- done in full, not deferred. Built a fresh
+   model via newReefParams() + the real caribbean_3 calibration recipe
+   and diffed its `other_params` structure field-by-field against both
+   bundled models. Found:
+   - A dozen genuinely dead top-level `other_params` fields on BOTH
+     caribbean_3_model and caribbean_10_model (`initial_algae_growth`,
+     `algae_capacity`, `detritus_capacity`, `sen_decomp`, `ext_decomp`,
+     `initial_d_external`, `method_params`, `bin.id`, `degrade`,
+     `refuge`, `refuge_lengths`, `carry_capacity`) -- remnants of
+     `main`'s old flat-storage convention from before the
+     S4-slot-then-revert migration (commit 619b8e6 onward), superseded
+     by the current nested `algae_params`/`detritus_params`/
+     `refuge_params` sub-lists. Confirmed unread by any current code
+     path (grepped R/, tests/, vignettes/) and removed from both models.
+   - IMPORTANT nuance found mid-audit: three of these field names
+     (`method_params`, `ext_decomp`, `sen_decomp`) were NOT actually
+     dead -- two vignettes (karpata_model-description.Rmd,
+     caribbean_3_model-description.Rmd) were reading them directly from
+     the stale top-level location for prose display. Confirmed the
+     top-level and correctly-nested copies held identical values, then
+     repointed both vignettes to read from the correct nested location
+     (`refuge_params$method_params`, `detritus_params$ext_decomp`,
+     `detritus_params$sen_decomp`) before removing the stale copies --
+     displayed numbers are unchanged, just sourced correctly now.
+   - Also found and removed a dead duplicate `d_external` field that had
+     been sitting alongside the correct `external` field on
+     caribbean_10_model (left over from before it was `tuneUR()`'d).
+   - Also discovered, but did NOT touch (explicitly out of scope for
+     this cleanup, not asked about, flagging here for whoever picks it
+     up next): `R/newReefParams.R`'s `use_UR_cc == TRUE` branch (lines
+     ~259-287) reads component params from these same dead top-level
+     field names (`other_params$algae_capacity`,
+     `other_params$initial_algae_growth`, `other_params$sen_decomp`,
+     `other_params$ext_decomp`, `other_params$detritus_capacity`,
+     `other_params$external`) rather than the current nested
+     `algae_params`/`detritus_params` locations. Neither bundled model
+     uses `use_UR_cc = TRUE` so this doesn't affect anything shipped,
+     but it means building a NEW model with `use_UR_cc = TRUE` today
+     would likely get `NULL` component params for algae/detritus
+     capacity and growth -- a real, currently-latent bug in that code
+     path, same migration-gap root cause as Findings 1/2 but in live
+     code rather than bundled data. Not investigated further; this is a
+     genuinely new item for "Outstanding, genuinely open" below.
+   Committed as part of a296a2c (caribbean_3_model side) and d46c23c
+   (caribbean_10_model side, bundled with finishing the rename since
+   that file's diff was already inseparable from the rename itself with
+   no intermediate commit).
+
+4. Finished the caribbean_10_model rename per the sixth session's plan:
+   claude_10_model no longer exists as bundled data; caribbean_10_model
+   is now tuneUR()'s tuned output; the old untuned version is archived at
+   inst/archive/caribbean_10_model_untuned.rda. devtools::test(): 0 fail
+   / 511 pass (up from 495 at the start of this session -- 16 new
+   assertions across 6 new/extended test files). devtools::check(vignettes
+   = TRUE): 0 errors / 0 warnings / 2 notes (both pre-existing: inst/LICENSE
+   top-level placement, tuneUR/data() style note -- matches the documented
+   baseline exactly). Re-rendered and read the actual output of all three
+   affected vignettes (mizerReef.Rmd, karpata_model-description.Rmd,
+   caribbean_3_model-description.Rmd) -- all render cleanly, numbers are
+   internally consistent (e.g. caribbean_10_model's detritus production
+   breakdown 227.60 + 125.94 - 236.87 = 116.67 exactly matches the P_D
+   value the sixth session recorded at t=0 during the original crash
+   diagnosis). Committed as d46c23c.
+
+5. Added regression tests specifically guarding the blind spot that let
+   Finding 2 ship unnoticed: new tests in test-caribbean_3_model.R and
+   test-caribbean_10_model.R check the BUNDLED, as-shipped objects' own
+   dB/dt directly (not just a fresh tuneUR() call's output), plus a
+   direct field-name guard (`external` present, `d_external` absent) for
+   both models. Also added direct unit tests for Finding 1's floor
+   behaviour in test-detritus_dynamics.R/test-algae_dynamics.R
+   (synthetic negative-production scenario, confirms the floored formula
+   is what's actually returned) and an integration-level regression test
+   in test-caribbean_10_model.R that re-runs the exact 20-year effort=1
+   fishing reproduction case and asserts no NAs/negative resource
+   biomass. Included in commits c3e7694/a296a2c/d46c23c alongside their
+   respective fixes.
+
+6. Updated NEWS.md with entries for both fixes and the metadata cleanup,
+   following the project's established style. Committed as 83b4dc4.
+
+** A naming question the user raised mid-session, explicitly deferred **
+
+The user flagged that `external` (the detritus_params field name Finding
+2 restored conformance to) isn't very descriptive on its own -- doesn't
+indicate it's detritus-specific. Confirmed this is a real, pre-existing
+name (not something invented this session) that is also a documented,
+exported argument to `setDetritusParams()`, not just an internal field
+-- so renaming it would mean updating the exported argument name plus
+getDetritusProduction()/tuneUR()/tuneUR_cc()/scaleReefModel(), a bigger
+and separately-risky piece of work (breaking change to an exported
+argument for any existing caller). User explicitly chose to DEFER this
+to a future release rather than do it this session. If picked up later:
+consider something like `external_flux` or `detritus_external`, and note
+this would need the same treatment across all three bundled models plus
+every function currently reading/writing `detritus_params$external`.
+
+** Still open / not done this session **
+
+- NOT YET PUSHED to origin. Four commits (c3e7694, a296a2c, d46c23c,
+  83b4dc4) sit on major_update locally, ahead of the last-pushed
+  6344c5a. Push when the user confirms they're ready (not done
+  automatically per this session's working norms around actions with
+  broader visibility).
+- The newly-discovered `use_UR_cc == TRUE` branch bug in
+  R/newReefParams.R (see item 3 above) -- flagged, not fixed, not
+  something either finding or the metadata audit was scoped to cover.
+  Worth a dedicated look: does anything currently exercise
+  `use_UR_cc = TRUE` (check tests/test-*_cc.R and tuneUR_cc() callers),
+  and if a user built a model that way today, what actually happens to
+  algae/detritus capacity and growth.
+- The `external` field-naming question above -- deferred to a future
+  release per the user, not logged anywhere else, so noting it here.
+- Everything under "Outstanding, genuinely open" and the deferred
+  "give algae/detritus a real absolute biomass scale" future-work plan
+  further down this file -- untouched this session, explicitly out of
+  scope per the user's own instruction at the start of this session
+  (mechanistically related to Finding 1/2's territory, tempting to fold
+  in, deliberately did not).
+
 === START HERE (updated 28/07, fifth session - PLAN ONLY, nothing
 below in this block has been executed yet. Target: Methods in Ecology
 and Evolution, submitted as an Application paper. Zenodo archival will
