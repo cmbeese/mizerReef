@@ -1,5 +1,127 @@
 MizerReef Major Package Update To Do List - 28/07 (updated)
 
+=== STOP AND READ FIRST (28/07, same day, eighth session/continuation)
+- independent pre-submission audit requested by the user (not trusting this
+  file's own account of "everything fixed"): three parallel read-only
+  investigations found ONE real, previously-unflagged bug (the `rho`
+  field-name issue below) plus some smaller cleanup. All fixed, verified,
+  committed. Nothing is paused; there is no uncommitted work. ===
+
+** What happened this session, in order **
+
+The user asked for an independent audit before MEE submission - explicitly
+not to trust the log's own account of "everything fixed and verified."
+Dispatched three parallel read-only investigations rather than re-reading
+this file at face value: (1) a grep-based sweep of R/, tests/, vignettes/
+for every previously-fixed stale field name, plus a re-check of
+newReefParams()'s use_UR_cc branches and the MizerReefParams-class.R/
+mizerReef-class.R slot definitions; (2) a full field-by-field dump of both
+bundled models' other_params structure plus a git push-state check; (3) a
+fresh, from-source devtools::test() rerun (devtools::check()/
+pkgdown::build_site() were blocked mid-task by an active plan-mode
+restriction and deferred to after plan approval, per that agent's own
+correct judgement call - both write files to disk).
+
+Most of the log's account held up exactly as claimed: devtools::test()
+matched the claimed 519-pass baseline exactly; git was fully clean and
+pushed (HEAD b09ccd6 == origin/major_update, no local-only commits);
+MizerReefParams-class.R/mizerReef-class.R confirmed to define zero
+setClass()/representation() calls anywhere in R/ - the extension-mechanism
+fix is genuinely structurally sound, not just claimed; every previously-
+fixed stale field name (d_external, algae_growth_initial, bad_pred,
+karpata_model as a data object, etc.) really is gone from live code.
+
+One real bug of the exact same migration-gap class turned up, not
+previously flagged anywhere in this file or NEWS.md:
+
+1. `rho` field relies on accidental R `$` partial-matching -
+   newReefParams() (lines ~218-227) wrote the algae/detritus consumption
+   matrices to other_params$algae_params$rho_algae and
+   other_params$detritus_params$rho_detritus, but EVERY consumer
+   (algae_components.R, detritus_components.R, reef-components.R,
+   reef-helpers.R, plus the roxygen docs and two existing tests) reads/
+   writes the bare field name `rho`. This only worked because R's `$`
+   silently does partial name-matching (`rho` uniquely prefix-matches
+   `rho_algae`) - reproduced the `partial match of 'rho' to 'rho_algae'`
+   warning directly under options(warnPartialMatchDollar = TRUE) to
+   confirm. Both bundled models had the same rho_algae/rho_detritus (not
+   rho) field names, relying on the same accident. Fixed newReefParams()
+   to write `rho` directly (matching every reader, and the name the
+   existing tests/docs already assumed). Patched both bundled .rda files
+   the same way prior sessions patched external/algae_growth: loaded,
+   renamed the field via `[[<-`/exact-name access (NOT `$<-`, which would
+   have hit the exact same partial-matching bug while trying to fix it -
+   caught this the hard way when the first patch-script attempt tripped
+   over its own `$rho` sanity check), re-saved with matching bzip2
+   compression, verified via all.equal() that nothing else changed and the
+   renamed values are byte-identical to before. Verified
+   getAlgaeConsumption()/getDetritusConsumption() return identical numbers
+   on both bundled models before and after (the rename is behaviour-
+   preserving). Added direct field-name regression tests (mirroring the
+   existing external-present/d_external-absent guards) to
+   test-caribbean_3_model.R, test-caribbean_10_model.R, and
+   test-newReefParams.R (a freshly-built object, not just the bundled
+   ones). devtools::test(): 0 fail, 519 -> 531 pass (12 new assertions).
+
+Smaller items found and fixed in the same pass:
+
+2. Dead code in R/reef-rates.R: getDegrade()/getVulnerable() assigned
+   `dt <- ...@other_params$dt` (three call sites) and
+   `method_params <- params@other_params$method_params` /
+   `old_rd <- method_params$refuge_density` (one call site) - none of
+   these were ever read afterward (other_params$dt is never written
+   anywhere in the package; the method_params read here was itself a
+   stale top-level read of a value that should live under
+   other_params$refuge_params$method_params, but the result was dead-end
+   regardless). Removed all of it; confirmed via devtools::test() this is
+   a genuine no-op (531 pass, unchanged).
+3. caribbean_10_model's other_params carried two more harmless-but-
+   asymmetric duplicate fields caribbean_3_model lacked, from the two
+   objects being frozen at slightly different historical builds: a dead
+   duplicate `new_refuge` nested inside refuge_params (the live flag is
+   the top-level other_params$new_refuge, confirmed via grep - the nested
+   copy is read nowhere), and an extra `capacity` field in the `algae`
+   mizer::setComponent() bookkeeping copy (also confirmed read nowhere).
+   Removed both from caribbean_10_model's bundled .rda so the two example
+   models' other_params structures now match exactly.
+4. vignettes/karpata_model-description.Rmd:537 used `karpata_model` as a
+   local variable name in a hidden <details> chunk - a cosmetic leftover
+   from before the bundled object was renamed to caribbean_10_model, not
+   a broken reference (confirmed not referenced again anywhere else in the
+   file). Renamed to caribbean_10_model for consistency now that the
+   rename is otherwise complete everywhere else.
+5. Deleted 7 untracked, gitignored, stale vignettes/*.html render
+   artifacts left over from before using-multiple-resources.Rmd's rename
+   and other since-fixed content bugs - confirmed via git ls-files they
+   were never tracked, purely local hygiene, not a repo/publication risk.
+6. DESCRIPTION's Date field (2026-07-17) was 11 days stale against the
+   actual most recent commit (today, 2026-07-28) - bumped both it and
+   CITATION.cff's date-released to match.
+7. Updated NEWS.md with entries for items 1-3 above, matching the
+   project's established style for this exact bug class.
+
+Final verified baseline after all of the above: devtools::test() - 0 fail,
+531 pass (up from 519). devtools::check(vignettes = TRUE, cran = FALSE) -
+0 errors, 0 warnings, 2 notes, both exactly the pre-existing documented
+baseline (inst/LICENSE top-level placement, tuneUR/tuneUR_cc codetools
+"no visible global function" note). pkgdown::build_site() (with CI=true
+to skip the known favicon-generator outage) - clean, no errors or warnings
+in the build log, docs/ is gitignored so no tracked changes there.
+
+** Still open / not done this session **
+
+- Nothing from this session is left half-done. All fixes are committed
+  (see git log once this session's commits land) and the log entry above
+  is the complete account.
+- Everything under "Outstanding, genuinely open" further down remains
+  exactly as it was - this was a targeted audit for the bug class
+  described above plus a general sweep, not a revisit of the deliberately
+  deferred items (algae/detritus absolute biomass scale, the `external`
+  field rename, reef-setParams.R test coverage, CRAN-only items,
+  anonymisation for double-anonymous review). None of those were touched,
+  per the user's original request to leave anonymisation for later and
+  per this file's own existing "deferred" markings on the others.
+
 === STOP AND READ FIRST (28/07, same day, seventh session/continuation)
 - the caribbean_10_model rename is DONE, both blocking findings are FIXED
 and VERIFIED, everything is committed. Nothing is paused; there is no
