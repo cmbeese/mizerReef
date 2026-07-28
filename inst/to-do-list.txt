@@ -5,7 +5,20 @@ MizerReef Major Package Update To Do List - 28/07 (updated)
   file's own account of "everything fixed"): three parallel read-only
   investigations found ONE real, previously-unflagged bug (the `rho`
   field-name issue below) plus some smaller cleanup. All fixed, verified,
-  committed. Nothing is paused; there is no uncommitted work. ===
+  committed, and pushed to origin/major_update (7 commits, 9843956..
+  ad0053d). Local main has been fast-forwarded to match origin/main
+  (071be96..0377cfa - 3 small commits that had landed directly on main:
+  LICENSE, CITATION.cff, a redundant-variable-assignment fix in
+  reef-project_methods.R). The user then explicitly said NOT to merge
+  major_update into main yet - main is intentionally left 158 commits
+  behind major_update. Plan going forward, per the user: merge
+  major_update into main first, THEN create a separate anonymised branch
+  from main and sync that (not main itself) to Zenodo for MEE's
+  double-anonymous review, per MEE's own author guidelines. No git tag
+  has been created yet. Nothing is paused in the sense of broken/
+  uncommitted work - the working tree is clean and everything is pushed -
+  but the main-merge and the anonymisation branch are both deliberately
+  not started yet, waiting on the user's go-ahead. ===
 
 ** What happened this session, in order **
 
@@ -110,17 +123,31 @@ in the build log, docs/ is gitignored so no tracked changes there.
 
 ** Still open / not done this session **
 
-- Nothing from this session is left half-done. All fixes are committed
-  (see git log once this session's commits land) and the log entry above
-  is the complete account.
+- Nothing from this session is left half-done or uncommitted. All 7 audit
+  fix commits are on origin/major_update; local main matches origin/main
+  exactly (fast-forwarded, not merged with major_update).
+- NEXT STEPS, in the order the user wants them (none started yet):
+  1. Merge major_update into main (confirmed a clean fast-forward is
+     possible - main is a strict ancestor of major_update, 158 commits
+     behind, 0 ahead - no divergence to reconcile). Waiting on the user's
+     explicit go-ahead before doing this; got stopped mid-check last time
+     ("DONT MERGE TO MAIN YET").
+  2. Once merged, likely tag the release (no existing tag convention in
+     this repo yet - v2.1.0 would be the first tag, matching DESCRIPTION's
+     Version field).
+  3. Create a separate anonymised branch off main (not main itself) and
+     sync that to Zenodo, per MEE's double-anonymous review guidelines -
+     the user's own plan, not yet started. See the existing
+     "MEE-SPECIFIC: prepare for double-anonymous review" item further
+     down this file for the background research already done on this
+     (anonymous.4open.science mirror vs. ScholarOne's anonymised upload
+     path, checking README/DESCRIPTION/CITATION.cff for identifying info).
 - Everything under "Outstanding, genuinely open" further down remains
   exactly as it was - this was a targeted audit for the bug class
   described above plus a general sweep, not a revisit of the deliberately
   deferred items (algae/detritus absolute biomass scale, the `external`
-  field rename, reef-setParams.R test coverage, CRAN-only items,
-  anonymisation for double-anonymous review). None of those were touched,
-  per the user's original request to leave anonymisation for later and
-  per this file's own existing "deferred" markings on the others.
+  field rename, reef-setParams.R test coverage, CRAN-only items). None of
+  those were touched, per this file's own existing "deferred" markings.
 
 === STOP AND READ FIRST (28/07, same day, seventh session/continuation)
 - the caribbean_10_model rename is DONE, both blocking findings are FIXED
