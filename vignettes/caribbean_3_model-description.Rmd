@@ -116,7 +116,7 @@ All fish are assumed to utilize refuge ($\tau = 1$). Fish smaller than `r paste(
 The following table gives the fish length bins and refuge densities that define the refuge profile used in the steady state. Length bins and refuge densities were garnered from the FORCE data in the same location as biomass estimates - the same [`karpata_refuge`](../reference/karpata_refuge.html) profile used by the 10-group model.
 
 ```{r, echo = FALSE}
-params@other_params$method_params %>%
+params@other_params$refuge_params$method_params %>%
     mutate(refuge_density = round(refuge_density,3)) %>%
     kable(row.names = FALSE,
           col.names = c("Start of Bin (cm)",
@@ -369,8 +369,8 @@ params@species_params %>%
 
 ```{r, echo = FALSE}
 #| include: false
-e_d <- params@other_params$ext_decomp
-s_d <- params@other_params$sen_decomp
+e_d <- params@other_params$detritus_params$ext_decomp
+s_d <- params@other_params$detritus_params$sen_decomp
 r <- getDetritusProduction(params)
 pf <- r[1]
 pd <- r[2]
