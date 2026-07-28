@@ -238,7 +238,7 @@ newReefParams <- function( # Original mizer parameters
             component_params = list(
                 rho = rho_alg,
                 capacity = params@other_params$algae_params$algae_capacity,
-                growth = params@other_params$algae_params$algae_growth_initial
+                growth = params@other_params$algae_params$algae_growth
             )
         )
 
@@ -253,7 +253,7 @@ newReefParams <- function( # Original mizer parameters
                 capacity = params@other_params$detritus_params$detritus_capacity,
                 sen_decomp = params@other_params$detritus_params$sen_decomp,
                 ext_decomp = params@other_params$detritus_params$ext_decomp,
-                external = params@other_params$detritus_params$d_external
+                external = params@other_params$detritus_params$external
             )
         )
     } else if (use_UR_cc == TRUE) {
@@ -265,8 +265,8 @@ newReefParams <- function( # Original mizer parameters
             encounter_fun = "encounter_contribution",
             component_params = list(
                 rho = rho_alg,
-                capacity = params@other_params$algae_capacity,
-                growth = params@other_params$initial_algae_growth
+                capacity = params@other_params$algae_params$algae_capacity,
+                growth = params@other_params$algae_params$algae_growth
             )
         )
 
@@ -278,10 +278,10 @@ newReefParams <- function( # Original mizer parameters
             encounter_fun = "encounter_contribution",
             component_params = list(
                 rho = rho_det,
-                sen_decomp = params@other_params$sen_decomp,
-                ext_decomp = params@other_params$ext_decomp,
-                capacity = params@other_params$detritus_capacity,
-                external = params@other_params$external
+                sen_decomp = params@other_params$detritus_params$sen_decomp,
+                ext_decomp = params@other_params$detritus_params$ext_decomp,
+                capacity = params@other_params$detritus_params$detritus_capacity,
+                external = params@other_params$detritus_params$external
             )
         )
     }

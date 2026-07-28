@@ -172,3 +172,43 @@ test_that("newReefParams errors when method is missing", {
         "method"
     )
 })
+
+test_that("newReefParams's mizer::setComponent() bookkeeping copy matches the real algae/detritus params, for both use_UR_cc settings", {
+    # Regression check for a bug in the same class as Finding 2
+    # (caribbean_3_model's stale d_external field): the component_params
+    # passed to setComponent() for the "algae"/"detritus" components used
+    # to read from field names (algae_growth_initial, d_external, and for
+    # use_UR_cc = TRUE, a set of top-level other_params fields) that no
+    # setter in the current codebase ever populates, so the resulting
+    # other_params$algae/other_params$detritus bookkeeping copy was
+    # silently NULL. Nothing in the actual dynamics (algae_dynamics()/
+    # detritus_dynamics()/their _cc variants) reads this bookkeeping copy
+    # -- they all read other_params$algae_params/detritus_params directly
+    # -- but display code (see the model-description vignettes) has read
+    # it before. This checks the copy is populated and consistent with
+    # the authoritative nested fields, for both use_UR_cc branches.
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+
+    for (use_UR_cc in c(FALSE, TRUE)) {
+        result <- suppressMessages(newReefParams(
+            species_params = caribbean_3_species,
+            interaction = caribbean_3_interaction,
+            method = "binned",
+            method_params = tuning_profile,
+            use_UR_cc = use_UR_cc
+        ))
+
+        expect_false(is.null(result@other_params$algae$growth))
+        expect_equal(
+            result@other_params$algae$growth,
+            result@other_params$algae_params$algae_growth
+        )
+        expect_false(is.null(result@other_params$detritus$external))
+        expect_equal(
+            result@other_params$detritus$external,
+            result@other_params$detritus_params$external
+        )
+    }
+})

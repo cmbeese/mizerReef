@@ -341,7 +341,7 @@ params@species_params %>%
 #### Algal production  
   
 ```{r, echo = FALSE, include=FALSE}
-pA <- params@other_params$algae$growth
+pA <- params@other_params$algae_params$algae_growth
 ```
 
 The rate at which algal biomass is produced by the ecosystem is given by a constant growth rate with units of grams per unit area per unit time. At steady state algal production is `r signif(pA,digits = 4)` grams per square meter per year.
@@ -371,7 +371,7 @@ s_d <- params@other_params$detritus_params$sen_decomp
 r <- getDetritusProduction(params)
 pf <- r[1]
 pd <- r[2]
-dext <- params@other_params$detritus$external
+dext <- params@other_params$detritus_params$external
 ```
 Detritus comes from defecation and decomposing dead organisms that die as a result of sources of external mortality. At steady state detritus from decomposing dead organisms is `r paste(round(pd,2))` g/year and defecation produces `r paste(round(pf,2))` g/year. A proportion `ext_decomp` of the external mortality and a proportion `sen_decomp` of senescence mortality decomposes to detritus.  The proportion of detritus that sinks from external mortality is `r paste(100*e_d,"%")` and the proportion that decomposes from senescence mortality is `r paste(100*s_d,"%")`. These values are based on estimates from @Hatcher_1988.
 
