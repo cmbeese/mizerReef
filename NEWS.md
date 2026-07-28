@@ -285,6 +285,30 @@
   displayed prose numbers read from these stale top-level fields instead
   of the correct nested ones; repointed to the correct fields (the
   displayed values are unchanged, since both copies held identical data).
+- `newReefParams()` populated `mizer::setComponent()`'s bookkeeping copy
+  of the algae/detritus components (`other_params$algae`,
+  `other_params$detritus`) from field names that no setter in the current
+  codebase writes to -- `algae_growth_initial` and `d_external` for the
+  default `use_UR_cc = FALSE` path (the same stale names as the two bugs
+  above), and a set of flat top-level fields (`algae_capacity`,
+  `initial_algae_growth`, `sen_decomp`, `ext_decomp`, `detritus_capacity`,
+  `external`) for `use_UR_cc = TRUE`, left over from `main`'s old
+  flat-storage convention. A freshly-built model's bookkeeping copy was
+  therefore silently `NULL` on both paths. The two bundled models only
+  ever displayed correct numbers from this copy because their `.rda`
+  files were built with older, still-self-consistent code and the copy
+  is set once at construction and never refreshed -- a frozen historical
+  accident, not evidence the current code path works. No simulation
+  dynamics are affected (`algae_dynamics()`/`detritus_dynamics()` and
+  their `_cc` variants all read `other_params$algae_params`/
+  `detritus_params` directly, never this bookkeeping copy), but display
+  code that reads it -- as `caribbean_3_model-description.Rmd` and
+  `karpata_model-description.Rmd` both did, for algal/detrital
+  production prose -- would silently break on a freshly-rebuilt model.
+  Fixed `newReefParams()` to read the current field names on both paths,
+  and repointed both vignettes to read the authoritative nested fields
+  directly rather than this bookkeeping copy (displayed numbers are
+  unchanged).
 
 # MizerReef 2.0.0
 
