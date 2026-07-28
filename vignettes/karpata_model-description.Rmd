@@ -534,7 +534,7 @@ plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
 plotSpectra(params, power = 1)
 
 # Save!
-karpata_model <- reefSteady(params)
+caribbean_10_model <- reefSteady(params)
 ```
 
 </details>
