@@ -104,6 +104,18 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, t = 0, ...) {
 #' This avoids the stability problems that would arise if we used the Euler
 #' method to solve the equation numerically.
 #'
+#' `B_A(t+dt)` above is a convex combination of `B_A(t)` and `P_A/c_A`, and
+#' is therefore guaranteed non-negative only when `P_A >= 0`. `P_A` (from
+#' [getAlgaeProduction()]) is a growth rate tuned once, at fixed abundances,
+#' by [tuneUR()]/[tuneUR_cc()]; it does not itself respond to the changing
+#' fish abundances of a live, non-frozen simulation. Production is floored
+#' at zero (`production <- max(production, 0)`) before it enters the
+#' analytic update above, so that this non-negativity guarantee holds even
+#' if some future/degraded parameterisation ever drove `P_A` negative. This
+#' has no effect at any steady state tuned by `tuneUR()`/`tuneUR_cc()`
+#' (there, production equals consumption, which is non-negative by
+#' construction) -- it only ever engages away from that steady state.
+#'
 #' @param params A [MizerParams] object
 #' @param n A matrix of current species abundances (species x size)
 #' @param n_other Other dynamic components.
@@ -122,12 +134,14 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, t = 0, ...) {
 algae_dynamics <- function(params, n, n_other, rates, dt, t = 0, ...) {
 
     consumption <- algae_consumption(params, n, rates)
-    production  <- sum(getAlgaeProduction(params, t))
-    
-    if(is.nan(consumption)){ 
+    # Floored at zero: the analytic update below is only guaranteed
+    # non-negative when production is non-negative (see Details).
+    production  <- max(sum(getAlgaeProduction(params, t)), 0)
+
+    if(is.nan(consumption)){
         warning("The algae consumption function is producing NaNs.")
     }
-    
+
 
     # If consumption is non-zero, return analytic solution
     if (consumption) {

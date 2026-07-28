@@ -47,6 +47,29 @@ The dynamical equation is solved analytically to
 
 This avoids the stability problems that would arise if we used the Euler
 method to solve the equation numerically.
+
+\code{B_D(t+dt)} above is a convex combination of \code{B_D(t)} and \code{P_D/c_D}, and
+is therefore guaranteed non-negative only when \code{P_D >= 0}. \code{P_D} (from
+\code{\link[=getDetritusProduction]{getDetritusProduction()}}) is \code{feces + decomp + external}: \code{feces} and
+\code{decomp} scale with current fish abundance and mortality, but \code{external}
+is a fixed constant, tuned once at fixed abundances by
+\code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}} and never updated again. In a live, non-frozen
+simulation (e.g. a multi-year \code{\link[mizer:project]{mizer::project()}} call with fishing),
+\code{feces + decomp} can shrink enough that the fixed \code{external} term drives
+total production negative, breaking the non-negativity guarantee above
+and eventually producing negative/\code{NaN} detritus biomass. Production is
+therefore floored at zero (\code{production <- max(production, 0)}) before it
+enters the analytic update above. This has no effect at any steady state
+tuned by \code{tuneUR()}/\code{tuneUR_cc()} (there, production equals consumption,
+which is non-negative by construction) -- it only ever engages once a
+live simulation has moved away from that steady state, which is exactly
+the situation where an unbounded negative production would otherwise be
+unphysical: \code{external} represents net exchange with the surrounding
+system (see the "flux of external detritus is negative" warning in
+\code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}}, documented there as detritus flowing off the
+reef), and the true floor on a net production/export rate is zero
+(nothing can be produced from, or exported past, an empty pool) rather
+than an unboundedly negative constant.
 }
 \seealso{
 \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=detritus_consumption]{detritus_consumption()}},
