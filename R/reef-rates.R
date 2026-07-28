@@ -40,10 +40,6 @@ getDegrade <- function(object, n, n_pp, n_other,
         if (missing(n_pp)) n_pp <- params@initial_n_pp
         if (missing(n_other)) n_other <- params@initial_n_other
 
-        dt <- params@other_params$dt
-        method_params <- params@other_params$method_params
-        old_rd <- method_params$refuge_density
-
         # calculate vulnerability
         degrade <- reefDegrade(params,
             n = n, n_pp = n_pp,
@@ -57,8 +53,6 @@ getDegrade <- function(object, n, n_pp, n_other,
         if (missing(time_range)) {
             time_range <- dimnames(sim@n)$time
         }
-        par <- sim@params
-        dt <- par@other_params$dt
         time_elements <- mizer::get_time_elements(sim, time_range)
         deg_time <- plyr::aaply(which(time_elements), 1, function(x) {
             # Necessary as we only want single time step but may only have 1
@@ -148,8 +142,6 @@ getVulnerable <- function(object, n, n_pp, n_other,
         if (missing(time_range)) {
             time_range <- dimnames(sim@n)$time
         }
-        par <- sim@params
-        dt <- par@other_params$dt
         time_elements <- mizer::get_time_elements(sim, time_range)
         vul_time <- plyr::aaply(which(time_elements), 1, function(x) {
             # Necessary as we only want single time step but may only have 1
