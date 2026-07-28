@@ -72,3 +72,54 @@ test_that("caribbean_10_model can be projected forward without producing NAs", {
     expect_false(anyNA(sim@n))
     expect_false(anyNA(sim@n_pp))
 })
+
+test_that("caribbean_10_model survives a multi-year live fishing simulation without negative resource biomass", {
+    # Regression check for Finding 1: caribbean_10_model's fixed, large
+    # negative detritus external flux used to drive total detritus
+    # production negative within a fraction of a year once effort = 1
+    # fishing started shifting fish abundance away from the tuned steady
+    # state, eventually producing negative and then NaN detritus biomass
+    # that crashed project() outright (see detritus_dynamics()'s Details
+    # for the mechanism, now fixed by flooring production at zero). This is
+    # the exact reproduction scenario from that diagnosis, checked at fine
+    # time resolution since annual snapshots alone missed the excursion the
+    # first time.
+    data(caribbean_10_model)
+    sim <- project(caribbean_10_model,
+        effort = 1, t_max = 20, t_save = 0.1, progress_bar = FALSE
+    )
+    n_other <- mizer::NOther(sim)
+    expect_false(anyNA(n_other))
+    expect_true(all(unlist(n_other) >= 0))
+})
+
+test_that("caribbean_10_model's algae and detritus are genuinely at steady state", {
+    # Regression check: an earlier version of this bundled object (now
+    # archived at inst/archive/caribbean_10_model_untuned.rda) had
+    # algae_growth left at newReefParams()'s raw untuned default (2000),
+    # so algae/detritus were confirmed NOT at steady state (dB/dt far from
+    # zero). The current object is tuneUR()'s output, which should give
+    # dB/dt = 0 for both resources.
+    data(caribbean_10_model)
+    m <- caribbean_10_model
+
+    P_A <- sum(getAlgaeProduction(m))
+    c_A <- algae_consumption(m, n = m@initial_n, rates = getRates(m))
+    expect_equal(P_A - c_A * algae_biomass(m), 0)
+
+    P_D <- sum(getDetritusProduction(m))
+    c_D <- detritus_consumption(m, n = m@initial_n, rates = getRates(m))
+    expect_equal(P_D - c_D * detritus_biomass(m), 0, tolerance = 1e-8)
+})
+
+test_that("caribbean_10_model's detritus_params external flux is stored under the correct field name", {
+    # Guard against the same stale-field-name class of bug as Finding 2
+    # (caribbean_3_model's d_external): caribbean_10_model briefly carried a
+    # dead d_external duplicate alongside the correctly-named external field,
+    # left over from before it was tuneUR()'d. Only external should remain.
+    data(caribbean_10_model)
+    dp_names <- names(caribbean_10_model@other_params$detritus_params)
+    expect_true("external" %in% dp_names)
+    expect_false("d_external" %in% dp_names)
+    expect_false(is.null(caribbean_10_model@other_params$detritus_params$external))
+})

@@ -203,7 +203,13 @@
 #' Built from \code{\link{caribbean_10_species}},
 #' \code{\link{caribbean_10_interaction}}, and \code{\link{karpata_refuge}};
 #' calibrated to match observed biomasses and upgraded to mizerReef 2.1.0 /
-#' mizer 3.1.0.
+#' mizer 3.1.0. Algae/detritus resource dynamics are tuned via [tuneUR()]
+#' so that both are genuinely at steady state (\code{dB/dt = 0}) for the
+#' model's calibrated abundances; an earlier untuned version of this object
+#' (\code{algae_growth} left at \code{newReefParams()}'s raw default of
+#' \code{2000}, so algae/detritus were not actually at steady state) is
+#' archived at \code{inst/archive/caribbean_10_model_untuned.rda} for
+#' reference.
 #'
 #' @keywords datasets
 #' @seealso \code{\link{caribbean_10_species}}, \code{\link{caribbean_10_interaction}},
@@ -217,39 +223,6 @@
 #'   10 species, competitive refuge, and algae/detritus components.
 #' @source PhD Thesis, FORCE dataset
 "caribbean_10_model"
-
-
-#' caribbean_10_model with algae/detritus resource dynamics properly tuned
-#'
-#' `caribbean_10_model`'s bundled `algae_growth` was still exactly 2000 --
-#' `newReefParams()`'s raw untuned default -- rather than a value derived by
-#' [tuneUR()], unlike `caribbean_3_model`'s `algae_growth` (86.87579). This
-#' means its algae and detritus resource pools were not actually at steady
-#' state for the model's calibrated species abundances (confirmed
-#' numerically: `dB/dt` for both algae and detritus was far from zero).
-#'
-#' `claude_10_model` is `caribbean_10_model` with [tuneUR()] applied: only
-#' `other_params$algae_params$algae_growth` and
-#' `other_params$detritus_params$external` differ from `caribbean_10_model`
-#' (confirmed via `all.equal()` on every other slot). After tuning,
-#' `dB/dt = 0` for both algae and detritus at the model's initial
-#' abundances. Provided alongside the original so the two can be compared
-#' directly (e.g. via [project()] or [reefSteady()]) before deciding
-#' whether `caribbean_10_model` itself should be replaced with the tuned
-#' version.
-#'
-#' @keywords datasets
-#' @seealso \code{\link{caribbean_10_model}}, \code{\link{tuneUR}}
-#' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
-#' complexity of Caribbean coral reefs and its relationships with fish
-#' community structure. PhD Thesis, Newcastle University.
-#' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
-#'   https://doi.org/10.26686/wgtn.26421523
-#' @format A \code{mizerReef} object (extends [MizerParams]) with
-#'   10 species, competitive refuge, and algae/detritus components.
-#' @source PhD Thesis, FORCE dataset; algae/detritus dynamics tuned via
-#'   [tuneUR()] from \code{\link{caribbean_10_model}}.
-"claude_10_model"
 
 
 #' Constant refuge profile for tuning steady states
