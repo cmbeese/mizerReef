@@ -6,17 +6,14 @@
   resources" showing how to chain mizerReef with
   [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
   size-structured background resources.
-- New bundled data object `claude_10_model`: `caribbean_10_model` with
-  [tuneUR()] applied to its algae/detritus resource dynamics. While adding
-  test coverage for `caribbean_10_model`, its `algae_growth` turned out to
-  still be exactly `2000` -- `newReefParams()`'s raw untuned default, unlike
+- `caribbean_10_model`'s algae/detritus resource dynamics are now properly
+  tuned via [tuneUR()]. Its `algae_growth` had been left at
+  `newReefParams()`'s raw untuned default of `2000`, unlike
   `caribbean_3_model`'s tuned `86.87579` -- meaning algae and detritus were
   not actually at steady state for the model's calibrated abundances
-  (confirmed numerically: `dB/dt` far from zero for both). `claude_10_model`
-  differs from `caribbean_10_model` only in `algae_growth` and the
-  detritus `external` flux, both computed via `tuneUR()`; `dB/dt = 0` for
-  both resources afterward. Provided alongside the original for comparison
-  before deciding whether `caribbean_10_model` itself should be replaced.
+  (confirmed numerically: `dB/dt` far from zero for both). The earlier,
+  untuned version of this object is archived at
+  `inst/archive/caribbean_10_model_untuned.rda` for reference.
 - New `include_inverts` argument (default `FALSE`) for `plotProductivity()`
   and `plotRelativeContribution()`, so users can choose whether to include
   the "inverts" species group (previously always excluded unconditionally
@@ -236,6 +233,58 @@
   applied in `getAlgaeProduction()` and `algae_dynamics_cc()` (which both
   now take a `t` argument), the same way `reefDegrade()` itself recomputes
   refuge density fresh from `t` rather than by mutating `params`.
+- `detritus_dynamics()`/`algae_dynamics()` could produce negative, then
+  `NaN`, resource biomass during a live (non-frozen) `project()` run.
+  Their analytic ODE update is a convex combination of the current biomass
+  and `production / consumption`, mathematically non-negative only if
+  production is non-negative -- but detritus production includes a fixed
+  `external` flux set once by `tuneUR()`/`tuneUR_cc()` at the model's
+  initial abundances and never updated again, so once fishing shifted fish
+  abundance enough to shrink the feces/decomposition terms, total
+  production could cross zero and go negative, breaking that guarantee.
+  Confirmed on `caribbean_10_model` under `effort = 1` fishing: detritus
+  production went negative by year 0.3, biomass itself went negative by
+  year 0.4, and the simulation eventually crashed with `NaN`. Fixed by
+  flooring production at zero in both functions before it enters the
+  analytic update; this has no effect at any `tuneUR()`/`tuneUR_cc()`-tuned
+  steady state (production there already equals consumption, which is
+  non-negative by construction) and only ever engages once a live
+  simulation has moved away from it. See `detritus_dynamics()`'s and
+  `algae_dynamics()`'s Details for the full mechanism.
+- `caribbean_3_model`'s bundled detritus external flux (`-120.1861`, the
+  same value its own model-description vignette displays) was silently
+  dropped from every live simulation: it was stored under the stale field
+  name `other_params$detritus_params$d_external`, left over from an old
+  S4-slot-then-revert migration, while `getDetritusProduction()` reads
+  `detritus_params$external` specifically -- the same class of bug already
+  fixed once for algae (`algae_growth_initial` vs. `algae_growth`, above).
+  Since the field was simply missing rather than present-but-wrong,
+  building the production vector silently omitted it with no warning:
+  the object's actual, as-shipped `dB_D/dt` was `120.1861`, not the zero
+  implied by its own vignette prose and by `test-tuneUR.R`'s existing
+  tests (which only ever checked a *fresh* `tuneUR(caribbean_3_model)`
+  call, not the bundled object's own on-disk state). Fixed by renaming the
+  field to `external`. New regression tests check the bundled objects'
+  own `dB/dt` directly, not just a fresh `tuneUR()` call's output, for
+  both `caribbean_3_model` and `caribbean_10_model`.
+- Cleaned up stale bundled-data metadata left over from the same
+  S4-slot-then-revert migration: `caribbean_3_model`/`caribbean_10_model`
+  carried about a dozen dead `other_params` fields (e.g.
+  `initial_algae_growth`, `initial_d_external`, `ext_decomp`,
+  `sen_decomp`, `method_params`, `bin.id`, `degrade`, `refuge`,
+  `refuge_lengths`, `carry_capacity`, `algae_capacity`,
+  `detritus_capacity`) at the top level of `other_params` -- remnants of
+  an old flat-storage convention, superseded by the current nested
+  `algae_params`/`detritus_params`/`refuge_params` sub-lists but never
+  removed. Confirmed unread by any current code path and removed from
+  both bundled models, which now match a freshly-built model's
+  `other_params` structure exactly. `caribbean_10_model` also carried a
+  dead duplicate `d_external` field alongside the correct `external`
+  field (from before it was `tuneUR()`'d); removed. Two vignettes
+  (`karpata_model-description.Rmd`, `caribbean_3_model-description.Rmd`)
+  displayed prose numbers read from these stale top-level fields instead
+  of the correct nested ones; repointed to the correct fields (the
+  displayed values are unchanged, since both copies held identical data).
 
 # MizerReef 2.0.0
 
