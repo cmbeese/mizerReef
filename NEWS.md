@@ -309,6 +309,30 @@
   and repointed both vignettes to read the authoritative nested fields
   directly rather than this bookkeeping copy (displayed numbers are
   unchanged).
+- `newReefParams()` stored the algae/detritus consumption matrix under
+  `other_params$algae_params$rho_algae`/
+  `other_params$detritus_params$rho_detritus`, but every consumer
+  (`algae_components.R`, `detritus_components.R`, `reef-components.R`,
+  `reef-helpers.R`) reads and writes the bare field name `rho`. This only
+  worked because R's `$` operator silently does partial name-matching
+  (`rho` uniquely prefix-matches `rho_algae`) -- the same migration-gap
+  bug class as the `d_external`/`algae_growth_initial` fixes above, just
+  one that hadn't broken output yet. Fixed `newReefParams()` to write
+  `rho` directly, matching every reader, and patched both bundled models
+  (`caribbean_3_model`, `caribbean_10_model`) the same way. New
+  regression tests guard the exact field name on both bundled models and
+  on a freshly-built model.
+- Removed a few more remnants of the same stale-bundled-data audit:
+  `caribbean_10_model` carried a dead duplicate `new_refuge` field nested
+  inside `refuge_params` (the live flag lives at the top level of
+  `other_params`) and an extra `capacity` field in its `algae`
+  bookkeeping copy that `caribbean_3_model` lacked -- both confirmed
+  unread by any current code path and removed so the two bundled models'
+  `other_params` structures now match exactly.
+- Removed a few lines of dead code in `getDegrade()`/`getVulnerable()`
+  (`R/reef-rates.R`) that read `other_params$dt` and the stale top-level
+  `other_params$method_params` -- neither value was ever used after being
+  assigned.
 
 # MizerReef 2.0.0
 
