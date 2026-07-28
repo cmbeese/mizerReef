@@ -134,18 +134,28 @@ every function currently reading/writing `detritus_params$external`.
 
 ** Still open / not done this session **
 
-- NOT YET PUSHED to origin. Four commits (c3e7694, a296a2c, d46c23c,
-  83b4dc4) sit on major_update locally, ahead of the last-pushed
-  6344c5a. Push when the user confirms they're ready (not done
-  automatically per this session's working norms around actions with
-  broader visibility).
-- The newly-discovered `use_UR_cc == TRUE` branch bug in
-  R/newReefParams.R (see item 3 above) -- flagged, not fixed, not
-  something either finding or the metadata audit was scoped to cover.
-  Worth a dedicated look: does anything currently exercise
-  `use_UR_cc = TRUE` (check tests/test-*_cc.R and tuneUR_cc() callers),
-  and if a user built a model that way today, what actually happens to
-  algae/detritus capacity and growth.
+- UPDATE: the `use_UR_cc == TRUE` bug flagged above WAS fixed this same
+  session, right after being flagged -- the user asked for it on the
+  spot. Commits 3e68151 (fix + vignette repoint + regression test) and
+  6d0c35b (NEWS.md). Root cause was the same migration-gap pattern as
+  Findings 1/2: newReefParams() fed mizer::setComponent()'s bookkeeping
+  copy of the algae/detritus components from stale/dead field names on
+  BOTH the use_UR_cc = FALSE and TRUE paths, so a freshly-built model's
+  `other_params$algae`/`other_params$detritus` bookkeeping copy was
+  silently NULL. No simulation dynamics were affected (confirmed
+  algae_dynamics()/detritus_dynamics() and their _cc variants never read
+  this copy), but two vignettes did, for display -- fixed those too.
+  devtools::test() 0 fail / 519 pass, devtools::check(vignettes=TRUE)
+  0 errors/0 warnings/2 notes (same pre-existing baseline). Session ended
+  right after this due to the user needing to leave for a meeting, so
+  double-check test/check are still clean as the very first thing next
+  session, just as a sanity check before doing anything else.
+- Everything through 6d0c35b is committed on major_update. Confirm
+  current push status with `git status -sb` / `git log
+  origin/major_update..HEAD` next session -- as of the last push this
+  session (12a6fee), commits 3e68151/6d0c35b were NOT yet pushed;
+  whether they got pushed before the user closed their laptop is
+  unconfirmed. Push once confirmed clean, if not already done.
 - The `external` field-naming question above -- deferred to a future
   release per the user, not logged anywhere else, so noting it here.
 - Everything under "Outstanding, genuinely open" and the deferred
