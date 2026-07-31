@@ -1,4 +1,154 @@
-MizerReef Major Package Update To Do List - 31/07 (updated)
+MizerReef Major Package Update To Do List - 01/08 (updated)
+
+=== STOP AND READ FIRST (01/08, tenth session, morning follow-up to the
+31/07 overnight algae fix) ===
+
+The user reviewed the overnight algae-production fix (31/07 session,
+below) and asked eight clarifying questions, then a follow-up round of
+three more targeted requests once satisfied with the answers. This
+entry covers the follow-up work; the original mechanism fix is
+untouched and still correct, this is documentation/investigation work
+plus two small, genuine pre-existing bugs found along the way.
+
+** Round 1 (explanatory only, no code changes) **
+
+Answered: (1) how the 2000 g/m^2/yr production default was verified
+(traced to main's own original default, cross-checked against fresh
+Carpenter 1986 / Tebbett & Bellwood 2021 literature converted to
+wet-mass terms); (2) why reefSteady()'s old freeze-then-jump pattern
+was unstable and what "algae co-adapts live" / "solve for biomass
+instead of production" mean, precisely; (3) confirmed reefSteady()'s
+own roxygen was still stale (only had an inline code comment) and
+fixed it; (4) explained the getDetritusProduction() feces-term
+mechanism that made detritus's external flux go stale when algae
+biomass moved; (5) confirmed fish results are completely unchanged
+(all.equal() + a byte-identical manuscript figure re-render), only
+algae/detritus numbers moved; (6) regenerated
+inst/scripts/karpata_example_fig.R's output -- byte-identical MD5,
+since it only plots fish-level biomass/productivity; (7) added a
+Carpenter (1990) Diadema antillarum mass-mortality citation to
+algae_biomass()'s docs supporting "low standing biomass under grazing
+is expected," while being explicit that this does NOT explain the
+bundled models' absolute-scale gap (still ~1e-9 g/m^2 vs. the
+literature's ~10-100 g DW/m^2 -- that remains the separate, deferred
+calibrateReefBiomass() issue, see the FUTURE WORK PLAN entry further
+down, which got a clarifying addendum today); (8) flagged (but did NOT
+yet fix) a vignette/code formula mismatch around the feeding-level
+term in c_A (algae) and p_D,f (detritus).
+
+** Round 2 (the user's three follow-ups on item 8, WITH code/doc
+changes) **
+
+1. "I think I used getAlgaeConsumption() as a different function than
+   algae_consumption() for a reason... it's the same pattern detritus
+   uses, right? It emulates mizerShelf?" -- CONFIRMED, by reading
+   mizerShelf's actual installed source directly (v1.0.2, found at
+   find.package("mizerShelf")): mizerShelf has the identical
+   x_consumption() [mass-specific, used in dynamics AND in its tuning
+   function tune_carrion_detritus()] / getXConsumption() [total
+   per-species, diagnostic-only] split, and critically its tuning
+   function uses the PLAIN mass-specific function, never the getX()
+   wrapper -- exactly the pattern the 31/07 fix switched tuneUR() to
+   for algae. So last night's fix (algae_consumption() instead of
+   getAlgaeConsumption() inside tuneUR()) is the CORRECT, mizerShelf-
+   consistent choice, not a deviation from it. No code change needed
+   here, only documented the reasoning (see item 2's commit).
+
+2. "Fix the roxygen documentation for detritus components to match
+   the code. Research the satiation mechanic thoroughly first, and
+   check whether it's described correctly." Satiation mechanic fully
+   traced: species_params$satiation (default: FALSE for carnivores,
+   TRUE for pure resource consumers -- see setRefuge()'s existing,
+   accurate docs) is read by projectFeedingLevel.mizerReef()
+   (R/reef-project_methods.R), which sets intake_max <- Inf for
+   satiation == FALSE species before calling mizer's standard Holling
+   type II feeding-level calculation -- so satiation=FALSE forces
+   feeding_level to 0 (unlimited intake, used for carnivores since
+   predation is refuge-regulated instead), and satiation=TRUE gives a
+   real, bounded, whole-diet feeding level (used for herbivores/
+   detritivores). Critically: feeding_level is a WHOLE-DIET quantity
+   (computed from a species' total encounter across prey + algae +
+   detritus + plankton combined), not something computed separately
+   per resource -- this needed stating explicitly since it's easy to
+   misread the per-resource formulas as if f_i(w) were resource-
+   specific. vignettes/model-description.Rmd's existing "Consumption
+   and satiation" section (lines ~215-236) was already accurate and
+   didn't need fixing.
+
+   Full roxygen audit (not just the one spot flagged in round 1) found
+   TWO real pre-existing doc/code mismatches, both present on main
+   unchanged, both confirmed against the actual function bodies (not
+   just doc comments -- learned that lesson the hard way in round 1,
+   see below):
+     - getDetritusProduction()'s displayed p_D,f formula was missing
+       the (1-f_i(w)) factor that its code has always applied. Fixed:
+       added the term, explained why (detritus's feces term uses the
+       same feeding-level-adjusted rate as detritus_consumption()/
+       getDetritusConsumption(), consistently, unlike algae).
+     - getAlgaeConsumption() used @inheritSection to borrow
+       algae_consumption()'s formula (no feeding level) -- wrong for
+       itself specifically, since getAlgaeConsumption()'s OWN code
+       (unlike algae_consumption()'s) does apply feeding level. Gave
+       it its own section with the correct formula, and fixed a
+       stray self-referencing @seealso (`[getAlgaeConsumption()]`
+       linking to itself) to point at algae_consumption() instead.
+   Also added an explanation to algae_consumption()'s own doc section
+   for why it deliberately omits feeding level (continuous grazing
+   pressure model, independent of individual satiation), cross-
+   referenced from both fixed spots. Committed as 5ec53b3.
+
+   *** CORRECTION TO ROUND 1: this round's audit found that what I'd
+   told the user in round 1 about detritus's feces term NOT using
+   feeding level was WRONG -- I'd only read the roxygen doc comment,
+   not the actual function body, which does apply it and always has.
+   Corrected directly with the user before making any changes. Lesson
+   applied for the rest of this session: verified every formula claim
+   against the executed function body, not just its documentation. ***
+
+3. "Take the feeding level out of algae in the model description... I
+   added the thesis c3 files, refer to these for what was done before
+   and what to cite." Files were untracked at the repo root
+   (c3_equations.qmd, c3_equations.tex) plus an existing gitignored
+   ignore/draft-vignettes/c3_parameters.Rmd -- moved the two loose
+   root files into ignore/thesis-materials/ for consistency with the
+   existing convention (gitignored, not committed; doesn't show as a
+   git change). c3_equations.qmd's compact equation list confirms both
+   c_A (algae) and c_D (detritus) were originally written WITHOUT a
+   feeding-level term in the thesis's own displayed math -- consistent
+   with main's original .qmd (checked last night) and with what the
+   real code does for c_A, but NOT for c_D or p_D,f (whose code has
+   always included feeding level despite none of the displayed-math
+   versions, thesis included, ever showing it for those two -- a
+   longstanding, thesis-inherited documentation gap, separate from
+   today's fixes and not touched).
+
+   Found the actual citation for the algae/detritus flux architecture:
+   c3_parameters.Rmd line 340 states outright "The equations governing
+   the flux of the algae and detritus resources were adapted from
+   @mizerShelf [@deJuan2023]" -- both already in vignettes/
+   references.bib, already cited in caribbean_3_model-description.Rmd,
+   but missing from model-description.Rmd (the general one with the
+   bug). Added there too. Did NOT find, in any available material, a
+   specific ecological citation for "herbivorous fish have full guts
+   most of the time" tied directly to this formula choice -- the
+   actual PhD thesis chapter 3 prose isn't in this repo, only its
+   bibliography and compact equation/parameter files survived. Gave
+   the user two candidate citations from that bibliography in round 1
+   (Ferreira et al. 1998; Choat, Clements & Robbins 2002) but did NOT
+   insert either into the docs, since I couldn't verify their content
+   supports the specific claim -- flagged as something for the user to
+   confirm against the actual thesis chapter, not something to guess
+   at. Fixed vignettes/model-description.Rmd's c_A formula (removed
+   the incorrect (1-f_i(w)) term) and removed an accompanying false
+   claim ("Herbivores are non-satiating by default") that contradicted
+   both the real default (satiation=TRUE for pure resource consumers)
+   and this same vignette's own earlier "Consumption and satiation"
+   section. Committed as 1545e2c.
+
+Full devtools::test() after all three: 542 pass, 0 fail (same benign
+warning as before, unrelated). devtools::document() clean, no roxygen
+errors. Re-rendered model-description.Rmd to confirm it still knits.
+Not yet re-run: a fresh full devtools::check(). ===
 
 === STOP AND READ FIRST (31/07, ninth session, overnight autonomous run) ===
 
