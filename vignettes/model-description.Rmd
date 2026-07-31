@@ -312,6 +312,9 @@ The algae and detritus pools each obey a linear balance between production and
 consumption. Because they are single scalars, their dynamics are ordinary
 differential equations that mizerReef solves analytically over each time step of
 length $dt$, which avoids the numerical instability of an explicit Euler step.
+The equations governing the flux of the algae and detritus resources were
+adapted from the mizerShelf extension package (Delius, de Juan & Maynou 2022;
+de Juan, Delius & Maynou 2023).
 
 ## Algae
 
@@ -330,12 +333,15 @@ production to compensate. $c_A$ is the **mass-specific** consumption rate
 (`algae_consumption()`). The latter is the total rate at which consumers graze
 the pool per unit of algal biomass,
 $$
-c_A = \sum_i \int \rho_{i,A}\,\theta_{i,A}\, w^{m_{alg}}
-  \big(1 - f_i(w)\big)\, N_i(w)\, dw,
+c_A = \sum_i \int \rho_{i,A}\,\theta_{i,A}\, w^{m_{alg}}\, N_i(w)\, dw,
 $$
-so that the total grazing rate is $c_A B_A$. (Herbivores are non-satiating by
-default, so $f_i(w) = 0$ and the bracket equals $1$.) Over a step the equation
-integrates to
+so that the total grazing rate is $c_A B_A$. Note that, unlike detritus
+consumption below, this deliberately does **not** include a feeding-level
+factor: algal depletion is modelled as driven by continuous grazing pressure
+rather than by any individual consumer's satiation state, regardless of the
+`satiation` setting for the herbivore species involved (see "Consumption and
+satiation" above, and `algae_consumption()`'s documentation for more detail).
+Over a step the equation integrates to
 $$
 B_A(t + dt) = B_A(t)\, e^{-c_A\, dt}
   + \frac{P_A}{c_A}\left(1 - e^{-c_A\, dt}\right).
