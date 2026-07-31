@@ -18,6 +18,13 @@ test_that("algae_dynamics_cc uses a boosted carrying capacity at a boosted times
         bleach_time = 2, degrade = TRUE, algae_boost = TRUE,
         algae_growth_boost = c(1), algae_capacity_boost = c(10)
     )
+    # Use a small, test-fixture algae_growth rather than the bundled
+    # model's real (literature-informed, much larger) production rate: with
+    # capacity = 1 and dt = 1, et = exp(-dt/ka * production) underflows to
+    # exactly 0 for both the boosted and unboosted ka at large production,
+    # making the two next-step biomasses indistinguishable for reasons
+    # unrelated to what this test checks.
+    params@other_params$algae_params$algae_growth <- 1
     # Zero out species abundance so algae_consumption() is 0 and
     # algae_dynamics_cc() takes its no-consumption branch
     # (et = exp(-dt/ka * production)), where ka's effect is directly
