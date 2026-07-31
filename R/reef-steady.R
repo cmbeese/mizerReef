@@ -67,9 +67,26 @@ reefSteady <- function(params, d_func = NULL,
     old_rdd_fun <- params@rates_funcs$RDD
     params@rates_funcs$RDD <- "constantRDD"
 
-    # Force other components to stay at current level
+    # Force other components to stay at current level, EXCEPT algae: algae
+    # production is a fixed, literature-informed constant that is never
+    # retuned to match consumption (see tuneUR()/tuneUR_cc()), and its
+    # dynamics (algae_dynamics()/algae_dynamics_cc()) converge to their
+    # steady state very fast relative to the fish sub-model, so leaving
+    # algae live lets it co-adapt with fish throughout convergence instead
+    # of being frozen and then jumped in one shot by the final
+    # tuneUR()/tuneUR_cc() call below. That one-shot jump matters because
+    # mizer's own convergence check (distanceSSLogN()) only looks at fish
+    # abundances, not at n_other -- so a frozen-then-jumped algae biomass
+    # left fish never having had a chance to adapt to the jump, and the
+    # "steady state" was not actually a joint fixed point. Only skip
+    # freezing algae when the final tuning step will actually run (i.e.
+    # when new_refuge == FALSE); when new_refuge == TRUE, algae is meant to
+    # be left completely untouched (see newReefParams()'s new_refuge docs).
     old_other_dynamics <- params@other_dynamics
     for (res in names(params@other_dynamics)) {
+        if (res == "algae" && params@other_params$new_refuge == FALSE) {
+            next
+        }
         params@other_dynamics[[res]] <- "constant_dynamics"
     }
 
