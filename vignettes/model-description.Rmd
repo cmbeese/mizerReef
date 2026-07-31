@@ -319,8 +319,14 @@ The algal biomass follows
 $$
 \frac{dB_A}{dt} = P_A - c_A\, B_A,
 $$
-where $P_A$ is the production rate (set to balance consumption at steady state,
-`getAlgaeProduction()`) and $c_A$ is the **mass-specific** consumption rate
+where $P_A$ is the production rate. Unlike detritus, algal production on a
+reef is real primary production and is not driven by grazer demand, so $P_A$
+is a fixed, literature-informed constant (`getAlgaeProduction()`, see
+`setAlgaeParams()`) rather than something tuned to match consumption; instead
+it is the algae *biomass* $B_A$ that is solved for at steady state
+(`tuneUR()`/`tuneUR_cc()`), so that, all else equal, a decrease in grazing
+pressure increases the standing algae biomass rather than reducing modelled
+production to compensate. $c_A$ is the **mass-specific** consumption rate
 (`algae_consumption()`). The latter is the total rate at which consumers graze
 the pool per unit of algal biomass,
 $$
