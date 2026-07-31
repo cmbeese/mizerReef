@@ -2,8 +2,36 @@
 
 #' Project a mizerReef model to steady state
 #'
-#' This function tunes the detritus and algae parameters after running
-#' mizer's default projectToSteady function.
+#' This function tunes the detritus and algae biomass after running mizer's
+#' default `projectToSteady()` function on the fish sub-model.
+#'
+#' @details
+#' Algae and detritus are treated differently while the fish sub-model
+#' converges. Detritus is frozen at its current biomass throughout (its
+#' `other_dynamics` is temporarily replaced with [constant_dynamics()]),
+#' because its production genuinely depends on a not-yet-tuned external
+#' flux (see [tuneUR()]/[tuneUR_cc()], [getDetritusProduction()]) that
+#' isn't set until the very end. Algae, by contrast, is left live and
+#' evolving via its own dynamics function
+#' ([algae_dynamics()]/[algae_dynamics_cc()]) throughout the loop, because
+#' algae production is a fixed, literature-informed constant (see
+#' [setAlgaeParams()]) that never needs retuning -- letting it co-adapt
+#' with the fish sub-model as it converges lets the two reach a genuine
+#' joint steady state together. (This matters because mizer's own
+#' convergence check, `distanceSSLogN()`, only looks at fish abundances,
+#' not at the resource pools -- freezing algae and then moving it in one
+#' shot at the very end, as used to happen, could leave fish not actually
+#' adapted to the final algae biomass.) Algae is frozen instead, like
+#' detritus, when `new_refuge == TRUE`, matching the fact that the final
+#' tuning step is also skipped in that case (see `new_refuge` in
+#' [newReefParams()]).
+#'
+#' After the fish sub-model converges, [tuneUR()] or [tuneUR_cc()] (chosen
+#' based on whether the model uses the carrying-capacity resource
+#' formulation) is called once to bring detritus to its own steady state
+#' and to make algae's (already live-evolved) biomass exact, unless
+#' `new_refuge == TRUE`, in which case algae and detritus are left
+#' completely untouched.
 #'
 #' @param params A [MizerParams] object
 #'

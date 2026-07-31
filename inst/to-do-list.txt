@@ -905,6 +905,26 @@ SCOPE for the current publication/release - deferred to a future
 release. Detailed plan below so a future session (or the user
 directly) can pick this up without re-deriving the mechanism above. ***
 
+*** CLARIFICATION (01/08, following morning after the algae production
+mechanism fix): the user pushed back, correctly, on how this was framed
+above - low algal standing biomass relative to production is NOT
+itself a bug, it's the expected, well-documented ecological signature
+of grazing pressure on a reef (added a citation for this to
+algae_biomass()'s roxygen docs: Carpenter, R.C. (1990). Mass mortality
+of Diadema antillarum: I. Long-term effects on sea urchin population
+dynamics and coral reef algal communities. Marine Biology, 104, 67-77
+-- algal cover roughly doubled within months once a dominant grazer's
+population collapsed). The actual issue this FUTURE WORK PLAN is about
+is narrower and more specific: the literature's "low" is still a real,
+measurable ~10-100 g DW/m^2, whereas the bundled models currently
+report ~1e-9 g/m^2 (post the 31/07 mechanism fix; was ~1e-10 to 1e-11
+before it) - a gap of roughly 9-10 orders of magnitude that grazing
+pressure alone cannot explain. That gap is the calibrateReefBiomass()
+rescaling artifact described below, unrelated to how much grazing is
+happening. Keep both facts in mind when this gets picked up: the
+qualitative "low biomass under grazing" pattern is correct and doesn't
+need fixing; the absolute numeric scale does. ***
+
 ** FUTURE WORK PLAN: give algae/detritus a real absolute biomass scale **
 
 Reference values the user supplied for calibrating a real target (EAM

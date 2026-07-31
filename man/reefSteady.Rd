@@ -60,7 +60,35 @@ shiny app. Default FALSE.}
 An object of type \link[mizer:MizerParams]{MizerParams}
 }
 \description{
-This function tunes the detritus and algae parameters after running
-mizer's default projectToSteady function.
+This function tunes the detritus and algae biomass after running mizer's
+default \code{projectToSteady()} function on the fish sub-model.
+}
+\details{
+Algae and detritus are treated differently while the fish sub-model
+converges. Detritus is frozen at its current biomass throughout (its
+\code{other_dynamics} is temporarily replaced with \code{\link[=constant_dynamics]{constant_dynamics()}}),
+because its production genuinely depends on a not-yet-tuned external
+flux (see \code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}}, \code{\link[=getDetritusProduction]{getDetritusProduction()}}) that
+isn't set until the very end. Algae, by contrast, is left live and
+evolving via its own dynamics function
+(\code{\link[=algae_dynamics]{algae_dynamics()}}/\code{\link[=algae_dynamics_cc]{algae_dynamics_cc()}}) throughout the loop, because
+algae production is a fixed, literature-informed constant (see
+\code{\link[=setAlgaeParams]{setAlgaeParams()}}) that never needs retuning -- letting it co-adapt
+with the fish sub-model as it converges lets the two reach a genuine
+joint steady state together. (This matters because mizer's own
+convergence check, \code{distanceSSLogN()}, only looks at fish abundances,
+not at the resource pools -- freezing algae and then moving it in one
+shot at the very end, as used to happen, could leave fish not actually
+adapted to the final algae biomass.) Algae is frozen instead, like
+detritus, when \code{new_refuge == TRUE}, matching the fact that the final
+tuning step is also skipped in that case (see \code{new_refuge} in
+\code{\link[=newReefParams]{newReefParams()}}).
+
+After the fish sub-model converges, \code{\link[=tuneUR]{tuneUR()}} or \code{\link[=tuneUR_cc]{tuneUR_cc()}} (chosen
+based on whether the model uses the carrying-capacity resource
+formulation) is called once to bring detritus to its own steady state
+and to make algae's (already live-evolved) biomass exact, unless
+\code{new_refuge == TRUE}, in which case algae and detritus are left
+completely untouched.
 }
 \concept{setup}
