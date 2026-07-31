@@ -305,9 +305,16 @@ time step to avoid Euler-step instabilities:
 $$\frac{dB}{dt} = P - c\,B \quad\Longrightarrow\quad
 B(t+dt) = B(t)\,e^{-c\,dt} + \frac{P}{c}\left(1-e^{-c\,dt}\right)$$
 
-For algae, production is a constant growth rate; for detritus, production
-also includes senescence and external decomposition inputs. Both have
-getters/setters for inspecting and tuning the steady-state balance, e.g.:
+For algae, production is a fixed, literature-informed constant growth rate
+that is *not* retuned to match consumption -- real algal primary production
+is not driven by grazer demand, so [tuneUR()]/[tuneUR_cc()] instead solve for
+the algae *biomass* that balances this fixed production against current
+consumption (see `algae_consumption()`'s documentation for the ecological
+rationale and citations). For detritus, production genuinely does depend on
+the rest of the system (fish egestion, senescence) plus an external flux, so
+[tuneUR()]/[tuneUR_cc()] instead solve for that external flux to balance a
+given detritus biomass against consumption. Both have getters/setters for
+inspecting and tuning the steady-state balance, e.g.:
 
 ```{r detritus-lifetime}
 detritus_lifetime(params)
