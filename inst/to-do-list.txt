@@ -239,6 +239,47 @@ algae is tuned. Findings:
     biomass), cross-referenced to algae_consumption()'s citations.
     Re-rendered to confirm it still knits. Committed as a583418.
 
+devtools::test() after this round: 542 pass, 0 fail (unchanged).
+
+** Round 5 (same day): mizerShelf provenance wording + confirmed
+algae_growth is user-settable **
+
+Two quick checks the user asked for directly:
+
+1. "mizerShelf's detritus dynamics were adapted for mizerReef -- NOT
+   exactly the same, I altered them for coral reefs. Is this
+   documented clearly?" It wasn't, clearly enough -- the existing
+   wording ("adapted from mizerShelf") was true but vague, and could
+   read as implying closer correspondence than exists. Verified the
+   real difference directly against mizerShelf's installed source
+   (v1.0.2) rather than asserting from memory: mizerShelf represents
+   its detritus/carrion pools by rescaling the total biomass of
+   mizer's size-structured background resource spectrum
+   (detritus_dynamics() returns `n_pp * next_biomass/current_biomass`
+   -- confirmed by printing the actual function), whereas mizerReef's
+   algae and detritus are genuinely unstructured scalar pools with
+   their own dedicated encounter-rate matrices, added as independent
+   components via setComponent(). Only the general mathematical form
+   (linear production/consumption balance, solved analytically) was
+   adapted -- the representation differs, and mizerReef adds
+   coral-reef-specific behaviour (algae's consumption-independent
+   production, this whole multi-day subject) with no mizerShelf
+   equivalent at all. Strengthened the wording in model-description.Rmd
+   and caribbean_3_model-description.Rmd (both already had the
+   citation, too vague), and added the same citation + explanation to
+   karpata_model-description.Rmd, which was missing it entirely despite
+   being caribbean_3_model-description.Rmd's sibling vignette (a gap
+   noticed but not acted on in round 1). All three re-rendered clean.
+   Committed as a28f365.
+2. "algae_growth defaults to 2000 but users can set it, right?"
+   Confirmed empirically, not just by reading the code: built a fresh
+   model via newReefParams() with no initial_algae_growth argument
+   (got 2000) and another with initial_algae_growth = 5000 (got 5000
+   exactly). Already documented at length (setAlgaeParams()'s
+   algae_growth_initial docs, newReefParams()'s initial_algae_growth
+   docs, both from round 1) -- nothing further needed here, just
+   verification.
+
 devtools::test() after this round: 542 pass, 0 fail (unchanged). ===
 
 === STOP AND READ FIRST (31/07, ninth session, overnight autonomous run) ===
