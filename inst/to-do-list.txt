@@ -1,4 +1,142 @@
-MizerReef Major Package Update To Do List - 28/07 (updated)
+MizerReef Major Package Update To Do List - 31/07 (updated)
+
+=== STOP AND READ FIRST (31/07, ninth session, overnight autonomous run) ===
+
+User request, verbatim in spirit: fix how algae production works before
+publication. In an earlier session algae dynamics were made structurally
+identical to detritus (tuneUR()/tuneUR_cc() force production to equal
+current consumption every reefSteady() call). The user says this is
+ecologically wrong specifically for algae (not detritus): Caribbean
+algal/EAM production is high, roughly constant, and NOT driven by grazer
+demand - standing biomass is low only because grazing pressure is high.
+Wants: cut grazer biomass -> algae standing biomass should rise, because
+production keeps happening but less gets eaten. The current mechanism
+can't produce this because it always re-pins production to match
+whatever is being consumed, effectively freezing biomass and hiding any
+such signal. Asked for literature research on a concrete production
+value, a written plan, and full execution (fix, tests, docs, vignettes,
+NEWS, small commits) while the user slept. Explicit standing
+instructions for this session: do real literature research rather than
+reusing a remembered number unverified; write the plan down before
+coding; regenerate vignettes if dynamics change; commit in small
+descriptive batches; and - IMPORTANT, given mid-session - do NOT
+regenerate/retune the bundled .rda model objects via the tuning
+pipeline (they carry manual tuning not captured in scripts and can't be
+reproduced that way) - instead patch only the specific stale slot in
+place on each existing object. Also explicitly asked for a formal
+testthat regression test asserting decreased grazing -> increased algae
+biomass, not just an ad hoc check.
+
+** Root cause (confirmed via full git history, not assumed) **
+
+R/reef-components.R's tuneUR()/tuneUR_cc() unconditionally overwrite
+other_params$algae_params$algae_growth with the *current* total algae
+consumption every time reefSteady() runs. Since reefSteady() freezes
+algae biomass while the fish sub-model iterates to steady state,
+biomass never actually moves - tuneUR() just backs out whatever
+production rate keeps biomass exactly where it already was. Net effect:
+every reefSteady() call silently discards the configured production
+rate and pins biomass constant instead, hiding exactly the ecological
+signal the user wants to see.
+
+Traced via `git worktree add /tmp/mizerreef-main main` (since removed)
+back to the very first commit (8f955a9): this is NOT new to
+major_update, it predates the package entirely (thesis-era `tuneUR`/
+`setURParams` already did this). inst/reef-model_description.qmd on
+main explicitly describes algae production in prose as "a constant
+growth rate" - the docs described the intent, the code never delivered
+it. setURParams()'s historical default `initial_algae_growth` was
+already 2e3 (matches the user's memory of "2000") - main's bundled
+karpata_model/bonaire_model had that 2000 silently overwritten down to
+131/other at save time by this same bug, in the user's own thesis
+models, confirming this predates any porting work.
+
+Separate, distinct, ALREADY KNOWN bug, explicitly NOT in scope tonight:
+algae_biomass()/detritus_biomass() report ~1e-10 to 1e-11 g/m^2 on all
+bundled models (see the "FUTURE WORK PLAN: give algae/detritus a real
+absolute biomass scale" section below, from 28/07, commit c3263bd) -
+root cause is calibrateReefBiomass()'s fish-only rescaling factor also
+hitting the resource pools with no absolute-scale justification. That
+remains deferred per the user's own prior instruction and needs a
+separate wet/dry-weight unit decision from the user. Tonight only fixes
+the *mechanism* (decouple production from consumption) and grounds the
+production constant in literature - it does not fix the absolute
+biomass scale.
+
+** Literature research done tonight **
+
+Standing EAM biomass ~10-100 g dry weight (DW)/m^2 and production
+~0.3-1.3 g DW/m^2/day (~110-475 g DW/m^2/yr) - both already recorded
+from the user in the 28/07 session, reconfirmed tonight against
+Carpenter (1986, Ecol Monogr 56:345-363, Caribbean/Virgin Islands: turf
+production up to ~14 g DW/m^2/day under intense grazing, an upper
+outlier not a baseline) and Tebbett & Bellwood (2021, Mar Environ Res
+168:105311, global algal turf productivity meta-analysis - full text
+paywalled, abstract-level only). Converting the 110-475 g DW/m^2/yr
+range to a wet-mass equivalent via a ~20% dry-matter approximation
+(general macroalgae dewatering literature, not turf-specific - no
+turf-specific DW:WW citation found) gives ~550-2375 g WW/m^2/yr. The
+user's remembered value of 2000 sits comfortably inside that converted
+range, and is already mizerReef's existing default
+(reef-setParams.R's `algae_growth_initial` default `2e3`) - the 2000
+default was never actually the bug, tuneUR() silently discarding it on
+every reefSteady() call was. Decision: keep the 2e3 default (avoids
+false precision - it's already well inside a defensible range),
+document the literature reasoning with citations in the roxygen docs,
+and fix tuneUR()/tuneUR_cc() so the value actually sticks.
+
+** Code plan **
+
+1. R/reef-components.R: tuneUR()/tuneUR_cc() stop writing algae_growth.
+   Instead solve the other direction of the same steady-state equation
+   for the resulting equilibrium biomass, using the existing fixed
+   algae_growth (via getAlgaeProduction(), t=0 baseline) and the
+   mass-specific consumption rate from algae_consumption() (NOT
+   getAlgaeConsumption(), which applies a (1-feeding_level) factor that
+   algae_dynamics()/algae_dynamics_cc() themselves never use - the old
+   tuneUR() code had this latent inconsistency too, fixing it now):
+     - No capacity (tuneUR): B_A* = P_A / c_A. Guard c_A == 0 (no
+       consumers -> no finite equilibrium; warn, leave biomass
+       unchanged, mirroring the existing din>dout detritus warning
+       pattern).
+     - Capacity (tuneUR_cc): B_A* = (K_A * P_A) / (P_A + K_A * c_A),
+       matches the `frac` fixed point already inside
+       algae_dynamics_cc(). Always well-defined.
+     - Set result to params@initial_n_other$algae. Detritus half of
+       both functions is untouched (working as intended, out of
+       scope).
+2. Update roxygen docs (tuneUR/tuneUR_cc, algae_dynamics/_cc,
+   getAlgaeProduction, setAlgaeParams/newReefParams's
+   initial_algae_growth) with the new mechanism + literature citations.
+3. Bundled models (caribbean_3_model, caribbean_10_model, others per
+   data.R): do NOT rerun the tuning pipeline. Load each .rda, recompute
+   only initial_n_other$algae via the same equilibrium formula using
+   the model's own already-tuned rho/fish abundances/algae_growth,
+   write in place, verify via all.equal()-style diffing that nothing
+   else moved.
+4. Rewrite existing tests that assert the OLD behaviour by name (found,
+   not yet touched): test-tuneUR.R ("tuneUR sets algae_growth to total
+   algae consumption"), test-tuneUR_cc.R ("tuneUR_cc sets algae_growth
+   to aout / (1 - ba/ka)"), test-reefSteady.R (~lines 85-111, asserts
+   algae_growth equals a consumption-derived value post-tuning),
+   test-caribbean_10_model.R (~line 99, comment references old tuned
+   value).
+5. Add a NEW formal testthat test (explicitly requested by the user,
+   not just an ad hoc check): reducing herbivore/grazer abundance and
+   re-tuning leads to INCREASED algae standing biomass (and vice
+   versa for an increase in grazing) - the actual ecological behaviour
+   this whole fix is for.
+6. devtools::document() + devtools::test(), fix fallout.
+7. Regenerate affected vignettes by re-knitting (numbers are live
+   `r`-computed per the 28/07 session's notes, not hardcoded - should
+   update automatically, not a manual text edit) if the bundled models'
+   numbers actually changed.
+8. NEWS.md entry, this file's completion entry, full devtools::check().
+9. Commit in small descriptive batches throughout, not one giant commit.
+
+Status when this entry was written: plan complete, implementation about
+to start. Not yet touched: any R/, tests/, data/, vignettes/, or
+NEWS.md file for this task. ===
 
 === STOP AND READ FIRST (28/07, same day, eighth session/continuation)
 - independent pre-submission audit requested by the user (not trusting this
