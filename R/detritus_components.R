@@ -287,8 +287,16 @@ plotDetritusConsumption <- function(params) {
 #'  \eqn{p_{D.f}} comes from the biomass that is consumed but not
 #'  assimilated and is given by:
 #'
-#'  \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
-#'        p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
+#'  \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,dw}{
+#'        p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,dw}
+#'
+#'  where \eqn{f_i(w)} is the feeding level (see [algae_consumption()]'s
+#'  "Algae consumption" section for how `satiation` controls it), so that
+#'  \eqn{(1-f_i(w))\,E_i(w)} is the biomass actually consumed (as opposed to
+#'  merely encountered) -- unlike algae consumption, which deliberately
+#'  ignores feeding level (see [algae_consumption()]), detritus's egestion
+#'  term uses the same feeding-level-adjusted consumption rate as
+#'  [getDetritusConsumption()] and [detritus_consumption()].
 #'
 #'  \eqn{p_{D.d}} comes from the biomass of fish that die as a result of
 #'  external mortality. External mortality includes local deaths that lead

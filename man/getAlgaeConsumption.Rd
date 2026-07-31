@@ -14,28 +14,29 @@ A named vector with the consumption rates from herbivores
 }
 \description{
 This function returns a named vector with one component for each species
-giving the rate in grams/year at which that species consumes algae
+giving the rate in grams/year at which that species consumes algae.
 }
-\section{Algae consumption}{
+\details{
+Unlike \code{\link[=algae_consumption]{algae_consumption()}} -- the mass-specific rate used in
+\code{\link[=algae_dynamics]{algae_dynamics()}}/\code{\link[=algae_dynamics_cc]{algae_dynamics_cc()}} and in \code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}},
+which deliberately ignores feeding level, because algal depletion is
+modelled as driven by continuous grazing rather than by any individual
+consumer's satiation state -- this function reports the total,
+feeding-level-adjusted rate at which each species actually ingests algae
+(e.g. for diagnostic use in \code{\link[=plotAlgaeConsumption]{plotAlgaeConsumption()}}). For a species with
+feeding level \eqn{f_i(w)}, the rate is:
 
+\deqn{c_{i.A} = \rho_{i.A}\int w^{m_{alg}}\,(1-f_i(w))\,N_i(w)\,dw\;B_A}{
+      c_{i.A} = \rho_{i.A}\int w^{m_{alg}}\,(1-f_i(w))\,N_i(w)\,dw\;B_A}
 
-The rate at which herbivorous consumer groups encounter algae
-biomass \eqn{E_{i.A}(w)} is controlled by the parameter
-\eqn{\rho_{A.i}}. It scales with the size of the consumer raised to
-an allometric exponent \eqn{m_{alg}} which is taken from empirical data.
-
-\deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
-       E_{i.A}(w)= rho_{i.A}\, w^{m_{alg}}\,B_A}
-
-The mass specific consumption rate then accounts for the preference of
-functional group $i$ for algae, \eqn{\theta_{i.A}}. This gives the
-mass-specific algae consumption rate:
-
-\deqn{c_A = \sum_i\int\rho_{i.A}\, w^{m_{alg}} N_i(w)\theta_{i.A}\,dw}{
-       c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}
+\code{f_i(w)} is 0 for species with \code{satiation = FALSE} (unlimited intake --
+by default the carnivores) and follows the usual Holling type II response
+otherwise (by default the herbivores/detritivores; see the \code{satiation}
+parameter of \code{\link[=setRefuge]{setRefuge()}}). It is a whole-diet quantity computed from a
+species' total encounter across all food sources (prey, algae, detritus,
+plankton combined), not something computed separately per resource.
 }
-
 \seealso{
-\code{\link[=getAlgaeProduction]{getAlgaeProduction()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}
+\code{\link[=getAlgaeProduction]{getAlgaeProduction()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=algae_consumption]{algae_consumption()}}
 }
 \concept{algae}

@@ -184,10 +184,19 @@ algae_dynamics <- function(params, n, n_other, rates, dt, t = 0, ...) {
 #' `other_params(params)$algae$rho`
 #'
 #' @section Algae consumption:
-#' 
-#'  The rate at which herbivorous consumer groups encounter algae 
-#'  biomass \eqn{E_{i.A}(w)} is controlled by the parameter 
-#'  \eqn{\rho_{A.i}}. It scales with the size of the consumer raised to 
+#'
+#'  This rate deliberately does not depend on feeding level or the
+#'  `satiation` species parameter (contrast with [detritus_consumption()],
+#'  which does) -- algal depletion is modelled as driven by continuous
+#'  grazing pressure rather than by any individual consumer's satiation
+#'  state. [getAlgaeConsumption()] reports the feeding-level-adjusted rate
+#'  actually ingested by each species for diagnostic purposes, but that
+#'  adjusted rate is not what depletes the algae pool or what
+#'  [tuneUR()]/[tuneUR_cc()] use for tuning.
+#'
+#'  The rate at which herbivorous consumer groups encounter algae
+#'  biomass \eqn{E_{i.A}(w)} is controlled by the parameter
+#'  \eqn{\rho_{A.i}}. It scales with the size of the consumer raised to
 #'  an allometric exponent \eqn{m_{alg}} which is taken from empirical data.
 #'  
 #'  \deqn{E_{i.A}(w)=\rho_{i.A}\, w^{m_{alg}}\,B_A}{
@@ -217,13 +226,30 @@ algae_consumption <- function(params,
 #' Get algae consumption rates
 #'
 #' This function returns a named vector with one component for each species
-#' giving the rate in grams/year at which that species consumes algae
-#' 
-#' @inheritSection algae_consumption Algae consumption
+#' giving the rate in grams/year at which that species consumes algae.
+#'
+#' Unlike [algae_consumption()] -- the mass-specific rate used in
+#' [algae_dynamics()]/[algae_dynamics_cc()] and in [tuneUR()]/[tuneUR_cc()],
+#' which deliberately ignores feeding level, because algal depletion is
+#' modelled as driven by continuous grazing rather than by any individual
+#' consumer's satiation state -- this function reports the total,
+#' feeding-level-adjusted rate at which each species actually ingests algae
+#' (e.g. for diagnostic use in [plotAlgaeConsumption()]). For a species with
+#' feeding level \eqn{f_i(w)}, the rate is:
+#'
+#' \deqn{c_{i.A} = \rho_{i.A}\int w^{m_{alg}}\,(1-f_i(w))\,N_i(w)\,dw\;B_A}{
+#'       c_{i.A} = \rho_{i.A}\int w^{m_{alg}}\,(1-f_i(w))\,N_i(w)\,dw\;B_A}
+#'
+#' `f_i(w)` is 0 for species with `satiation = FALSE` (unlimited intake --
+#' by default the carnivores) and follows the usual Holling type II response
+#' otherwise (by default the herbivores/detritivores; see the `satiation`
+#' parameter of [setRefuge()]). It is a whole-diet quantity computed from a
+#' species' total encounter across all food sources (prey, algae, detritus,
+#' plankton combined), not something computed separately per resource.
 #'
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores
-#' @seealso [getAlgaeProduction()], [algae_dynamics()], [getAlgaeConsumption()]
+#' @seealso [getAlgaeProduction()], [algae_dynamics()], [algae_consumption()]
 #' @concept algae
 #' @export
 getAlgaeConsumption <- function(params) {
