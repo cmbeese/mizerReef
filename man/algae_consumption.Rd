@@ -30,12 +30,18 @@ The rho parameter for herbivorous fish groups is stored in
 
 This rate deliberately does not depend on feeding level or the
 \code{satiation} species parameter (contrast with \code{\link[=detritus_consumption]{detritus_consumption()}},
-which does) -- algal depletion is modelled as driven by continuous
-grazing pressure rather than by any individual consumer's satiation
-state. \code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}} reports the feeding-level-adjusted rate
-actually ingested by each species for diagnostic purposes, but that
-adjusted rate is not what depletes the algae pool or what
-\code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}} use for tuning.
+which does): in mizerReef, satiation-mediated consumption is exclusive to
+detritivory. Increases in herbivorous fish density following coral
+bleaching events suggest that reef herbivores respond to increased food
+availability without regulating their consumption (Ledlie et al. 2007;
+Pratchett et al. 2008; Khalil et al. 2013; Elma et al. 2023), and
+Caribbean herbivores have been observed to fill their gut up to three
+times a day (Ferreira et al. 1998; Kopp et al. 2010). Algal depletion is
+therefore modelled as driven by continuous grazing pressure rather than
+by any individual consumer's satiation state. \code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}
+reports the feeding-level-adjusted rate actually ingested by each species
+for diagnostic purposes, but that adjusted rate is not what depletes the
+algae pool or what \code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}} use for tuning.
 
 The rate at which herbivorous consumer groups encounter algae
 biomass \eqn{E_{i.A}(w)} is controlled by the parameter

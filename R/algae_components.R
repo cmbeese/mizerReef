@@ -187,12 +187,18 @@ algae_dynamics <- function(params, n, n_other, rates, dt, t = 0, ...) {
 #'
 #'  This rate deliberately does not depend on feeding level or the
 #'  `satiation` species parameter (contrast with [detritus_consumption()],
-#'  which does) -- algal depletion is modelled as driven by continuous
-#'  grazing pressure rather than by any individual consumer's satiation
-#'  state. [getAlgaeConsumption()] reports the feeding-level-adjusted rate
-#'  actually ingested by each species for diagnostic purposes, but that
-#'  adjusted rate is not what depletes the algae pool or what
-#'  [tuneUR()]/[tuneUR_cc()] use for tuning.
+#'  which does): in mizerReef, satiation-mediated consumption is exclusive to
+#'  detritivory. Increases in herbivorous fish density following coral
+#'  bleaching events suggest that reef herbivores respond to increased food
+#'  availability without regulating their consumption (Ledlie et al. 2007;
+#'  Pratchett et al. 2008; Khalil et al. 2013; Elma et al. 2023), and
+#'  Caribbean herbivores have been observed to fill their gut up to three
+#'  times a day (Ferreira et al. 1998; Kopp et al. 2010). Algal depletion is
+#'  therefore modelled as driven by continuous grazing pressure rather than
+#'  by any individual consumer's satiation state. [getAlgaeConsumption()]
+#'  reports the feeding-level-adjusted rate actually ingested by each species
+#'  for diagnostic purposes, but that adjusted rate is not what depletes the
+#'  algae pool or what [tuneUR()]/[tuneUR_cc()] use for tuning.
 #'
 #'  The rate at which herbivorous consumer groups encounter algae
 #'  biomass \eqn{E_{i.A}(w)} is controlled by the parameter

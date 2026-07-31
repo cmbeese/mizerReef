@@ -3,6 +3,8 @@ title: "The mizerReef size-spectrum model"
 output:
   rmarkdown::html_vignette:
     toc: true
+bibliography: references.bib
+csl: ecology.csl
 vignette: >
   %\VignetteIndexEntry{The mizerReef size-spectrum model}
   %\VignetteEngine{knitr::rmarkdown}
@@ -313,8 +315,7 @@ consumption. Because they are single scalars, their dynamics are ordinary
 differential equations that mizerReef solves analytically over each time step of
 length $dt$, which avoids the numerical instability of an explicit Euler step.
 The equations governing the flux of the algae and detritus resources were
-adapted from the mizerShelf extension package (Delius, de Juan & Maynou 2022;
-de Juan, Delius & Maynou 2023).
+adapted from the mizerShelf extension package [@mizerShelf; @deJuan2023].
 
 ## Algae
 
@@ -337,10 +338,15 @@ c_A = \sum_i \int \rho_{i,A}\,\theta_{i,A}\, w^{m_{alg}}\, N_i(w)\, dw,
 $$
 so that the total grazing rate is $c_A B_A$. Note that, unlike detritus
 consumption below, this deliberately does **not** include a feeding-level
-factor: algal depletion is modelled as driven by continuous grazing pressure
-rather than by any individual consumer's satiation state, regardless of the
-`satiation` setting for the herbivore species involved (see "Consumption and
-satiation" above, and `algae_consumption()`'s documentation for more detail).
+factor: in mizerReef, satiation-mediated consumption is exclusive to
+detritivory. Increases in herbivorous fish density following coral bleaching
+events suggest that reef herbivores respond to increased food availability
+without regulating their consumption [@Ledlie2007; @Pratchett2008;
+@Khalil2013; @Elma2023], and Caribbean herbivores have been observed to fill
+their gut up to three times a day [@Ferreira1998; @Kopp2010]. Algal
+consumption is therefore modelled as driven by continuous grazing pressure
+regardless of the `satiation` setting for the herbivore species involved --
+see `algae_consumption()`'s documentation for more detail.
 Over a step the equation integrates to
 $$
 B_A(t + dt) = B_A(t)\, e^{-c_A\, dt}
