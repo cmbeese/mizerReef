@@ -241,6 +241,131 @@ call `upgradeReefParams()` again.
 6. `devtools::check()` clean.
 7. Small, descriptive commits as I go, not one giant commit.
 
+** Outcome (session complete) **
+
+All of the above done. Summary of what shipped:
+
+- `upgradeReefParams()` in R/mizerReef-upgrade.R, next to the existing
+  `upgrade.mizerReef()` hook. Detects a genuine 1.x object structurally
+  (`other_params$algae` present, `$algae_params` and
+  `$refuge_params$method_params` absent), stop()s with a clear message
+  if the input doesn't match that shape, message()+returns unchanged if
+  already `"mizerReef"`. Migration steps, in order: (1) run the input
+  through `mizer::validParams()` first so any core mizer-level version
+  drift is handled by mizer's own upgrade code before anything
+  reef-specific is touched (verified this is a no-op on
+  reef-specific fields); (2) rename `bad_pred` -> `blocked_pred`
+  (handles the edge case where both already exist by just dropping
+  `bad_pred`); (3) reset the five old direct rate-function overrides
+  (`reefRates`/`reefEncounter`/`reefFeedingLevel`/`reefPredMort`/
+  `reefMort`) to mizer's stock names, leaving every other
+  `@rates_funcs` entry untouched; (4) clear the old 1-row
+  `refuge_params` data.frame to a list (this was the one real bug
+  caught during testing -- `setRefuge()` builds `refuge_params` up as
+  a list, and assigning a multi-row `method_params` data.frame into a
+  single cell of the old 1-row data.frame errors), then rebuild the
+  nested `refuge_params` structure by calling the real `setRefuge()` +
+  `getRefuge()` with the preserved method/method_params/a_bar/b_bar/
+  w_settle/max_protect/tau (`use_dummy_fish_bins = TRUE`, matching
+  documented legacy behaviour); relocates `t_bleach`/`trajectory`/
+  `deg_scale` into `refuge_params` too when `degrade` was `TRUE`, with
+  an extra warning since that path isn't exercised by either real
+  bundled object; (5) populate `algae`/`algae_params` and
+  `detritus`/`detritus_params` using the PRESERVED tuned values (not
+  package defaults) via the real `setAlgaeParams()`/
+  `setDetritusParams()`, then directly overwrite the live `algae`/
+  `detritus` component lists (the ones dynamics functions actually
+  read) with the preserved rho/growth/external values, and manually
+  add `algae_params$rho`/`detritus_params$rho` since the setters don't
+  populate those (only `newReefParams()`'s own rho-calculation step
+  does, on a fresh build); (6) delete the now-superseded flat
+  top-level `other_params` fields (`method_params`, `refuge`,
+  `bin.id`, `refuge_lengths`, `carry_capacity`, `algae_capacity`,
+  `detritus_capacity`, `sen_decomp`, `ext_decomp`, `degrade`,
+  `t_bleach`, `trajectory`, `deg_scale`, `initial_algae_growth`,
+  `initial_d_external`) so nothing stale is left sitting alongside the
+  new structure; (7) register the extension chain and promote to the
+  `mizerReef` S4 class exactly like `newReefParams()` does, then a
+  final `validParams()`. Ends with two `warning()`s (not just
+  message()/docs): one naming which rate functions were reset (only
+  fires if any actually needed resetting), one that the migrated
+  object's algae/detritus tuning is carried over as-is and isn't
+  guaranteed to still be at a joint steady state, recommending
+  `reefSteady()`.
+
+- Verified end to end against the two real bundled 1.x objects
+  (`karpata_model.rda`, `bonaire_model.rda` from `main`, both
+  "competitive" refuge method, no degradation) via a temporary git
+  worktree: migrated object passes `validParams()`, is class
+  `"mizerReef"`, every non-reef-specific core mizer slot (`w`, `dw`,
+  `initial_n`, `search_vol`, `psi`, `intake_max`, `metab`) is
+  byte-identical to the input except `gear_params`, which mizer's own
+  core upgrade wraps in an added S3 class marker (confirmed the
+  underlying data is unchanged via `all.equal()` on the data frame
+  content) -- and `project()` runs on the result without error. Since
+  neither real bundled object uses "sigmoidal"/"binned"/"noncomplex"
+  or `degrade = TRUE`, also hand-built (not via 1.x's own
+  `newReefParams()`, which turned out to be broken against the
+  currently-installed mizer 3.2.0 for unrelated reasons -- a `main`-
+  branch/mizer-version incompatibility, not something in scope to fix
+  this session) a synthetic 1.x-shaped fixture covering all four
+  refuge methods plus the degrade path, all verified working the same
+  way. This fixture-building approach became the tests too.
+
+- tests/testthat/test-upgradeReefParams.R: 13 `test_that()` blocks,
+  56 expectations, all passing. Covers: successful migration + both
+  warning messages; `bad_pred` rename (including the
+  already-has-`blocked_pred` edge case); rate-function reset;
+  preserved tuned values (not defaults) in both the live component and
+  its config echo, and that the two stay in sync; the exact expected
+  algae/detritus/refuge_params key sets; stale top-level fields
+  actually removed; core mizer slots untouched; the result
+  successfully `project()`s; all four refuge methods; the degrade
+  relocation + its extra warning; already-current objects returned
+  unchanged with a message() (not warning); and a clear error on an
+  object that isn't mizerReef-shaped at all. Uses a local
+  `make_fake_v1()` helper (not the real bundled `main`-branch .rda
+  files, which aren't reachable from this branch's test suite) and a
+  `capture_result_and_warnings()` helper -- nesting two `expect_warning()`
+  calls to check for two separate warnings from one call turned out to
+  be fragile (the inner call consumes/muffles its match before the
+  outer one runs, so `result` ends up bound to a leftover condition
+  object instead of the actual return value) -- collecting every
+  warning message up front via `withCallingHandlers()` and checking
+  the return value and the messages separately is the robust pattern.
+
+- NEWS.md: new bullet under the existing 2.1.0 "New features" section
+  (this hasn't shipped yet, so it's an addition to the unreleased
+  entry, not a new version header) explaining what
+  `upgradeReefParams()` is for, that it's structural-only, and that it
+  ends with a recommendation to run `reefSteady()`.
+
+- `devtools::check(vignettes = FALSE)`: 0 errors, 0 warnings, 2 notes
+  (inst/LICENSE top-level placement, tuneUR/tuneUR_cc codetools quirk
+  + data() style note) -- both already-documented pre-existing notes
+  from prior sessions' baseline, nothing new introduced.
+
+- Full `devtools::test()`: 258 test blocks, 596 expectations, 0
+  failed, 0 errors, 1 pre-existing documented benign warning
+  (tuneUR's "flux of external detritus is negative" -- see the 01/08
+  round-2 entry above for why that's expected).
+
+- Cleaned up the temporary `/tmp/mizerreef-main` worktree and scratch
+  files used for verification; nothing left over in the repo.
+
+- NOT done this session, flagged as open follow-up: `main`'s own
+  `newReefParams()` errors when run against the currently-installed
+  mizer 3.2.0 (`reefRates` failing mizer's function-signature test
+  call) -- irrelevant to this task (migrating already-built 1.x
+  objects doesn't require 1.x's code to still run), but worth knowing
+  if anyone ever needs to freshly build a 1.x-era object again for any
+  reason. Also not done: no attempt to verify `upgradeReefParams()`
+  against a real 1.x object with `degrade = TRUE`, since neither
+  bundled example has one -- the relocation logic was written by
+  reading `main`'s `setDegradation()` source directly and is covered
+  by a synthetic test, but flagged with its own warning in the
+  function itself for exactly this reason.
+
 === STOP AND READ FIRST (01/08, tenth session, morning follow-up to the
 31/07 overnight algae fix) ===
 
