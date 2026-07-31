@@ -148,7 +148,63 @@ changes) **
 Full devtools::test() after all three: 542 pass, 0 fail (same benign
 warning as before, unrelated). devtools::document() clean, no roxygen
 errors. Re-rendered model-description.Rmd to confirm it still knits.
-Not yet re-run: a fresh full devtools::check(). ===
+
+** Round 3 (same day, the user added the real thesis chapter text) **
+
+The user added Chapter3.tex (the actual PhD thesis chapter 3 prose,
+802 lines) at the repo root and asked to complete the citation item
+now that the real text was available -- round 2's c3_equations.qmd/
+c3_parameters.Rmd were only compact equation/parameter reference
+files, not the actual chapter prose, so round 2 could only offer two
+unverified candidate citations. Chapter3.tex resolves this completely:
+line 189 states the design rule explicitly in the author's own words
+-- "In MizerReef models, the mediation of consumption by satiation is
+exclusive to detritivory" -- backed by six citations, now confirmed
+and fully sourced (with DOIs, cross-checked against the thesis's own
+bibliography):
+  - Ledlie et al. (2007, Coral Reefs 26:641-653), Pratchett et al.
+    (2008, Oceanogr Mar Biol Annu Rev 46:251-296), Khalil et al. (2013,
+    Environ Biol Fishes 96:1065-1072), Elma et al. (2023, Mar Pollut
+    Bull 186:114479): herbivorous fish density increases following
+    coral bleaching suggest reef herbivores respond to increased food
+    availability without regulating their consumption.
+  - Ferreira et al. (1998, J Fish Biol 53:222-235; this is the exact
+    same paper flagged as a candidate in round 1, now confirmed
+    correct) and Kopp et al. (2010, Helgol Mar Res 64:181-190):
+    Caribbean herbivores observed to fill their gut up to three times
+    a day.
+Also directly confirmed against the real chapter text (not just the
+compact equations file): the thesis's own c_A formula (line ~331-334)
+has no feeding-level term, matching the code exactly, as does its
+prose. The thesis's own c_D formula (line 309) DOES include
+(1-f_i(w)), matching the code -- so, unlike what round 2's compact
+c3_equations.qmd suggested, the full chapter's displayed math was
+never actually missing the feeding-level term for detritus; only that
+separate, compact reference file was incomplete. Doesn't change
+anything already fixed, just a more precise provenance note.
+
+Implemented: added all six references as full bibtex entries to
+vignettes/references.bib. model-description.Rmd had no
+bibliography/csl support in its YAML at all (unlike its sibling
+model-description vignettes, which already had it) so citations
+couldn't previously render there -- added `bibliography:
+references.bib` / `csl: ecology.csl`, matching the sibling vignettes'
+convention, and replaced round 2's placeholder wording with the
+properly cited explanation using real [@key] citations. Verified by
+rendering: in-text citation resolves to formatted author-year text and
+a full reference-list entry appears, not literal "[@Key]" text. Also
+updated algae_consumption()'s roxygen with the same six citations in
+prose form (roxygen has no bibliography mechanism, so plain
+"Author et al. (Year)" text is used there instead of [@key]). Moved
+the newly-added Chapter3.tex into ignore/thesis-materials/, matching
+the existing (gitignored) convention. Committed as cd75b4b.
+
+Full devtools::test() after this round: 542 pass, 0 fail (unchanged).
+devtools::document() clean. Not yet re-run: a fresh full
+devtools::check() since round 1's overnight run (round 1 did run one;
+rounds 2 and 3 have only re-run devtools::test()/document() and
+individual vignette renders, not a full check() -- worth doing before
+this is considered fully closed out). ===
 
 === STOP AND READ FIRST (31/07, ninth session, overnight autonomous run) ===
 
