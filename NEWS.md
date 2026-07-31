@@ -2,6 +2,24 @@
 
 ## New features
 
+- New `upgradeReefParams()` function for anyone with a params object
+  built with mizerReef 1.x (the version accompanying the original
+  thesis, on this package's `main` branch). mizerReef 2.x is a
+  structural rewrite -- reef behaviour is now applied through S3
+  dispatch on a `mizerReef` class instead of the old direct
+  `@rates_funcs` overrides, and `other_params` is laid out differently
+  -- so a 1.x params object handed directly to 2.x code would silently
+  run the old code path rather than erroring. Call
+  `params <- upgradeReefParams(params)` once on an existing 1.x object
+  to bring it up to the current structural layout. This is a
+  structural migration only: your tuned values (algae growth rate,
+  detritus external flux, capacities, refuge method and parameters)
+  are carried over as-is, not reset to package defaults or silently
+  re-tuned -- `upgradeReefParams()` warns you about what changed and
+  suggests running [reefSteady()] afterwards if you want a fresh
+  steady state under the current algae/detritus mechanism. (Objects
+  already created with mizerReef 2.x are kept up to date automatically
+  by `validParams()` and don't need this function.)
 - New vignette "Combining mizerReef with mizerMR: multiple background
   resources" showing how to chain mizerReef with
   [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
