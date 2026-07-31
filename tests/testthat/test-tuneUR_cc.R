@@ -1,31 +1,44 @@
-test_that("tuneUR_cc sets algae_growth to aout / (1 - ba/ka)", {
-    # tuneUR_cc()'s documented formula: the steady-state condition for
-    # algae_dynamics_cc()'s ODE dB/dt = P*(1-B/K) - c*B rearranges to
-    # P = c*B / (1-B/K); since getAlgaeConsumption() already returns the
-    # total (biomass-multiplied) rate c*B, this is aout / (1 - ba/ka),
-    # computed here independently of tuneUR_cc()'s own call to the formula.
+test_that("tuneUR_cc leaves algae_growth untouched and sets algae biomass to (K*P) / (P + K*c)", {
+    # tuneUR_cc() no longer retunes algae_growth to match consumption.
+    # Instead it solves the fixed dB_A/dt = P*(1-B/K) - c*B = 0 for the
+    # biomass, using algae_consumption() to match algae_dynamics_cc().
     data(caribbean_3_model)
     cc_params <- setURcapacity(caribbean_3_model, cap = 1.5)
 
-    ba <- algae_biomass(cc_params)
+    old_growth <- cc_params@other_params$algae_params$algae_growth
     ka <- cc_params@other_params$algae_params$algae_capacity
-    aout <- sum(getAlgaeConsumption(cc_params))
-    expected_growth <- aout / (1 - ba / ka)
+    pa <- sum(getAlgaeProduction(cc_params))
+    ca <- algae_consumption(cc_params, n = cc_params@initial_n, rates = getRates(cc_params))
+    expected_biomass <- (ka * pa) / (pa + ka * ca)
 
     result <- suppressWarnings(tuneUR_cc(cc_params))
-    expect_equal(result@other_params$algae_params$algae_growth, expected_growth)
+    expect_equal(result@other_params$algae_params$algae_growth, old_growth)
+    expect_equal(algae_biomass(result), expected_biomass)
 })
 
-test_that("tuneUR_cc sets detritus external flux to dout / (1 - bd/kd) - din", {
+test_that("tuneUR_cc sets detritus external flux to dout / (1 - bd/kd) - din, using the post-algae-tuning state", {
+    # tuneUR_cc() tunes algae biomass first, then computes detritus's
+    # production/consumption from that already-updated state (detritus
+    # genuinely depends on the current system state, including algae, via
+    # fish feeding level) -- so the expected values here must be computed
+    # from the same post-algae-tuning intermediate state that tuneUR_cc()
+    # itself uses, not from the original input params.
     data(caribbean_3_model)
     cc_params <- setURcapacity(caribbean_3_model, cap = 1.5)
 
-    bd <- detritus_biomass(cc_params)
-    kd <- cc_params@other_params$detritus_params$detritus_capacity
-    zeroed <- cc_params
+    # Replicate tuneUR_cc()'s algae step to get the same intermediate state.
+    ka <- cc_params@other_params$algae_params$algae_capacity
+    pa <- sum(getAlgaeProduction(cc_params))
+    ca <- algae_consumption(cc_params, n = cc_params@initial_n, rates = getRates(cc_params))
+    algae_tuned <- cc_params
+    algae_tuned@initial_n_other$algae <- (ka * pa) / (pa + ka * ca)
+
+    bd <- detritus_biomass(algae_tuned)
+    kd <- algae_tuned@other_params$detritus_params$detritus_capacity
+    zeroed <- algae_tuned
     zeroed@other_params$detritus_params$external <- 0
     din <- sum(getDetritusProduction(zeroed))
-    dout <- sum(getDetritusConsumption(cc_params))
+    dout <- sum(getDetritusConsumption(algae_tuned))
     expected_external <- (dout / (1 - bd / kd)) - din
 
     result <- suppressWarnings(tuneUR_cc(cc_params))

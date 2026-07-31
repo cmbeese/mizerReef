@@ -1,12 +1,30 @@
-test_that("tuneUR sets algae_growth to total algae consumption", {
-    # tuneUR()'s documented formula is algae_growth <- sum(getAlgaeConsumption(params)),
-    # computed here independently of tuneUR()'s own call to that formula.
+test_that("tuneUR leaves algae_growth untouched and sets algae biomass to P_A / c_A", {
+    # tuneUR() no longer retunes algae_growth to match consumption (that
+    # would make algal production track grazer demand, which is not how
+    # real algal primary production works). Instead it solves the fixed
+    # dB_A/dt = P_A - c_A*B_A = 0 for the biomass, using algae_consumption()
+    # (mass-specific, no feeding-level factor) to match exactly what
+    # algae_dynamics() uses.
     data(caribbean_3_model)
     params <- caribbean_3_model
-    expected_growth <- sum(getAlgaeConsumption(params))
+    old_growth <- params@other_params$algae_params$algae_growth
+    expected_biomass <- sum(getAlgaeProduction(params)) /
+        algae_consumption(params, n = params@initial_n, rates = getRates(params))
 
     result <- suppressWarnings(tuneUR(params))
-    expect_equal(result@other_params$algae_params$algae_growth, expected_growth)
+    expect_equal(result@other_params$algae_params$algae_growth, old_growth)
+    expect_equal(algae_biomass(result), expected_biomass)
+})
+
+test_that("tuneUR warns and leaves algae biomass unchanged when algae consumption is zero", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params@other_params$algae_params$rho[] <- 0
+    old_biomass <- algae_biomass(params)
+
+    expect_warning(tuneUR(params), "no finite")
+    result <- suppressWarnings(tuneUR(params))
+    expect_equal(algae_biomass(result), old_biomass)
 })
 
 test_that("tuneUR sets detritus external flux to consumption minus production-with-external-zeroed", {

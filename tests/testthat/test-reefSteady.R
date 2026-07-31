@@ -104,9 +104,14 @@ test_that("reefSteady dispatches to tuneUR_cc when use_UR_cc is TRUE", {
 
 test_that("reefSteady with return_sim = TRUE returns a MizerSim-like object wrapping the tuned params", {
     data(caribbean_3_model)
+    old_growth <- caribbean_3_model@other_params$algae_params$algae_growth
     sim <- reefSteady(caribbean_3_model, return_sim = TRUE, progress_bar = FALSE)
     expect_s4_class(sim@params, "mizerReef")
 
-    expected_growth <- sum(getAlgaeConsumption(sim@params))
-    expect_equal(sim@params@other_params$algae_params$algae_growth, expected_growth)
+    # algae_growth is a fixed input, left unchanged by tuning -- only the
+    # algae biomass is retuned to the resulting steady state.
+    expect_equal(sim@params@other_params$algae_params$algae_growth, old_growth)
+    P_A <- sum(getAlgaeProduction(sim@params))
+    c_A <- algae_consumption(sim@params, n = sim@params@initial_n, rates = getRates(sim@params))
+    expect_equal(P_A - c_A * algae_biomass(sim@params), 0)
 })
