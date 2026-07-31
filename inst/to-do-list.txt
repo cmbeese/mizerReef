@@ -1,5 +1,246 @@
 MizerReef Major Package Update To Do List - 01/08 (updated)
 
+=== STOP AND READ FIRST (01/08, eleventh session: upgradeReefParams(),
+migrating v1 (main/thesis) params objects to v2 (major_update)) ===
+
+** Why this session exists **
+
+The user has real users of the package running the thesis-era `main`
+branch (mizerReef 1.x -- I'll call this "v1" below). `major_update`
+(this branch, DESCRIPTION Version: 2.1.0, "v2") is close to release and
+is a structural rewrite: reef behaviour used to be wired in via direct
+`@rates_funcs` name overrides (`reefEncounter`, `reefFeedingLevel`,
+`reefPredMort`, `reefMort`, `reefRates`); it's now wired in via S3
+dispatch on a `mizerReef` marker class chained through mizer's
+extension-registration system (`project*.mizerReef` methods in
+R/reef-project_methods.R, see vignettes/extension_mechanism.Rmd). A
+real v1 object handed to v2 code will not error immediately (the old
+`reef*` functions still exist) but will silently run the OLD code path
+and bypass every behavioural fix/change made in this branch. The user
+wants a function users can call once, on their existing tuned v1
+params object, to bring it up to the v2 structural layout WITHOUT
+losing their tuned model or having it silently re-tune itself. This
+needs to ship before the release, and needs a NEWS.md entry so users
+actually see it.
+
+There's a memory file from a previous session
+([[project-upgradeparams-v1-to-v2]] in this project's Claude memory)
+with a lot of pre-gathered context on this exact question. Per the
+user's explicit instruction this session, I treated that as a
+starting point, not ground truth, and re-verified everything myself
+against the live code and real bundled v1 objects before acting on it
+-- some of it (e.g. the existence and behaviour of an already-nested
+`refuge_params`/`use_dummy_fish_bins` in v2, and the exact algae/detritus
+component vs. "_params" echo split) needed more precision than the
+memory captured, and one thing (the algae/detritus "_params" echo lists
+being genuinely stale/unused by the live dynamics, not just a
+duplication smell) was a new finding this session.
+
+** How I verified all of this (don't re-derive from scratch next time) **
+
+`git worktree add /tmp/mizerreef-main main` gives a live copy of a
+real v1 object: `data/karpata_model.rda` and `data/bonaire_model.rda`
+(loaded directly with `load()`, not `data()`, since main's DESCRIPTION
+doesn't define an R package namespace for me to attach mid-session
+cleanly alongside major_update -- just `load("path.rda")` into a fresh
+Rscript and inspect). Compared structurally against (a) the bundled
+`caribbean_3_model` in this branch, which turned out to be a stale,
+inconsistent reference (see below) and (b) a *freshly built* v2 object
+from a tiny synthetic 2-species `newReefParams()` call in this branch
+via `devtools::load_all()`, which is what I actually trusted as the
+ground-truth target schema. Remove the worktree when this session's
+work is committed and verified: `git worktree remove /tmp/mizerreef-main`.
+
+** The exact structural diff, v1 -> v2 (verified against real objects, not guessed) **
+
+- **Class**: v1 = plain S4 `"MizerParams"`. v2 = `"mizerReef"`, set via
+  `params@extensions <- mizer::getRegisteredExtensions(); params <-
+  mizer::coerceToExtensionClass(params)` at the end of `newReefParams()`.
+  A genuine v1 object's `@extensions` is `character(0)` -- it was never
+  registered, so mizer's own automatic `upgrade.mizerReef()` S3 hook
+  (fired via `runExtensionUpgrades()` inside `validParams()`) never
+  fires for it. That hook (already implemented in this file, see
+  `upgrade.mizerReef()` above/below) only handles a DIFFERENT, smaller,
+  already-registered-extension migration (old direct S4
+  slots -> `other_params` sub-lists, some earlier point in this
+  branch's own history) -- it is not sufficient for the v1 cold-start
+  case and I left it untouched.
+
+- **`@rates_funcs`**: v1 has `Rates="reefRates"`,
+  `Encounter="reefEncounter"`, `FeedingLevel="reefFeedingLevel"`,
+  `PredMort="reefPredMort"`, `Mort="reefMort"` (direct overrides). v2
+  leaves all five at mizer's stock defaults (`mizerRates`,
+  `mizerEncounter`, `mizerFeedingLevel`, `mizerPredMort`, `mizerMort`)
+  and gets reef behaviour via S3 dispatch instead. All other
+  `@rates_funcs` entries (EReproAndGrowth, PredRate, FMort, ERepro,
+  EGrowth, ResourceMort, RDI, RDD) were already mizer stock in v1 too --
+  only reset the five reef-specific ones, don't touch the rest (in case
+  a user customised RDD, etc.).
+
+- **`species_params$bad_pred` -> `blocked_pred`**: straight rename,
+  confirmed present under the old name on both bundled v1 objects.
+
+- **Core mizer-level slot drift** (unrelated to mizerReef, just normal
+  mizer version drift -- e.g. karpata_model's `mizer_version` is
+  "2.5.0", current mizer is 3.2.0, and its `@rates_funcs` is missing
+  the newer `Diffusion` entry entirely): don't hand-roll this. Calling
+  `mizer::validParams()` on the raw v1 object already triggers mizer's
+  own internal `upgrade.MizerParams()` correctly and safely -- verified
+  it leaves every reef-specific `other_params`/`species_params` column
+  completely untouched (mizer's upgrade code has zero knowledge of
+  mizerReef's fields) while fixing `Diffusion`, `mizer_version`, etc.
+  `upgradeReefParams()` calls `mizer::validParams()` itself (exported,
+  not an internal `:::` call) at the start, before touching anything
+  reef-specific, and again at the end after class promotion.
+
+- **`other_params$algae`/`other_params$detritus` (the LIVE, authoritative
+  component-params lists consumed directly by `algae_dynamics()`/
+  `detritus_dynamics()` via `other_dynamics`/`other_encounter`, see
+  R/reef-components.R:27 `params@other_params[[component]]$rho`)**:
+  same keys and same nesting in both v1 and v2 for the non-carrying-
+  capacity case (`rho`, `growth` for algae; `rho`, `sen_decomp`,
+  `ext_decomp`, `external` for detritus) EXCEPT v2's `newReefParams()`
+  unconditionally adds a `capacity` key to both (confirmed against a
+  freshly-built v2 object) that v1 only added when carrying capacity
+  was turned on via the (separate, opt-in) `setURcapacity()`. Migration
+  adds this key using the preserved `algae_capacity`/`detritus_capacity`
+  value (or 1, matching `newReefParams()`'s own non-cc default) so the
+  migrated object matches the current schema exactly.
+
+- **`other_params$algae_params`/`other_params$detritus_params` (the
+  "config echo" lists written once by `setAlgaeParams()`/
+  `setDetritusParams()`, NOT read by the live dynamics functions)**:
+  new in v2, don't exist in v1 at all. IMPORTANT finding this session:
+  on the real bundled `caribbean_3_model`, these are already stale/out
+  of sync with the live `algae`/`detritus` lists (`algae_params$algae_growth`
+  = 2000, the untuned literature default, while the live
+  `algae$growth` = 86.9, the actual tuned value the model runs on;
+  `detritus_params$external` = -885 vs. live `detritus$external` =
+  -120) -- `reefSteady()`/`tuneUR()` update the live component but
+  never touch this echo. So these lists are structurally required
+  (`newReefParams()` always creates them) but NOT the source of truth
+  and NOT safe to treat as authoritative for anything. `upgradeReefParams()`
+  populates them by calling the real `setAlgaeParams()`/
+  `setDetritusParams()` with the PRESERVED v1 tuned values (not
+  defaults) so they start in sync, but the live `algae`/`detritus`
+  lists remain the actual source of truth exactly as in every existing
+  v2 object.
+
+- **`other_params$refuge_params`**: v1 has this as a 1-row data.frame
+  with just `method`, `a_bar`, `b_bar`, `w_settle`, `max_protect`,
+  `tau` -- everything else refuge-related
+  (`method_params`, `refuge`, `bin.id`, `refuge_lengths`, `degrade`,
+  and for degrade=TRUE objects, `t_bleach`/`trajectory`/`deg_scale`,
+  confirmed by reading v1's `setDegradation()`/`setURcapacity()`
+  source directly in the worktree) lives at the TOP LEVEL of
+  `other_params` instead. v2 nests everything inside
+  `refuge_params` (confirmed against both a fresh build and
+  R/reef-project_methods.R's actual field reads, e.g.
+  `params@other_params$refuge_params$method_params`,
+  `...$refuge_params$degrade`, `...$refuge_params$bin.id`) and adds one
+  genuinely new field, `use_dummy_fish_bins`, which didn't exist as a
+  concept in v1 -- v1's `getRefuge()` always used the shared
+  `a_bar`/`b_bar` dummy-fish conversion, so `TRUE` (the current
+  default, explicitly documented as "legacy behavior") is the correct,
+  behaviour-preserving value for migrated objects, not a guess.
+  `upgradeReefParams()` rebuilds this whole nested structure by calling
+  the real `setRefuge()` + `getRefuge()` with the preserved
+  method/method_params/a_bar/b_bar/w_settle/max_protect/tau (and
+  preserved refuge_user/blocked_pred/satiation, which are already
+  present as species_params columns so setRefuge()'s "only fill in if
+  missing" branches leave them untouched) -- this recomputes
+  `refuge`/`bin.id`/`refuge_lengths` from those same preserved inputs
+  using the CURRENT, presumably bug-fixed logic, rather than carrying
+  over v1's raw computed matrices as-is. I judged this as a structural
+  recomputation (same inputs, current code), not a silent recalibration,
+  since none of the actual tunable numbers change. If `degrade` was
+  TRUE, `t_bleach`/`trajectory`/`deg_scale` are relocated into
+  `refuge_params` too (same rename-and-relocate treatment) -- flagged
+  with an extra warning since neither bundled v1 test object actually
+  has `degrade = TRUE`, so this specific path is verified against
+  source reading only, not a real object.
+
+- **`ext_mort_params`, `include_sen_mort`, `new_refuge`**: same names,
+  same shape, top-level in both v1 and v2 -- carried over unchanged.
+
+- **Explicitly NOT carried over** (stale v1-only bookkeeping,
+  superseded in v2, per this session's design decision and the prior
+  session's memory note): top-level `other_params$initial_algae_growth`
+  and `other_params$initial_d_external` (the ORIGINAL pre-tuning input
+  values, not the live tuned ones -- keeping them would just be more of
+  the same "duplicate value goes stale" pattern already found once this
+  session). Top-level `algae_capacity`/`detritus_capacity`/
+  `carry_capacity` are read once during migration then dropped (their
+  values live on in `algae_params$algae_capacity`/
+  `detritus_params$detritus_capacity`/`other_params$use_UR_cc` instead).
+
+** Explicit design decision: preserve tuned values, don't re-tune **
+
+`algae_growth`, `detritus_external`, capacities, refuge
+method/method_params -- all migrated as-is from the v1 object, not
+reset to v2's literature-default constants and not silently re-run
+through `reefSteady()`/`tuneUR()`. Per the prior session's memory note
+and my own judgement: retuning is a calibration decision that needs
+the user's domain judgement (e.g. `caribbean_10_model`'s NEWS.md entry
+this session's history shows exactly this kind of silent staleness
+biting the project before), not something an upgrade function should
+decide unilaterally. `upgradeReefParams()` ends with `warning()` calls
+(not just message()/docs) telling the user: (a) it reset the old
+direct rate-function overrides to the new S3-dispatch defaults (a real
+behavioural change, not just a rename) and (b) the migrated object
+carries over the OLD tuning values as-is and is not guaranteed to be a
+genuine joint steady state under the current (fixed) algae/detritus
+mechanism -- they should consider running `reefSteady()` themselves.
+
+** Naming **
+
+Per the prior session's memory note (the user explicitly raised this
+closing out that session): named `upgradeReefParams()`, not
+`upgradeParams()` or `upgradeParams.mizerReef()`, specifically so it
+doesn't collide with or get confused for `mizer::upgradeParams()`
+(which is internal/unexported anyway, `mizer:::upgradeParams`) or the
+automatic `upgrade.mizerReef()` S3 hook already in this file (which
+only fires for already-registered v2.x objects and is unrelated to
+this cold-start v1 case). `upgradeReefParams()` finishes by registering
+the extension and promoting the class exactly like `newReefParams()`
+does, so any *future* v2.x -> v2.y micro-upgrade then works
+automatically via the standard hook without the user ever needing to
+call `upgradeReefParams()` again.
+
+** Plan **
+
+1. Implement `upgradeReefParams()` in R/mizerReef-upgrade.R, next to
+   the existing `upgrade.mizerReef()` S3 method. Detect a genuine v1
+   object structurally (not by version number, since v1 objects don't
+   carry a mizerReef version at all): not already class `"mizerReef"`,
+   AND `other_params$algae` present but `other_params$algae_params`
+   absent, AND `other_params$refuge_params$method_params` absent (i.e.
+   the flat, pre-2.1.0 layout). If the object is already `"mizerReef"`,
+   just message() and return it unchanged (the standard hook already
+   covers it). If it doesn't match the v1 signature either, stop()
+   with a clear "doesn't look like a pre-2.1.0 mizerReef object"
+   error rather than guessing.
+2. Test against both real bundled v1 objects in the worktree
+   (karpata_model.rda and bonaire_model.rda -- both use the
+   "competitive" refuge method, so also write a synthetic
+   "sigmoidal"/"binned"/"noncomplex" test case by hand to exercise
+   those paths, since neither real bundled object does) and confirm
+   the result passes `mizer::validParams()`, has class `"mizerReef"`,
+   and that fish-level state (w, initial_n, search_vol, psi, etc. --
+   everything NOT reef-specific) is byte-identical `all.equal()` to
+   the input, only reef-specific fields changed.
+3. Write roxygen docs + `devtools::document()`.
+4. Write tests in tests/testthat/ using a small synthetic v1-shaped
+   object built by hand (don't depend on the real bundled .rda files
+   for the unit test, per the "never regenerate bundled .rda" memory
+   note -- construct a minimal fake v1 object directly instead) plus
+   at least one test against a real loaded v1 object if that's
+   feasible without adding the old package as a test dependency.
+5. Add a NEWS.md entry under this version so users actually see this
+   on upgrade.
+6. `devtools::check()` clean.
+7. Small, descriptive commits as I go, not one giant commit.
+
 === STOP AND READ FIRST (01/08, tenth session, morning follow-up to the
 31/07 overnight algae fix) ===
 
