@@ -51,8 +51,8 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' (algae and detritus) to steady state
 #'
 #' For models that use unstructured resources with carrying capacities,
-#' this functions sets the production rates of detritus and algae so
-#' that productions equals consumption at steady state.
+#' this function sets the algae biomass and the production rate of detritus
+#' so that each is at steady state.
 #'
 #' With a carrying capacity, the time evolution of the algae biomass
 #' \eqn{B_A(t)} is described by
@@ -66,11 +66,18 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' `algae_consumption()` and \eqn{P_A} is the rate at which algae
 #' grows, calculated with `getAlgaeProduction()`.
 #'
-#' In this tuning function, the growth of rate of algae is set to
-#' \eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A})} grams per meter squared per year
-#' so that consumption is equal to production for steady state.
+#' Unlike detritus, algal production on a reef is primary production and is
+#' not driven by consumer demand: it is a property of the algae itself (see
+#' `getAlgaeProduction()`), left unchanged by this function. Instead, this
+#' tuning function solves the above steady-state condition for the algae
+#' biomass, setting it to
+#' \eqn{B_A = (K_A \cdot P_A)/(P_A + K_A \cdot c_A)} grams per meter squared,
+#' so that production equals consumption for the given, fixed production
+#' rate. This means that, all else equal, a *decrease* in grazing pressure
+#' (lower \eqn{c_A}) increases the tuned algae biomass rather than reducing
+#' \eqn{P_A} to compensate.
 #'
-#' Similarly, the time evolution of the detritus biomass \eqn{B_D(t)} is
+#' The time evolution of the detritus biomass \eqn{B_D(t)} is
 #' described by
 #'
 #'  \deqn{ \frac{dB_D}{dt} = P_D\left( 1 -
@@ -89,6 +96,9 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' In this tuning function, the external production of detritus is set to
 #' \eqn{(c_D \cdot B_D)/(1-\frac{B_D}{K_D}) - P_{D.f} - P_{D.d}} grams per meter
 #' squared per year so that production equals consumption at steady state.
+#' Unlike algae, detritus production genuinely is driven by the rest of the
+#' system (fish egestion, senescence) plus an external flux, so tuning the
+#' (external) production rate to match a chosen biomass remains appropriate.
 #'
 #' @param params A MizerParams object
 #' @param ... unused
@@ -98,14 +108,17 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' @export
 tuneUR_cc <- function(params, ...) {
     # algae
-    # getAlgaeConsumption() already returns the total (biomass-multiplied)
-    # consumption rate c_A * B_A, so the steady-state condition
-    # P_A * (1 - B_A/K_A) = c_A * B_A rearranges to P_A = aout / (1 - ba/ka)
-    # (no extra factor of ba -- aout already carries it).
-    ba <- algae_biomass(params)
+    # algae_growth (P_A) is a fixed, literature-informed production rate
+    # (see getAlgaeProduction()) and is deliberately NOT retuned here -- real
+    # algal production is not driven by grazer demand. Instead we solve the
+    # steady-state condition P_A * (1 - B_A/K_A) = c_A * B_A for B_A. Uses
+    # algae_consumption() (mass-specific, no feeding-level factor) to match
+    # exactly what algae_dynamics_cc() itself uses, so the result is an exact
+    # fixed point of the dynamics.
     ka <- params@other_params$algae_params$algae_capacity
-    aout <- sum(getAlgaeConsumption(params))
-    params@other_params$algae_params$algae_growth <- aout / (1 - ba / ka)
+    pa <- sum(getAlgaeProduction(params))
+    ca <- algae_consumption(params)
+    params@initial_n_other$algae <- (ka * pa) / (pa + ka * ca)
 
     # detritus
     # Same reasoning: getDetritusConsumption() already returns c_D * B_D.
@@ -127,10 +140,24 @@ tuneUR_cc <- function(params, ...) {
 
 #' Tune unstructured resources (algae and detritus) to steady state
 #'
-#' This first sets the rate of degradation of algae so that for the given
-#' abundances, the algae is at steady state. It then sets the rate at which
-#' detritus flows in from external sources (e.g. the pelagic zone) so that for
-#' the given abundances the detritus is at steady state.
+#' This first sets the algae biomass so that, for the given abundances and
+#' the algae's fixed production rate (see `getAlgaeProduction()`), algae is
+#' at steady state. It then sets the rate at which detritus flows in from
+#' external sources (e.g. the pelagic zone) so that for the given abundances
+#' the detritus is at steady state.
+#'
+#' The time evolution of the algae biomass \eqn{B_A(t)} is described by
+#' \eqn{dB_A/dt = P_A - c_A \cdot B_A}, where \eqn{c_A} is the mass-specific
+#' consumption rate from `algae_consumption()` and \eqn{P_A} is the algae
+#' production rate from `getAlgaeProduction()`. Unlike detritus, algal
+#' production on a reef is primary production, not driven by consumer
+#' demand: \eqn{P_A} is a fixed property of the algae, left unchanged by
+#' this function. Instead, this tuning function solves \eqn{dB_A/dt = 0} for
+#' the algae biomass, setting it to \eqn{B_A = P_A / c_A}. This means that,
+#' all else equal, a *decrease* in grazing pressure (lower \eqn{c_A})
+#' increases the tuned algae biomass rather than reducing \eqn{P_A} to
+#' compensate. If \eqn{c_A = 0} (no consumers), no finite steady-state
+#' biomass exists and the algae biomass is left unchanged, with a warning.
 #'
 #' @param params A MizerParams object
 #' @param ... unused
@@ -140,8 +167,21 @@ tuneUR_cc <- function(params, ...) {
 #' @export
 tuneUR <- function(params, ...) {
     # algae
-    aout <- sum(getAlgaeConsumption(params))
-    params@other_params$algae_params$algae_growth <- aout
+    # algae_growth (P_A) is a fixed, literature-informed production rate
+    # (see getAlgaeProduction()) and is deliberately NOT retuned here -- real
+    # algal production is not driven by grazer demand. Instead we solve
+    # dB_A/dt = P_A - c_A * B_A = 0 for B_A. Uses algae_consumption()
+    # (mass-specific, no feeding-level factor) to match exactly what
+    # algae_dynamics() itself uses, so the result is an exact fixed point.
+    pa <- sum(getAlgaeProduction(params))
+    ca <- algae_consumption(params)
+    if (ca > 0) {
+        params@initial_n_other$algae <- pa / ca
+    } else {
+        warning("Algae consumption is zero, so algae has no finite ",
+                "steady-state biomass at the current algae growth rate. ",
+                "Leaving algae biomass unchanged.")
+    }
 
     # detritus
     params@other_params$detritus_params$external <- 0

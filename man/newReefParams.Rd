@@ -178,9 +178,15 @@ values must be numeric and between 0 and 1.}
 all unstructured resources. Default is FALSE. This flag
 is stored in the other_params slot.}
 
-\item{initial_algae_growth}{Numeric. The initial growth rate of algae in
-grams/m^2/year, passed on to \code{\link[=setAlgaeParams]{setAlgaeParams()}}
-as \code{algae_growth_initial}. Default is 2e3.}
+\item{initial_algae_growth}{Numeric. The fixed, literature-informed
+growth rate of algae in grams/m^2/year,
+passed on to \code{\link[=setAlgaeParams]{setAlgaeParams()}} as
+\code{algae_growth_initial} (see there for the
+literature basis for the default of 2e3).
+Held constant rather than retuned to match
+consumption -- see
+\code{?setAlgaeParams}'s "Algae as an
+unstructured resource" section.}
 
 \item{algae_capacity}{Numeric. Carrying capacity for algae biomass in
 grams per year. Default is 1e4.}
@@ -248,9 +254,16 @@ resource components, senescence mortality, and predation refuge.
 
  The initial growth rate (`algae_growth_initial`) and carrying
  capacity (`algae_capacity`) control the baseline production
- and maximum standing stock of algae, respectively. These values
- may be reset by [reefSteady()] to ensure steady state abundances
- match observed or target values.
+ and maximum standing stock of algae, respectively. Unlike
+ detritus, algal production on a reef is real primary production
+ and is not driven by grazer demand, so `algae_growth_initial` is
+ treated as a fixed, literature-informed constant: it is *not*
+ reset by [reefSteady()]. Instead [reefSteady()] (via [tuneUR()]/
+ [tuneUR_cc()]) solves for the algae *biomass* that is at steady
+ state for this fixed production rate and the model's current
+ abundances, so that, all else equal, reducing grazing pressure
+ increases the resulting algae biomass rather than reducing
+ production to compensate.
 
  Carrying capacity can be toggled with `use_UR_cc`. When enabled,
  algae biomass will be limited by the specified capacity.

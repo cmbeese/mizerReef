@@ -26,13 +26,17 @@ invertebrates. The model includes competitive predation refuge (using
 Built from \code{\link{caribbean_10_species}},
 \code{\link{caribbean_10_interaction}}, and \code{\link{karpata_refuge}};
 calibrated to match observed biomasses and upgraded to mizerReef 2.1.0 /
-mizer 3.1.0. Algae/detritus resource dynamics are tuned via \code{\link[=tuneUR]{tuneUR()}}
-so that both are genuinely at steady state (\code{dB/dt = 0}) for the
-model's calibrated abundances; an earlier untuned version of this object
-(\code{algae_growth} left at \code{newReefParams()}'s raw default of
-\code{2000}, so algae/detritus were not actually at steady state) is
-archived at \code{inst/archive/caribbean_10_model_untuned.rda} for
-reference.
+mizer 3.1.0. Detritus resource dynamics are tuned via \code{\link[=tuneUR]{tuneUR()}} so that
+they are genuinely at steady state (\code{dB/dt = 0}) for the model's
+calibrated abundances. Algae biomass is likewise tuned by \code{\link[=tuneUR]{tuneUR()}} to
+its own steady state, but for a fixed, literature-informed production
+rate (\code{algae_growth}, left at \code{newReefParams()}'s default of
+\code{2000} grams per square meter per year -- see
+\code{\link{setAlgaeParams}}) that is not itself retuned to match
+consumption, since real algal production is not driven by grazer demand;
+an earlier untuned version of this object (algae biomass not yet solved
+for its steady state) is archived at
+\code{inst/archive/caribbean_10_model_untuned.rda} for reference.
 }
 \references{
 FORCE dataset. From: Dryden, C. (2017). Habitat structural

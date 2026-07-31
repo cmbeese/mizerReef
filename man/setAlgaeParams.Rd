@@ -16,8 +16,26 @@ setAlgaeParams(
 \arguments{
 \item{params}{A \code{MizerParams} object.}
 
-\item{algae_growth_initial}{Numeric. The initial growth rate of algae
-in grams/m^2/year. Default is 2e3.}
+\item{algae_growth_initial}{Numeric. The fixed, literature-informed
+growth rate of algae in grams/m^2/year,
+held constant (not retuned to match
+consumption -- see the "Algae as an
+unstructured resource" section above).
+Default is 2e3, near the upper end of the
+range implied by converting Caribbean
+algal turf net production estimates of
+~110-475 g dry weight/m^2/year (Carpenter,
+R.C. (1986). Partitioning herbivory and
+its effects on coral reef algal
+communities. Ecological Monographs, 56,
+345-363; consistent with the meta-analysis
+in Tebbett, S.B. & Bellwood, D.R. (2021).
+Algal turf productivity on coral reefs: A
+meta-analysis. Marine Environmental
+Research, 168, 105311) to the wet-mass
+units used elsewhere in mizerReef, using
+an approximate 20\% dry-matter content for
+turf algae.}
 
 \item{algae_capacity}{Numeric. Carrying capacity for algae biomass in
 grams per year. Default is 1e4.}
@@ -67,9 +85,16 @@ UR_interaction argument.
 
  The initial growth rate (`algae_growth_initial`) and carrying
  capacity (`algae_capacity`) control the baseline production
- and maximum standing stock of algae, respectively. These values
- may be reset by [reefSteady()] to ensure steady state abundances
- match observed or target values.
+ and maximum standing stock of algae, respectively. Unlike
+ detritus, algal production on a reef is real primary production
+ and is not driven by grazer demand, so `algae_growth_initial` is
+ treated as a fixed, literature-informed constant: it is *not*
+ reset by [reefSteady()]. Instead [reefSteady()] (via [tuneUR()]/
+ [tuneUR_cc()]) solves for the algae *biomass* that is at steady
+ state for this fixed production rate and the model's current
+ abundances, so that, all else equal, reducing grazing pressure
+ increases the resulting algae biomass rather than reducing
+ production to compensate.
 
  Carrying capacity can be toggled with `use_UR_cc`. When enabled,
  algae biomass will be limited by the specified capacity.

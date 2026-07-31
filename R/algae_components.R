@@ -106,14 +106,20 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, t = 0, ...) {
 #'
 #' `B_A(t+dt)` above is a convex combination of `B_A(t)` and `P_A/c_A`, and
 #' is therefore guaranteed non-negative only when `P_A >= 0`. `P_A` (from
-#' [getAlgaeProduction()]) is a growth rate tuned once, at fixed abundances,
-#' by [tuneUR()]/[tuneUR_cc()]; it does not itself respond to the changing
-#' fish abundances of a live, non-frozen simulation. Production is floored
-#' at zero (`production <- max(production, 0)`) before it enters the
-#' analytic update above, so that this non-negativity guarantee holds even
-#' if some future/degraded parameterisation ever drove `P_A` negative. This
-#' has no effect at any steady state tuned by `tuneUR()`/`tuneUR_cc()`
-#' (there, production equals consumption, which is non-negative by
+#' [getAlgaeProduction()]) is a fixed, literature-informed production rate
+#' representing real algal primary production, which is not driven by
+#' consumer demand: it is set once (by `setAlgaeParams()`/`newReefParams()`)
+#' and does not respond to the changing fish abundances of a live,
+#' non-frozen simulation, or get retuned to match consumption -- only the
+#' algae *biomass* moves, converging on `P_A/c_A` as `c_A` (and therefore
+#' grazing pressure) changes. [tuneUR()]/[tuneUR_cc()] tune the algae
+#' *biomass* to this same fixed point for a chosen set of abundances, rather
+#' than tuning `P_A`. Production is floored at zero
+#' (`production <- max(production, 0)`) before it enters the analytic
+#' update above, so that this non-negativity guarantee holds even if some
+#' future/degraded parameterisation ever drove `P_A` negative. This has no
+#' effect at any steady state tuned by `tuneUR()`/`tuneUR_cc()` (there,
+#' `P_A` is a literature-informed constant and is non-negative by
 #' construction) -- it only ever engages away from that steady state.
 #'
 #' @param params A [MizerParams] object
@@ -241,11 +247,16 @@ plotAlgaeConsumption <- function(params) {
 #' Algae production rate
 #'
 #' This is the rate in grams/year/m^-2 at which the system produces algae
-#' biomass. The baseline rate is set so that production and consumption are
-#' equal for chosen steady state abundances (see [tuneUR()]/[tuneUR_cc()]).
-#' If post-bleaching algae boosting has been configured with
-#' [setDegradation()], the baseline rate is scaled by the boost factor
-#' appropriate for time `t` (see [getAlgaeBoost()]).
+#' biomass. Unlike detritus production, this is real primary production and
+#' is not driven by consumer demand: the baseline rate is a fixed,
+#' literature-informed constant set by `setAlgaeParams()`/`newReefParams()`
+#' (see the `initial_algae_growth` argument there for the default value and
+#' its literature basis) and is left unchanged by [tuneUR()]/[tuneUR_cc()],
+#' which instead tune the algae *biomass* to the steady state implied by
+#' this fixed production rate and the current consumption. If post-bleaching
+#' algae boosting has been configured with [setDegradation()], the baseline
+#' rate is scaled by the boost factor appropriate for time `t` (see
+#' [getAlgaeBoost()]).
 #'
 #' @param params MizerParams
 #' @param t The current time, used to determine the post-bleaching algae

@@ -53,14 +53,20 @@ method to solve the equation numerically.
 
 \code{B_A(t+dt)} above is a convex combination of \code{B_A(t)} and \code{P_A/c_A}, and
 is therefore guaranteed non-negative only when \code{P_A >= 0}. \code{P_A} (from
-\code{\link[=getAlgaeProduction]{getAlgaeProduction()}}) is a growth rate tuned once, at fixed abundances,
-by \code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}}; it does not itself respond to the changing
-fish abundances of a live, non-frozen simulation. Production is floored
-at zero (\code{production <- max(production, 0)}) before it enters the
-analytic update above, so that this non-negativity guarantee holds even
-if some future/degraded parameterisation ever drove \code{P_A} negative. This
-has no effect at any steady state tuned by \code{tuneUR()}/\code{tuneUR_cc()}
-(there, production equals consumption, which is non-negative by
+\code{\link[=getAlgaeProduction]{getAlgaeProduction()}}) is a fixed, literature-informed production rate
+representing real algal primary production, which is not driven by
+consumer demand: it is set once (by \code{setAlgaeParams()}/\code{newReefParams()})
+and does not respond to the changing fish abundances of a live,
+non-frozen simulation, or get retuned to match consumption -- only the
+algae \emph{biomass} moves, converging on \code{P_A/c_A} as \code{c_A} (and therefore
+grazing pressure) changes. \code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}} tune the algae
+\emph{biomass} to this same fixed point for a chosen set of abundances, rather
+than tuning \code{P_A}. Production is floored at zero
+(\code{production <- max(production, 0)}) before it enters the analytic
+update above, so that this non-negativity guarantee holds even if some
+future/degraded parameterisation ever drove \code{P_A} negative. This has no
+effect at any steady state tuned by \code{tuneUR()}/\code{tuneUR_cc()} (there,
+\code{P_A} is a literature-informed constant and is non-negative by
 construction) -- it only ever engages away from that steady state.
 }
 \seealso{
