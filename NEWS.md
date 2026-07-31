@@ -42,6 +42,33 @@
 
 ## Bug fixes
 
+- Algal production no longer tracks grazer consumption. `tuneUR()`/
+  `tuneUR_cc()` used to overwrite `algae_growth` with the current total
+  algae consumption on every `reefSteady()` call, which -- since algae
+  biomass was frozen while the fish sub-model converged -- silently pinned
+  algae biomass constant and discarded whatever production rate was
+  configured, every time. Real algal primary production on a reef is not
+  driven by grazer demand (unlike detritus, where flux-balance against
+  consumer egestion is appropriate): standing algal biomass is normally low
+  because grazing pressure is high, not because algae isn't growing.
+  `algae_growth` is now a fixed, literature-informed constant (see
+  `setAlgaeParams()`'s `algae_growth_initial` docs for the citations behind
+  the default of `2000` grams/m^2/year), and `tuneUR()`/`tuneUR_cc()`
+  instead solve for the algae *biomass* that balances it, so a decrease in
+  grazing pressure now increases the tuned algae biomass rather than
+  silently reducing modelled production to compensate. Also fixes a latent
+  inconsistency where the old tuning formula used a different (feeding-level
+  adjusted) consumption rate than `algae_dynamics()`/`algae_dynamics_cc()`
+  themselves use, so the tuned biomass is now an exact fixed point of the
+  dynamics. `reefSteady()` also no longer freezes algae's own dynamics
+  during the fish convergence loop (only detritus, whose production
+  genuinely depends on a not-yet-tuned external flux, is still frozen),
+  since algae's dynamics now converge to a real steady state that fish need
+  to be given the chance to adapt to. `caribbean_3_model` and
+  `caribbean_10_model` have both been updated in place (`algae_growth` and
+  algae biomass retuned to the new mechanism, plus detritus's external flux
+  -- which depends on algae's raw encounter rate via egestion -- retuned to
+  match; every other slot, including all fish abundances, is unchanged).
 - `plotVulnerable()`, `plotRefugeProfile()`, and `plotProductivity()`
   (and therefore `plotRelativeContribution()`, which calls it) excluded any
   species literally named `"inverts"` unconditionally, with no way to opt

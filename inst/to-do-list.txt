@@ -136,7 +136,80 @@ and fix tuneUR()/tuneUR_cc() so the value actually sticks.
 
 Status when this entry was written: plan complete, implementation about
 to start. Not yet touched: any R/, tests/, data/, vignettes/, or
-NEWS.md file for this task. ===
+NEWS.md file for this task.
+
+** UPDATE, same session, task complete ** All 9 plan steps done and
+committed (8 commits: 1fb3967 plan log .. through the NEWS.md/this-file
+update). One real thing came up during implementation that wasn't in
+the original plan: fixing tuneUR()/tuneUR_cc() alone made repeated
+reefSteady() calls on the same model DIVERGE (checked by chaining
+reefSteady() 3x on caribbean_3_model and re-projecting 1.5 more years
+each time -- distance after each re-projection grew 5.75 -> 74.8 ->
+147.4). Root cause: reefSteady() froze ALL other_dynamics (algae +
+detritus) during mizer's fish-convergence loop, then jumped algae to
+its new tuned biomass in one shot at the very end. Under the OLD
+mechanism this was harmless (algebraically guaranteed to reproduce the
+frozen value exactly). Under the NEW mechanism the jump is real, and
+since mizer's own convergence check (distanceSSLogN()) only looks at
+fish abundances, not n_other, fish never got a chance to adapt to it.
+Fixed by no longer freezing algae's own dynamics during the loop (only
+when new_refuge == FALSE, matching when the final tuning step runs at
+all) -- algae's dynamics converge very fast (large mass-specific
+consumption rate) so this doesn't slow the loop down, and it makes the
+whole system converge to a genuine joint fixed point. After the fix,
+the same chained-reefSteady() check converges (0.003 -> 0.0008 ->
+0.0002 instead of diverging). Also found, while patching the bundled
+models: algae's raw encounter rate feeds directly into detritus's
+egestion term (getDetritusProduction()'s p_D.f is NOT gated by feeding
+level, unlike the encounter that actually gets consumed), so once
+algae biomass moved, detritus's `external` flux -- tuned once in the
+past -- went stale too (residual jumped from ~1e-13 to ~765, a 74%
+relative error on caribbean_3_model). Fixed by retuning detritus in the
+same step as algae (tuneUR() already does both, in the right order).
+
+Literature value used: kept the existing 2e3 g/m^2/year default (see
+the earlier entry in this file for the citations/reasoning -- Carpenter
+1986, Tebbett & Bellwood 2021, converted via an approximate 20%
+dry-matter content for turf algae) rather than picking a new number --
+2000 was already well-supported and changing it would have been false
+precision. Patched caribbean_3_model (algae_growth 86.9 -> 2000, algae
+biomass factor x23, detritus external -120.2 -> -885.4) and
+caribbean_10_model (algae_growth 130.9 -> 2000, algae biomass factor
+x15, detritus external -236.9 -> -984.5) in place -- fish abundances,
+rho, capacities, and every other slot verified byte-identical via
+all.equal() before/after. Did NOT rerun the tuning/calibration
+pipeline, per the user's explicit instruction. Deliberately did NOT
+also touch the separate, already-known, deferred absolute-biomass-scale
+bug (see the "FUTURE WORK PLAN" section above) -- checked that this is
+a reasonable simplification for now: herbivore feeding level from algae
+is 0 both before and after the patch (still governed by that same,
+separate, deferred issue), so the biomass change measurably affects
+detritus egestion but not fish growth/mortality at the current scale.
+
+Added a formal regression test (tests/testthat/test-algae-grazing-
+response.R, requested explicitly by the user) asserting the actual
+ecological behaviour: reducing/increasing grazer abundance and
+re-tuning moves algae biomass in the expected direction while
+algae_growth stays fixed, for both tuneUR() and tuneUR_cc().
+
+Full devtools::test(): 542 pass, 0 fail (one benign warning from a test
+that deliberately triggers two warnings at once). Re-knit all 7
+vignettes that reference algae/detritus numbers -- all render cleanly;
+caribbean_3_model-description.Rmd's inline "algal production is ...
+grams" figure now correctly reads 2000. Fixed one stale sentence in
+model-description.Rmd describing the old mechanism, and one unrelated
+floating-point-underflow test fixture (test-algae_dynamics_cc.R) that
+broke only because the bundled model's production value got bigger.
+devtools::check() launched at the end of this session -- check its own
+output/exit status before trusting this account, per the standing
+"don't just trust the log" instruction from the 28/07 audit above.
+
+Noticed but explicitly NOT fixed (out of scope, flagging for later):
+model-description.Rmd's displayed formulas for c_A (algae) and p_D,f
+(detritus, the "Faeces" term) both include a (1 - f_i(w)) feeding-level
+factor that the actual R code (algae_consumption(),
+getDetritusProduction()) does not apply -- a pre-existing vignette/code
+mismatch, unrelated to this session's mechanism fix, not touched. ===
 
 === STOP AND READ FIRST (28/07, same day, eighth session/continuation)
 - independent pre-submission audit requested by the user (not trusting this
