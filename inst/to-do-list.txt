@@ -200,11 +200,46 @@ the newly-added Chapter3.tex into ignore/thesis-materials/, matching
 the existing (gitignored) convention. Committed as cd75b4b.
 
 Full devtools::test() after this round: 542 pass, 0 fail (unchanged).
-devtools::document() clean. Not yet re-run: a fresh full
-devtools::check() since round 1's overnight run (round 1 did run one;
-rounds 2 and 3 have only re-run devtools::test()/document() and
-individual vignette renders, not a full check() -- worth doing before
-this is considered fully closed out). ===
+devtools::document() clean. Also re-ran a fresh full devtools::check()
+after this round (correcting what this entry originally said here,
+"not yet re-run" -- it was, right after committing round 3): 0 errors,
+0 warnings, 2 NOTEs, both the same pre-existing benign ones as every
+prior check() this whole project (inst/LICENSE top-level placement,
+the tuneUR/tuneUR_cc codetools quirk).
+
+** Round 4 (same day, the user asked me to also check the two
+per-model description vignettes, which I'd forgotten) **
+
+Checked caribbean_3_model-description.Rmd, karpata_model-description.Rmd
+(the two per-model vignettes, distinct from the general
+model-description.Rmd already fixed in round 1), plus
+steady-state-recipe.Rmd, mizerReef.Rmd, using-multiple-resources.Rmd,
+and extension_mechanism.Rmd, for any remaining stale text about how
+algae is tuned. Findings:
+  - caribbean_3_model-description.Rmd/karpata_model-description.Rmd:
+    NO changes needed. Both already say algae production is "given by
+    a constant growth rate" -- already-accurate wording (only the
+    underlying *value* was wrong before this session, already fixed by
+    the round-1 bundled-model patch and confirmed re-rendering to 2000
+    that same night). Grepped both files for any other tuning-mechanism
+    language ("production equals consumption", "tuned so that",
+    "balance", "grazing pressure", etc.) -- no hits, nothing else to
+    fix. Detrital production section already reads
+    other_params$detritus_params$external live, so it automatically
+    reflects the retuned value too.
+  - steady-state-recipe.Rmd/mizerReef.Rmd/using-multiple-resources.Rmd:
+    don't discuss the algae/detritus production mechanism at all --
+    nothing to check here.
+  - extension_mechanism.Rmd: not wrong, but vague ("Both have
+    getters/setters for inspecting and tuning the steady-state
+    balance") in a way that could read as if algae and detritus were
+    tuned symmetrically. Replaced with an explicit statement of the
+    actual asymmetry (algae solves for biomass against fixed
+    production; detritus solves for external flux against given
+    biomass), cross-referenced to algae_consumption()'s citations.
+    Re-rendered to confirm it still knits. Committed as a583418.
+
+devtools::test() after this round: 542 pass, 0 fail (unchanged). ===
 
 === STOP AND READ FIRST (31/07, ninth session, overnight autonomous run) ===
 
