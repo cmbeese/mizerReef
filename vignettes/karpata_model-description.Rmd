@@ -309,7 +309,7 @@ df %>%
 [Skip to Tuning the Steady State](#tuning-the-steady-state)
 :::
 
-The fish spectrum is fed by three background resources: plankton , algae, and detritus. Small individuals of all species will feed on plankton while only herbivorous groups and invertebrates feed on algae or detritus. 
+The fish spectrum is fed by three background resources: plankton , algae, and detritus. Small individuals of all species will feed on plankton while only herbivorous groups and invertebrates feed on algae or detritus. The general mathematical form of the algae and detritus dynamics -- a linear production/consumption balance for each pool, solved analytically each time step -- was adapted from @mizerShelf [@deJuan2023]. This is not a direct port: mizerShelf represents its detritus/carrion pools by rescaling the total biomass of mizer's size-structured background resource spectrum, whereas mizerReef's algae and detritus are genuinely unstructured scalar pools with their own dedicated encounter-rate matrices, added as independent components via `setComponent()`. mizerReef also adds coral-reef-specific behaviour with no equivalent in mizerShelf, most notably that algae production is treated as a fixed rate of primary production decoupled from consumer demand rather than tuned to match consumption (see `algae_consumption()`'s documentation for the ecological rationale and citations).
 
 ### Plankton {#plankton}
 ```{r, echo = FALSE}

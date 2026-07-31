@@ -314,8 +314,20 @@ The algae and detritus pools each obey a linear balance between production and
 consumption. Because they are single scalars, their dynamics are ordinary
 differential equations that mizerReef solves analytically over each time step of
 length $dt$, which avoids the numerical instability of an explicit Euler step.
-The equations governing the flux of the algae and detritus resources were
-adapted from the mizerShelf extension package [@mizerShelf; @deJuan2023].
+The general mathematical form of these dynamics -- a linear production/
+consumption balance for each unstructured pool, solved analytically each time
+step -- was adapted from the mizerShelf extension package
+[@mizerShelf; @deJuan2023]. This is not a direct port, though: mizerShelf
+represents its detritus/carrion pools by rescaling the total biomass of
+mizer's size-structured background resource spectrum, whereas mizerReef's
+algae and detritus are genuinely unstructured scalar pools with their own
+dedicated species- and size-dependent encounter-rate matrices ($\rho$), added
+as independent components via `setComponent()`. mizerReef also adds
+coral-reef-specific behaviour with no equivalent in mizerShelf, most notably
+that algae production is treated as a fixed rate of primary production
+decoupled from consumer demand rather than tuned to match consumption (see
+`algae_consumption()`'s documentation for the ecological rationale and
+citations).
 
 ## Algae
 
