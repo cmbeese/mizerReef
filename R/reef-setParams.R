@@ -1185,6 +1185,20 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
 #'                      profile is being used for simulation. Determines
 #'                      whether algae and detritus production are tuned when
 #'                      the model is run to steady state. Defaults to FALSE.
+#'                      Set this to `TRUE` when comparing fish outcomes under
+#'                      two refuge profiles (e.g. before/after a habitat
+#'                      complexity or MPA-style change) and you want to
+#'                      isolate the effect of the refuge change on fish by
+#'                      holding the algae/detritus resource base fixed at its
+#'                      current values, rather than letting it silently
+#'                      readjust and mask the comparison. Leave at the
+#'                      default `FALSE` for ordinary steady-state tuning,
+#'                      where algae/detritus should retune to match the
+#'                      (possibly still-changing) fish community. This
+#'                      rationale is inferred from the code's behaviour, not
+#'                      confirmed against original design notes -- verify it
+#'                      matches your intended use before relying on it for a
+#'                      scenario comparison.
 #'
 #' @param new_method    The new method to be used for setting the refuge
 #'                      profile. Options are "sigmoidal", "binned",
