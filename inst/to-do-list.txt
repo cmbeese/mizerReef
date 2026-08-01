@@ -1,3 +1,247 @@
+=== STOP AND READ FIRST (01/08, fourteenth session: second, independent
+pre-push release audit) ===
+
+User's explicit premise: a fresh session, deliberately not anchored to the
+thirteenth session's conclusions, because that session's own audit found
+several real bugs despite 12+ prior sessions of work -- per
+[[feedback-repeat-audit-after-bugs-found]], finding bugs in a pass raises
+the bar for the next one rather than lowering it. Instructed to re-verify
+everything from live source/tests, not trust the prior session's claims
+(including the user's own). Scope: re-verify the thirteenth session's own
+test/example/doc work, a full fresh test()/check() on `main`, a holistic
+read of the actual merge diff, release metadata sanity, the two previously
+-deferred decisions (inst/data-csv, new_refuge), and the pkgdown/workflow
+paths end-to-end.
+
+** Ground-truth checks re-run this session (all independently, not assumed) **
+- devtools::test() on `main` before any changes: 705 pass, 0 fail, 1
+  pre-existing warning -- exactly matched the thirteenth session's claim.
+- devtools::check(vignettes = TRUE, args = "--as-cran") on `main` before
+  changes: 0 errors, 0 warnings, exactly the same 2 known pre-existing
+  NOTEs (inst/LICENSE placement; tuneUR/tuneUR_cc codetools quirk) --
+  matched exactly, nothing new.
+- pkgdown reference index: called pkgdown:::data_reference_index() (which
+  internally calls check_missing_topics(), which config_abort()s -- a hard
+  error, not a warning -- if any exported topic is missing) directly rather
+  than trusting a full build_site() run; completed with no error, confirming
+  the index is genuinely complete (only upgradeReefParams was missing last
+  session; already fixed; nothing else missing now).
+- .github/workflows/*.yaml (R-CMD-check, pkgdown, test-coverage): all
+  boilerplate r-lib/actions templates, no hardcoded paths to check --
+  confirmed none reference the now-removed inst/to-do-list.txt or deleted
+  inst/archive/ files (they don't reference specific repo paths at all).
+- Swept R/ for browser()/debug()/TODO/FIXME/stray print()-cat()/hardcoded
+  local paths/secrets -- clean, nothing found.
+- Read the full origin/main..HEAD diffstat (269 files, +19197/-7436 -- this
+  is the entire v1->v2 rewrite, origin/main is the pre-rename 1.0.1 tree)
+  and the DESCRIPTION/NAMESPACE diffs in full. Structurally sound: version
+  bump, dependency changes, and every export add/remove/rename matches
+  what NEWS.md documents (e.g. plotRefuge -> plotRefugeProfile,
+  removeSpecies -> S3 method, setURParams -> split into
+  setAlgaeParams/setDetritusParams). No red flags.
+- Release metadata: DESCRIPTION Version 2.1.0 / Date 2026-07-28,
+  CITATION.cff version "2.1.0" / date-released 2026-07-28, inst/CITATION
+  "R package version 2.1.0" -- all three internally consistent with each
+  other. NEWS.md's "# MizerReef 2.1.0" header STILL has no release date
+  (flagged last session, confirmed still true, not fixed -- this is
+  correctly left for actual release time, not a bug to fix now, but
+  DESCRIPTION's Date and CITATION.cff's date-released will also need
+  bumping to the real push date at that point, not just NEWS.md).
+
+** Independent re-verification of the thirteenth session's own work (two
+background agents, both read-only, both told explicitly not to trust the
+prior session's commit messages) **
+
+Agent 1 re-derived correctness by hand for all 26 rewritten test files
+(the ones that used to be "doesn't error only"). Verdict: 23/26 solid
+(legitimate independent-derivation techniques: loop-vs-matrix cross-checks,
+genuine ODE/invariant derivations, appropriate reuse of already-validated
+building blocks for thin wrappers/setters where there's no other ground
+truth). Found two real, previously-unnoticed problems:
+  1. test-detritus_dynamics_cc.R's zero-consumption test hardcoded the
+     source's own (buggy, see below) formula as its "expected" value --
+     fully tautological, could not have caught the bug it was sitting on
+     top of.
+  2. test-calibrateReefNumber.R was missing the same end-to-end
+     total-matches-observed postcondition check its near-identical sibling
+     test-calibrateReefBiomass.R already has.
+Both fixed this session (see below). A third, minor issue (a partial
+tautology in test-getDetritusProduction.R's decomp-weighting test, already
+partly compensated by a swap-differentiation check in the same test) was
+reviewed and deliberately left as-is -- the combination formula it checks
+has no independent ground truth to derive against, and over-engineering a
+low-severity nit wasn't worth it this round.
+
+Agent 2 re-ran and independently re-verified all 14 non-\dontrun @examples
+(via devtools::run_examples()) and re-checked all 5 doc/vignette fixes
+against live source/data (does caribbean_3_interaction actually exist and
+load; does the CSV actually have the claimed column; is Gustav Delius
+actually in DESCRIPTION's Authors@R; etc.) -- all confirmed genuinely
+correct, no incomplete fixes found. Two minor, non-blocking example-
+quality nits noted (newReefParams()'s example is thin; tuneUR()'s example
+triggers an expected-but-unexplained "flux of external detritus is
+negative" warning) -- not acted on, cosmetic polish only.
+
+** Real bug found and fixed: algae_dynamics_cc()/detritus_dynamics_cc()
+zero-consumption branch **
+
+Both functions solve dB/dt = P*(1 - B/K) - c*B analytically. When c
+(consumption) is exactly 0 -- to avoid a 0/0 in the general formula's
+`frac <- (K*P)/(P + K*c)` -- they special-cased to
+`et <- exp(-dt/K * P); return(B0 * et)`, i.e. pure decay toward zero. But
+the general formula's actual limit as c -> 0 is frac -> K (not 0): the
+correct behaviour when there's no consumption but production is nonzero is
+to relax TOWARD the carrying capacity K, not decay away from it. Verified
+independently (not just algebraically -- numerically, via tiny-step Euler
+integration of the documented ODE with c fixed at 0) before touching
+anything: with P=171.08, K=50, B0=5, dt=1, the buggy code returns 0.163;
+the correct value (confirmed by Euler integration to 5 decimal places) is
+48.53. Fix: both branches now return `B0 * et + K * (1 - et)`, which
+correctly reduces to B0 unchanged in the one truly degenerate sub-case
+(production also 0, et=1) and to the proper relaxation-to-K otherwise.
+
+Neither bundled model (caribbean_3_model, caribbean_10_model) hits this
+code path by default -- both use the plain (non-cc) dynamics functions,
+confirmed by checking other_dynamics$algae/detritus directly -- so no
+bundled .rda changes needed and no regression risk to the two reference
+models. This is a live bug in the carrying-capacity path used via
+setURcapacity()/degradation-trajectory scenarios (setDegradation()),
+which would bite a user running a bleaching-recovery scenario where a
+resource's consumers crash to near-zero abundance.
+
+test-detritus_dynamics_cc.R's zero-consumption test was rewritten to
+independently derive the correct value via Euler integration instead of
+mirroring the source formula (same technique its own general-branch test
+already used, just not applied to this branch). Discovered mid-fix that
+the original test's setup was itself subtly wrong in a way worth
+remembering: detritus_dynamics_cc() computes `production` internally via
+`getDetritusProduction(params)` with NO n/rates arguments (its own fresh
+internal getRates() call on params' real, un-zeroed abundances), not by
+reusing the n/rates passed into detritus_dynamics_cc() itself -- so
+zeroing the `n` argument alone does NOT zero the production term; species_
+params$alpha <- 1 (no waste) is needed too, to genuinely zero production
+for the fully-degenerate sub-case test. This is the same footgun flagged
+in the thirteenth session's notes (production and consumption use
+different rates objects) but this session found it also silently breaks
+naive test setups, not just naive reasoning about the function. algae_
+dynamics_cc() had zero correctness coverage for this branch at all
+(only a "runs without error" test and an unrelated boost-differentiation
+test) -- new equivalent test added.
+
+Commits: eda2f2a (source fix + both test fixes/additions), cherry-picked
+onto major_update as ffd01f2 so this branch (kept as the full dev log)
+doesn't silently diverge from main by missing a real bug fix.
+
+** test-calibrateReefNumber.R fix **
+Added the missing end-to-end postcondition test (total model number after
+calibration matches total observed), mirroring calibrateReefBiomass's
+existing equivalent. Commit e923be3 / cherry-picked as 4aea8d1.
+
+** Two previously-deferred decisions, both resolved this session (not
+deferred again) **
+
+1. inst/data-csv/ ~9 unreferenced files -- the thirteenth session couldn't
+   independently confirm these were stale vs. just undocumented. This
+   session re-derived it properly: grepped for the literal ".csv" filename
+   (not just the bare dataset name, which was matching unrelated .rda
+   object references and produced false "referenced" hits last time).
+   8 files had zero literal-path references anywhere:
+     - bonaire_interaction.csv, bonaire_species.csv: orphaned. The
+       corresponding bundled objects (bonaire_model.rda, bonaire_species.rda,
+       bonaire_int.rda, bonaire_refuge.rda) were deleted entirely in the
+       v1->v2 rewrite -- confirmed via `ls data/`, no bonaire_*.rda exists
+       anymore. Dead weight with zero live dataset behind them. DELETED.
+     - caribbean_interaction.csv, caribbean_species.csv: confirmed via
+       diff to be an exact-content duplicate (interaction matrix) and a
+       column-subset predecessor (missing the later-added w_inf column,
+       every other value identical) of caribbean_10_interaction.csv /
+       caribbean_10_species.csv respectively -- superseded leftovers from
+       before the karpata->caribbean rename split into _3/_10 variants.
+       DELETED.
+     - algae_scale.csv, rubble_scale.csv, recovery_scale.csv: confirmed
+       via direct content comparison that these are the pre-consolidation
+       per-trajectory CSVs superseded by deg_scales.csv (verified
+       numerically: deg_scales.csv's raw per-bin deltas, when converted to
+       1+delta multipliers, reproduce these three files' values exactly).
+       man/algae_scale.Rd, man/rubble_scale.Rd, man/recovery_scale.Rd
+       already say the bundled objects are "derived from
+       inst/data-csv/deg_scales.csv", confirming these three are stale.
+       DELETED.
+   aquarius_refuge.csv was the 8th unreferenced-by-path file but is NOT
+   stale: aquarius_refuge.rda IS a real, still-bundled, documented dataset
+   (confirmed data/aquarius_refuge.rda exists and has a real man page) --
+   this CSV is very plausibly its legitimate provenance source, just not
+   path-cited the way karpata_refuge.csv/caribbean_*.csv are in a
+   reproducibility script. KEPT.
+   Executed as a single deletion (part of commit eda2f2a / ffd01f2).
+
+2. new_refuge algae-freeze open question -- did real git archaeology this
+   session (the user said they weren't sure of their own original
+   reasoning): found the actual introducing commit (e09d674, 2024-02-29,
+   "added new_refuge flag to turn off resource tuning when running to
+   steady") -- title only, no body, no prose explanation anywhere. Checked
+   neighbouring commits from the same session (all degradation/bleaching-
+   trajectory work, culminating in e0a2c7f "final submission version" --
+   this was thesis submission week) for a functional link between
+   new_refuge and the degradation trajectory feature it was committed
+   alongside -- found none: reefDegrade()/reef-project_methods.R never
+   references new_refuge or calls newRefuge(), in either the current tree
+   or anywhere in git history. Also checked the pre-2024 thesis model-
+   description doc (inst/reef-model_description.qmd, deleted at commit
+   e10b5aa) for refuge-scenario-comparison language -- predates new_refuge
+   entirely, no hit. Conclusion: the original reasoning is genuinely not
+   recoverable from any artifact in this repository; further archaeology
+   won't find it. Decision made: rather than defer a third time, documented
+   the plausible rationale (isolating a refuge change's effect on fish by
+   holding algae/detritus fixed for scenario comparisons) directly in
+   newRefuge()'s roxygen, explicitly labelled as inferred/unconfirmed
+   rather than asserted as fact. Commit 6795405 / cherry-picked as 7d86e4b.
+   The deeper "is this actually still the right design" question remains
+   open and can only be resolved by the user's own judgement -- but the
+   documentation gap (the actionable part) is closed.
+
+** Housekeeping note **
+An earlier check() run in this session picked up a stray Rplots.pdf (an
+artifact of ad hoc R commands run in the repo root during the audit
+itself, not a package issue) as a spurious extra top-level-files NOTE.
+Deleted (it's already .gitignore'd, was never going to be committed) and
+re-ran check() to confirm the NOTE count returned to exactly the 2 known
+ones. Not a repo bug, just a reminder that ad hoc interactive R sessions
+in the working directory can leave droppings that make check() look worse
+than it is.
+
+** Final ground-truth re-check after all fixes **
+devtools::test(): 709 pass, 0 fail, 1 pre-existing warning (up from 705 --
+4 new: the two dynamics_cc regression tests, calibrateReefNumber's new
+postcondition test... and one more, the algae_dynamics_cc zero-consumption
+test, confirmed as 4 net new test_that() blocks across the session).
+devtools::check(vignettes = TRUE, args = "--as-cran"): 0 errors, 0
+warnings, exactly the same 2 known pre-existing NOTEs. Re-ran on
+`major_update` after cherry-picking to confirm the same clean result
+there too.
+
+** Session status: audit complete. Found and fixed one real, previously-
+unknown bug (zero-consumption dynamics_cc), one real test-completeness gap,
+resolved both previously-deferred decisions with actual evidence (not
+punted again), documented the new_refuge rationale, and found no other
+correctness, metadata, or infrastructure issues after a full holistic pass.
+6 commits on main (data-csv+bugfix, calibrateReefNumber fix, new_refuge
+doc -- plus the pre-existing 3 from this session's earlier housekeeping),
+all cherry-picked onto major_update so the two branches don't diverge in
+substance (major_update still additionally carries inst/to-do-list.txt and
+the 28 archived files main deliberately dropped). **
+
+Per [[feedback-repeat-audit-after-bugs-found]]: this round DID find a real
+bug (again), so per that same standing guidance, this is reported to the
+user as findings + a recommendation, not as a unilateral "ready to push"
+declaration -- that call is explicitly the user's to make, informed by the
+fact that a fourth consecutive audit round found something real. Whether
+a fifth round is warranted, or whether two real-bug-finding rounds in a
+row plus this round's much smaller and more marginal findings (a test gap
+and a rare-edge-case bug, vs. the wider structural issues found two rounds
+ago) means the law of diminishing returns has been reached, is for the
+user to weigh.
+
 === STOP AND READ FIRST (01/08, thirteenth session: pre-merge release audit
 + clean-merge planning) ===
 
