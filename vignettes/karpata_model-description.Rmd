@@ -395,8 +395,8 @@ library(assertthat)
 library(here)
 
 ## Load parameters -----------------------------------
-karpata_10plus  <- read.csv(here("inst/karpata_10plus.csv"))
-karpata_int     <- read.csv(here("inst/cbn_interaction.csv"),  
+karpata_10plus  <- read.csv(here("inst/data-csv/caribbean_10_species.csv"))
+karpata_int     <- read.csv(here("inst/data-csv/caribbean_10_interaction.csv"),
                             row.names = 1)
 karpata_refuge  <- karpata_refuge
 tuning_profile  <- tuning_profile
@@ -475,7 +475,7 @@ plotVulnerable(params)
 plotBiomassVsSpecies(params) # spot on
 
 # Check match with observed age at maturity
-age_mat_observed = karpata_species$age_mat
+age_mat_observed = karpata_10plus$age_mat
 age_mat_model = age_mat(params)
 data.frame(age_mat_model, age_mat_observed)
 # Still look good
