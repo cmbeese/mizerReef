@@ -20,7 +20,7 @@ test_that("plotAlgaeConsumption's underlying data matches getAlgaeConsumption() 
 test_that("plotAlgaeConsumption returns a valid ggplot when no species consumes algae", {
     data(caribbean_3_model)
     params <- caribbean_3_model
-    params@other_params$algae_params$rho[] <- 0
+    params@other_params$algae$rho[] <- 0
 
     result <- plotAlgaeConsumption(params)
     expect_s3_class(result, "ggplot")

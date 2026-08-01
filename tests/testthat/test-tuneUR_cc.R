@@ -5,14 +5,14 @@ test_that("tuneUR_cc leaves algae_growth untouched and sets algae biomass to (K*
     data(caribbean_3_model)
     cc_params <- setURcapacity(caribbean_3_model, cap = 1.5)
 
-    old_growth <- cc_params@other_params$algae_params$algae_growth
-    ka <- cc_params@other_params$algae_params$algae_capacity
+    old_growth <- cc_params@other_params$algae$growth
+    ka <- cc_params@other_params$algae$capacity
     pa <- sum(getAlgaeProduction(cc_params))
     ca <- algae_consumption(cc_params, n = cc_params@initial_n, rates = getRates(cc_params))
     expected_biomass <- (ka * pa) / (pa + ka * ca)
 
     result <- suppressWarnings(tuneUR_cc(cc_params))
-    expect_equal(result@other_params$algae_params$algae_growth, old_growth)
+    expect_equal(result@other_params$algae$growth, old_growth)
     expect_equal(algae_biomass(result), expected_biomass)
 })
 
@@ -27,22 +27,22 @@ test_that("tuneUR_cc sets detritus external flux to dout / (1 - bd/kd) - din, us
     cc_params <- setURcapacity(caribbean_3_model, cap = 1.5)
 
     # Replicate tuneUR_cc()'s algae step to get the same intermediate state.
-    ka <- cc_params@other_params$algae_params$algae_capacity
+    ka <- cc_params@other_params$algae$capacity
     pa <- sum(getAlgaeProduction(cc_params))
     ca <- algae_consumption(cc_params, n = cc_params@initial_n, rates = getRates(cc_params))
     algae_tuned <- cc_params
     algae_tuned@initial_n_other$algae <- (ka * pa) / (pa + ka * ca)
 
     bd <- detritus_biomass(algae_tuned)
-    kd <- algae_tuned@other_params$detritus_params$detritus_capacity
+    kd <- algae_tuned@other_params$detritus$capacity
     zeroed <- algae_tuned
-    zeroed@other_params$detritus_params$external <- 0
+    zeroed@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(zeroed))
     dout <- sum(getDetritusConsumption(algae_tuned))
     expected_external <- (dout / (1 - bd / kd)) - din
 
     result <- suppressWarnings(tuneUR_cc(cc_params))
-    expect_equal(result@other_params$detritus_params$external, expected_external)
+    expect_equal(result@other_params$detritus$external, expected_external)
 })
 
 test_that("tuneUR_cc reaches a genuine steady state: dB/dt = 0 for both resources", {
@@ -59,13 +59,13 @@ test_that("tuneUR_cc reaches a genuine steady state: dB/dt = 0 for both resource
     result <- suppressWarnings(tuneUR_cc(cc_params))
 
     ba <- algae_biomass(result)
-    ka <- result@other_params$algae_params$algae_capacity
+    ka <- result@other_params$algae$capacity
     c_A <- algae_consumption(result, n = result@initial_n, rates = getRates(result))
     P_A <- sum(getAlgaeProduction(result))
     expect_equal(P_A * (1 - ba / ka) - c_A * ba, 0)
 
     bd <- detritus_biomass(result)
-    kd <- result@other_params$detritus_params$detritus_capacity
+    kd <- result@other_params$detritus$capacity
     c_D <- detritus_consumption(result, n = result@initial_n, rates = getRates(result))
     P_D <- sum(getDetritusProduction(result))
     expect_equal(P_D * (1 - bd / kd) - c_D * bd, 0)
@@ -76,7 +76,7 @@ test_that("tuneUR_cc warns when the resulting external detritus flux is negative
     cc_params <- setURcapacity(caribbean_3_model, cap = 1.5)
 
     zeroed <- cc_params
-    zeroed@other_params$detritus_params$external <- 0
+    zeroed@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(zeroed))
     dout <- sum(getDetritusConsumption(cc_params))
     expect_gt(din, dout)

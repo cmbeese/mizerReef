@@ -9,7 +9,7 @@ test_that("reducing grazer abundance increases tuned algae biomass, for fixed al
     data(caribbean_3_model)
     params <- caribbean_3_model
     baseline <- suppressWarnings(tuneUR(params))
-    baseline_growth <- baseline@other_params$algae_params$algae_growth
+    baseline_growth <- baseline@other_params$algae$growth
     baseline_biomass <- algae_biomass(baseline)
 
     # "herbivores" is the only species with rho_algae > 0 in this model.
@@ -20,7 +20,7 @@ test_that("reducing grazer abundance increases tuned algae biomass, for fixed al
 
     # Algae production must be exactly the same fixed rate -- not retuned.
     expect_equal(
-        fewer_grazers@other_params$algae_params$algae_growth,
+        fewer_grazers@other_params$algae$growth,
         baseline_growth
     )
     # But less consumption means more standing algae biomass.
@@ -31,7 +31,7 @@ test_that("increasing grazer abundance decreases tuned algae biomass, for fixed 
     data(caribbean_3_model)
     params <- caribbean_3_model
     baseline <- suppressWarnings(tuneUR(params))
-    baseline_growth <- baseline@other_params$algae_params$algae_growth
+    baseline_growth <- baseline@other_params$algae$growth
     baseline_biomass <- algae_biomass(baseline)
 
     more_grazers <- params
@@ -40,7 +40,7 @@ test_that("increasing grazer abundance decreases tuned algae biomass, for fixed 
     more_grazers <- suppressWarnings(tuneUR(more_grazers))
 
     expect_equal(
-        more_grazers@other_params$algae_params$algae_growth,
+        more_grazers@other_params$algae$growth,
         baseline_growth
     )
     expect_lt(algae_biomass(more_grazers), baseline_biomass)
@@ -50,7 +50,7 @@ test_that("the same grazing-response pattern holds for tuneUR_cc (carrying-capac
     data(caribbean_3_model)
     cc_params <- setURcapacity(caribbean_3_model, cap = 1.5)
     baseline <- suppressWarnings(tuneUR_cc(cc_params))
-    baseline_growth <- baseline@other_params$algae_params$algae_growth
+    baseline_growth <- baseline@other_params$algae$growth
     baseline_biomass <- algae_biomass(baseline)
 
     fewer_grazers <- cc_params
@@ -59,7 +59,7 @@ test_that("the same grazing-response pattern holds for tuneUR_cc (carrying-capac
     fewer_grazers <- suppressWarnings(tuneUR_cc(fewer_grazers))
 
     expect_equal(
-        fewer_grazers@other_params$algae_params$algae_growth,
+        fewer_grazers@other_params$algae$growth,
         baseline_growth
     )
     expect_gt(algae_biomass(fewer_grazers), baseline_biomass)

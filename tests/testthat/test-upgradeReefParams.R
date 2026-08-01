@@ -52,11 +52,11 @@ make_fake_v1 <- function(method = "binned",
         refuge_lengths = op$refuge_params$refuge_lengths,
         carry_capacity = FALSE,
         initial_algae_growth = 2000,
-        algae_capacity = op$algae_params$algae_capacity,
-        sen_decomp = op$detritus_params$sen_decomp,
-        ext_decomp = op$detritus_params$ext_decomp,
+        algae_capacity = op$algae$capacity,
+        sen_decomp = op$detritus$sen_decomp,
+        ext_decomp = op$detritus$ext_decomp,
         initial_d_external = 1,
-        detritus_capacity = op$detritus_params$detritus_capacity,
+        detritus_capacity = op$detritus$capacity,
         ext_mort_params = op$ext_mort_params,
         algae = list(rho = op$algae$rho, growth = op$algae$growth),
         detritus = list(
@@ -144,12 +144,7 @@ test_that("upgradeReefParams preserves tuned algae/detritus values instead of re
     result <- suppressWarnings(upgradeReefParams(fake))
 
     expect_equal(result@other_params$algae$growth, tuned_growth)
-    expect_equal(result@other_params$algae_params$algae_growth, tuned_growth)
     expect_equal(result@other_params$detritus$external, tuned_external)
-    expect_equal(result@other_params$detritus_params$external, tuned_external)
-    # the live component and its config echo must agree
-    expect_equal(result@other_params$algae$growth,
-                 result@other_params$algae_params$algae_growth)
 })
 
 test_that("upgradeReefParams builds the expected algae/detritus/refuge schema", {
@@ -157,12 +152,10 @@ test_that("upgradeReefParams builds the expected algae/detritus/refuge schema", 
     result <- suppressWarnings(upgradeReefParams(fake))
 
     expect_setequal(names(result@other_params$algae), c("rho", "capacity", "growth"))
-    expect_setequal(names(result@other_params$algae_params),
-                    c("algae_growth", "algae_capacity", "rho"))
+    expect_null(result@other_params$algae_params)
     expect_setequal(names(result@other_params$detritus),
                     c("rho", "capacity", "sen_decomp", "ext_decomp", "external"))
-    expect_setequal(names(result@other_params$detritus_params),
-                    c("detritus_capacity", "sen_decomp", "ext_decomp", "external", "rho"))
+    expect_null(result@other_params$detritus_params)
     expect_true(is.list(result@other_params$refuge_params))
     expect_false(is.data.frame(result@other_params$refuge_params))
     expect_true(result@other_params$refuge_params$use_dummy_fish_bins)

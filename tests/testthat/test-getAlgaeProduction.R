@@ -13,7 +13,7 @@ test_that("getAlgaeProduction applies the growth boost multiplier to the baselin
         bleach_time = 2, degrade = TRUE, algae_boost = TRUE,
         algae_growth_boost = growth_boost, algae_capacity_boost = c(2)
     )
-    baseline <- params@other_params$algae_params$algae_growth
+    baseline <- params@other_params$algae$growth
 
     expect_equal(getAlgaeProduction(params, t = 0), baseline)
     expect_equal(getAlgaeProduction(params, t = 2), baseline * growth_boost[1])
@@ -33,7 +33,7 @@ test_that("getAlgaeProduction defaults to t = 0 (no boost) when t is not given",
     )
     expect_equal(
         getAlgaeProduction(params),
-        params@other_params$algae_params$algae_growth
+        params@other_params$algae$growth
     )
 })
 
@@ -45,7 +45,7 @@ test_that("algae_boost = FALSE leaves algae production at the baseline rate rega
         bleach_time = 2, degrade = TRUE, algae_boost = FALSE,
         algae_growth_boost = c(5), algae_capacity_boost = c(5)
     )
-    baseline <- params@other_params$algae_params$algae_growth
+    baseline <- params@other_params$algae$growth
     expect_equal(getAlgaeProduction(params, t = 2), baseline)
     expect_equal(getAlgaeProduction(params, t = 10), baseline)
 })

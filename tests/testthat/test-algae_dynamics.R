@@ -17,7 +17,7 @@ test_that("algae_dynamics floors negative production at zero", {
     # rate.
     data(caribbean_3_model)
     params <- caribbean_3_model
-    params@other_params$algae_params$algae_growth <- -1e6
+    params@other_params$algae$growth <- -1e6
     rates <- getRates(params)
     n_other <- params@initial_n_other
     dt <- 0.1

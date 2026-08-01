@@ -112,16 +112,16 @@ test_that("caribbean_10_model's algae and detritus are genuinely at steady state
     expect_equal(P_D - c_D * detritus_biomass(m), 0, tolerance = 1e-8)
 })
 
-test_that("caribbean_10_model's detritus_params external flux is stored under the correct field name", {
+test_that("caribbean_10_model's detritus external flux is stored under the correct field name", {
     # Guard against the same stale-field-name class of bug as Finding 2
     # (caribbean_3_model's d_external): caribbean_10_model briefly carried a
     # dead d_external duplicate alongside the correctly-named external field,
     # left over from before it was tuneUR()'d. Only external should remain.
     data(caribbean_10_model)
-    dp_names <- names(caribbean_10_model@other_params$detritus_params)
+    dp_names <- names(caribbean_10_model@other_params$detritus)
     expect_true("external" %in% dp_names)
     expect_false("d_external" %in% dp_names)
-    expect_false(is.null(caribbean_10_model@other_params$detritus_params$external))
+    expect_false(is.null(caribbean_10_model@other_params$detritus$external))
 })
 
 test_that("caribbean_10_model's algae/detritus consumption matrix is stored under the correct field name", {
@@ -131,10 +131,19 @@ test_that("caribbean_10_model's algae/detritus consumption matrix is stored unde
     # consumer reads/writes the bare `rho` field, only working by accident
     # of R's `$` partial name-matching. Guard the exact field name.
     data(caribbean_10_model)
-    ap_names <- names(caribbean_10_model@other_params$algae_params)
-    dp_names <- names(caribbean_10_model@other_params$detritus_params)
+    ap_names <- names(caribbean_10_model@other_params$algae)
+    dp_names <- names(caribbean_10_model@other_params$detritus)
     expect_true("rho" %in% ap_names)
     expect_false("rho_algae" %in% ap_names)
     expect_true("rho" %in% dp_names)
     expect_false("rho_detritus" %in% dp_names)
+})
+
+test_that("caribbean_10_model no longer carries a duplicate algae_params/detritus_params structure", {
+    # Regression check for the fix consolidating other_params$algae_params/
+    # detritus_params onto the mizer-canonical other_params$algae/detritus:
+    # only one structure should exist per resource.
+    data(caribbean_10_model)
+    expect_null(caribbean_10_model@other_params$algae_params)
+    expect_null(caribbean_10_model@other_params$detritus_params)
 })

@@ -7,19 +7,19 @@ test_that("tuneUR leaves algae_growth untouched and sets algae biomass to P_A / 
     # algae_dynamics() uses.
     data(caribbean_3_model)
     params <- caribbean_3_model
-    old_growth <- params@other_params$algae_params$algae_growth
+    old_growth <- params@other_params$algae$growth
     expected_biomass <- sum(getAlgaeProduction(params)) /
         algae_consumption(params, n = params@initial_n, rates = getRates(params))
 
     result <- suppressWarnings(tuneUR(params))
-    expect_equal(result@other_params$algae_params$algae_growth, old_growth)
+    expect_equal(result@other_params$algae$growth, old_growth)
     expect_equal(algae_biomass(result), expected_biomass)
 })
 
 test_that("tuneUR warns and leaves algae biomass unchanged when algae consumption is zero", {
     data(caribbean_3_model)
     params <- caribbean_3_model
-    params@other_params$algae_params$rho[] <- 0
+    params@other_params$algae$rho[] <- 0
     old_biomass <- algae_biomass(params)
 
     expect_warning(tuneUR(params), "no finite")
@@ -31,13 +31,13 @@ test_that("tuneUR sets detritus external flux to consumption minus production-wi
     data(caribbean_3_model)
     params <- caribbean_3_model
     zeroed <- params
-    zeroed@other_params$detritus_params$external <- 0
+    zeroed@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(zeroed))
     dout <- sum(getDetritusConsumption(params))
     expected_external <- dout - din
 
     result <- suppressWarnings(tuneUR(params))
-    expect_equal(result@other_params$detritus_params$external, expected_external)
+    expect_equal(result@other_params$detritus$external, expected_external)
 })
 
 test_that("tuneUR reaches a genuine steady state: production equals consumption for both resources", {
@@ -61,7 +61,7 @@ test_that("tuneUR warns when the resulting external detritus flux is negative", 
     data(caribbean_3_model)
     params <- caribbean_3_model
     zeroed <- params
-    zeroed@other_params$detritus_params$external <- 0
+    zeroed@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(zeroed))
     dout <- sum(getDetritusConsumption(params))
     expect_gt(din, dout) # caribbean_3_model triggers the negative-flux case

@@ -20,7 +20,7 @@ test_that("detritus_dynamics floors negative production at zero", {
     # zero-production formula exactly, not go negative.
     data(caribbean_3_model)
     params <- caribbean_3_model
-    params@other_params$detritus_params$external <- -1e6
+    params@other_params$detritus$external <- -1e6
     rates <- getRates(params)
     n_other <- params@initial_n_other
     dt <- 0.1

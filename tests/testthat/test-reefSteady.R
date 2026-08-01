@@ -82,12 +82,12 @@ test_that("reefSteady does not retune algae/detritus when new_refuge = TRUE", {
     new_refuge_params <- newRefuge(caribbean_3_model,
         new_refuge = TRUE, new_method = "sigmoidal", new_method_params = mp
     )
-    old_growth <- new_refuge_params@other_params$algae_params$algae_growth
-    old_external <- new_refuge_params@other_params$detritus_params$external
+    old_growth <- new_refuge_params@other_params$algae$growth
+    old_external <- new_refuge_params@other_params$detritus$external
 
     result <- reefSteady(new_refuge_params, progress_bar = FALSE)
-    expect_equal(result@other_params$algae_params$algae_growth, old_growth)
-    expect_equal(result@other_params$detritus_params$external, old_external)
+    expect_equal(result@other_params$algae$growth, old_growth)
+    expect_equal(result@other_params$detritus$external, old_external)
 })
 
 test_that("reefSteady dispatches to tuneUR_cc when use_UR_cc is TRUE", {
@@ -96,7 +96,7 @@ test_that("reefSteady dispatches to tuneUR_cc when use_UR_cc is TRUE", {
     result <- suppressWarnings(reefSteady(cc_params, progress_bar = FALSE))
 
     ba <- algae_biomass(result)
-    ka <- result@other_params$algae_params$algae_capacity
+    ka <- result@other_params$algae$capacity
     c_A <- algae_consumption(result, n = result@initial_n, rates = getRates(result))
     P_A <- sum(getAlgaeProduction(result))
     expect_equal(P_A * (1 - ba / ka) - c_A * ba, 0)
@@ -104,13 +104,13 @@ test_that("reefSteady dispatches to tuneUR_cc when use_UR_cc is TRUE", {
 
 test_that("reefSteady with return_sim = TRUE returns a MizerSim-like object wrapping the tuned params", {
     data(caribbean_3_model)
-    old_growth <- caribbean_3_model@other_params$algae_params$algae_growth
+    old_growth <- caribbean_3_model@other_params$algae$growth
     sim <- reefSteady(caribbean_3_model, return_sim = TRUE, progress_bar = FALSE)
     expect_s4_class(sim@params, "mizerReef")
 
     # algae_growth is a fixed input, left unchanged by tuning -- only the
     # algae biomass is retuned to the resulting steady state.
-    expect_equal(sim@params@other_params$algae_params$algae_growth, old_growth)
+    expect_equal(sim@params@other_params$algae$growth, old_growth)
     P_A <- sum(getAlgaeProduction(sim@params))
     c_A <- algae_consumption(sim@params, n = sim@params@initial_n, rates = getRates(sim@params))
     expect_equal(P_A - c_A * algae_biomass(sim@params), 0)

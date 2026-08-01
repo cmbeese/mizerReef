@@ -15,7 +15,7 @@ test_that("getAlgaeBoost returns 1 before the bleaching year", {
         bleach_time = 3, degrade = TRUE, algae_boost = TRUE,
         algae_growth_boost = c(1.5, 2), algae_capacity_boost = c(2)
     )
-    boost_vec <- params@other_params$algae_params$algae_growth_boost
+    boost_vec <- params@other_params$algae$algae_growth_boost
     expect_identical(getAlgaeBoost(params, t = 0, boost_vec), 1)
     expect_identical(getAlgaeBoost(params, t = 2, boost_vec), 1)
 })

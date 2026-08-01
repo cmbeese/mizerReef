@@ -47,8 +47,8 @@ test_that("newReefParams's refuge matrix matches setRefuge + getRefuge called di
         min_w_pp = NA, w_pp_cutoff = 1, n = 0.75, p = 0.75
     ))
     base@other_params$refuge_params <- list()
-    base@other_params$algae_params <- list()
-    base@other_params$detritus_params <- list()
+    base@other_params$algae <- list()
+    base@other_params$detritus <- list()
     direct <- getRefuge(setRefuge(base, method = "binned", method_params = tuning_profile))
 
     expect_equal(
@@ -173,20 +173,15 @@ test_that("newReefParams errors when method is missing", {
     )
 })
 
-test_that("newReefParams's mizer::setComponent() bookkeeping copy matches the real algae/detritus params, for both use_UR_cc settings", {
-    # Regression check for a bug in the same class as Finding 2
-    # (caribbean_3_model's stale d_external field): the component_params
-    # passed to setComponent() for the "algae"/"detritus" components used
-    # to read from field names (algae_growth_initial, d_external, and for
-    # use_UR_cc = TRUE, a set of top-level other_params fields) that no
-    # setter in the current codebase ever populates, so the resulting
-    # other_params$algae/other_params$detritus bookkeeping copy was
-    # silently NULL. Nothing in the actual dynamics (algae_dynamics()/
-    # detritus_dynamics()/their _cc variants) reads this bookkeeping copy
-    # -- they all read other_params$algae_params/detritus_params directly
-    # -- but display code (see the model-description vignettes) has read
-    # it before. This checks the copy is populated and consistent with
-    # the authoritative nested fields, for both use_UR_cc branches.
+test_that("newReefParams populates other_params$algae/detritus consistently with mizer::getComponent(), for both use_UR_cc settings", {
+    # Regression check: other_params$algae/other_params$detritus is the
+    # single, mizer-canonical storage location for these components
+    # (mizer::setComponent()'s/getComponent()'s contract), populated once at
+    # construction via setComponent()'s component_params argument. This
+    # checks it is actually populated and that mizer::getComponent() -- a
+    # real, exported mizer function any user or extension might call --
+    # sees the same values newReefParams() itself just set, for both
+    # use_UR_cc branches.
     data(caribbean_3_species)
     data(caribbean_3_interaction)
     data(tuning_profile)
@@ -202,13 +197,13 @@ test_that("newReefParams's mizer::setComponent() bookkeeping copy matches the re
 
         expect_false(is.null(result@other_params$algae$growth))
         expect_equal(
-            result@other_params$algae$growth,
-            result@other_params$algae_params$algae_growth
+            mizer::getComponent(result, "algae")$component_params$growth,
+            result@other_params$algae$growth
         )
         expect_false(is.null(result@other_params$detritus$external))
         expect_equal(
-            result@other_params$detritus$external,
-            result@other_params$detritus_params$external
+            mizer::getComponent(result, "detritus")$component_params$external,
+            result@other_params$detritus$external
         )
     }
 })
@@ -218,7 +213,8 @@ test_that("newReefParams stores the algae/detritus consumption matrix under the 
     # newReefParams() used to write the consumption matrix to
     # other_params$algae_params$rho_algae / detritus_params$rho_detritus,
     # while every consumer (algae_components.R, detritus_components.R,
-    # reef-components.R, reef-helpers.R) reads/writes the bare `rho` field.
+    # reef-components.R, reef-helpers.R) reads/writes the bare `rho` field
+    # of the single, mizer-canonical other_params$algae/detritus location.
     # This only worked by accident of R's `$` partial name-matching (`rho`
     # uniquely prefix-matches `rho_algae`), which would silently break under
     # `[[` access or if a second field starting with `rho` were ever added.
@@ -234,10 +230,12 @@ test_that("newReefParams stores the algae/detritus consumption matrix under the 
         method_params = tuning_profile
     ))
 
-    ap_names <- names(result@other_params$algae_params)
-    dp_names <- names(result@other_params$detritus_params)
-    expect_true("rho" %in% ap_names)
-    expect_false("rho_algae" %in% ap_names)
-    expect_true("rho" %in% dp_names)
-    expect_false("rho_detritus" %in% dp_names)
+    a_names <- names(result@other_params$algae)
+    d_names <- names(result@other_params$detritus)
+    expect_true("rho" %in% a_names)
+    expect_false("rho_algae" %in% a_names)
+    expect_true("rho" %in% d_names)
+    expect_false("rho_detritus" %in% d_names)
+    expect_null(result@other_params$algae_params)
+    expect_null(result@other_params$detritus_params)
 })

@@ -18,7 +18,7 @@ test_that("plotDetritusConsumption's underlying data matches getDetritusConsumpt
 test_that("plotDetritusConsumption shows the 'no consumers' message when no species consumes detritus", {
     data(caribbean_3_model)
     params <- caribbean_3_model
-    params@other_params$detritus_params$rho[] <- 0
+    params@other_params$detritus$rho[] <- 0
 
     result <- plotDetritusConsumption(params)
     expect_s3_class(result, "ggplot")
