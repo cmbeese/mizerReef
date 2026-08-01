@@ -60,6 +60,29 @@
 
 ## Bug fixes
 
+- Algae and detritus parameters are no longer duplicated across two
+  `other_params` structures. `mizer::setComponent()`/`getComponent()` treat
+  `other_params[[component]]` (e.g. `other_params$algae`,
+  `other_params$detritus`) as the single canonical storage location for a
+  component's parameters, but `setAlgaeParams()`/`setDetritusParams()` and
+  every downstream reader/writer (`algae_consumption()`,
+  `getAlgaeProduction()`, `getAlgaeBoost()`, `detritus_consumption()`,
+  `getDetritusProduction()`, `encounter_contribution()`, `tuneUR()`/
+  `tuneUR_cc()`, `scaleReefModel()`, `matchReefGrowth()`,
+  `removeSpecies.mizerReef()`) instead used a second, self-invented
+  `other_params$algae_params`/`detritus_params` structure. The canonical
+  location was populated once at construction and never touched again, so
+  it silently went stale the moment `tuneUR()`/`reefSteady()` ran --
+  concretely breaking `mizer::getComponent()`/`removeComponent()`, real
+  exported mizer functions, for algae/detritus specifically. Everything now
+  reads and writes the single `other_params$algae`/`other_params$detritus`
+  location; the `_params`-suffixed structures are gone rather than kept in
+  sync. This is a pure storage-location consolidation -- no tuned values
+  changed. `caribbean_3_model` and `caribbean_10_model` have been patched in
+  place to the single consolidated structure, using the values each model
+  was actually tuned to and running on (confirmed by each model's own
+  steady-state behaviour); `upgradeReefParams()` and its tests were updated
+  to build the consolidated schema.
 - Algal production no longer tracks grazer consumption. `tuneUR()`/
   `tuneUR_cc()` used to overwrite `algae_growth` with the current total
   algae consumption on every `reefSteady()` call, which -- since algae
