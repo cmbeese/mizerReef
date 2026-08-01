@@ -1,5 +1,52 @@
 MizerReef Major Package Update To Do List - 01/08 (updated)
 
+** FUTURE WORK PLAN: consolidate other_params$algae_params/detritus_params
+onto the mizer-canonical other_params$algae/detritus (dedicated session,
+not yet started) **
+
+Found while building `upgradeReefParams()` in the eleventh session (below)
+and deliberately deferred to its own session at the user's request. Full
+research, root-cause story, and exact fix scope are written up in this
+project's Claude memory as [[project-algae-detritus-component-consolidation]]
+-- read that file in full before starting, it has everything needed
+(mizer's `getComponent()` contract verified from source, mizerShelf's
+`carrion` component read as the reference implementation, and `main`'s
+own `setURParams()`/`algae_consumption()` read directly to confirm this
+bug was introduced during `major_update`, not inherited from `main`).
+
+One-paragraph summary: mizerReef's algae/detritus components are
+registered via `mizer::setComponent()`, whose canonical parameter storage
+location -- per `mizer::getComponent()`'s own source -- is the bare
+`other_params[[component]]` (i.e. `other_params$algae`,
+`other_params$detritus`, no suffix). mizerReef's own
+`setAlgaeParams()`/`setDetritusParams()` instead write to a second,
+self-invented `other_params$algae_params`/`other_params$detritus_params`
+structure, and every reader (`algae_consumption()`, `getAlgaeProduction()`,
+`detritus_consumption()`, `getDetritusProduction()`,
+`encounter_contribution()`, `tuneUR()`/`tuneUR_cc()`, `scaleReefModel()`,
+`removeSpecies.mizerReef()`'s row-trimming) reads/writes that second
+structure instead of the canonical one -- so the canonical
+`other_params$algae`/`other_params$detritus` (populated once at
+construction via `setComponent()`'s `component_params` argument) silently
+goes stale the moment `tuneUR()`/`reefSteady()` runs, and stays wrong
+forever after. Confirmed on both bundled models (`caribbean_3_model`:
+stale `algae$growth` = 86.9 vs. live `algae_params$algae_growth` = 2000;
+`caribbean_10_model` shows the same pattern). Concretely breaks
+`mizer::getComponent()`/`removeComponent()` -- real, exported mizer
+functions -- for algae/detritus specifically.
+
+The fix: delete `algae_params`/`detritus_params` entirely and consolidate
+everything onto `other_params$algae`/`other_params$detritus`, matching
+`main`'s original design and mizerShelf's `carrion` component (both
+confirmed via direct source reading to already do this correctly). Pure
+storage-location consolidation -- no tuned values change. Full list of
+every write/read site to update, plus the interaction with the
+just-shipped `upgradeReefParams()` (which currently builds the buggy
+two-structure schema and needs updating in the same session) and the
+bundled-`.rda`-patching question (`caribbean_10_model`'s `detritus$external`
+is ambiguous between -236.9 stale and -984.5 live once there's only one
+field -- ask the user, don't assume) are all in the memory file above.
+
 === STOP AND READ FIRST (01/08, eleventh session: upgradeReefParams(),
 migrating v1 (main/thesis) params objects to v2 (major_update)) ===
 
