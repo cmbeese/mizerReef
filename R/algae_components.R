@@ -91,8 +91,12 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, t = 0, ...) {
         fracet <- frac *(1- et)
         return(n_other$algae * et + fracet)
     }
+    # Special-cased only to avoid the 0/0 that `frac` above would hit when
+    # consumption == 0 (the general formula's limit as consumption -> 0 is
+    # frac -> ka, not 0): still relaxes toward the carrying capacity ka, not
+    # toward zero, whenever production is nonzero.
     et <- exp(-dt/ka * (production))
-    return(n_other$algae * et)
+    return(n_other$algae * et + ka * (1 - et))
 }
 
 

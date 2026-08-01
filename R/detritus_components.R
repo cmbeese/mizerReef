@@ -67,8 +67,12 @@ detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
         fracet <- frac * (1 - et)
         return(n_other$detritus * et + fracet)
     }
+    # Special-cased only to avoid the 0/0 that `frac` above would hit when
+    # consumption == 0 (the general formula's limit as consumption -> 0 is
+    # frac -> kd, not 0): still relaxes toward the carrying capacity kd, not
+    # toward zero, whenever production is nonzero.
     et <- exp(-dt / kd * (production))
-    return(n_other$detritus * et)
+    return(n_other$detritus * et + kd * (1 - et))
 }
 
 #' Detritus dynamics
