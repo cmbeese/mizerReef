@@ -34,6 +34,21 @@ test_that("getProductivity with a narrower size range gives less than or equal p
     expect_true(any(as.numeric(narrow) < as.numeric(full)))
 })
 
+test_that("getProductivity(sim) defaults min_fishing_l to 7cm and max_fishing_l to the largest species' l_max", {
+    data(caribbean_3_model)
+    sim <- project(caribbean_3_model, t_max = 1, progress_bar = FALSE)
+    explicit <- getProductivity(sim,
+        time_range = 0,
+        min_fishing_l = 7, max_fishing_l = max(sim@params@species_params$l_max)
+    )
+    result <- getProductivity(sim, time_range = 0)
+    expect_equal(result, explicit)
+    # Regression guard: without the default, mizer::get_size_range_array()
+    # falls back to the full weight spectrum, not the documented 7cm cutoff.
+    full_range <- getProductivity(sim, time_range = 0, min_fishing_l = 0, max_fishing_l = Inf)
+    expect_false(isTRUE(all.equal(as.numeric(result), as.numeric(full_range))))
+})
+
 test_that("getProductivity with include_repro = TRUE uses getEReproAndGrowth instead of getEGrowthTime", {
     data(caribbean_3_model)
     params <- caribbean_3_model
