@@ -17,12 +17,12 @@ removeSpecies.mizerReef <- function(params, species, ...) {
     p <- NextMethod()
 
     # Remove algae rho values for species
-    p@other_params$algae_params$rho <-
-        p@other_params$algae_params$rho[keep, , drop = FALSE]
+    p@other_params$algae$rho <-
+        p@other_params$algae$rho[keep, , drop = FALSE]
 
     # Remove detritus rho values for species
-    p@other_params$detritus_params$rho <-
-        p@other_params$detritus_params$rho[keep, , drop = FALSE]
+    p@other_params$detritus$rho <-
+        p@other_params$detritus$rho[keep, , drop = FALSE]
 
     p
 }

@@ -3,7 +3,8 @@
 #' Called automatically by [mizer::validParams()] when an object created with
 #' an older version of mizerReef is loaded. Migrates data stored in the old
 #' custom S4 slots (`refuge_params`, `algae_params`, `detritus_params`) to the
-#' `other_params` sub-lists used since version 2.1.0.
+#' `other_params` sub-lists used since version 2.1.0 (`other_params$refuge_params`,
+#' `other_params$algae`, `other_params$detritus`).
 #'
 #' @param object A `mizerReef` params object (possibly from an older version).
 #' @param ... Unused.
@@ -14,7 +15,11 @@ upgrade.mizerReef <- function(object, ...) {
     # Migrate old S4 slot data to other_params sub-lists if needed.
     # The old class had three extra slots: refuge_params, algae_params,
     # and detritus_params. In mizerReef >= 2.1.0 these are stored as named
-    # lists inside other_params instead.
+    # lists inside other_params instead, at other_params$refuge_params,
+    # other_params$algae, and other_params$detritus (the mizer-canonical
+    # other_params[[component]] location for algae/detritus specifically,
+    # matching mizer::setComponent()'s/getComponent()'s contract -- see
+    # inst/to-do-list.txt's algae/detritus consolidation session).
     #
     # Because the slots no longer exist in the class definition, attempting to
     # access them via @ would raise an error. We use tryCatch to detect the
@@ -26,11 +31,11 @@ upgrade.mizerReef <- function(object, ...) {
         if (old_refuge && is.null(object@other_params$refuge_params)) {
             object@other_params$refuge_params  <- slot(object, "refuge_params")
         }
-        if (old_algae && is.null(object@other_params$algae_params)) {
-            object@other_params$algae_params   <- slot(object, "algae_params")
+        if (old_algae && is.null(object@other_params$algae)) {
+            object@other_params$algae   <- slot(object, "algae_params")
         }
-        if (old_det && is.null(object@other_params$detritus_params)) {
-            object@other_params$detritus_params <- slot(object, "detritus_params")
+        if (old_det && is.null(object@other_params$detritus)) {
+            object@other_params$detritus <- slot(object, "detritus_params")
         }
     }, error = function(e) NULL)  # silently ignore if slots do not exist
     object
@@ -99,7 +104,7 @@ upgradeReefParams <- function(params) {
     # algae/detritus dynamics components exist (`other_params$algae`/
     # `$detritus`, set up by mizer::setComponent() in newReefParams() since
     # 1.x), but none of the 2.1.0+ nesting/echo structure does.
-    is_legacy <- !is.null(op$algae) && is.null(op$algae_params) &&
+    is_legacy <- !is.null(op$algae) &&
         !is.null(op$refuge_params) && is.null(op$refuge_params$method_params)
 
     if (!is_legacy) {
@@ -172,8 +177,12 @@ upgradeReefParams <- function(params) {
         )
     }
 
-    # --- algae: preserve tuned values, populate both the live component and
-    #     the (structurally required, but not authoritative) config echo ----
+    # --- algae: preserve tuned values -----------------------------------------
+    # setAlgaeParams()/setDetritusParams() now write directly to the single
+    # canonical other_params$algae/detritus location, so all that's left is
+    # to add back the preserved rho matrix (the one field they don't set --
+    # only newReefParams()'s own rho-calculation step does that on a fresh
+    # build).
     algae_capacity <- if (is.null(op$algae_capacity)) 1 else op$algae_capacity
     use_UR_cc <- isTRUE(op$carry_capacity)
     params <- setAlgaeParams(
@@ -182,15 +191,7 @@ upgradeReefParams <- function(params) {
         algae_capacity = algae_capacity,
         use_UR_cc = use_UR_cc
     )
-    params@other_params$algae <- list(
-        rho = op$algae$rho,
-        capacity = algae_capacity,
-        growth = op$algae$growth
-    )
-    # setAlgaeParams() doesn't populate the echo's `rho` (only
-    # newReefParams()'s own rho-calculation step does that on a fresh
-    # build) -- add it here so the echo matches the live component.
-    params@other_params$algae_params$rho <- op$algae$rho
+    params@other_params$algae$rho <- op$algae$rho
 
     # --- detritus: same treatment ---------------------------------------------
     detritus_capacity <- if (is.null(op$detritus_capacity)) 1 else op$detritus_capacity
@@ -202,14 +203,7 @@ upgradeReefParams <- function(params) {
         external = op$detritus$external,
         use_UR_cc = use_UR_cc
     )
-    params@other_params$detritus <- list(
-        rho = op$detritus$rho,
-        capacity = detritus_capacity,
-        sen_decomp = op$detritus$sen_decomp,
-        ext_decomp = op$detritus$ext_decomp,
-        external = op$detritus$external
-    )
-    params@other_params$detritus_params$rho <- op$detritus$rho
+    params@other_params$detritus$rho <- op$detritus$rho
 
     # --- external mortality / senescence / new_refuge: unchanged names --------
     params@other_params$ext_mort_params  <- op$ext_mort_params

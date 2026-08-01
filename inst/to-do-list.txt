@@ -1,51 +1,207 @@
-MizerReef Major Package Update To Do List - 01/08 (updated)
+MizerReef Major Package Update To Do List - 01/08 (twelfth session: algae/
+detritus other_params consolidation)
 
-** FUTURE WORK PLAN: consolidate other_params$algae_params/detritus_params
-onto the mizer-canonical other_params$algae/detritus (dedicated session,
-not yet started) **
+=== STOP AND READ FIRST (01/08, twelfth session: consolidate
+other_params$algae_params/detritus_params onto other_params$algae/detritus) ===
 
-Found while building `upgradeReefParams()` in the eleventh session (below)
-and deliberately deferred to its own session at the user's request. Full
-research, root-cause story, and exact fix scope are written up in this
-project's Claude memory as [[project-algae-detritus-component-consolidation]]
--- read that file in full before starting, it has everything needed
-(mizer's `getComponent()` contract verified from source, mizerShelf's
-`carrion` component read as the reference implementation, and `main`'s
-own `setURParams()`/`algae_consumption()` read directly to confirm this
-bug was introduced during `major_update`, not inherited from `main`).
+Full research, root-cause story, and original fix scope are written up in
+this project's Claude memory as [[project-algae-detritus-component-consolidation]]
+and were read in full before starting this session -- not re-derived. This
+entry records the concrete, re-verified plan actually executed. One-line
+summary of the bug: mizer's own `setComponent()`/`getComponent()` contract
+makes `other_params[[component]]` (bare name, e.g. `other_params$algae`)
+the single canonical storage location for a component's parameters, but
+mizerReef's own `setAlgaeParams()`/`setDetritusParams()` and every
+downstream reader/writer instead used a second, self-invented
+`other_params$algae_params`/`other_params$detritus_params` structure --
+so the canonical location went stale the moment `tuneUR()`/`reefSteady()`
+ran, and every subsequent read of it (including `mizer::getComponent()`/
+`removeComponent()`, real exported mizer functions) got wrong data.
 
-One-paragraph summary: mizerReef's algae/detritus components are
-registered via `mizer::setComponent()`, whose canonical parameter storage
-location -- per `mizer::getComponent()`'s own source -- is the bare
-`other_params[[component]]` (i.e. `other_params$algae`,
-`other_params$detritus`, no suffix). mizerReef's own
-`setAlgaeParams()`/`setDetritusParams()` instead write to a second,
-self-invented `other_params$algae_params`/`other_params$detritus_params`
-structure, and every reader (`algae_consumption()`, `getAlgaeProduction()`,
-`detritus_consumption()`, `getDetritusProduction()`,
-`encounter_contribution()`, `tuneUR()`/`tuneUR_cc()`, `scaleReefModel()`,
-`removeSpecies.mizerReef()`'s row-trimming) reads/writes that second
-structure instead of the canonical one -- so the canonical
-`other_params$algae`/`other_params$detritus` (populated once at
-construction via `setComponent()`'s `component_params` argument) silently
-goes stale the moment `tuneUR()`/`reefSteady()` runs, and stays wrong
-forever after. Confirmed on both bundled models (`caribbean_3_model`:
-stale `algae$growth` = 86.9 vs. live `algae_params$algae_growth` = 2000;
-`caribbean_10_model` shows the same pattern). Concretely breaks
-`mizer::getComponent()`/`removeComponent()` -- real, exported mizer
-functions -- for algae/detritus specifically.
+** Re-verification done this session (state may have moved since the
+memory file was written) **
 
-The fix: delete `algae_params`/`detritus_params` entirely and consolidate
-everything onto `other_params$algae`/`other_params$detritus`, matching
-`main`'s original design and mizerShelf's `carrion` component (both
-confirmed via direct source reading to already do this correctly). Pure
-storage-location consolidation -- no tuned values change. Full list of
-every write/read site to update, plus the interaction with the
-just-shipped `upgradeReefParams()` (which currently builds the buggy
-two-structure schema and needs updating in the same session) and the
-bundled-`.rda`-patching question (`caribbean_10_model`'s `detritus$external`
-is ambiguous between -236.9 stale and -984.5 live once there's only one
-field -- ask the user, don't assume) are all in the memory file above.
+Re-ran `grep -rn "algae_params\|detritus_params" R/*.R` and a broader
+`grep -rln` across R/, tests/, vignettes/, man/, inst/ -- the memory
+file's touch-point list is still accurate, plus two things it didn't
+enumerate:
+  - `R/mizerReef-upgrade.R`'s automatic `upgrade.mizerReef()` S3 hook
+    (migrates an even older pre-2.1.0 S4-slot layout) also writes
+    `object@other_params$algae_params`/`detritus_params` -- not in the
+    memory file's list, included in this session's fix for consistency
+    (its target renamed to `$algae`/`$detritus` to match; the S4 slot
+    names it reads FROM, `.hasSlot(object, "algae_params")`, are a
+    different, unrelated namespace and are untouched).
+  - Three vignettes reference the old fields, not just
+    `extension_mechanism.Rmd`: `vignettes/caribbean_3_model-description.Rmd`
+    and `vignettes/karpata_model-description.Rmd` also read
+    `other_params$algae_params$algae_growth` /
+    `other_params$detritus_params$ext_decomp`/`sen_decomp`/`external`.
+  - Inspected both bundled `.rda` objects directly (`load()`, not
+    `data()`, to avoid touching the installed package): confirmed
+    `other_params$algae`/`other_params$detritus` in BOTH
+    `caribbean_3_model` and `caribbean_10_model` are missing a `capacity`
+    field entirely (only `rho` and `growth`/decomposition fields present)
+    -- capacity only ever lived in the `_params` echo (`algae_capacity`/
+    `detritus_capacity`, both `1` for both models). Also confirmed via
+    the bundled models' own existing steady-state tests
+    (`test-caribbean_3_model.R`/`test-caribbean_10_model.R`, which check
+    `getAlgaeProduction()`/`algae_consumption()`/`getDetritusProduction()`/
+    `detritus_consumption()` against `algae_biomass()`/`detritus_biomass()`)
+    that the LIVE `_params` values are what the shipped objects are
+    actually tuned to -- P_A - c_A*B_A = 0 and P_D - c_D*B_D = 0 hold only
+    for the live numbers, not the stale `$algae`/`$detritus` ones.
+
+** User confirmed via AskUserQuestion, 01/08: use the LIVE values for both
+bundled models **, not the stale ones:
+  - caribbean_3_model: algae$growth -> 2000 (was 86.87579 stale);
+    algae$capacity -> 1 (new field); detritus$external -> -885.4358
+    (was -120.1861 stale); detritus$capacity -> 1 (new field)
+  - caribbean_10_model: algae$growth -> 2000 (was 130.9335 stale);
+    algae$capacity -> 1 (new field); detritus$external -> -984.4937
+    (was -236.8671 stale); detritus$capacity -> 1 (new field)
+  - rho matrices already identical between the live and stale structures
+    in both models (confirmed via all.equal()) -- no decision needed there.
+
+** Consolidated schema (sub-field names) **
+
+Every field name that already exists at BOTH locations keeps its existing
+bare name (this is already what `newReefParams()`'s `setComponent()` call
+uses at construction, so no invention needed, just making every other
+writer target it too):
+  - `other_params$algae`:    rho, capacity (was `algae_capacity`),
+                              growth (was `algae_growth`)
+  - `other_params$detritus`: rho, capacity (was `detritus_capacity`),
+                              sen_decomp, ext_decomp, external (these three
+                              already share the same name at both locations)
+  - Post-bleaching boost fields have no bare-name precedent from
+    construction time (they're never part of `setComponent()`'s initial
+    `component_params`) -- kept as `algae_boost`/`algae_growth_boost`/
+    `algae_capacity_boost` inside `other_params$algae`, just relocated,
+    to minimise gratuitous renaming beyond what the fix requires.
+
+** Ordering hazard found and handled: mizer::setComponent() is a full
+overwrite, not a merge ** (confirmed by reading `deparse(mizer::setComponent)`
+directly: `params@other_params[[component]] <- component_params`, no
+merge logic). `newReefParams()` calls `setAlgaeParams()`/`setDetritusParams()`
+(and optionally `setDegradation()`, which sets the boost fields) BEFORE it
+calls `setComponent()` to register "algae"/"detritus" for the first time.
+Once those functions write directly into `other_params$algae`/`detritus`,
+a naive `setComponent(component_params = list(rho=, capacity=, growth=))`
+call afterward would silently wipe out any boost fields already set by
+`setDegradation()`. Fix: in `newReefParams()`, assign `rho` directly onto
+the already-populated `other_params$algae`/`detritus` list, then pass
+`component_params = params@other_params$algae` (the whole existing list,
+not a freshly-built one) to `setComponent()` -- this makes the "overwrite"
+a no-op on the fields already there while still doing `setComponent()`'s
+real job (registering `other_dynamics`, `initial_n_other`, `encounter_fun`,
+colours).
+
+** Concrete task list for this session **
+
+1. `R/newReefParams.R`: init block writes `other_params$algae <- list()`/
+   `other_params$detritus <- list()` instead of the `_params`-suffixed
+   names; drop the standalone rho-assignment-then-separate-component_params
+   pattern for the `setComponent()` calls in favour of the merge-safe
+   pattern described above (both the `use_UR_cc == FALSE` and `== TRUE`
+   branches).
+2. `R/reef-setParams.R`: `setAlgaeParams()`/`setDetritusParams()` write to
+   `other_params$algae`/`other_params$detritus` (renamed sub-fields per the
+   schema above); `setDegradation()`'s algae-boost block writes into
+   `other_params$algae` instead of `other_params$algae_params`; `setURcapacity()`
+   writes `other_params$algae$capacity`/`other_params$detritus$capacity`
+   directly (component already registered, no `setComponent()` call
+   needed here, matching mizerShelf's `tune_carrion_detritus()` pattern of
+   direct in-place field assignment). Update the two roxygen `@details`/
+   `@return` blocks that currently say "stored in the `algae_params`/
+   `detritus_params` slot".
+3. `R/algae_components.R` / `R/detritus_components.R`: every
+   `other_params$algae_params$X` / `other_params$detritus_params$X` read
+   becomes `other_params$algae$X'` / `other_params$detritus$X'` per the
+   rename map (`algae_consumption()`, `getAlgaeConsumption()`,
+   `getAlgaeProduction()`, `getAlgaeBoost()`'s docs, `rescale_algae()`,
+   `detritus_consumption()`, `getDetritusConsumption()`,
+   `getDetritusProduction()`, `rescale_detritus()`, plus the `ka`/`kd`
+   capacity lookups in `algae_dynamics_cc()`/`detritus_dynamics_cc()`).
+4. `R/reef-components.R`: `encounter_contribution()` drops its algae/
+   detritus special-case branches entirely now that they'd be identical to
+   the generic `params@other_params[[component]]$rho * n_other[[component]]`
+   branch already used for other extensions' components (e.g. mizerMR's);
+   `tuneUR()`, `tuneUR_cc()`, `scaleReefModel()`, `matchReefGrowth()` updated.
+5. `R/reef-helpers.R`: `removeSpecies.mizerReef()`'s row-trimming updated.
+6. `R/mizerReef-upgrade.R`:
+   - `upgrade.mizerReef()` (the automatic S3 hook): target renamed from
+     `object@other_params$algae_params`/`detritus_params` to
+     `$algae`/`$detritus` (the `.hasSlot()` reads are untouched, different
+     namespace).
+   - `upgradeReefParams()`: since `setAlgaeParams()`/`setDetritusParams()`
+     now write directly to the canonical location, the old "populate both
+     the live component and the not-authoritative config echo" block
+     collapses to just adding the preserved `rho` value on top of what
+     `setAlgaeParams()`/`setDetritusParams()` already wrote -- delete the
+     separate `params@other_params$algae <- list(...)` block and the
+     `params@other_params$algae_params$rho <-` line, replace with a single
+     `params@other_params$algae$rho <- op$algae$rho` (ditto detritus).
+   - `is_legacy` detection (~line 102): drop the now-always-true
+     `is.null(op$algae_params)` conjunct (nothing ever sets `algae_params`
+     post-fix, so it no longer carries any distinguishing power -- the
+     `refuge_params`/`refuge_params$method_params` check alone still
+     correctly separates v1 from current v2 objects, verified by re-reading
+     the logic for both cases).
+7. `R/MizerReefParams-class.R`: leave as-is -- `algae_params`/
+   `detritus_params` there are ignored constructor-argument NAMES for
+   backward compatibility, not internal storage keys; no rename needed
+   and the existing roxygen text ("Ignored (now stored in `other_params`)")
+   remains accurate without naming a specific key.
+8. `vignettes/extension_mechanism.Rmd`: update the `encounter_contribution()`
+   and `removeSpecies.mizerReef()` code listings to match the fixed source
+   (drop the algae/detritus special cases in the former); update the prose
+   around the `upgrade.mizerReef()` listing.
+9. `vignettes/caribbean_3_model-description.Rmd` and
+   `vignettes/karpata_model-description.Rmd`: update the
+   `other_params$algae_params$algae_growth` / `other_params$detritus_params$*`
+   references. Not expected to change any displayed numbers (the values
+   these vignettes read are already the live ones), but re-knit-check after
+   the code changes since bundled-data/vignette mismatches have been a
+   recurring real bug source in this repo.
+10. Bundled `.rda` objects: patch `other_params$algae`/`other_params$detritus`
+    in place per the user-confirmed live values above (rename `_params`
+    fields into place, delete the `_params` structures), NOT regenerated
+    from any tuning script. Re-save with `usethis::use_data(..., overwrite = TRUE)`
+    or equivalent in-place `save()`, matching existing bundled-object
+    format.
+11. Tests: update every hardcoded `other_params$algae_params`/
+    `detritus_params` reference across `test-plotDetritusConsumption.R`,
+    `test-algae_dynamics_cc.R`, `test-algae-grazing-response.R`,
+    `test-detritus_dynamics.R`, `test-caribbean_10_model.R`,
+    `test-getAlgaeBoost.R`, `test-reefSteady.R`, `test-algae_dynamics.R`,
+    `test-caribbean_3_model.R`, `test-tuneUR.R`, `test-newReefParams.R`,
+    `test-upgradeReefParams.R`, `test-getAlgaeProduction.R`,
+    `test-plotAlgaeConsumption.R`, `test-tuneUR_cc.R`. In
+    `test-upgradeReefParams.R` specifically: `make_fake_v1()`'s synthetic
+    1.x object construction, and the
+    "upgradeReefParams preserves tuned algae/detritus values..." /
+    "...builds the expected algae/detritus/refuge schema" tests, which
+    currently assert on BOTH structures existing and agreeing -- rewrite
+    to assert on the single consolidated structure only. In
+    `test-caribbean_3_model.R`/`test-caribbean_10_model.R`: the two tests
+    literally titled "...consumption matrix/external flux is stored under
+    the correct field name" currently check `other_params$algae_params`/
+    `detritus_params` names -- retarget at `other_params$algae`/`detritus`.
+12. `man/*.Rd`: regenerate via `devtools::document()` after the roxygen
+    source changes above rather than hand-editing.
+13. `NEWS.md`: add an entry for this fix (bug: algae/detritus parameters
+    were duplicated across two `other_params` structures with only one
+    being live; fix: consolidated onto mizer's canonical
+    `other_params$algae`/`other_params$detritus` location, matching
+    `mizer::getComponent()`'s contract; no tuned values changed, bundled
+    models patched in place to their already-live values).
+14. Run full test suite (`devtools::test()`) and `devtools::check()`;
+    fix anything that surfaces before calling this done.
+
+Work in small, descriptive commits (roughly: source consolidation, bundled
+`.rda` patch, tests, vignettes/docs, NEWS.md) rather than one giant commit,
+per [[feedback-mizerreef-autonomy]].
 
 === STOP AND READ FIRST (01/08, eleventh session: upgradeReefParams(),
 migrating v1 (main/thesis) params objects to v2 (major_update)) ===

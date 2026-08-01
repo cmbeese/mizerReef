@@ -72,11 +72,12 @@
 #' @param algae_colour Character. Colour to use for algae in plots.
 #'                     Default is "darkseagreen3".
 #' @details All algae-related parameters (growth rate, capacity) are stored in
-#'          the `algae_params` slot of the params object. Resource interaction
-#'          strengths are set in the species_params data frame. This function
-#'          supports flexible multi-resource interaction via the
-#'          UR_interaction argument.
-#' @return A `MizerParams` object with updated algae parameters (in `algae_params` slot).
+#'          the `algae` component of `other_params` (i.e. `other_params(params)$algae`),
+#'          the same location `mizer::getComponent()`/`mizer::removeComponent()`
+#'          use. Resource interaction strengths are set in the species_params
+#'          data frame. This function supports flexible multi-resource
+#'          interaction via the UR_interaction argument.
+#' @return A `MizerParams` object with updated algae parameters (in `other_params$algae`).
 #' @concept algae
 #' @export
 setAlgaeParams <- function(params,
@@ -90,8 +91,8 @@ setAlgaeParams <- function(params,
     assert_that(is.flag(use_UR_cc))
     params@other_params$use_UR_cc <- use_UR_cc
 
-    # Ensure algae_params slot exists
-    if (is.null(params@other_params$algae_params)) params@other_params$algae_params <- list()
+    # Ensure algae component slot exists
+    if (is.null(params@other_params$algae)) params@other_params$algae <- list()
 
     # Interaction setup (array for all URs)
     if (is.null(UR_interaction)) {
@@ -117,20 +118,20 @@ setAlgaeParams <- function(params,
     # Store algae params in slot with checks
     # algae_growth_initial check
     if (is.null(algae_growth_initial)) {
-        params@other_params$algae_params$algae_growth <- 2e3
+        params@other_params$algae$growth <- 2e3
     } else {
         if (!is.numeric(algae_growth_initial)) stop("algae_growth_initial should be a numerical value.")
         if (algae_growth_initial < 0) stop("algae_growth_initial must be non-negative.")
-        params@other_params$algae_params$algae_growth <- algae_growth_initial
+        params@other_params$algae$growth <- algae_growth_initial
     }
 
     # algae_capacity check
     if (is.null(algae_capacity)) {
-        params@other_params$algae_params$algae_capacity <- 1
+        params@other_params$algae$capacity <- 1
     } else {
         if (!is.numeric(algae_capacity)) stop("algae_capacity should be a numerical value.")
         if (algae_capacity < 0) stop("algae_capacity must be non-negative.")
-        params@other_params$algae_params$algae_capacity <- algae_capacity
+        params@other_params$algae$capacity <- algae_capacity
     }
 
     # Colour check (for algae_colour)
@@ -199,10 +200,12 @@ setAlgaeParams <- function(params,
 #' @param detritus_colour Character. Colour to use for detritus in plots. Default is "plum4".
 #'
 #' @details All detritus-related parameters (capacity, decomposition rates, external input) are
-#'          stored in the `detritus_params` slot of the params object. Resource interaction
+#'          stored in the `detritus` component of `other_params` (i.e.
+#'          `other_params(params)$detritus`), the same location
+#'          `mizer::getComponent()`/`mizer::removeComponent()` use. Resource interaction
 #'          strengths are set in the species_params data frame. This function supports flexible
 #'          multi-resource interaction via the UR_interaction argument.
-#' @return A `MizerParams` object with updated detritus parameters (in `detritus_params` slot).
+#' @return A `MizerParams` object with updated detritus parameters (in `other_params$detritus`).
 #' @concept detritus
 #' @export
 setDetritusParams <- function(params,
@@ -218,8 +221,8 @@ setDetritusParams <- function(params,
     assert_that(is.flag(use_UR_cc))
     params@other_params$use_UR_cc <- use_UR_cc
 
-    # Ensure detritus_params slot exists
-    if (is.null(params@other_params$detritus_params)) params@other_params$detritus_params <- list()
+    # Ensure detritus component slot exists
+    if (is.null(params@other_params$detritus)) params@other_params$detritus <- list()
 
     # Interaction setup (array for all URs)
     if (is.null(UR_interaction)) {
@@ -246,28 +249,28 @@ setDetritusParams <- function(params,
         }
     }
 
-    # Store detritus params in slot with checks
-    params@other_params$detritus_params$detritus_capacity <- ifelse(is.null(detritus_capacity), 1, detritus_capacity)
+    # Store detritus params with checks
+    params@other_params$detritus$capacity <- ifelse(is.null(detritus_capacity), 1, detritus_capacity)
 
     # sen_decomp check
     if (is.null(sen_decomp)) {
-        params@other_params$detritus_params$sen_decomp <- 0.8
+        params@other_params$detritus$sen_decomp <- 0.8
     } else {
         if (!is.numeric(sen_decomp)) stop("sen_decomp should be a numerical value.")
         if (sen_decomp < 0 || sen_decomp > 1) stop("sen_decomp must be a proportion between 0 and 1.")
-        params@other_params$detritus_params$sen_decomp <- sen_decomp
+        params@other_params$detritus$sen_decomp <- sen_decomp
     }
 
     # ext_decomp check
     if (is.null(ext_decomp)) {
-        params@other_params$detritus_params$ext_decomp <- 0.2
+        params@other_params$detritus$ext_decomp <- 0.2
     } else {
         if (!is.numeric(ext_decomp)) stop("ext_decomp should be a numerical value.")
         if (ext_decomp < 0 || ext_decomp > 1) stop("ext_decomp must be a proportion between 0 and 1.")
-        params@other_params$detritus_params$ext_decomp <- ext_decomp
+        params@other_params$detritus$ext_decomp <- ext_decomp
     }
 
-    params@other_params$detritus_params$external <- ifelse(is.null(external), 1, external)
+    params@other_params$detritus$external <- ifelse(is.null(external), 1, external)
 
     # Colour check (for detritus_colour)
     if (!is.null(detritus_colour)) {
@@ -1342,7 +1345,7 @@ newRefuge <- function(params, new_refuge = FALSE,
 #' Prepare a steady state model for projections with degradation
 #'
 #' This function stores degradation parameters in the `refuge_params` slot of
-#' the params object, and algae adjustment parameters in the `algae_params` slot.
+#' the params object, and algae adjustment parameters in `other_params$algae`.
 #'
 #' @param params a mizer object
 #'
@@ -1385,7 +1388,7 @@ newRefuge <- function(params, new_refuge = FALSE,
 #' @param ... Unused
 #'
 #' @return A mizer object with updated degradation parameters stored in `refuge_params`
-#'         and algae adjustment parameters in `algae_params`.
+#'         and algae adjustment parameters in `other_params$algae`.
 #' @concept degradation
 #' @seealso [algae_dynamics_cc()],[detritus_dynamics_cc()],
 #'          [tuneUR_cc()], [reefDegrade()]
@@ -1431,10 +1434,10 @@ setDegradation <- function(params, trajectory = NULL, deg_scale,
     params@other_params$refuge_params$deg_scale <- deg_scale
 
     # Store algae adjustment parameters
-    params@other_params$algae_params$algae_boost <- algae_boost
+    params@other_params$algae$algae_boost <- algae_boost
     if (algae_boost) {
-        params@other_params$algae_params$algae_growth_boost <- algae_growth_boost
-        params@other_params$algae_params$algae_capacity_boost <- algae_capacity_boost
+        params@other_params$algae$algae_growth_boost <- algae_growth_boost
+        params@other_params$algae$algae_capacity_boost <- algae_capacity_boost
     }
 
     # Save time parameters were modified
@@ -1472,11 +1475,11 @@ setURcapacity <- function(params, cap = 1.5, ...) {
     # Algae
     ba <- algae_biomass(params)
     new_a_carry <- cap * ba
-    params@other_params$algae_params$algae_capacity <- new_a_carry
+    params@other_params$algae$capacity <- new_a_carry
     # Detritus
     bd <- detritus_biomass(params)
     new_d_carry <- cap * bd
-    params@other_params$detritus_params$detritus_capacity <- new_d_carry
+    params@other_params$detritus$capacity <- new_d_carry
 
     # Switch to carrying capacity dynamics
     params@other_dynamics$algae <- "algae_dynamics_cc"

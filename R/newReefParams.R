@@ -113,9 +113,9 @@ newReefParams <- function( # Original mizer parameters
 
     # Initialise other_params sub-lists for reef-specific state
     # (these replace the old custom S4 slots)
-    if (is.null(params@other_params$refuge_params))  params@other_params$refuge_params  <- list()
-    if (is.null(params@other_params$algae_params))   params@other_params$algae_params   <- list()
-    if (is.null(params@other_params$detritus_params)) params@other_params$detritus_params <- list()
+    if (is.null(params@other_params$refuge_params)) params@other_params$refuge_params <- list()
+    if (is.null(params@other_params$algae))         params@other_params$algae         <- list()
+    if (is.null(params@other_params$detritus))       params@other_params$detritus     <- list()
 
     # Change resource color
     params@linecolour["Resource"] <- resource_color
@@ -228,9 +228,16 @@ newReefParams <- function( # Original mizer parameters
     rho_alg <- outer(params@species_params$rho_algae, params@w^0.86)
     rho_det <- outer(params@species_params$rho_detritus, params@w^n)
 
-    # Store rho values in new params slots
-    params@other_params$algae_params$rho <- rho_alg
-    params@other_params$detritus_params$rho <- rho_det
+    # Store rho values directly onto the (already-populated, by
+    # setAlgaeParams()/setDetritusParams()/setDegradation() above) canonical
+    # other_params$algae/detritus lists, then pass those whole lists through
+    # as setComponent()'s component_params below. setComponent() *overwrites*
+    # other_params[[component]] rather than merging into it, so building a
+    # fresh, narrower list here would silently drop fields already set
+    # (e.g. setDegradation()'s algae_boost/algae_growth_boost/
+    # algae_capacity_boost) instead of just adding rho to them.
+    params@other_params$algae$rho <- rho_alg
+    params@other_params$detritus$rho <- rho_det
 
     ### Add components ----
 
@@ -241,11 +248,7 @@ newReefParams <- function( # Original mizer parameters
             initial_value = 1,
             dynamics_fun = "algae_dynamics",
             encounter_fun = "encounter_contribution",
-            component_params = list(
-                rho = rho_alg,
-                capacity = params@other_params$algae_params$algae_capacity,
-                growth = params@other_params$algae_params$algae_growth
-            )
+            component_params = params@other_params$algae
         )
 
         ### Detritus component - Add in detritus ----
@@ -254,13 +257,7 @@ newReefParams <- function( # Original mizer parameters
             initial_value = 1,
             dynamics_fun = "detritus_dynamics",
             encounter_fun = "encounter_contribution",
-            component_params = list(
-                rho = rho_det,
-                capacity = params@other_params$detritus_params$detritus_capacity,
-                sen_decomp = params@other_params$detritus_params$sen_decomp,
-                ext_decomp = params@other_params$detritus_params$ext_decomp,
-                external = params@other_params$detritus_params$external
-            )
+            component_params = params@other_params$detritus
         )
     } else if (use_UR_cc == TRUE) {
         ### Algae Component - Add in algae ----
@@ -269,11 +266,7 @@ newReefParams <- function( # Original mizer parameters
             initial_value = 1,
             dynamics_fun = "algae_dynamics_cc",
             encounter_fun = "encounter_contribution",
-            component_params = list(
-                rho = rho_alg,
-                capacity = params@other_params$algae_params$algae_capacity,
-                growth = params@other_params$algae_params$algae_growth
-            )
+            component_params = params@other_params$algae
         )
 
         ### Detritus component - Add in detritus ----
@@ -282,13 +275,7 @@ newReefParams <- function( # Original mizer parameters
             initial_value = 1,
             dynamics_fun = "detritus_dynamics_cc",
             encounter_fun = "encounter_contribution",
-            component_params = list(
-                rho = rho_det,
-                sen_decomp = params@other_params$detritus_params$sen_decomp,
-                ext_decomp = params@other_params$detritus_params$ext_decomp,
-                capacity = params@other_params$detritus_params$detritus_capacity,
-                external = params@other_params$detritus_params$external
-            )
+            component_params = params@other_params$detritus
         )
     }
 
