@@ -1,3 +1,173 @@
+=== STOP AND READ FIRST (01/08, thirteenth session: pre-merge release audit
++ clean-merge planning) ===
+
+User asked for a final "check everything" pass before merging major_update
+into main for the 2.1.0 public release (docs, vignettes, pkgdown site,
+whether the ~600 tests are meaningful, bug fixes still correct), plus a
+plan for what should/shouldn't carry over into main (this branch stays as
+the full development log; main should be a clean release tree).
+
+** Ground-truth checks run this session **
+- devtools::test(): 601 pass, 0 fail, 1 pre-existing benign warning
+  (tuneUR's "flux of external detritus is negative" -- documented before).
+- devtools::check(vignettes = TRUE, args = "--as-cran"): 0 errors,
+  0 warnings, 2 pre-existing NOTEs (inst/LICENSE top-level placement;
+  tuneUR/tuneUR_cc codetools quirk) -- both already known, nothing new.
+- Re-verified the algae/detritus other_params consolidation (twelfth
+  session) is still clean: no lingering other_params$algae_params/
+  detritus_params anywhere except deliberate v1-upgrade-history references
+  (upgrade.mizerReef(), extension_mechanism.Rmd's explanation of the old
+  layout) and tests asserting the old fields are now NULL. Bundled models'
+  live other_params$algae/detritus values still match what NEWS.md claims
+  (c3: growth=2000/capacity=1/detritus external=-885.4358; c10: growth=2000/
+  capacity=1/detritus external=-984.4937).
+- pkgdown::build_site(): favicon step failed on a transient
+  realfavicongenerator.net HTTP 500 (external service, not our content --
+  not actionable, retry later). Sitrep DID catch a real bug: "1 topic
+  missing from index: upgradeReefParams" in _pkgdown.yml. Fixed by adding
+  `@concept setup` to upgradeReefParams()'s roxygen (matches how
+  newReefParams()/reefSteady() are tagged for the same "Setting up a
+  mizerReef model" section) -- confirmed present in the reference index
+  build after re-documenting. Committed as bb7cca2.
+
+** Test-quality audit (delegated to a background agent, read-only) **
+Reviewed 69/78 test files in full against their R/ source. Verdict: the
+files covering the package's actual novel mechanisms (algae/detritus
+dynamics, tuneUR/tuneUR_cc, the refuge system, reef-specific rate
+functions, reefSteady, newReefParams, upgradeReefParams, both bundled-model
+regression files) are consistently strong -- independently hand-derived
+expected values, real historical bugs documented as regression guards, no
+skip()'d or disabled tests anywhere. BUT roughly a quarter of the 78
+files -- mostly calibration/scaling utilities (setURcapacity,
+calibrateReefBiomass/Number, rescale_algae/rescale_detritus/
+rescaleComponents, scaleReefAbundance/scaleReefBackground/scaleReefModel,
+matchReefGrowth, removeSpecies) plus five consumption/production
+primitives that OTHER tests treat as ground truth (algae_consumption,
+detritus_consumption, getAlgaeConsumption, getDetritusConsumption,
+getDetritusProduction) -- have only `expect_error(fn(params), NA)`,
+i.e. "doesn't error," no check that the computed value is right. Since
+tuneUR()/tuneUR_cc()'s own tests reuse algae_consumption()/
+detritus_consumption() to build their "expected" values, a real logic bug
+in those five primitives could hide behind otherwise-passing tests
+elsewhere. NOT fixed this session (writing real assertions for ~19 files
+is its own dedicated session) -- flagged to the user as the top
+pre-release test-coverage gap, left for a future session or an explicit
+decision to ship as-is.
+
+Also flagged: test-reefSteady.R's "does not retune algae/detritus when
+new_refuge = TRUE" test locks in the exact behaviour flagged as an
+unresolved open design question in [[project-new-refuge-algae-freeze-question]]
+-- if that question gets resolved in favour of changing the behaviour,
+this test will need updating, not just the source.
+
+** Vignette/doc accuracy audit (delegated to a second background agent,
+read-only) **
+All 7 vignettes with real content render clean (0 errors/warnings) via
+rmarkdown::render() off devtools::load_all(). devtools::document() is a
+true no-op against committed HEAD (before this session's own doc fix).
+Real, fixed-this-session findings, all in vignette prose/example code
+(none in man/*.Rd, none in live code paths):
+  - vignettes/mizerReef.Rmd: quick-start example did `data("karpata_int")`,
+    which doesn't exist (renamed to caribbean_3_interaction/
+    caribbean_10_interaction in the karpata->caribbean rename, an earlier
+    session's change this vignette was never updated for). Fixed to
+    caribbean_3_interaction. Also claimed a `step_tune` example dataset
+    exists for tuning profiles -- it never has in this branch, removed
+    the claim. Also `plotBiomass(params)` was called on a bare
+    MizerParams/mizerReef object; mizer::plotBiomass only has a MizerSim
+    method (confirmed via UseMethod dispatch) -- fixed to project()
+    first, matching the vignette's own later correct example. Committed
+    as 32c4c9a.
+  - vignettes/karpata_model-description.Rmd: the "complete calibration
+    script" listing read from inst/karpata_10plus.csv/inst/cbn_interaction.csv,
+    neither of which exist (superseded by inst/data-csv/
+    caribbean_10_species.csv/caribbean_10_interaction.csv in the same
+    rename -- verified same row count/columns/age_mat field before
+    swapping the paths in). Also fixed a copy-paste bug later in the same
+    script (`karpata_species$age_mat`, never defined in the script --
+    should be `karpata_10plus$age_mat`, already loaded earlier). Committed
+    as 8e50194.
+  - vignettes/extension_mechanism.Rmd: overstated that the dead
+    makeActiveBinding() re-coercion code in .onLoad covers both bundled
+    models; verified against R/mizerReef-package.R it's scoped to
+    caribbean_3_model only. Doesn't change the practical conclusion
+    (mechanism doesn't fire either way), fixed the claim's scope. README.md:
+    suggested citation dropped Gustav Delius, who's a listed author/
+    copyright holder in DESCRIPTION and inst/CITATION -- added back.
+    Both committed as 2aa8c7d.
+
+Real finding NOT acted on this session, flagged for a decision: none of
+the 89 exported man pages have a runnable @examples block anywhere in the
+package (grep -c "@examples" R/*.R == 0). Vignettes carry real runnable
+examples, so this isn't a "users have no examples at all" gap, but it is
+a real reference-index usability gap or a deliberate scope choice --
+needs the user's call before release, not something to silently add or
+silently ignore.
+
+** Clean-merge inventory (main should NOT get the full major_update tree
+as-is; this branch stays the full dev log per the user's explicit
+instruction) **
+- .claude/ -- already untracked by git, nothing to do regardless of merge
+  strategy.
+- inst/to-do-list.txt (this file, 3295+ lines) -- tracked, NOT in
+  .Rbuildignore (ships inside the installed package today). User
+  explicitly flagged this one as a dev artifact that shouldn't reach main.
+- inst/archive/ -- 29 tracked files. grep-verified only
+  caribbean_10_model_untuned.rda is actually referenced anywhere live
+  (R/data.R's @source docs for caribbean_10_model, a comment in
+  test-caribbean_10_model.R) -- genuinely documented as "archived... for
+  reference." The other 28 files, INCLUDING the entire nested
+  data-archive/ subfolder (16 "thesis-"-prefixed duplicate .rda files) and
+  inst/archive/data.R (a stale roxygen-source copy documenting
+  pre-rename objects like karpata_model/karpata_species that no longer
+  exist as bundled data), have zero live references anywhere in R/,
+  vignettes/, tests/, man/, NEWS.md, README.md.
+- inst/scripts/ (check-test-coverage.R, karpata_example_fig.R,
+  Caribbean_3_model-calibration.R) -- all three are legitimate, explicitly
+  documented reproducibility artifacts (paper code-availability checklist,
+  manuscript figure regeneration, calibration script cited by name in
+  caribbean_3_model-description.Rmd) -- keep all of these, not dev cruft.
+- inst/data-csv/ -- mostly legitimate documented provenance (referenced
+  from R/data.R roxygen @source-style comments and
+  caribbean_3_model-description.Rmd's reproducible script), but ~9 files
+  (algae_scale.csv, rubble_scale.csv, recovery_scale.csv,
+  caribbean_species.csv, caribbean_interaction.csv, bonaire_species.csv,
+  bonaire_interaction.csv, aquarius_refuge.csv, caribbean_10_interaction.csv,
+  caribbean_10_species.csv -- note the last two ARE used by this session's
+  karpata_model-description.Rmd fix above, so don't remove those two) have
+  zero doc references. Unlike inst/archive, I could NOT independently
+  confirm these are stale (e.g. caribbean_10's docs just say "PhD Thesis,
+  FORCE dataset" with no CSV citation, so an unreferenced CSV isn't
+  necessarily dead) -- flagged for the user's judgement, not included in
+  any "safe to remove" recommendation.
+- data/, R/, man/, tests/, vignettes/, NEWS.md, README.md, DESCRIPTION,
+  NAMESPACE, LICENSE, CITATION.cff, inst/CITATION, inst/LICENSE,
+  inst/logo.png -- all real shipped package content, no changes
+  recommended.
+
+Proposed mechanics (NOT yet executed -- presented to the user as a plan,
+pending their decision on history strategy): standard `git merge --no-ff
+major_update` into main (preserves major_update's full commit history
+exactly as the user wants it kept as a dev log) followed by a SEPARATE
+cleanup commit on main removing inst/to-do-list.txt and the 28 dead files
+under inst/archive/ (keeping caribbean_10_model_untuned.rda). Squash-merge
+was considered as an alternative (single clean commit on main instead of
+191) but changes main's public commit history significantly and only the
+user can decide if that's wanted -- raised as an open question, not
+decided.
+
+Also open, raised to the user, not decided: NEWS.md's "MizerReef 2.1.0"
+section header currently has no release date (still reads as
+in-progress/unreleased framing) -- normal R package convention is to
+finalize this at release time.
+
+** Session status: audit complete, small fixes committed (4 commits:
+bb7cca2 pkgdown concept tag, 32c4c9a mizerReef.Rmd, 8e50194
+karpata_model-description.Rmd, 2aa8c7d extension_mechanism.Rmd + README).
+Clean-merge plan drafted and presented to user for approval -- NOT yet
+executed (no merge, no inst/archive deletion, no NEWS.md date change
+performed this session; all pending user sign-off). **
+
 MizerReef Major Package Update To Do List - 01/08 (twelfth session: algae/
 detritus other_params consolidation)
 
