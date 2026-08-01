@@ -59,11 +59,11 @@ If shorter than algae_growth_boost, will be padded with 1s
 }
 \value{
 A mizer object with updated degradation parameters stored in \code{refuge_params}
-and algae adjustment parameters in \code{algae_params}.
+and algae adjustment parameters in \code{other_params$algae}.
 }
 \description{
 This function stores degradation parameters in the \code{refuge_params} slot of
-the params object, and algae adjustment parameters in the \code{algae_params} slot.
+the params object, and algae adjustment parameters in \code{other_params$algae}.
 }
 \seealso{
 \code{\link[=algae_dynamics_cc]{algae_dynamics_cc()}},\code{\link[=detritus_dynamics_cc]{detritus_dynamics_cc()}},

@@ -41,14 +41,16 @@ is FALSE. This flag is stored in the other_params slot.}
 \item{detritus_colour}{Character. Colour to use for detritus in plots. Default is "plum4".}
 }
 \value{
-A \code{MizerParams} object with updated detritus parameters (in \code{detritus_params} slot).
+A \code{MizerParams} object with updated detritus parameters (in \code{other_params$detritus}).
 }
 \description{
 Set detritus parameters for mizerReef
 }
 \details{
 All detritus-related parameters (capacity, decomposition rates, external input) are
-stored in the \code{detritus_params} slot of the params object. Resource interaction
+stored in the \code{detritus} component of \code{other_params} (i.e.
+\code{other_params(params)$detritus}), the same location
+\code{mizer::getComponent()}/\code{mizer::removeComponent()} use. Resource interaction
 strengths are set in the species_params data frame. This function supports flexible
 multi-resource interaction via the UR_interaction argument.
 }

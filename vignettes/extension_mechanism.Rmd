@@ -280,17 +280,14 @@ params <- mizer::setComponent(
 Both share the same `encounter_contribution()` helper, which adds
 $\rho_i(w)\,B$ to species $i$'s encounter rate, where $B$ is the current
 biomass of the component and $\rho_i(w)$ is a species- and size-dependent
-encounter-rate coefficient stored in `other_params(params)`:
+encounter-rate coefficient stored in `other_params(params)[[component]]` --
+the same location `setComponent()`'s `component_params` argument writes to
+above, and what `mizer::getComponent()`/`removeComponent()` read from, so
+algae and detritus need no special-casing here:
 
 ```r
 encounter_contribution <- function(params, n_other, component, ...) {
-    if (component == "algae") {
-        params@other_params$algae_params$rho * n_other[[component]]
-    } else if (component == "detritus") {
-        params@other_params$detritus_params$rho * n_other[[component]]
-    } else {
-        params@other_params[[component]]$rho * n_other[[component]]
-    }
+    params@other_params[[component]]$rho * n_other[[component]]
 }
 ```
 
@@ -400,10 +397,10 @@ matrices, which live outside the standard mizer slots that
 removeSpecies.mizerReef <- function(params, species, ...) {
     keep <- !valid_species_arg(params, species, return.logical = TRUE)
     p <- NextMethod()
-    p@other_params$algae_params$rho <-
-        p@other_params$algae_params$rho[keep, , drop = FALSE]
-    p@other_params$detritus_params$rho <-
-        p@other_params$detritus_params$rho[keep, , drop = FALSE]
+    p@other_params$algae$rho <-
+        p@other_params$algae$rho[keep, , drop = FALSE]
+    p@other_params$detritus$rho <-
+        p@other_params$detritus$rho[keep, , drop = FALSE]
     p
 }
 ```
@@ -433,16 +430,27 @@ upgrade.mizerReef <- function(object, ...) {
         if (old_refuge && is.null(object@other_params$refuge_params)) {
             object@other_params$refuge_params  <- slot(object, "refuge_params")
         }
-        if (old_algae && is.null(object@other_params$algae_params)) {
-            object@other_params$algae_params   <- slot(object, "algae_params")
+        if (old_algae && is.null(object@other_params$algae)) {
+            object@other_params$algae   <- slot(object, "algae_params")
         }
-        if (old_det && is.null(object@other_params$detritus_params)) {
-            object@other_params$detritus_params <- slot(object, "detritus_params")
+        if (old_det && is.null(object@other_params$detritus)) {
+            object@other_params$detritus <- slot(object, "detritus_params")
         }
     }, error = function(e) NULL)
     object
 }
 ```
+
+The old S4 slots were literally named `algae_params`/`detritus_params`
+(`.hasSlot()`/`slot()` above read those slot names directly), which is a
+coincidental naming match with an unrelated, later bug: `other_params$
+algae_params`/`detritus_params` was for a while also used internally as a
+second, non-canonical copy of the live algae/detritus component data,
+duplicating `other_params$algae`/`detritus` (the location
+`mizer::setComponent()`/`getComponent()` actually use). That duplication has
+since been removed -- `other_params$algae`/`detritus` is the single storage
+location, which is also why the migration above now targets it directly
+rather than `other_params$algae_params`/`detritus_params`.
 
 This method is idempotent and never touches the version stamp, per the
 upgrade contract described in `vignette("creating-extension-packages",

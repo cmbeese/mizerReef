@@ -12,7 +12,7 @@ getAlgaeBoost(params, t, boost_vector)
 \item{t}{The current time}
 
 \item{boost_vector}{The boost vector to use -- \code{algae_growth_boost} or
-\code{algae_capacity_boost} from \code{params@other_params$algae_params}.
+\code{algae_capacity_boost} from \code{params@other_params$algae}.
 Element 1 gives the multiplier for the bleaching year itself, element 2
 for one year post-bleaching, and so on. If \code{t} is later than the last
 element of \code{boost_vector}, the cumulative product stays fixed at the

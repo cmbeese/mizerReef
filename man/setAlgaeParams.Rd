@@ -55,17 +55,18 @@ is stored in the other_params slot.}
 Default is "darkseagreen3".}
 }
 \value{
-A \code{MizerParams} object with updated algae parameters (in \code{algae_params} slot).
+A \code{MizerParams} object with updated algae parameters (in \code{other_params$algae}).
 }
 \description{
 Set algae parameters for mizerReef
 }
 \details{
 All algae-related parameters (growth rate, capacity) are stored in
-the \code{algae_params} slot of the params object. Resource interaction
-strengths are set in the species_params data frame. This function
-supports flexible multi-resource interaction via the
-UR_interaction argument.
+the \code{algae} component of \code{other_params} (i.e. \code{other_params(params)$algae}),
+the same location \code{mizer::getComponent()}/\code{mizer::removeComponent()}
+use. Resource interaction strengths are set in the species_params
+data frame. This function supports flexible multi-resource
+interaction via the UR_interaction argument.
 }
 \section{Algae as an unstructured resource}{
 
