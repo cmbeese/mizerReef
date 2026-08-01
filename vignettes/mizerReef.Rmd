@@ -150,12 +150,12 @@ diet preferences, or other ecological factors influencing predation rates.
 
 It is important that the order of rows and columns in the interaction matrix matches
 the order of species in the species parameter data frame within the params object.
-To view the [example interaction matrix](https://cmbeese.github.io/mizerReef/reference/karpata_int.html)
-included with MizerReef, run:  
+To view the [example interaction matrix](https://cmbeese.github.io/mizerReef/reference/caribbean_3_interaction.html)
+included with MizerReef, run:
 
 ```{r interaction-matrix-example, echo=TRUE, eval=FALSE}
-data("karpata_int")
-karpata_int
+data("caribbean_3_interaction")
+caribbean_3_interaction
 ```
 </details>
 
@@ -337,8 +337,8 @@ reef-specific values.
 The best practice if you have refuge density data is to first create a model
 using the binned method that approximates your refuge profile to reach
 an initial steady state and calibrate biomasses, then switch to the competitive method.
-The package includes example refuge profiles for tuning (`tuning_profile`)
-and a simple step function (`step_tune`) that can be used for this purpose.
+The package includes an example refuge profile for tuning (`tuning_profile`)
+that can be used for this purpose.
 </details>
 
 
@@ -404,10 +404,11 @@ several plotting functions to help you visualize and interpret your model output
   plotDiet(params)
   ```
 
-- **Total biomass for each species:**  
-  Use [plotBiomass()] to view steady-state biomasses.
+- **Total biomass for each species:**
+  Use [plotBiomass()] on a projected simulation to view biomasses over time.
   ```{r plot-biomass, eval=FALSE}
-  plotBiomass(params)
+  sim <- project(params)
+  plotBiomass(sim)
   ```
 
 > <details><summary>💡 **Tip:** `plotBiomass()` is mizer's own function.</summary> mizerReef does not override it — instead it registers a `getBiomass()` method for `mizerReef` models so that algae and detritus biomass are automatically included alongside species biomass, regardless of the order in which `mizer` and `mizerReef` are loaded.</details>
