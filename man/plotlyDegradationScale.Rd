@@ -18,8 +18,9 @@ the degradation scaling or trajectory from its \code{@other_params$refuge_params
 
 \item{trajectory}{Optional. Either a character string (\code{"rubble"},
 \code{"algae"}, \code{"recovery"}) to use built-in data, or a
-user-provided numeric matrix/data.frame with the correct format (bleaching
-year in first column, remaining columns as refuge size bins).}
+user-provided numeric matrix/data.frame with refuge size bins as rows
+and bleaching years as columns (column 1 = bleaching year, remaining
+columns = years 1, 2, 3... post-bleaching).}
 
 \item{return_data}{Logical. If TRUE, returns the formatted data frame
 instead of the plot. Default FALSE.}

@@ -353,8 +353,11 @@ plotlyRefugeProfile <- function(object,
 #'
 #' Creates a heatmap showing the scaling of refuge density across bleaching
 #' years and refuge size bins for a given degradation trajectory. The input
-#' data should have the first column as bleaching year, and the remaining
-#' columns as refuge size bins.
+#' data should have refuge size bins as rows and bleaching years as columns
+#' (column 1 = bleaching year, remaining columns = years 1, 2, 3... post-
+#' bleaching), matching the format of the built-in trajectory objects
+#' (e.g. \code{rubble_scale}) and of \code{deg_scale} as used by
+#' [reefDegrade()].
 #'
 #' This function is flexible in its input:
 #' \itemize{
@@ -362,8 +365,9 @@ plotlyRefugeProfile <- function(object,
 #'     \itemize{
 #'       \item A character string (\code{"rubble"}, \code{"algae"},
 #'         \code{"recovery"}) to use built-in data.
-#'       \item A user-provided numeric matrix or data.frame (bleaching year in
-#'         first column, remaining columns as refuge size bins).
+#'       \item A user-provided numeric matrix or data.frame with refuge size
+#'         bins as rows and bleaching years as columns (column 1 = bleaching
+#'         year, remaining columns = years 1, 2, 3... post-bleaching).
 #'     }
 #'   \item If \code{trajectory} is not provided, \code{object} must be
 #'     supplied and can be a [MizerParams] or
@@ -379,8 +383,9 @@ plotlyRefugeProfile <- function(object,
 #'
 #' @param trajectory Optional. Either a character string (\code{"rubble"},
 #'   \code{"algae"}, \code{"recovery"}) to use built-in data, or a
-#'   user-provided numeric matrix/data.frame with the correct format (bleaching
-#'   year in first column, remaining columns as refuge size bins).
+#'   user-provided numeric matrix/data.frame with refuge size bins as rows
+#'   and bleaching years as columns (column 1 = bleaching year, remaining
+#'   columns = years 1, 2, 3... post-bleaching).
 #'
 #' @param return_data Logical. If TRUE, returns the formatted data frame
 #'   instead of the plot. Default FALSE.

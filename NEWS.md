@@ -190,6 +190,13 @@
   spectrum instead, overestimating productivity by 30-90% depending on
   species (confirmed on `caribbean_3_model`). Fixed to apply the same
   default on both branches.
+- `plotDegradationScale()`'s documentation for a user-supplied custom
+  `trajectory` matrix/data.frame described the opposite orientation to what
+  the code (and the built-in `rubble_scale`/`algae_scale`/`recovery_scale`
+  objects, and `deg_scale` as consumed by `reefDegrade()`) actually expect:
+  refuge size bins as rows and bleaching years as columns, not bleaching
+  year in the first column. Documentation fixed to match actual behaviour;
+  no code change.
 
 ### Compatibility with other mizer extensions (e.g. mizerMR)
 
