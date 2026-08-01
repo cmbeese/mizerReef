@@ -78,6 +78,7 @@ upgrade.mizerReef <- function(object, ...) {
 #'   upgrades that run every time [mizer::validParams()] is called on an
 #'   already-registered `mizerReef` object -- this function is for the
 #'   one-off 1.x -> 2.x jump only.
+#' @concept setup
 #' @export
 upgradeReefParams <- function(params) {
     assert_that(is(params, "MizerParams"))

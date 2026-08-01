@@ -49,3 +49,4 @@ upgrades that run every time \code{\link[mizer:validParams]{mizer::validParams()
 already-registered \code{mizerReef} object -- this function is for the
 one-off 1.x -> 2.x jump only.
 }
+\concept{setup}
