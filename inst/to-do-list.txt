@@ -219,6 +219,47 @@ read the old fields. Deferred: consolidating the `NEWS.md` file itself
 (grown large across many sessions, likely has duplication/inconsistency
 worth a dedicated audit pass) -- see [[project-newsmd-consolidation-audit]].
 
+** Session complete, 01/08 (NEWS.md consolidation audit) **. Deferred item
+above actioned. Rewrote the unreleased "MizerReef 2.1.0" section of
+`NEWS.md` (442 -> 241 lines); the released "MizerReef 2.0.0" section was
+left untouched. Changes:
+- Merged 5 separate bullets describing the same algae/detritus
+  `other_params$algae_params`/`detritus_params` duplication saga (found by
+  grepping for that structure across the whole 5-commit thread) into one
+  bullet. Confirmed via `grep -rn "algae_params|detritus_params" R/` and the
+  bundled models' own `other_params` (loaded with `load()`) that the
+  structure genuinely no longer exists anywhere current, so the old
+  per-discovery bullets were describing dead terminology.
+- Found and fixed a real inaccuracy: the "New features" bullet about
+  `caribbean_10_model` being untuned quoted `caribbean_3_model`'s
+  `algae_growth` as `86.87579` -- stale. Loading both bundled `.rda` files
+  now shows `algae_growth = 2000` for BOTH models, because a later fix in
+  the same unreleased section made `algae_growth` a fixed constant instead
+  of something tuned per-model. Dropped the stale number; folded the real
+  fact (never run through `tuneUR()`) into the algae-mechanism bug-fix
+  entry.
+- Made explicit that 2.0.0's `MizerReefParams` S4 class (with dedicated
+  refuge/algae/detritus slots) has since been removed in favour of
+  `other_params` + S3 dispatch -- confirmed via `R/MizerReefParams-class.R`
+  (now a deprecated shim) and `R/mizerReef-upgrade.R`'s `upgrade.mizerReef()`
+  (the automatic `validParams()` hook that migrates 2.0.0-era S4-slot
+  objects). Previously only the 1.x -> 2.x migration was documented; the
+  2.0.0 -> 2.1.0 structural change (the "add slots, then revert" the user
+  flagged from memory) wasn't spelled out anywhere.
+- Grouped "Bug fixes" into `### Algae and detritus dynamics` / `Refuge` /
+  `Plotting functions` / `Compatibility with other mizer extensions` /
+  `Other`, and cut entries with zero user-visible effect (dead-field
+  removal, unused-variable cleanup).
+- On a second full pass (user asked to double-check before committing):
+  re-verified essentially every remaining claim against current source
+  (function signatures, defaults, roxygen docs, bundled `.rda` contents)
+  rather than trusting the first pass. Found one real bug introduced by my
+  own condensing: claimed `reefSteady()` "no longer freezes algae... only
+  detritus is still frozen" -- true only when `new_refuge == FALSE`; when
+  `new_refuge == TRUE`, algae IS frozen too (confirmed in
+  `R/reef-steady.R`). Fixed to state the `new_refuge` condition explicitly.
+  Everything else checked out against source.
+
 === STOP AND READ FIRST (01/08, eleventh session: upgradeReefParams(),
 migrating v1 (main/thesis) params objects to v2 (major_update)) ===
 
