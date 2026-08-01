@@ -1,6 +1,29 @@
 MizerReef Major Package Update To Do List - 01/08 (twelfth session: algae/
 detritus other_params consolidation)
 
+=== OPEN QUESTION, not yet investigated (01/08) ===
+
+Why does `new_refuge = TRUE` freeze algae/detritus during `reefSteady()`
+instead of letting them retune to the new refuge profile? (See
+`R/reef-steady.R` lines ~98-118, ~151: when `new_refuge == TRUE`, algae is
+frozen alongside detritus during fish convergence, and the final
+`tuneUR()`/`tuneUR_cc()` call is skipped entirely, leaving algae/detritus
+"completely untouched.") The `new_refuge` flag itself is set by
+`newRefuge()`/`newReefParams()` (`R/reef-setParams.R`, `R/newReefParams.R`)
+and is documented only as "prevents algae/detritus from being re-tuned
+during reefSteady()" -- no vignette or comment explains the underlying
+reasoning, and the user (who wrote this originally) isn't sure why they
+did it that way. Working hypothesis, unconfirmed: when comparing scenarios
+under a new/changed refuge profile (e.g. an MPA policy change), you want
+to isolate the effect of the refuge change on fish by holding the resource
+base (algae/detritus) fixed, rather than letting it silently readjust to
+compensate for the new fish behaviour and mask the comparison. Needs a
+dedicated session to either find the original reasoning (check thesis /
+git blame on the earliest `new_refuge` commit) or, if it really was an
+arbitrary/undocumented choice, decide whether the current behaviour is
+still what's wanted and document it properly either way. See memory
+[[project-new-refuge-algae-freeze-question]].
+
 === STOP AND READ FIRST (01/08, twelfth session: consolidate
 other_params$algae_params/detritus_params onto other_params$algae/detritus) ===
 
