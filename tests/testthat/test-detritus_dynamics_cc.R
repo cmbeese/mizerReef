@@ -51,19 +51,71 @@ test_that("detritus_dynamics_cc's analytic solution matches numerical integratio
     expect_equal(analytic, B, tolerance = 1e-3)
 })
 
-test_that("detritus_dynamics_cc reduces to the no-consumption exponential decay branch when consumption is zero", {
+test_that("detritus_dynamics_cc relaxes toward carrying capacity, not zero, when consumption is zero but production isn't", {
+    # Regression test for a real bug: the consumption == 0 branch used to
+    # return only B0 * exp(-dt/K * P) (decay toward zero), dropping the
+    # `+ K * (1 - et)` relaxation-to-capacity term that the general formula's
+    # own c -> 0 limit requires (frac -> K, not 0). Verified independently
+    # here via tiny-step Euler integration of the documented ODE
+    # dB/dt = P*(1 - B/K) - c*B with c fixed at 0, rather than re-deriving
+    # the closed form a second time.
     data(caribbean_3_model)
     params <- caribbean_3_model
-    params <- setURcapacity(params)
     params@other_params$detritus$rho[] <- 0
     n <- params@initial_n
     n_other <- params@initial_n_other
     rates <- getRates(params)
 
-    P <- sum(getDetritusProduction(params, n, rates))
-    K <- params@other_params$detritus$capacity
+    # As in the test above, use a sane synthetic capacity rather than the
+    # real, numerically tiny, biomass-derived setURcapacity() value -- the
+    # real value makes dt/K * P astronomically large, which both makes
+    # explicit Euler diverge AND (irrelevantly to what this test checks)
+    # underflows et to exactly 0 either way.
+    K <- 50
+    params@other_params$detritus$capacity <- K
+    P <- sum(getDetritusProduction(params))
     B0 <- detritus_biomass(params)
-    expected <- B0 * exp(-1 / K * P)
 
-    expect_equal(detritus_dynamics_cc(params, n, n_other, rates, dt = 1), expected)
+    dt_total <- 1
+    n_steps <- 2e5
+    h <- dt_total / n_steps
+    B <- B0
+    for (i in seq_len(n_steps)) {
+        B <- B + h * (P * (1 - B / K))
+    }
+
+    expect_equal(detritus_dynamics_cc(params, n, n_other, rates, dt = dt_total),
+        B,
+        tolerance = 1e-4
+    )
+})
+
+test_that("detritus_dynamics_cc's no-consumption branch leaves biomass unchanged when production is also zero", {
+    # The one case the special branch genuinely needs to handle (avoiding
+    # 0/0 in the general formula's `frac`): both production and consumption
+    # zero means dB/dt = 0, so biomass should be exactly unchanged.
+    # Note: detritus_dynamics_cc() computes `production` internally via
+    # getDetritusProduction(params) with NO n/rates arguments (its own fresh
+    # getRates() call on params' real, unzeroed abundances) rather than
+    # reusing the n/rates passed in here -- so zeroing consumption's `n`
+    # alone does not zero production's feces term. alpha = 1 (no waste)
+    # zeroes feces regardless of abundance; sen_decomp/ext_decomp/external
+    # zero out the rest.
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params <- setURcapacity(params)
+    params@other_params$detritus$rho[] <- 0
+    params@other_params$detritus$external <- 0
+    params@other_params$detritus$sen_decomp <- 0
+    params@other_params$detritus$ext_decomp <- 0
+    params@species_params$alpha <- 1
+    n <- params@initial_n * 0
+    n_other <- params@initial_n_other
+    rates <- getRates(params)
+
+    expect_equal(sum(getDetritusProduction(params)), 0)
+    expect_equal(
+        detritus_dynamics_cc(params, n, n_other, rates, dt = 1),
+        n_other$detritus
+    )
 })
