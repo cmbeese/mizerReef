@@ -8,3 +8,9 @@
 test2.rda
 test_sp2.rda
 test_i2.rda
+^ignore$
+^\.kilo$
+^\.vscode$
+^\.claude$
+^LICENSE$
+^CITATION\.cff$

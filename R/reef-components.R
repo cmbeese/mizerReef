@@ -2,7 +2,7 @@
 #'
 #' The encounter rate \eqn{E_i(w)} for an unstructured resource like algae or
 #' detritus is proportional to the total biomass \eqn{B} with a coefficient
-#' \eqn{\rho_i(w)} that depends on the functional group \eqn{i} and the size of
+#' \eqn{\rho_i(w)} that depends on the species \eqn{i} and the size of
 #' the consumer:
 #'
 #' \deqn{E_i(w) = \rho_i(w) B.}
@@ -19,7 +19,6 @@
 #' @export
 #' @concept Uresources
 encounter_contribution <- function(params, n_other, component, ...) {
-    
     params@other_params[[component]]$rho * n_other[[component]]
 }
 
@@ -28,7 +27,7 @@ encounter_contribution <- function(params, n_other, component, ...) {
 #' This multiplies the algae & detritus biomass by a factor and divides the
 #' interaction between all groups and unstructured resource by the same
 #' factor, so as to keep the total consumption of these resources unchanged.
-#' 
+#'
 #' @param params A MizerParams object
 #' @param algae_factor A number to scale algae by
 #' @param detritus_factor A number to scale detritus by
@@ -36,52 +35,64 @@ encounter_contribution <- function(params, n_other, component, ...) {
 #' @concept Uresources
 #' @export
 rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
-    rescale_algae(rescale_detritus(params, detritus_factor),
-                  algae_factor)
+    rescale_algae(
+        rescale_detritus(params, detritus_factor),
+        algae_factor
+    )
 }
 
-#' Tune unstructured resources with carrying capacities 
+#' Tune unstructured resources with carrying capacities
 #' (algae and detritus) to steady state
 #'
 #' For models that use unstructured resources with carrying capacities,
-#' this functions sets the production rates of detritus and algae so
-#' that productions equals consumption at steady state.
-#' 
-#' With a carrying capacity, the time evolution of the algae biomass 
+#' this function sets the algae biomass and the production rate of detritus
+#' so that each is at steady state.
+#'
+#' With a carrying capacity, the time evolution of the algae biomass
 #' \eqn{B_A(t)} is described by
 #'
-#'  \deqn{ \frac{dB_A}{dt} = P_A\left( 1 - 
+#'  \deqn{ \frac{dB_A}{dt} = P_A\left( 1 -
 #'                          \frac{B_A}{K_A} \right) - c_A \, B_A }{
 #'                 dB_A/dt = P_A * (1 - B_A/ K_A) - c_A * B_A}
-#' 
+#'
 #' where \eqn{K_A} is the system's carrying capacity for algae in grams/ year,
 #' \eqn{c_A} is the mass-specific rate of consumption calculated with
 #' `algae_consumption()` and \eqn{P_A} is the rate at which algae
 #' grows, calculated with `getAlgaeProduction()`.
-#' 
-#' In this tuning function, the growth of rate of algae is set to 
-#' \eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A})} grams per meter squared per year
-#' so that consumption is equal to production for steady state.
-#' 
-#' Similarly, the time evolution of the detritus biomass \eqn{B_D(t)} is 
+#'
+#' Unlike detritus, algal production on a reef is primary production and is
+#' not driven by consumer demand: it is a property of the algae itself (see
+#' `getAlgaeProduction()`), left unchanged by this function. Instead, this
+#' tuning function solves the above steady-state condition for the algae
+#' biomass, setting it to
+#' \eqn{B_A = (K_A \cdot P_A)/(P_A + K_A \cdot c_A)} grams per meter squared,
+#' so that production equals consumption for the given, fixed production
+#' rate. This means that, all else equal, a *decrease* in grazing pressure
+#' (lower \eqn{c_A}) increases the tuned algae biomass rather than reducing
+#' \eqn{P_A} to compensate.
+#'
+#' The time evolution of the detritus biomass \eqn{B_D(t)} is
 #' described by
 #'
-#'  \deqn{ \frac{dB_D}{dt} = P_D\left( 1 - 
+#'  \deqn{ \frac{dB_D}{dt} = P_D\left( 1 -
 #'                          \frac{B_D}{K_D} \right) - c_D \, B_D }{
 #'                 dB_D/dt = P_D * (1 - B_D/ K_D) - c_D * B_D}
-#'                 
+#'
 #' where \eqn{K_D} is the system's carrying capacity for detritus in grams/ year,
 #' \eqn{c_D} is the mass-specific rate of consumption calculated with
 #' `detritus_consumption()` and \eqn{P_D} is the rate at which detritus
 #' is produced calculated with `getDetritusProduction()`. Total detritus
 #' production is given with
-#' 
+#'
 #'  \deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
 #'        p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
-#' 
-#' In this tuning function, the external production of detritus is set to 
+#'
+#' In this tuning function, the external production of detritus is set to
 #' \eqn{(c_D \cdot B_D)/(1-\frac{B_D}{K_D}) - P_{D.f} - P_{D.d}} grams per meter
-#' squared per year so that production equals consumption at steady state. 
+#' squared per year so that production equals consumption at steady state.
+#' Unlike algae, detritus production genuinely is driven by the rest of the
+#' system (fish egestion, senescence) plus an external flux, so tuning the
+#' (external) production rate to match a chosen biomass remains appropriate.
 #'
 #' @param params A MizerParams object
 #' @param ... unused
@@ -89,52 +100,94 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #' @concept Uresources
 #' @seealso [reefSteady()], [algae_dynamics_cc()], [detritus_dynamics_cc()]
 #' @export
-tuneUR_cc <- function(params,...) {
-    
+tuneUR_cc <- function(params, ...) {
     # algae
-    ba <- algae_biomass(params)
+    # algae_growth (P_A) is a fixed, literature-informed production rate
+    # (see getAlgaeProduction()) and is deliberately NOT retuned here -- real
+    # algal production is not driven by grazer demand. Instead we solve the
+    # steady-state condition P_A * (1 - B_A/K_A) = c_A * B_A for B_A. Uses
+    # algae_consumption() (mass-specific, no feeding-level factor) to match
+    # exactly what algae_dynamics_cc() itself uses, so the result is an exact
+    # fixed point of the dynamics.
     ka <- params@other_params$algae$capacity
-    aout <- sum(getAlgaeConsumption(params))
-    params@other_params$algae$growth <- (aout*ba)/(1-ba/ka)
-    
+    pa <- sum(getAlgaeProduction(params))
+    ca <- algae_consumption(params)
+    params@initial_n_other$algae <- (ka * pa) / (pa + ka * ca)
+
     # detritus
+    # Same reasoning: getDetritusConsumption() already returns c_D * B_D.
     params@other_params$detritus$external <- 0
     bd <- detritus_biomass(params)
     kd <- params@other_params$detritus$capacity
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
+        # Not an error: a negative external flux is a valid steady state,
+        # interpreted as detritus flowing off the reef (e.g. to deeper
+        # water) rather than flowing in from external sources.
         warning("The flux of external detritus is negative.")
     }
-    params@other_params$detritus$external <- ((dout*bd)/(1-bd/kd)) - din
-    
+    params@other_params$detritus$external <- (dout / (1 - bd / kd)) - din
+
     params
 }
 
 #' Tune unstructured resources (algae and detritus) to steady state
 #'
-#' This first sets the rate of degradation of algae so that for the given
-#' abundances, the algae is at steady state. It then sets the rate at which
-#' detritus flows in from external sources (e.g. the pelagic zone) so that for
-#' the given abundances the detritus is at steady state.
+#' This first sets the algae biomass so that, for the given abundances and
+#' the algae's fixed production rate (see `getAlgaeProduction()`), algae is
+#' at steady state. It then sets the rate at which detritus flows in from
+#' external sources (e.g. the pelagic zone) so that for the given abundances
+#' the detritus is at steady state.
+#'
+#' The time evolution of the algae biomass \eqn{B_A(t)} is described by
+#' \eqn{dB_A/dt = P_A - c_A \cdot B_A}, where \eqn{c_A} is the mass-specific
+#' consumption rate from `algae_consumption()` and \eqn{P_A} is the algae
+#' production rate from `getAlgaeProduction()`. Unlike detritus, algal
+#' production on a reef is primary production, not driven by consumer
+#' demand: \eqn{P_A} is a fixed property of the algae, left unchanged by
+#' this function. Instead, this tuning function solves \eqn{dB_A/dt = 0} for
+#' the algae biomass, setting it to \eqn{B_A = P_A / c_A}. This means that,
+#' all else equal, a *decrease* in grazing pressure (lower \eqn{c_A})
+#' increases the tuned algae biomass rather than reducing \eqn{P_A} to
+#' compensate. If \eqn{c_A = 0} (no consumers), no finite steady-state
+#' biomass exists and the algae biomass is left unchanged, with a warning.
 #'
 #' @param params A MizerParams object
 #' @param ... unused
 #' @return An updated MizerParams object
 #' @concept Uresources
 #' @seealso [reefSteady()], [algae_dynamics()], [detritus_dynamics()]
+#' @examples
+#' data(caribbean_3_model)
+#' params <- tuneUR(caribbean_3_model)
 #' @export
-tuneUR <- function(params,...) {
-
+tuneUR <- function(params, ...) {
     # algae
-    aout <- sum(getAlgaeConsumption(params))
-    params@other_params$algae$growth <- aout
+    # algae_growth (P_A) is a fixed, literature-informed production rate
+    # (see getAlgaeProduction()) and is deliberately NOT retuned here -- real
+    # algal production is not driven by grazer demand. Instead we solve
+    # dB_A/dt = P_A - c_A * B_A = 0 for B_A. Uses algae_consumption()
+    # (mass-specific, no feeding-level factor) to match exactly what
+    # algae_dynamics() itself uses, so the result is an exact fixed point.
+    pa <- sum(getAlgaeProduction(params))
+    ca <- algae_consumption(params)
+    if (ca > 0) {
+        params@initial_n_other$algae <- pa / ca
+    } else {
+        warning("Algae consumption is zero, so algae has no finite ",
+                "steady-state biomass at the current algae growth rate. ",
+                "Leaving algae biomass unchanged.")
+    }
 
     # detritus
     params@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(params))
     dout <- sum(getDetritusConsumption(params))
     if (din > dout) {
+        # Not an error: a negative external flux is a valid steady state,
+        # interpreted as detritus flowing off the reef (e.g. to deeper
+        # water) rather than flowing in from external sources.
         warning("The flux of external detritus is negative.")
     }
     params@other_params$detritus$external <- dout - din
@@ -161,13 +214,15 @@ tuneUR <- function(params,...) {
 #'   \item  A number that gives the factor for all foreground species.
 #'   }
 #'
-#' @return An object of type \linkS4class{MizerParams}
+#' @return An object of type [MizerParams]
 #' @concept calibration
 #' @export
 scaleReefAbundance <- function(params, factor) {
     params <- validParams(params)
-    assert_that(is.numeric(factor),
-                all(factor > 0))
+    assert_that(
+        is.numeric(factor),
+        all(factor > 0)
+    )
     is_foreground <- !is.na(params@A)
     no_sp <- sum(is_foreground)
     if (length(factor) == 1 && length(names(factor)) == 0) {
@@ -177,15 +232,17 @@ scaleReefAbundance <- function(params, factor) {
     to_rescale <- names(factor)
     wrong <- setdiff(to_rescale, params@species_params$species)
     if (length(wrong) > 0) {
-        stop(paste(wrong, collapse = ", "),
-             " do not exist.")
+        stop(
+            paste(wrong, collapse = ", "),
+            " do not exist."
+        )
     }
     assert_that(length(to_rescale) == length(factor))
-    
+
     params@initial_n[to_rescale, ] <-
         params@initial_n[to_rescale, ] * factor
-    
-    return(setBevertonHolt(params, reproduction_level = 1/2))
+
+    return(setBevertonHolt(params, reproduction_level = 1 / 2))
 }
 
 #' Scale model parameters
@@ -199,23 +256,16 @@ scaleReefAbundance <- function(params, factor) {
 #' @concept calibration
 #' @export
 scaleReefModel <- function(params, factor) {
-
     # Algae
-    params@other_params[["algae"]]$rho <-
-        params@other_params[["algae"]]$rho / factor
-    params@species_params$rho_algae <-
-        params@species_params$rho_algae / factor
-    params@other_params$algae$growth <-
-        params@other_params$algae$growth * factor
+    params@other_params$algae$rho <- params@other_params$algae$rho / factor
+    params@species_params$rho_algae <- params@species_params$rho_algae / factor
+    params@other_params$algae$growth <- params@other_params$algae$growth * factor
 
     # Detritus
-    params@other_params[["detritus"]]$rho <-
-        params@other_params[["detritus"]]$rho / factor
-    params@species_params$rho_detritus <-
-        params@species_params$rho_detritus / factor
-    params@other_params$detritus$external <-
-        params@other_params$detritus$external * factor
-    
+    params@other_params$detritus$rho <- params@other_params$detritus$rho / factor
+    params@species_params$rho_detritus <- params@species_params$rho_detritus / factor
+    params@other_params$detritus$external <- params@other_params$detritus$external * factor
+
     # now comes the code of mizer's standard scaleModel()
     params <- validParams(params)
     assert_that(is.number(factor), factor > 0)
@@ -229,9 +279,9 @@ scaleReefModel <- function(params, factor) {
     if ("R_max" %in% names(params@species_params)) {
         params@species_params$R_max <- params@species_params$R_max * factor
     }
-    params@search_vol <- params@search_vol/factor
+    params@search_vol <- params@search_vol / factor
     if ("gamma" %in% names(params@species_params)) {
-        params@species_params$gamma <- params@species_params$gamma/factor
+        params@species_params$gamma <- params@species_params$gamma / factor
     }
     initial_n_other <- params@initial_n_other
     for (res in names(initial_n_other)) {
@@ -245,9 +295,9 @@ scaleReefModel <- function(params, factor) {
 }
 
 #' Scale background down by a factor
-#' 
+#'
 #' Replaces scale down background function
-#' 
+#'
 #' @param params a mizer model object
 #' @param factor A number giving the factor by which the background abundance
 #'   will be reduced
@@ -259,29 +309,31 @@ scaleReefBackground <- function(params, factor) {
 }
 
 
-
 #' Calibrate the scale of a mizerReef model to match total observed biomass
-#' 
-#' This function replaces mizer's calibrateBiomass function to include 
-#' unstructured resources. Given a Mizer Params object, it returns an updated 
-#' MizerParams object which is rescaled with [scaleReefModel()] so that the 
+#'
+#' This function replaces mizer's calibrateBiomass function to include
+#' unstructured resources. Given a Mizer Params object, it returns an updated
+#' MizerParams object which is rescaled with [scaleReefModel()] so that the
 #' total biomass in the model agrees with the total observed biomass.
-#' 
+#'
 #' Biomass observations usually only include individuals above a certain size.
 #' This size should be specified in a biomass_cutoff column of the species
 #' parameter data frame. If this is missing, it is assumed that all sizes are
 #' included in the observed biomass, i.e., it includes larval biomass.
-#' 
+#'
 #' After using this function the total biomass in the model will match the
 #' total biomass, summed over all species. However the biomasses of the
 #' individual species will not match observations yet, with some species
 #' having biomasses that are too high and others too low. So after this
-#' function use the mizer function matchReefBiomasses() to match the 
-#' biomasses for each group. 
-#' 
+#' function use the mizer function matchReefBiomasses() to match the
+#' biomasses for each group.
+#'
 #' @param params A MizerParams object
 #' @return A MizerParams object
 #' @concept calibration
+#' @examples
+#' data(caribbean_3_model)
+#' params <- calibrateReefBiomass(caribbean_3_model)
 #' @export
 calibrateReefBiomass <- function(params) {
     if ((!("biomass_observed" %in% names(params@species_params))) ||
@@ -298,10 +350,10 @@ calibrateReefBiomass <- function(params) {
     sp_observed <- which(!is.na(observed))
     model_total <- 0
     for (sp_idx in sp_observed) {
-        model_total <- 
-            model_total + 
+        model_total <-
+            model_total +
             sum((params@initial_n[sp_idx, ] * params@w * params@dw)
-                [params@w >= cutoff[[sp_idx]]])
+            [params@w >= cutoff[[sp_idx]]])
     }
     scaleReefModel(params, factor = observed_total / model_total)
 }
@@ -313,9 +365,9 @@ calibrateReefBiomass <- function(params) {
 #' Calibrate the model scale to match total observed number
 #'
 #' Replaces mizer's [mizer::calibrateNumber()] function. Given a MizerParams
-#' object `params` for which number observations are available for at least 
-#' some species via the `number_observed` column in the species_params data 
-#' frame, this function returns an updated MizerParams object which is 
+#' object `params` for which number observations are available for at least
+#' some species via the `number_observed` column in the species_params data
+#' frame, this function returns an updated MizerParams object which is
 #' rescaled with [scaleReefModel()] so that the total number in
 #' the model agrees with the total observed number.
 #'
@@ -356,14 +408,14 @@ calibrateReefNumber <- function(params) {
         model_total <-
             model_total +
             sum((params@initial_n[sp_idx, ] * params@dw)
-                [params@w >= cutoff[[sp_idx]]])
+            [params@w >= cutoff[[sp_idx]]])
     }
     scaleReefModel(params, factor = observed_total / model_total)
 }
 
 
 #' Hold resource dynamics constant
-#' 
+#'
 #' @param params MizerParams object
 #' @param n_other Biomasses of unstructured components
 #' @param component Name of component to view dynamics for
@@ -375,10 +427,10 @@ constant_dynamics <- function(params, n_other, component, ...) {
 }
 
 #' Match observed growth rates
-#' 
+#'
 #' This does the same as `mizer::matchGrowth()` but in addition also rescales
 #' the consumption rates of algae and detritus.
-#' 
+#'
 #' @param params A MizerParams object
 #' @param species The species to be affected. Optional. By default all species
 #'   for which growth information is available will be affected. A vector of
@@ -386,37 +438,44 @@ constant_dynamics <- function(params, n_other, component, ...) {
 #'   vector indicating for each species whether it is to be affected (TRUE) or
 #'   not.
 #' @param keep A string determining which quantity is to be kept constant. The
-#'   choices are "egg" which keeps the egg density constant, "biomass" which 
+#'   choices are "egg" which keeps the egg density constant, "biomass" which
 #'   keeps the total biomass of the species constant and "number" which keeps
 #'   the total number of individuals constant.
-#' @return A modified MizerParams object with rescaled rates and rescaled 
+#' @return A modified MizerParams object with rescaled rates and rescaled
 #'   species parameters `gamma`,`h`, `ks` and `k`.
 #' @concept calibration
 #' @export
 matchReefGrowth <- function(params, species = NULL,
                             keep = c("egg", "biomass", "number")) {
-    
     assert_that(is(params, "MizerParams"))
-    sel <- valid_species_arg(params, species = species, 
-                             return.logical = TRUE)
+    sel <- valid_species_arg(params,
+        species = species,
+        return.logical = TRUE
+    )
     sp <- params@species_params
     keep <- match.arg(keep)
-    
+
     biomass <- getBiomass(params)
     number <- getN(params)
-    
+
     sp <- set_species_param_default(sp, "age_mat", NA)
     # If age at maturity is not specified, calculate it from von Bertalanffy
     if (all(c("k_vb", "w_inf") %in% names(sp))) {
         age_mat_vB <- age_mat_vB(params)
         sp <- mizer::set_species_param_default(sp, "age_mat", age_mat_vB)
     }
-    
+
+    # Error check: age_mat must not be zero for any species
+    if (any(sp$age_mat == 0, na.rm = TRUE)) {
+        bad_species <- which(sp$age_mat == 0)
+        stop(paste0("Error: age_mat is zero for species ", paste(names(bad_species), collapse = ", "), ", age_mat must be non-zero."))
+    }
+
     # Don't affect species where no age at maturity is available
     sel <- sel & !is.na(sp$age_mat)
-    
+
     factor <- age_mat(params)[sel] / sp$age_mat[sel]
-    
+
     params@search_vol[sel, ] <- params@search_vol[sel, ] * factor
     params@intake_max[sel, ] <- params@intake_max[sel, ] * factor
     params@metab[sel, ] <- params@metab[sel, ] * factor
@@ -428,21 +487,17 @@ matchReefGrowth <- function(params, species = NULL,
     if ("k" %in% names(sp)) {
         params@species_params[sel, "k"] <- sp[sel, "k"] * factor
     }
-    
+
     # rescale consumption of algae and detritus
-    
-    params@other_params$algae$rho[sel, ] <- 
-        params@other_params$algae$rho[sel, ] * factor
-    params@species_params$rho_algae[sel] <-
-        params@species_params$rho_algae[sel] * factor
-    
-    params@other_params$detritus$rho[sel, ] <- 
-        params@other_params$detritus$rho[sel, ] * factor
-    params@species_params$rho_detritus[sel] <-
-        params@species_params$rho_detritus[sel] * factor
-    
+
+    params@other_params$algae$rho[sel, ] <- params@other_params$algae$rho[sel, ] * factor
+    params@species_params$rho_algae[sel] <- params@species_params$rho_algae[sel] * factor
+
+    params@other_params$detritus$rho[sel, ] <- params@other_params$detritus$rho[sel, ] * factor
+    params@species_params$rho_detritus[sel] <- params@species_params$rho_detritus[sel] * factor
+
     params <- steadySingleSpecies(params, species = sel)
-    
+
     if (keep == "biomass") {
         factor <- biomass / getBiomass(params)
         params@initial_n <- params@initial_n * factor
@@ -451,6 +506,6 @@ matchReefGrowth <- function(params, species = NULL,
         factor <- number / getN(params)
         params@initial_n <- params@initial_n * factor
     }
-    
+
     setBevertonHolt(params)
 }

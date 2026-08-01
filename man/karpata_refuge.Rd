@@ -3,22 +3,46 @@
 \docType{data}
 \name{karpata_refuge}
 \alias{karpata_refuge}
-\title{Competitive method refuge parameters for a generic Caribbean reef}
+\title{Competitive method refuge parameters for Karpata reef in Bonaire}
 \format{
-A MizerParams object
+A data frame with 10 rows and 3 columns: \code{start_L} (start of
+length bin in cm), \code{end_L} (end of length bin in cm), and
+\code{refuge_density} (refuge density in no./m^2).
 }
 \source{
-PhD Thesis
+FORCE dataset, Bonaire (Dryden 2017)
 }
 \usage{
 karpata_refuge
 }
 \description{
-This is a 2-dimensional array containing start and end lengths for size bins
-and \code{prop_protect} for each size bin, which gives the refuge density per
-square meter for ten 5cm wide fish length bins ranging from 0 to 50 cm.
-Data from the Karpata reef study site.
-
-PhD Thesis chapter 4
+This data frame contains refuge density parameters for the competitive
+refuge method. It records the density of refuges (no./m^2) in each of
+ten 5 cm fish-length bins (0-50 cm), derived from field measurements at
+the Karpata reef site in Bonaire (FORCE dataset, Dryden 2017).
 }
+\details{
+Use this with \code{method = "competitive"} in \code{\link{setRefuge}()}.
+
+This profile is reused across mizerReef's example models: it is the
+data behind \code{\link{caribbean_10_model}}'s refuge as well as
+\code{\link{caribbean_3_model}}'s.
+
+Use this with \code{method = "competitive"} in \code{\link{setRefuge}()}.
+}
+\references{
+FORCE dataset. From: Dryden, C. (2017). Habitat structural
+complexity of Caribbean coral reefs and its relationships with fish
+community structure. PhD Thesis, Newcastle University.
+
+Beese, C. (2025). PhD Thesis. "Modelling Coral Reef Futures:
+Exploring the role of structural complexity in sustaining ecosystem
+services." Victoria University of Wellington.
+https://doi.org/10.26686/wgtn.26421523
+}
+\seealso{
+\code{\link{setRefuge}()}, \code{\link{caribbean_10_model}},
+\code{\link{caribbean_3_model}}, \code{\link{aquarius_refuge}}
+}
+\concept{refugeParams}
 \keyword{datasets}

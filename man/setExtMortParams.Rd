@@ -7,25 +7,41 @@
 setExtMortParams(params, ext_mort_params = NULL)
 }
 \arguments{
-\item{params}{MizerParams object
+\item{params}{A \code{MizerParams} object.}
 
-Optional parameters:}
-
-\item{ext_mort_params}{Named list containing desired mortality parameters}
+\item{ext_mort_params}{Optional. A named list or matrix with columns/names
+'nat_mort', 'sen_prop', and 'sen_curve'. If NULL,
+defaults are used. All values must be numeric and
+non-negative.}
 }
 \value{
-MizerParams object with updated mortality parameters
+A \code{MizerParams} object with updated external mortality parameters
+(stored in \code{other_params$ext_mort_params}).
 }
 \description{
-mizerReef models contain two sources of external mortality, residual
-natural mortality and senescence. This function checks if given parameters
-are valid, sets defaults, and then stores them in the mizerParams object.
+Set the parameters for external mortality
 }
-\details{
-External mortality is implemented by default in mizerReef. You do not need
-to set these parameters. This function should only be used to change default
-values.
+\section{External mortality in mizerReef}{
+
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ External mortality in mizerReef includes residual natural mortality
+ and senescence mortality, representing background sources of death
+ not explicitly modeled (e.g., predation, disease, aging). This function
+ allows you to set or override the default rates and scaling for these
+ processes.
+
+ Residual natural mortality is modeled as an allometric function of body
+ size, decreasing with increasing size. Senescence mortality is modeled
+ as a power function of relative size, allowing flexible control over
+ the rate and scaling of age-related death.
+
+ If no parameters are provided, defaults are used: nat_mort = 0.2,
+ sen_prop = 0.1, sen_curve = 0.3. All parameters must be numeric
+ and non-negative. The function checks for required columns and
+ valid values if a custom parameter set is provided.
+}\if{html}{\out{</div>}}
 }
+
 \section{Residual natural mortality}{
 
 
@@ -33,12 +49,12 @@ values.
  fishing mortality that is not explicitly included in the model. It is
  assumed to decrease allometrically with body size. Residual natural
  mortality is a rate with units 1/year given by:
- 
+
  \deqn{\mu_{nat.i}(w) = \mu_{nat}\, w^{1-n}.}
       \{\\mu_\{nat.i\}(w) = \\mu_\{nat\}\\, w^\{1-n\}.\}
-      
+
   Here \eqn{\mu_{nat}} is the residual natural mortality rate at size
-  1 g and \eqn{n} is the allometric scaling exponent. In mizerReef, 
+  1 g and \eqn{n} is the allometric scaling exponent. In mizerReef,
   these default to \eqn{\mu_{nat} = 0.2} and \eqn{n = 0.75}.
 }\if{html}{\out{</div>}}
 }
@@ -47,17 +63,17 @@ values.
 
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{ Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
- mortality caused by background sources such as illness or age. The 
+ mortality caused by background sources such as illness or age. The
  rate of senescence mortality (in 1/year) is given by:
 
  \deqn{\mu_{sen.i}(w) = k_{sen}\left(
-                             \frac{log_{10}(w)}{log_{10}(w_{max.i})}
+                             \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
                              \right)^{p_{sen}}}
       \{\\mu_\{sen.i\}(w) = k_\{sen\}
-      (log_\{10\}(w)/log_\{10\}(w_\{max.i\}))^\{p_\{sen\}\}\}
+      (\\log_\{10\}(w)/\\log_\{10\}(w_\{max.i\}))^\{p_\{sen\}\}\}
 
- where \eqn{k_{sen}} is the rate of senescence mortality, \eqn{p_sen}
- defines the slope of the senescence curve, \eqn{w_max.i} maximum body
+ where \eqn{k_{sen}} is the rate of senescence mortality, \eqn{p_{sen}}
+ defines the slope of the senescence curve, \eqn{w_{max.i}} maximum body
  size of group \eqn{i} in grams.
 }\if{html}{\out{</div>}}
 }

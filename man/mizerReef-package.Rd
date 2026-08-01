@@ -4,8 +4,8 @@
 \name{mizerReef-package}
 \alias{mizerReef}
 \alias{mizerReef-package}
-\title{mizerReef: A mizer extension package for modelling tropical coral reefs.
-Includes benthic complexity through the provision of predation refuge.}
+\title{mizerReef: A mizer extension package for modelling structurally complex marine ecosystems.
+Captures the role of habitat complexity as predation refuge and add benthic coupling.}
 \description{
 This is an extension package for the mizer package
 (https://sizespectrum.org/mizer/) that makes it easy to set up a mizer model
@@ -18,8 +18,8 @@ for coral reefs where we could compare areas based on their benthic complexity.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://sizespectrum.org/mizerReef/}
   \item \url{https://cmbeese.github.io/mizerReef/}
+  \item Report bugs at \url{https://github.com/cmbeese/mizerReef/issues}
 }
 
 }
@@ -28,6 +28,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Chelsey M. Beese \email{beese.c.m@gmail.com} (\href{https://orcid.org/0000-0003-0949-7888}{ORCID})
   \item Gustav Delius \email{gustav.delius@york.ac.uk} (\href{https://orcid.org/0000-0003-4092-8228}{ORCID}) [copyright holder]
   \item Peter J. Mumby \email{p.j.mumby@uq.edu.au} (\href{https://orcid.org/0000-0002-6297-9053}{ORCID})
   \item Alice Rogers \email{alice.rogers@vuw.ac.nz} (\href{https://orcid.org/0000-0002-7244-0860}{ORCID})

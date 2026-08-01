@@ -15,10 +15,29 @@ tuneUR(params, ...)
 An updated MizerParams object
 }
 \description{
-This first sets the rate of degradation of algae so that for the given
-abundances, the algae is at steady state. It then sets the rate at which
-detritus flows in from external sources (e.g. the pelagic zone) so that for
-the given abundances the detritus is at steady state.
+This first sets the algae biomass so that, for the given abundances and
+the algae's fixed production rate (see \code{getAlgaeProduction()}), algae is
+at steady state. It then sets the rate at which detritus flows in from
+external sources (e.g. the pelagic zone) so that for the given abundances
+the detritus is at steady state.
+}
+\details{
+The time evolution of the algae biomass \eqn{B_A(t)} is described by
+\eqn{dB_A/dt = P_A - c_A \cdot B_A}, where \eqn{c_A} is the mass-specific
+consumption rate from \code{algae_consumption()} and \eqn{P_A} is the algae
+production rate from \code{getAlgaeProduction()}. Unlike detritus, algal
+production on a reef is primary production, not driven by consumer
+demand: \eqn{P_A} is a fixed property of the algae, left unchanged by
+this function. Instead, this tuning function solves \eqn{dB_A/dt = 0} for
+the algae biomass, setting it to \eqn{B_A = P_A / c_A}. This means that,
+all else equal, a \emph{decrease} in grazing pressure (lower \eqn{c_A})
+increases the tuned algae biomass rather than reducing \eqn{P_A} to
+compensate. If \eqn{c_A = 0} (no consumers), no finite steady-state
+biomass exists and the algae biomass is left unchanged, with a warning.
+}
+\examples{
+data(caribbean_3_model)
+params <- tuneUR(caribbean_3_model)
 }
 \seealso{
 \code{\link[=reefSteady]{reefSteady()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=detritus_dynamics]{detritus_dynamics()}}

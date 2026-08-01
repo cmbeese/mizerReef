@@ -7,7 +7,7 @@
 getSenMort(
   params,
   n = initialN(params),
-  n_pp = initialNResource(params),
+  n_pp = params@initial_n_pp,
   n_other = initialNOther(params),
   t = 0,
   ...
@@ -24,8 +24,8 @@ getSenMort(
 ecosystem}
 
 \item{t}{The time for which to do the calculation (Not used by standard
-mizer rate functions but useful for extensions with
-time-dependent parameters.)}
+mizer rate functions but useful for extensions with time-dependent
+parameters.)}
 
 \item{...}{Unused}
 }
@@ -57,9 +57,9 @@ Returns the rate of senescence mortality at each size by functional group.
 }
 
 \seealso{
-Other rate functions: 
-\code{\link{getDegrade}()},
-\code{\link{getVulnerable}()}
+Other rate functions:
+\code{\link[=getDegrade]{getDegrade()}},
+\code{\link[=getVulnerable]{getVulnerable()}}
 }
 \concept{extmort}
 \concept{rate functions}

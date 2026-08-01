@@ -4,20 +4,36 @@
 \alias{getAlgaeProduction}
 \title{Algae production rate}
 \usage{
-getAlgaeProduction(params)
+getAlgaeProduction(params, t = 0)
 }
 \arguments{
 \item{params}{MizerParams}
+
+\item{t}{The current time, used to determine the post-bleaching algae
+growth boost, if any (see \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}). Defaults to \code{0},
+which is always before any bleaching event, so no boost applies.}
 }
 \value{
 The annual growth rate of algae per square meter
 }
 \description{
 This is the rate in grams/year/m^-2 at which the system produces algae
-biomass. The rate is set so that production and consumption are equal for
-chosen steady state abundances.
+biomass. Unlike detritus production, this is real primary production and
+is not driven by consumer demand: the baseline rate is a fixed,
+literature-informed constant set by \code{setAlgaeParams()}/\code{newReefParams()}
+(see the \code{initial_algae_growth} argument there for the default value and
+its literature basis) and is left unchanged by \code{\link[=tuneUR]{tuneUR()}}/\code{\link[=tuneUR_cc]{tuneUR_cc()}},
+which instead tune the algae \emph{biomass} to the steady state implied by
+this fixed production rate and the current consumption. If post-bleaching
+algae boosting has been configured with \code{\link[=setDegradation]{setDegradation()}}, the baseline
+rate is scaled by the boost factor appropriate for time \code{t} (see
+\code{\link[=getAlgaeBoost]{getAlgaeBoost()}}).
+}
+\examples{
+data(caribbean_3_model)
+getAlgaeProduction(caribbean_3_model)
 }
 \seealso{
-\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}
+\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}
 }
 \concept{algae}

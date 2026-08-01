@@ -7,7 +7,7 @@
 reefDegrade(params, n, n_pp, n_other, t, ...)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams]{MizerParams} object}
 
 \item{n}{A matrix of species abundances (species x size).}
 
@@ -23,20 +23,33 @@ parameters.)}
 \item{...}{Unused}
 }
 \value{
-A new methods parameters data frame scaled by bleaching
+A numeric vector of scaled refuge densities for each size bin
 }
 \description{
-Allows for the degradation of coral reef habitat structure following an
+Allows for the gradual degradation of habitat structure following an
 acute disturbance by decreasing the availability of refuge over time.
 }
+\details{
+The degradation is controlled by a scaling matrix \code{deg_scale} where:
+\itemize{
+\item Column 1 represents the bleaching year (initial impact)
+\item Columns 2+ represent years 1, 2, 3... post-bleaching
+}
+
+At each timestep, the scaling factors are multiplied by the previous
+timestep's refuge density. \code{\link[=setDegradation]{setDegradation()}} can also configure an
+independent, optional post-bleaching algae growth/capacity boost (see
+\code{\link[=getAlgaeBoost]{getAlgaeBoost()}}); that boost is unrelated to refuge density and is not
+computed by this function.
+}
 \seealso{
-Other mizer rate functions: 
-\code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
-\code{\link{reefMort}()},
-\code{\link{reefPredMort}()},
-\code{\link{reefRates}()},
-\code{\link{reefVulnerable}()}
+Other mizer rate functions:
+\code{\link[=reefEncounter]{reefEncounter()}},
+\code{\link[=reefFeedingLevel]{reefFeedingLevel()}},
+\code{\link[=reefMort]{reefMort()}},
+\code{\link[=reefPredMort]{reefPredMort()}},
+\code{\link[=reefRates]{reefRates()}},
+\code{\link[=reefVulnerable]{reefVulnerable()}}
 }
 \concept{degradation}
 \concept{mizer rate functions}

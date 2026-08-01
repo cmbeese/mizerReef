@@ -1,7 +1,7 @@
 Package: mizerReef
-Title: Mizer Models with Benthic Coupling for Coral Reefs
-Version: 1.0.1
-Date: 2024-31-01
+Title: Mizer Models with Benthic Coupling for Structurally Complex Systems
+Version: 2.1.0
+Date: 2026-07-28
 Authors@R: c(
     person("Chelsey M.", "Beese",
            email = "beese.c.m@gmail.com",
@@ -17,16 +17,17 @@ Authors@R: c(
     person("Alice", "Rogers",
            email = "alice.rogers@vuw.ac.nz", role = "aut",
            comment = c(ORCID = "0000-0002-7244-0860")))
-Description: This package provides the functionality for setting up and
-    exploring mizer models with benthic coupling. New dynamics include
-    predation refuges as well as algae, detritus, and plankton components. The
-    package also includes two sets of example parameters for Caribbean coral 
-    reefs.
+Description: This package extends the mizer framework to support multi-species size
+    spectrum models (MSSM) with benthic coupling for structurally complex marine
+    ecosystems. It introduces predation refuges and additional benthic resources,
+    such as algae and detritus, which are not size-structured. The package supports
+    flexible habitat structures and includes example parameters for a generic Caribbean
+    coral reef system.
 License: GPL-3
-Depends: 
-    R (>= 3.5.0)
+Depends:
+    R (>= 4.1.0),
+    mizer (>= 3.2.0)
 Imports:
-    mizer (>= 2.4.0),
     mizerExperimental (>= 2.4.0),
     assertthat,
     lubridate,
@@ -38,34 +39,41 @@ Imports:
     dplyr,
     plyr,
     lifecycle,
-    reshape2
-Suggests: 
+    reshape2,
+    scales
+Suggests:
     knitr,
+    mizerMR,
     patchwork,
     rmarkdown,
     testthat (>= 3.0.0)
-Remotes: 
-    sizespectrum/mizerExperimental
+Remotes:
+    sizespectrum/mizerExperimental,
+    sizespectrum/mizerMR
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
-URL: https://sizespectrum.org/mizerReef/, https://cmbeese.github.io/mizerReef/
+URL: https://cmbeese.github.io/mizerReef/
+BugReports: https://github.com/cmbeese/mizerReef/issues
 Language: en-GB
 Collate:
+    'MizerReefParams-class.R'
     'algae_components.R'
     'data.R'
     'detritus_components.R'
+    'mizerReef-class.R'
     'mizerReef-package.R'
+    'mizerReef-upgrade.R'
     'newReefParams.R'
+    'reef-analysis_plots.R'
     'reef-components.R'
     'reef-helpers.R'
-    'reef-plots.R'
+    'reef-parameter_plots.R'
     'reef-project_methods.R'
     'reef-rates.R'
     'reef-setParams.R'
     'reef-steady.R'
     'reef-summary_methods.R'
-    'reef-summary_plots.R'
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0

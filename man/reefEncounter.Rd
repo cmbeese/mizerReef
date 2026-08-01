@@ -4,19 +4,10 @@
 \alias{reefEncounter}
 \title{Get encounter rate needed to project a mizerReef model}
 \usage{
-reefEncounter(
-  params,
-  n,
-  n_pp,
-  n_other,
-  t,
-  vulnerable = reefVulnerable(params, n, n_pp, n_other, t, new_rd = reefDegrade(params,
-    n, n_pp, n_other, t)),
-  ...
-)
+reefEncounter(params, n, n_pp, n_other, t, vulnerable = NULL, ...)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams]{MizerParams} object}
 
 \item{n}{A matrix of species abundances (species x size).}
 
@@ -41,7 +32,7 @@ the encounter rates.
 \description{
 Calculates the rate \eqn{E_i(w)} at which a predator from group \eqn{i} and
 weight \eqn{w} encounters food (grams/year). You would not usually call this
-function directly but instead use \code{\link[=getEncounter]{getEncounter()}}, which then calls this
+function directly but instead use \code{\link[mizer:getEncounter]{getEncounter()}}, which then calls this
 function.
 }
 \section{Predation encounter}{
@@ -65,9 +56,9 @@ Here \eqn{N_j(w)} is the abundance density of species \eqn{j} and
 \eqn{N_R(w)} is the abundance density of resource. The overall
 prefactor \eqn{\gamma_i(w)} determines the predation power of the
 predator. It could be interpreted as a search volume and is set with
-the \code{\link[=setSearchVolume]{setSearchVolume()}} function.
+the \code{\link[mizer:setSearchVolume]{setSearchVolume()}} function.
 
-The predation kernel \eqn{\phi(w,w_p)}is set with the \code{\link[=setPredKernel]{setPredKernel()}}
+The predation kernel \eqn{\phi(w,w_p)}is set with the \code{\link[mizer:setPredKernel]{setPredKernel()}}
 function.
 
 The vulnerability to predation, \eqn{V_{ji}(w)} accounts for protective
@@ -75,7 +66,7 @@ behavior of the prey. The parameters that control this are set with the
 \code{\link[=setRefuge]{setRefuge()}} function.
 
 The species interaction matrix \eqn{\theta_{ij}} is set with
-\code{\link[=setInteraction]{setInteraction()}} and the resource interaction vector \eqn{\theta_{ip}}
+\code{\link[mizer:setInteraction]{setInteraction()}} and the resource interaction vector \eqn{\theta_{ip}}
 is taken from the \code{interaction_resource}column in
 \code{params@species_params}.
 }
@@ -84,25 +75,25 @@ is taken from the \code{interaction_resource}column in
 
 The encounter rate is multiplied by \eqn{1-f_0} to obtain the consumption
 rate, where \eqn{f_0} is the feeding level calculated with
-\code{\link[=getFeedingLevel]{getFeedingLevel()}}. This is used by the \code{\link[=project]{project()}} function for performing
+\code{\link[mizer:getFeedingLevel]{getFeedingLevel()}}. This is used by the \code{\link[mizer:project]{project()}} function for performing
 simulations.
 
 The function returns values also for sizes outside the size-range of the
 species. These values should not be used, as they are meaningless.
 
 If your model contains additional components that you added with
-\code{\link[=setComponent]{setComponent()}} and for which you specified an \code{encounter_fun} function then
+\code{\link[mizer:setComponent]{setComponent()}} and for which you specified an \code{encounter_fun} function then
 the encounters of these components will be included in the returned value.
 }
 
 \seealso{
-Other mizer rate functions: 
-\code{\link{reefDegrade}()},
-\code{\link{reefFeedingLevel}()},
-\code{\link{reefMort}()},
-\code{\link{reefPredMort}()},
-\code{\link{reefRates}()},
-\code{\link{reefVulnerable}()}
+Other mizer rate functions:
+\code{\link[=reefDegrade]{reefDegrade()}},
+\code{\link[=reefFeedingLevel]{reefFeedingLevel()}},
+\code{\link[=reefMort]{reefMort()}},
+\code{\link[=reefPredMort]{reefPredMort()}},
+\code{\link[=reefRates]{reefRates()}},
+\code{\link[=reefVulnerable]{reefVulnerable()}}
 }
 \concept{mizer rate functions}
 \concept{refugeRates}

@@ -4,20 +4,10 @@
 \alias{reefPredMort}
 \title{Get total predation mortality rate needed to project mizer reef model}
 \usage{
-reefPredMort(
-  params,
-  n,
-  n_pp,
-  n_other,
-  t,
-  pred_rate,
-  vulnerable = reefVulnerable(params, n, n_pp, n_other, t, new_rd = reefDegrade(params,
-    n, n_pp, n_other, t)),
-  ...
-)
+reefPredMort(params, n, n_pp, n_other, t, pred_rate, vulnerable = NULL, ...)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams]{MizerParams} object}
 
 \item{n}{A matrix of species abundances (species x size).}
 
@@ -51,16 +41,16 @@ of 1/year) on each prey species by prey size:
   \mu_{p.i}(w_p) = \sum_j pred_rate_j(w_p) V_{ji}(w_p) \theta_{ji}.}
 
 You would not usually call this function directly but instead
-use \code{\link[=getPredMort]{getPredMort()}}, which then calls this function.
+use \code{\link[mizer:getPredMort]{getPredMort()}}, which then calls this function.
 }
 \seealso{
-Other mizer rate functions: 
-\code{\link{reefDegrade}()},
-\code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
-\code{\link{reefMort}()},
-\code{\link{reefRates}()},
-\code{\link{reefVulnerable}()}
+Other mizer rate functions:
+\code{\link[=reefDegrade]{reefDegrade()}},
+\code{\link[=reefEncounter]{reefEncounter()}},
+\code{\link[=reefFeedingLevel]{reefFeedingLevel()}},
+\code{\link[=reefMort]{reefMort()}},
+\code{\link[=reefRates]{reefRates()}},
+\code{\link[=reefVulnerable]{reefVulnerable()}}
 }
 \concept{mizer rate functions}
 \concept{refugeRates}

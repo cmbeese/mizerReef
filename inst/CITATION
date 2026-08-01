@@ -1,0 +1,13 @@
+bibentry(
+    bibtype = "Manual",
+    title = "MizerReef: an R package to create multi-species size spectrum models for structurally complex habitats",
+    author = c(
+        person("Chelsey M.", "Beese", email = "beese.c.m@gmail.com", role = c("aut", "cre")),
+        person("Gustav", "Delius", email = "gustav.delius@york.ac.uk", role = c("aut", "cph")),
+        person("Peter J.", "Mumby", email = "p.j.mumby@uq.edu.au", role = "aut"),
+        person("Alice", "Rogers", email = "alice.rogers@vuw.ac.nz", role = "aut")
+    ),
+    year = "2026",
+    note = "R package version 2.1.0",
+    url = "https://github.com/cmbeese/mizerReef"
+)

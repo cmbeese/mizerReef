@@ -11,7 +11,7 @@ getDetritusProduction(params, n = params@initial_n, rates = getRates(params))
 
 \item{n}{A matrix of current species abundances (species x size)}
 
-\item{rates}{A list of rates as returned by \code{\link[=getRates]{getRates()}}}
+\item{rates}{A list of rates as returned by \code{\link[mizer:getRates]{getRates()}}}
 }
 \value{
 A vector with named entries "feces", "decomp", and "external",
@@ -45,8 +45,16 @@ ecosystem has contributions from three sources:
 \eqn{p_{D.f}} comes from the biomass that is consumed but not
 assimilated and is given by:
 
-\deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
-       p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
+\deqn{p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,dw}{
+       p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,dw}
+
+where \eqn{f_i(w)} is the feeding level (see \code{\link[=algae_consumption]{algae_consumption()}}'s
+"Algae consumption" section for how \code{satiation} controls it), so that
+\eqn{(1-f_i(w))\,E_i(w)} is the biomass actually consumed (as opposed to
+merely encountered) -- unlike algae consumption, which deliberately
+ignores feeding level (see \code{\link[=algae_consumption]{algae_consumption()}}), detritus's egestion
+term uses the same feeding-level-adjusted consumption rate as
+\code{\link[=getDetritusConsumption]{getDetritusConsumption()}} and \code{\link[=detritus_consumption]{detritus_consumption()}}.
 
 \eqn{p_{D.d}} comes from the biomass of fish that die as a result of
 external mortality. External mortality includes local deaths that lead
@@ -56,10 +64,10 @@ birds. Thus, only a proportion \code{prop_decomp} of this material
 decomposes to detritus. The detritus production from decomposing
 dead organisms is given by:
 
-\deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+\deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
                  \mathtt{prop\_decomp}\,
                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
-     p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+     p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
                  \mathtt{prop\_decomp}\,
                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
 
@@ -71,4 +79,8 @@ independent of any other model component. It is set so that production
 and consumption are equal for the chosen steady state abundances.
 }
 
+\examples{
+data(caribbean_3_model)
+getDetritusProduction(caribbean_3_model)
+}
 \concept{detritus}

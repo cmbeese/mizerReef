@@ -17,14 +17,14 @@ An updated MizerParams object
 }
 \description{
 For models that use unstructured resources with carrying capacities,
-this functions sets the production rates of detritus and algae so
-that productions equals consumption at steady state.
+this function sets the algae biomass and the production rate of detritus
+so that each is at steady state.
 }
 \details{
 With a carrying capacity, the time evolution of the algae biomass
 \eqn{B_A(t)} is described by
 
-\deqn{ \frac{dB_A}{dt} = P_A\left( 1 - 
+\deqn{ \frac{dB_A}{dt} = P_A\left( 1 -
                          \frac{B_A}{K_A} \right) - c_A \, B_A }{
                 dB_A/dt = P_A * (1 - B_A/ K_A) - c_A * B_A}
 
@@ -33,14 +33,21 @@ where \eqn{K_A} is the system's carrying capacity for algae in grams/ year,
 \code{algae_consumption()} and \eqn{P_A} is the rate at which algae
 grows, calculated with \code{getAlgaeProduction()}.
 
-In this tuning function, the growth of rate of algae is set to
-\eqn{(c_A \cdot B_A)/(1-\frac{B_A}{K_A})} grams per meter squared per year
-so that consumption is equal to production for steady state.
+Unlike detritus, algal production on a reef is primary production and is
+not driven by consumer demand: it is a property of the algae itself (see
+\code{getAlgaeProduction()}), left unchanged by this function. Instead, this
+tuning function solves the above steady-state condition for the algae
+biomass, setting it to
+\eqn{B_A = (K_A \cdot P_A)/(P_A + K_A \cdot c_A)} grams per meter squared,
+so that production equals consumption for the given, fixed production
+rate. This means that, all else equal, a \emph{decrease} in grazing pressure
+(lower \eqn{c_A}) increases the tuned algae biomass rather than reducing
+\eqn{P_A} to compensate.
 
-Similarly, the time evolution of the detritus biomass \eqn{B_D(t)} is
+The time evolution of the detritus biomass \eqn{B_D(t)} is
 described by
 
-\deqn{ \frac{dB_D}{dt} = P_D\left( 1 - 
+\deqn{ \frac{dB_D}{dt} = P_D\left( 1 -
                          \frac{B_D}{K_D} \right) - c_D \, B_D }{
                 dB_D/dt = P_D * (1 - B_D/ K_D) - c_D * B_D}
 
@@ -56,6 +63,9 @@ production is given with
 In this tuning function, the external production of detritus is set to
 \eqn{(c_D \cdot B_D)/(1-\frac{B_D}{K_D}) - P_{D.f} - P_{D.d}} grams per meter
 squared per year so that production equals consumption at steady state.
+Unlike algae, detritus production genuinely is driven by the rest of the
+system (fish egestion, senescence) plus an external flux, so tuning the
+(external) production rate to match a chosen biomass remains appropriate.
 }
 \seealso{
 \code{\link[=reefSteady]{reefSteady()}}, \code{\link[=algae_dynamics_cc]{algae_dynamics_cc()}}, \code{\link[=detritus_dynamics_cc]{detritus_dynamics_cc()}}

@@ -7,7 +7,7 @@
 reefRates(params, n, n_pp, n_other, t = 0, effort, rates_fns, ...)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams]{MizerParams} object}
 
 \item{n}{A matrix of species abundances (species x size).}
 
@@ -41,30 +41,32 @@ By default this function returns a list with the following components:
 \item predation vulnerability from \code{\link[=reefVulnerable]{reefVulnerable()}}
 \item encounter from \code{\link[=reefEncounter]{reefEncounter()}}
 \item feeding level from \code{\link[=reefFeedingLevel]{reefFeedingLevel()}}
-\item e from \code{\link[=mizerEReproAndGrowth]{mizerEReproAndGrowth()}}
-\item e_repro from \code{\link[=mizerERepro]{mizerERepro()}}
-\item e_growth from \code{\link[=mizerEGrowth]{mizerEGrowth()}}
-\item pred_rate from \code{\link[=mizerPredRate]{mizerPredRate()}}
+\item e from \code{\link[mizer:mizerEReproAndGrowth]{mizerEReproAndGrowth()}}
+\item e_repro from \code{\link[mizer:mizerERepro]{mizerERepro()}}
+\item e_growth from \code{\link[mizer:mizerEGrowth]{mizerEGrowth()}}
+\item pred_rate from \code{\link[mizer:mizerPredRate]{mizerPredRate()}}
 \item pred_mort from \code{\link[=reefPredMort]{reefPredMort()}}
 \item sen_mort from \code{\link[=reefSenMort]{reefSenMort()}}
-\item f_mort from \code{\link[=mizerFMort]{mizerFMort()}}
+\item f_mort from \code{\link[mizer:mizerFMort]{mizerFMort()}}
 \item mort from \code{\link[=reefMort]{reefMort()}}
-\item rdi from \code{\link[=mizerRDI]{mizerRDI()}}
-\item rdd from \code{\link[=BevertonHoltRDD]{BevertonHoltRDD()}}
-\item resource_mort from \code{\link[=mizerResourceMort]{mizerResourceMort()}}
+\item rdi from \code{\link[mizer:mizerRDI]{mizerRDI()}}
+\item rdd from \code{\link[mizer:BevertonHoltRDD]{BevertonHoltRDD()}}
+\item resource_mort from \code{\link[mizer:mizerResourceMort]{mizerResourceMort()}}
 }
 
-However you can replace any of these rate functions by your own rate
-function if you wish, see \code{\link[=setRateFunction]{setRateFunction()}} for details.
+However you can replace any of these rate functions by overriding the
+relevant \code{project*.mizerReef} S3 method (e.g. \code{projectEncounter.mizerReef}),
+following the \code{NextMethod()}-based composition pattern used throughout
+this file so that other extension packages keep working.
 }
 \seealso{
-Other mizer rate functions: 
-\code{\link{reefDegrade}()},
-\code{\link{reefEncounter}()},
-\code{\link{reefFeedingLevel}()},
-\code{\link{reefMort}()},
-\code{\link{reefPredMort}()},
-\code{\link{reefVulnerable}()}
+Other mizer rate functions:
+\code{\link[=reefDegrade]{reefDegrade()}},
+\code{\link[=reefEncounter]{reefEncounter()}},
+\code{\link[=reefFeedingLevel]{reefFeedingLevel()}},
+\code{\link[=reefMort]{reefMort()}},
+\code{\link[=reefPredMort]{reefPredMort()}},
+\code{\link[=reefVulnerable]{reefVulnerable()}}
 }
 \concept{mizer rate functions}
 \concept{refugeRates}

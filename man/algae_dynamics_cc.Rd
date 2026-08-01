@@ -4,18 +4,22 @@
 \alias{algae_dynamics_cc}
 \title{Algae dynamics with carrying capacity}
 \usage{
-algae_dynamics_cc(params, n, n_other, rates, dt, ...)
+algae_dynamics_cc(params, n, n_other, rates, dt, t = 0, ...)
 }
 \arguments{
-\item{params}{A \link{MizerParams} object}
+\item{params}{A \link[mizer:MizerParams]{MizerParams} object}
 
 \item{n}{A matrix of current species abundances (species x size)}
 
 \item{n_other}{Other dynamic components.}
 
-\item{rates}{A list of rates as returned by \code{\link[=getRates]{getRates()}}}
+\item{rates}{A list of rates as returned by \code{\link[mizer:getRates]{getRates()}}}
 
 \item{dt}{Time step size}
+
+\item{t}{The current time, used to determine the post-bleaching algae
+growth and capacity boosts, if any (see \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}).
+Defaults to \code{0}, which is always before any bleaching event.}
 
 \item{...}{Unused}
 }
@@ -49,6 +53,6 @@ The dynamical equation is solved analytically to
 }
 \seealso{
 \code{\link[=detritus_dynamics]{detritus_dynamics()}}, \code{\link[=algae_consumption]{algae_consumption()}},
-\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}
+\code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=getAlgaeProduction]{getAlgaeProduction()}}, \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}
 }
 \concept{algae}

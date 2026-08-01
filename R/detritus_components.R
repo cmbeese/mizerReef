@@ -20,7 +20,7 @@ detritus_biomass <- function(params) {
 #'
 #' The time evolution of the detritus biomass \eqn{B} is described by
 #'
-#'  \deqn{ \frac{dB_D}{dt} = P_D\left( 1 - 
+#'  \deqn{ \frac{dB_D}{dt} = P_D\left( 1 -
 #'                          \frac{B_D}{K_D} \right) - c_D \, B_D }{
 #'                 dB_D/dt = P_D * (1 - B_D/ K_D) - c_D * B_D}
 #'
@@ -35,7 +35,7 @@ detritus_biomass <- function(params) {
 #'                        + \frac{K_D \, P_D}{P_D+ K_D \, c_D} \left(1-
 #'                        e^{-\frac{dt}{K_D}(P_D+ K_D \, c_D)}\right) }{
 #'         B_D(t + dt) = B_D(t) exp^(-dt/K_D * (P_D+ K_D*c_D)) +
-#'                        (K_D*P_D) / (P_D + K_D*c_D) *(1 - e^(-dt/K_D * 
+#'                        (K_D*P_D) / (P_D + K_D*c_D) *(1 - e^(-dt/K_D *
 #'                        (P_D + K_D*c_D)) }
 #'
 #' @param params A [MizerParams] object
@@ -51,24 +51,23 @@ detritus_biomass <- function(params) {
 #' @concept detritus
 #' @export
 detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
-    
     consumption <- detritus_consumption(params, n, rates)
     production <- sum(getDetritusProduction(params))
     kd <- params@other_params$detritus$capacity
-    
-    if(is.nan(consumption)){ 
+
+    if (is.nan(consumption)) {
         warning("The detritus consumption function is producing NaNs.")
     }
-    
-    
+
+
     # If consumption is non-zero, return analytic solution
     if (consumption) {
-        et <- exp(-dt/kd * (production + kd * consumption))
-        frac <- (kd*production) / (production + kd * consumption)
-        fracet <- frac *(1- et)
+        et <- exp(-dt / kd * (production + kd * consumption))
+        frac <- (kd * production) / (production + kd * consumption)
+        fracet <- frac * (1 - et)
         return(n_other$detritus * et + fracet)
-    } 
-    et <- exp(-dt/kd * (production))
+    }
+    et <- exp(-dt / kd * (production))
     return(n_other$detritus * et)
 }
 
@@ -82,21 +81,44 @@ detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 #' \deqn{dB_D/dt = P_D - c_D \cdot B_D }{
 #'       dB_D/dt = P_D - c_D * B_D }
 #'
-#' where \eqn{c_D} is the mass-specific rate of consumption, calculated 
-#' with `detritus_consumption()`and \eqn{P_D} is the rate at which the 
-#' rest of the system produces detritus biomass, calculate with 
+#' where \eqn{c_D} is the mass-specific rate of consumption, calculated
+#' with `detritus_consumption()`and \eqn{P_D} is the rate at which the
+#' rest of the system produces detritus biomass, calculate with
 #' `getDetritusProduction()`.
-#' 
+#'
 #' The dynamical equation is solved analytically to
-#' 
+#'
 #' \deqn{B_D(t+dt) = B(t)\exp(-c_D \cdot dt)
 #'               + \frac{P_D}{c_D}
 #'                 (1-\exp(-c_D \cdot dt)).}{
-#'       B_D(t+dt) = B(t) exp(-c_D * dt) 
+#'       B_D(t+dt) = B(t) exp(-c_D * dt)
 #'               + P_D/c_D * (1 - exp(-c_D * dt)).}
 #'
 #' This avoids the stability problems that would arise if we used the Euler
 #' method to solve the equation numerically.
+#'
+#' `B_D(t+dt)` above is a convex combination of `B_D(t)` and `P_D/c_D`, and
+#' is therefore guaranteed non-negative only when `P_D >= 0`. `P_D` (from
+#' [getDetritusProduction()]) is `feces + decomp + external`: `feces` and
+#' `decomp` scale with current fish abundance and mortality, but `external`
+#' is a fixed constant, tuned once at fixed abundances by
+#' [tuneUR()]/[tuneUR_cc()] and never updated again. In a live, non-frozen
+#' simulation (e.g. a multi-year [mizer::project()] call with fishing),
+#' `feces + decomp` can shrink enough that the fixed `external` term drives
+#' total production negative, breaking the non-negativity guarantee above
+#' and eventually producing negative/`NaN` detritus biomass. Production is
+#' therefore floored at zero (`production <- max(production, 0)`) before it
+#' enters the analytic update above. This has no effect at any steady state
+#' tuned by `tuneUR()`/`tuneUR_cc()` (there, production equals consumption,
+#' which is non-negative by construction) -- it only ever engages once a
+#' live simulation has moved away from that steady state, which is exactly
+#' the situation where an unbounded negative production would otherwise be
+#' unphysical: `external` represents net exchange with the surrounding
+#' system (see the "flux of external detritus is negative" warning in
+#' [tuneUR()]/[tuneUR_cc()], documented there as detritus flowing off the
+#' reef), and the true floor on a net production/export rate is zero
+#' (nothing can be produced from, or exported past, an empty pool) rather
+#' than an unboundedly negative constant.
 #'
 #' @param params A [MizerParams] object
 #' @param n A matrix of current species abundances (species x size)
@@ -106,22 +128,23 @@ detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
 #' @param ... Unused
 #'
 #' @return A vector giving the detritus spectrum at the next time step.
-#' @seealso [algae_dynamics()], [detritus_consumption()], 
+#' @seealso [algae_dynamics()], [detritus_consumption()],
 #'          [getDetritusConsumption()], [getDetritusProduction()]
 #' @concept detritus
 #' @export
 detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
-
     consumption <- detritus_consumption(params, n, rates)
-    production <- sum(getDetritusProduction(params, n, rates))
-    
-    if(is.nan(consumption)){ 
+    # Floored at zero: the analytic update below is only guaranteed
+    # non-negative when production is non-negative (see Details).
+    production <- max(sum(getDetritusProduction(params, n, rates)), 0)
+
+    if (is.nan(consumption)) {
         warning("The detritus consumption function is producing NaNs.")
     }
-    
+
     if (consumption) {
         et <- exp(-consumption * dt)
-        return(n_other$detritus * et + production / consumption  * (1 - et))
+        return(n_other$detritus * et + production / consumption * (1 - et))
     }
     return(n_other$detritus + production * dt)
 }
@@ -134,7 +157,7 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #'
 #' The rho parameter for each functional group is stored in
 #' `other_params(params)$detritus$rho`
-#' 
+#'
 #' @inheritSection getDetritusConsumption Detritus consumption
 #'
 #' @param params MizerParams
@@ -143,14 +166,15 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #'
 #' @return The mass-specific consumption rate of detritus in grams per year.
 #' @concept detritus
+#' @examples
+#' data(caribbean_3_model)
+#' detritus_consumption(caribbean_3_model)
 #' @export
 detritus_consumption <- function(params,
                                  n = params@initial_n,
                                  rates = getRates(params)) {
-    
-    sum((params@other_params$detritus$rho * n * 
-             (1 - rates$feeding_level)) %*% params@dw)
-    
+    sum((params@other_params$detritus$rho * n *
+        (1 - rates$feeding_level)) %*% params@dw)
 }
 
 
@@ -158,46 +182,45 @@ detritus_consumption <- function(params,
 #'
 #' This function returns a named vector with one component for each species
 #' giving the rate in grams/year at which that species consumes detritus
-#' 
+#'
 #' @section Detritus consumption:
-#' 
-#'  The rate at which detritivorous consumer groups encounter detrital 
-#'  biomass \eqn{E_{i.D}(w)} is controlled by the parameter 
-#'  \eqn{\rho_{D.i}}. It scales with the size of the consumer raised to 
-#'  an allometric exponent \eqn{m_{det}} which is taken to be the same as 
+#'
+#'  The rate at which detritivorous consumer groups encounter detrital
+#'  biomass \eqn{E_{i.D}(w)} is controlled by the parameter
+#'  \eqn{\rho_{D.i}}. It scales with the size of the consumer raised to
+#'  an allometric exponent \eqn{m_{det}} which is taken to be the same as
 #'  the scaling exponent of the maximum intake rate for fish consumers.
-#'  
+#'
 #'  \deqn{E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D }{
 #'        E_{i.D}(w)=\rho_{i.D}\, w^{m_{det}}\,B_D}
-#'          
-#'  The mass specific consumption rate then accounts for the preference of 
-#'  functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding 
+#'
+#'  The mass specific consumption rate then accounts for the preference of
+#'  functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding
 #'  level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
 #'  rate:
-#'  
-#'  \deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+#'
+#'  \deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}}
 #'              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
-#'        c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+#'        c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}}
 #'              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
-#'              
-#' 
+#'
+#'
 #' @param params MizerParams
 #' @return A named vector with the consumption rates from herbivores
 #' @seealso [getAlgaeProduction()], [algae_dynamics()], [getDetritusConsumption()]
-#' 
+#'
 #' @concept detritus
 #' @export
 getDetritusConsumption <- function(params) {
-
     # With feeding level
     feeding_level <- getFeedingLevel(params)
     consumption <- (params@other_params$detritus$rho * params@initial_n *
-                        (1 - feeding_level)) %*% params@dw
+        (1 - feeding_level)) %*% params@dw
 
-    names(consumption) <- params@species_params$species
-    
     # Convert from mass specific rate to total rates
     consumption <- consumption * params@initial_n_other$detritus
+
+    names(consumption) <- params@species_params$species
 
     return(consumption)
 }
@@ -208,18 +231,39 @@ getDetritusConsumption <- function(params) {
 #' @param params MizerParams
 #' @return A pie chart.
 #' @concept detritus
+#' @examples
+#' data(caribbean_3_model)
+#' plotDetritusConsumption(caribbean_3_model)
 #' @export
 plotDetritusConsumption <- function(params) {
     consumption <- getDetritusConsumption(params)
     total <- sum(consumption)
-    consumption <- consumption[consumption > total/100]
-    df <- data.frame(Consumer = names(consumption),
-                     Rate = consumption)
+    consumption <- consumption[consumption > total / 100]
+    # Defensive: ensure names(consumption) is never NULL and matches length(consumption)
+    cons_names <- names(consumption)
+    if (is.null(cons_names)) cons_names <- character(length(consumption))
+    if (length(consumption) == 0) {
+        # Return an empty ggplot with a message
+        return(ggplot() +
+            labs(
+                title = "No detritus consumers with >1% of total consumption",
+                x = NULL, y = NULL
+            ) +
+            theme_void()
+        )
+    }
+    df <- data.frame(
+        Consumer = cons_names,
+        Rate = as.numeric(consumption),
+        stringsAsFactors = FALSE
+    )
     ggplot(df, aes(x = "", y = Rate, fill = Consumer)) +
         geom_bar(stat = "identity", width = 1) +
         coord_polar("y", start = 0) +
-        labs(title = "Detritus consumption rate [g/year]",
-             x = "", y = "")
+        labs(
+            title = "Detritus consumption rate [g/year]",
+            x = "", y = ""
+        )
 }
 
 
@@ -227,51 +271,59 @@ plotDetritusConsumption <- function(params) {
 #'
 #' Gives a named vector with the rates at which different components of the
 #' ecosystem produce detritus:
-#' 
+#'
 #' \enumerate{
 #'      \item consumed biomass not assimilated by predators ("feces"),
 #'      \item decomposing dead organisms ("decomp"),
 #'      \item the pelagic zone ("external").
 #'  }
-#'  
+#'
 #' This function returns a vector with the individual contributions for each
 #' source. These can be summed with `sum()` to get the total detritus
 #' production rate.
-#' 
+#'
 #' @section Detritus production:
-#'    
-#'  The rate \eqn{p_D} at which detritus biomass is produced by the 
+#'
+#'  The rate \eqn{p_D} at which detritus biomass is produced by the
 #'  ecosystem has contributions from three sources:
-#'  
+#'
 #'  \deqn{p_D = p_{D.f} + p_{D.d} + p_{D.ext}}{
 #'        p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
-#'        
-#'  \eqn{p_{D.f}} comes from the biomass that is consumed but not 
+#'
+#'  \eqn{p_{D.f}} comes from the biomass that is consumed but not
 #'  assimilated and is given by:
-#'  
-#'  \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}{
-#'        p_{D.f} = \sum_i(1-\alpha_i)\int E_i(w)\,dw}
-#'        
-#'  \eqn{p_{D.d}} comes from the biomass of fish that die as a result of 
-#'  external mortality. External mortality includes local deaths that lead 
+#'
+#'  \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,dw}{
+#'        p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,dw}
+#'
+#'  where \eqn{f_i(w)} is the feeding level (see [algae_consumption()]'s
+#'  "Algae consumption" section for how `satiation` controls it), so that
+#'  \eqn{(1-f_i(w))\,E_i(w)} is the biomass actually consumed (as opposed to
+#'  merely encountered) -- unlike algae consumption, which deliberately
+#'  ignores feeding level (see [algae_consumption()]), detritus's egestion
+#'  term uses the same feeding-level-adjusted consumption rate as
+#'  [getDetritusConsumption()] and [detritus_consumption()].
+#'
+#'  \eqn{p_{D.d}} comes from the biomass of fish that die as a result of
+#'  external mortality. External mortality includes local deaths that lead
 #'  to detritus but also deaths due to predation by species that are not
-#'  explicitly modelled, for example transient predators, mammals, or sea 
-#'  birds. Thus, only a proportion `prop_decomp` of this material 
-#'  decomposes to detritus. The detritus production from decomposing 
+#'  explicitly modelled, for example transient predators, mammals, or sea
+#'  birds. Thus, only a proportion `prop_decomp` of this material
+#'  decomposes to detritus. The detritus production from decomposing
 #'  dead organisms is given by:
-#'  
-#'  \deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+#'
+#'  \deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
 #'                  \mathtt{prop\_decomp}\,
 #'                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
-#'      p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw + 
+#'      p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
 #'                  \mathtt{prop\_decomp}\,
 #'                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
-#'                  
+#'
 #'  \eqn{p_{D.ext}} is the rate at which detritus enters the system from
 #'  unmodelled or external sources. For coral reefs, this includes detritus
-#'  produced by sponges and coral mucous as well as waste material that 
-#'  sinks in from the pelagic zone. This rate is a model parameter 
-#'  independent of any other model component. It is set so that production 
+#'  produced by sponges and coral mucous as well as waste material that
+#'  sinks in from the pelagic zone. This rate is a model parameter
+#'  independent of any other model component. It is set so that production
 #'  and consumption are equal for the chosen steady state abundances.
 #'
 #' @param params MizerParams
@@ -282,28 +334,37 @@ plotDetritusConsumption <- function(params) {
 #' giving the rates at which detritus biomass is produced by each of these
 #' sources in grams per year.
 #' @concept detritus
+#' @examples
+#' data(caribbean_3_model)
+#' getDetritusProduction(caribbean_3_model)
 #' @export
 getDetritusProduction <- function(params, n = params@initial_n,
                                   rates = getRates(params)) {
     # Feces
     # With feeding level
     consumption <- sweep((1 - rates$feeding_level) * rates$encounter * n, 2,
-                         params@dw, "*", check.margin = FALSE)
+        params@dw, "*",
+        check.margin = FALSE
+    )
 
     feces <- sweep(consumption, 1, (1 - params@species_params$alpha), "*",
-                   check.margin = FALSE)
+        check.margin = FALSE
+    )
 
     # Decomposition of dead organisms
     ex_mort <- sum((params@mu_b * n) %*% (params@w * params@dw))
     sen_mort <- getSenMort(params)
     sen_mort <- sum((sen_mort * n) %*% (params@w * params@dw))
+
+    # Get proportions of decomposition
     sen_decomp <- params@other_params$detritus$sen_decomp
     ext_decomp <- params@other_params$detritus$ext_decomp
 
     # Return vector
-    c(feces    = sum(feces),
-      decomp   = (ext_decomp*ex_mort) + (sen_decomp*sen_mort),
-      external = params@other_params$detritus$external
+    c(
+        feces = sum(feces),
+        decomp = (ext_decomp * ex_mort) + (sen_decomp * sen_mort),
+        external = params@other_params$detritus$external
     )
 }
 
@@ -316,13 +377,17 @@ getDetritusProduction <- function(params, n = params@initial_n,
 #' @export
 plotDetritusProduction <- function(params) {
     production <- getDetritusProduction(params)
-    df <- data.frame(Source = names(production),
-                     Rate = production)
+    df <- data.frame(
+        Source = names(production),
+        Rate = production
+    )
     ggplot(df, aes(x = "", y = Rate, fill = Source)) +
         geom_bar(stat = "identity", width = 1) +
         coord_polar("y", start = 0) +
-        labs(title = "Detritus production rate [g/year]",
-             x = "", y = "")
+        labs(
+            title = "Detritus production rate [g/year]",
+            x = "", y = ""
+        )
 }
 
 
@@ -337,8 +402,9 @@ plotDetritusProduction <- function(params) {
 #' @export
 detritus_lifetime <- function(params) {
     1 / detritus_consumption(params,
-                             n = params@initial_n,
-                             rates = getRates(params))
+        n = params@initial_n,
+        rates = getRates(params)
+    )
 }
 
 #' @rdname detritus_lifetime
@@ -360,13 +426,11 @@ detritus_lifetime <- function(params) {
 #' This multiplies the detritus biomass by a factor and divides the
 #' interaction between all species and the detritus by the same
 #' factor, so as to keep the total consumption of detritus unchanged.
-#' It also divides the mass-specific rate of decomposition by the same
-#' factor so that the total detritus decomposition rate stays the same.
 #' @param params A MizerParams object
 #' @param factor A number
-#' 
+#'
 #' @return An updated MizerParams object
-#' 
+#'
 #' @concept detritus
 #' @export
 rescale_detritus <- function(params, factor) {
@@ -374,7 +438,7 @@ rescale_detritus <- function(params, factor) {
         params@initial_n_other[["detritus"]] * factor
     params@species_params$rho_detritus <-
         params@species_params$rho_detritus / factor
-    params@other_params[["detritus"]]$rho <-
-        params@other_params[["detritus"]]$rho / factor
+    params@other_params$detritus$rho <-
+        params@other_params$detritus$rho / factor
     params
 }

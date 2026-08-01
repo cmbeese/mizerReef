@@ -11,7 +11,7 @@ detritus_consumption(params, n = params@initial_n, rates = getRates(params))
 
 \item{n}{A matrix of current species abundances (species x size)}
 
-\item{rates}{A list of rates as returned by \code{\link[=getRates]{getRates()}}}
+\item{rates}{A list of rates as returned by \code{\link[mizer:getRates]{getRates()}}}
 }
 \value{
 The mass-specific consumption rate of detritus in grams per year.
@@ -42,10 +42,14 @@ functional group $i$ for detritus, \eqn{\theta_{i.D}} and the feeding
 level \eqn{f_i(w)}. This gives the mass-specific detritus consumption
 rate:
 
-\deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+\deqn{c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}}
              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}{
-       c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}} 
+       c_D = \sum_i\int\rho_{i.D}\, w^{m_{det}}
              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
 }
 
+\examples{
+data(caribbean_3_model)
+detritus_consumption(caribbean_3_model)
+}
 \concept{detritus}

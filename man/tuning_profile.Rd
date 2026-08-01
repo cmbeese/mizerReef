@@ -5,32 +5,28 @@
 \alias{tuning_profile}
 \title{Constant refuge profile for tuning steady states}
 \format{
-dataframe
+data frame
 }
 \source{
-PhD Thesis
+Beese PhD Thesis
 }
 \usage{
 tuning_profile
 }
 \description{
-This is a 2-dimensional array containing start and end lengths for size bins
-and \code{prop_protect} equal to 20\% for all size bins up to 50 cm in length.
+This data frame provides a constant refuge profile for model calibration
+and steady-state tuning. It contains start and end lengths for size bins
+and sets \code{prop_protect} to 60\% for all bins up to 50 cm in length.
 }
 \details{
-These refuge parameters are intended for tuning the steady state when
-using the density-dependent competitive method. The tuning profile provides
-a constant proportion of refuges to all fish up to 50 cm in length.
-
-When creating a model using the competitive method, you should run
-\code{\link[=newReefParams]{newReefParams()}} with the "binned" method and a proportional
-tuning profile.
-
-After species biomasses and growth rates have been calibrated to match
-empirical observations, use the \code{\link[=newRefuge]{newRefuge()}} function to implement your
-competitive refuge parameters. After using \code{\link[=newRefuge]{newRefuge()}}, make sure to
-iterate through \code{\link[mizer:matchBiomasses]{mizer:: matchBiomasses()}}, \code{\link[=matchReefGrowth]{matchReefGrowth()}}, and
-\code{\link[=reefSteady]{reefSteady()}} again to regain the steady state.
+These parameters are intended to be used with the "binned" method, which
+is independent of density. The tuning profile should be used while
+calibrating biomass and growth rates before switching to the competitive
+method. See the "Getting Started" vignette for more details.
+}
+\references{
+Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+\url{https://doi.org/10.26686/thesis.123456}
 }
 \concept{calibration}
 \keyword{datasets}
