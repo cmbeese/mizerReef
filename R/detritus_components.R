@@ -166,6 +166,9 @@ detritus_dynamics <- function(params, n, n_other, rates, dt, ...) {
 #'
 #' @return The mass-specific consumption rate of detritus in grams per year.
 #' @concept detritus
+#' @examples
+#' data(caribbean_3_model)
+#' detritus_consumption(caribbean_3_model)
 #' @export
 detritus_consumption <- function(params,
                                  n = params@initial_n,
@@ -228,6 +231,9 @@ getDetritusConsumption <- function(params) {
 #' @param params MizerParams
 #' @return A pie chart.
 #' @concept detritus
+#' @examples
+#' data(caribbean_3_model)
+#' plotDetritusConsumption(caribbean_3_model)
 #' @export
 plotDetritusConsumption <- function(params) {
     consumption <- getDetritusConsumption(params)
@@ -328,6 +334,9 @@ plotDetritusConsumption <- function(params) {
 #' giving the rates at which detritus biomass is produced by each of these
 #' sources in grams per year.
 #' @concept detritus
+#' @examples
+#' data(caribbean_3_model)
+#' getDetritusProduction(caribbean_3_model)
 #' @export
 getDetritusProduction <- function(params, n = params@initial_n,
                                   rates = getRates(params)) {

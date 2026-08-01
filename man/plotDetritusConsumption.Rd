@@ -15,4 +15,8 @@ A pie chart.
 \description{
 Plot detritus consumption rates by species
 }
+\examples{
+data(caribbean_3_model)
+plotDetritusConsumption(caribbean_3_model)
+}
 \concept{detritus}

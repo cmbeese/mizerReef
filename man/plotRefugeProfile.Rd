@@ -39,6 +39,10 @@ A ggplot2 object
 When called with a \link[mizer:MizerParams]{MizerParams} object the initial refuge
 profile is plotted. The complement of vulnerability.
 }
+\examples{
+data(caribbean_3_model)
+plotRefugeProfile(caribbean_3_model)
+}
 \seealso{
 \link[mizer:plotting_functions]{plotting_functions}, \code{\link[=setRefuge]{setRefuge()}}, \code{\link[=plotVulnerable]{plotVulnerable()}}
 

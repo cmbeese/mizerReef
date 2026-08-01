@@ -48,4 +48,8 @@ rate:
              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
 }
 
+\examples{
+data(caribbean_3_model)
+detritus_consumption(caribbean_3_model)
+}
 \concept{detritus}

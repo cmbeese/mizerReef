@@ -189,10 +189,10 @@ consumption -- see
 unstructured resource" section.}
 
 \item{algae_capacity}{Numeric. Carrying capacity for algae biomass in
-grams per year. Default is 1e4.}
+grams per year. Default is 1.}
 
 \item{detritus_capacity}{Numeric. Carrying capacity for detritus biomass in grams
-per year. Default is 1e4.}
+per year. Default is 1.}
 
 \item{sen_decomp}{Numeric. Proportion of decomposing mass from senescence mortality
 that becomes detritus. Default is 0.8.}
@@ -420,4 +420,13 @@ as a .csv file. The data can then be read into R using the command
 \code{read.csv()}.
 }
 
+\examples{
+params <- newReefParams(
+    species_params = caribbean_3_species,
+    interaction = caribbean_3_interaction,
+    method = "binned",
+    method_params = tuning_profile
+)
+class(params)
+}
 \concept{setup}

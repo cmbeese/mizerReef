@@ -197,6 +197,9 @@ plotlyVulnerable <- function(object,
 #' @family plotting functions
 #' @concept refugePlots
 #' @seealso [plotting_functions], [setRefuge()], [plotVulnerable()]
+#' @examples
+#' data(caribbean_3_model)
+#' plotRefugeProfile(caribbean_3_model)
 plotRefugeProfile <- function(object,
                               species = NULL,
                               all.sizes = FALSE,

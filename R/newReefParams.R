@@ -65,6 +65,14 @@
 #'
 #' @concept setup
 #' @return An object of type [MizerParams]
+#' @examples
+#' params <- newReefParams(
+#'     species_params = caribbean_3_species,
+#'     interaction = caribbean_3_interaction,
+#'     method = "binned",
+#'     method_params = tuning_profile
+#' )
+#' class(params)
 newReefParams <- function( # Original mizer parameters
                           species_params, interaction = NULL,
                           crit_feed = NULL,

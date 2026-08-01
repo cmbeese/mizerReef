@@ -158,6 +158,9 @@ tuneUR_cc <- function(params, ...) {
 #' @return An updated MizerParams object
 #' @concept Uresources
 #' @seealso [reefSteady()], [algae_dynamics()], [detritus_dynamics()]
+#' @examples
+#' data(caribbean_3_model)
+#' params <- tuneUR(caribbean_3_model)
 #' @export
 tuneUR <- function(params, ...) {
     # algae
@@ -328,6 +331,9 @@ scaleReefBackground <- function(params, factor) {
 #' @param params A MizerParams object
 #' @return A MizerParams object
 #' @concept calibration
+#' @examples
+#' data(caribbean_3_model)
+#' params <- calibrateReefBiomass(caribbean_3_model)
 #' @export
 calibrateReefBiomass <- function(params) {
     if ((!("biomass_observed" %in% names(params@species_params))) ||

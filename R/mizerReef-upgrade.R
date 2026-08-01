@@ -79,6 +79,13 @@ upgrade.mizerReef <- function(object, ...) {
 #'   already-registered `mizerReef` object -- this function is for the
 #'   one-off 1.x -> 2.x jump only.
 #' @concept setup
+#' @examples
+#' \dontrun{
+#' # `old_params` is a MizerParams object created with mizerReef 1.x (the
+#' # version on this package's `main`/thesis branch), e.g. loaded from a
+#' # saved .rds/.rda file from before upgrading the package.
+#' params <- upgradeReefParams(old_params)
+#' }
 #' @export
 upgradeReefParams <- function(params) {
     assert_that(is(params, "MizerParams"))

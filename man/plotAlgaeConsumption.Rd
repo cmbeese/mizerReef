@@ -15,4 +15,8 @@ A pie chart.
 \description{
 Plot algae consumption rates
 }
+\examples{
+data(caribbean_3_model)
+plotAlgaeConsumption(caribbean_3_model)
+}
 \concept{algae}

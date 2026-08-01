@@ -19,7 +19,7 @@ setDetritusParams(
 \item{params}{A \code{MizerParams} object.}
 
 \item{detritus_capacity}{Numeric. Carrying capacity for detritus biomass in grams
-per year. Default is 1e4.}
+per year. Default is 1.}
 
 \item{sen_decomp}{Numeric. Proportion of decomposing mass from senescence mortality
 that becomes detritus. Default is 0.8.}
@@ -157,4 +157,8 @@ rate:
              N_i(w) \left(1-f_i(w)\right) \theta_{i.D}\,dw}
 }
 
+\examples{
+data(caribbean_3_model)
+params <- setDetritusParams(caribbean_3_model, external = 10)
+}
 \concept{detritus}

@@ -79,4 +79,8 @@ independent of any other model component. It is set so that production
 and consumption are equal for the chosen steady state abundances.
 }
 
+\examples{
+data(caribbean_3_model)
+getDetritusProduction(caribbean_3_model)
+}
 \concept{detritus}

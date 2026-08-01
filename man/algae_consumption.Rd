@@ -59,4 +59,8 @@ mass-specific algae consumption rate:
        c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}
 }
 
+\examples{
+data(caribbean_3_model)
+algae_consumption(caribbean_3_model)
+}
 \concept{algae}

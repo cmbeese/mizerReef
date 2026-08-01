@@ -38,7 +38,7 @@ an approximate 20\% dry-matter content for
 turf algae.}
 
 \item{algae_capacity}{Numeric. Carrying capacity for algae biomass in
-grams per year. Default is 1e4.}
+grams per year. Default is 1.}
 
 \item{UR_interaction}{Optional. A named list or array with one or more
 resource interaction vectors (e.g. interaction_algae,
@@ -140,4 +140,8 @@ mass-specific algae consumption rate:
        c_A = \sum_i\int rho_{i.A}\, w^{m_{alg}} N_i(w) theta_{i.A}\,dw}
 }
 
+\examples{
+data(caribbean_3_model)
+params <- setAlgaeParams(caribbean_3_model, algae_growth_initial = 2500)
+}
 \concept{algae}

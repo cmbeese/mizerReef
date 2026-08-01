@@ -29,6 +29,10 @@ algae boosting has been configured with \code{\link[=setDegradation]{setDegradat
 rate is scaled by the boost factor appropriate for time \code{t} (see
 \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}).
 }
+\examples{
+data(caribbean_3_model)
+getAlgaeProduction(caribbean_3_model)
+}
 \seealso{
 \code{\link[=getAlgaeConsumption]{getAlgaeConsumption()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=getAlgaeBoost]{getAlgaeBoost()}}
 }

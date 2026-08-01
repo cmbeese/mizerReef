@@ -73,6 +73,9 @@
 #'
 #' @return An object of type [MizerParams]
 #' @concept setup
+#' @examples
+#' data(caribbean_3_model)
+#' params <- reefSteady(caribbean_3_model)
 #' @include reef-components.R
 #' @export
 reefSteady <- function(params, d_func = NULL,

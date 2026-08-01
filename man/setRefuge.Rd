@@ -247,6 +247,13 @@ as a .csv file. The data can then be read into R using the command
 \code{read.csv()}.
 }
 
+\examples{
+data(caribbean_3_model)
+data(tuning_profile)
+params <- setRefuge(caribbean_3_model,
+    method = "binned", method_params = tuning_profile
+)
+}
 \seealso{
 \code{\link[=reefEncounter]{reefEncounter()}}, \code{\link[=reefPredMort]{reefPredMort()}}, \code{\link[=setAlgaeParams]{setAlgaeParams()}}, \code{\link[=setDetritusParams]{setDetritusParams()}}
 }

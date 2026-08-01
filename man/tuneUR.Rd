@@ -35,6 +35,10 @@ increases the tuned algae biomass rather than reducing \eqn{P_A} to
 compensate. If \eqn{c_A = 0} (no consumers), no finite steady-state
 biomass exists and the algae biomass is left unchanged, with a warning.
 }
+\examples{
+data(caribbean_3_model)
+params <- tuneUR(caribbean_3_model)
+}
 \seealso{
 \code{\link[=reefSteady]{reefSteady()}}, \code{\link[=algae_dynamics]{algae_dynamics()}}, \code{\link[=detritus_dynamics]{detritus_dynamics()}}
 }

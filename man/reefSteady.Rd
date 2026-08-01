@@ -91,4 +91,8 @@ and to make algae's (already live-evolved) biomass exact, unless
 \code{new_refuge == TRUE}, in which case algae and detritus are left
 completely untouched.
 }
+\examples{
+data(caribbean_3_model)
+params <- reefSteady(caribbean_3_model)
+}
 \concept{setup}

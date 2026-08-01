@@ -43,6 +43,14 @@ and the algae/detritus sections of \code{\link[=setAlgaeParams]{setAlgaeParams()
 for what changed). Run \code{\link[=reefSteady]{reefSteady()}} on the result if you want a fresh
 steady state under the current mechanism.
 }
+\examples{
+\dontrun{
+# `old_params` is a MizerParams object created with mizerReef 1.x (the
+# version on this package's `main`/thesis branch), e.g. loaded from a
+# saved .rds/.rda file from before upgrading the package.
+params <- upgradeReefParams(old_params)
+}
+}
 \seealso{
 \code{\link[=upgrade.mizerReef]{upgrade.mizerReef()}} for the automatic, incremental micro-version
 upgrades that run every time \code{\link[mizer:validParams]{mizer::validParams()}} is called on an

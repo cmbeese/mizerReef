@@ -79,6 +79,9 @@
 #'          interaction via the UR_interaction argument.
 #' @return A `MizerParams` object with updated algae parameters (in `other_params$algae`).
 #' @concept algae
+#' @examples
+#' data(caribbean_3_model)
+#' params <- setAlgaeParams(caribbean_3_model, algae_growth_initial = 2500)
 #' @export
 setAlgaeParams <- function(params,
                            algae_growth_initial = NULL,
@@ -207,6 +210,9 @@ setAlgaeParams <- function(params,
 #'          multi-resource interaction via the UR_interaction argument.
 #' @return A `MizerParams` object with updated detritus parameters (in `other_params$detritus`).
 #' @concept detritus
+#' @examples
+#' data(caribbean_3_model)
+#' params <- setDetritusParams(caribbean_3_model, external = 10)
 #' @export
 setDetritusParams <- function(params,
                               detritus_capacity = NULL,
@@ -622,6 +628,12 @@ setExtMortParams <- function(params,
 #'
 #' @return  A MizerParams object with updated refuge parameters
 #' @concept refugeParams
+#' @examples
+#' data(caribbean_3_model)
+#' data(tuning_profile)
+#' params <- setRefuge(caribbean_3_model,
+#'     method = "binned", method_params = tuning_profile
+#' )
 #' @export
 setRefuge <- function(params, method, method_params = NULL,
                       # Parameters specific to each group

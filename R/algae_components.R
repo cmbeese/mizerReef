@@ -221,6 +221,9 @@ algae_dynamics <- function(params, n, n_other, rates, dt, t = 0, ...) {
 #'
 #' @return The mass-specific consumption rate of algae in grams per year.
 #' @concept algae
+#' @examples
+#' data(caribbean_3_model)
+#' algae_consumption(caribbean_3_model)
 #' @export
 algae_consumption <- function(params,
                               n = params@initial_n,
@@ -279,6 +282,9 @@ getAlgaeConsumption <- function(params) {
 #' @param params MizerParams
 #' @return A pie chart.
 #' @concept algae
+#' @examples
+#' data(caribbean_3_model)
+#' plotAlgaeConsumption(caribbean_3_model)
 #' @export
 plotAlgaeConsumption <- function(params) {
     consumption <- getAlgaeConsumption(params)
@@ -315,6 +321,9 @@ plotAlgaeConsumption <- function(params) {
 #' @return The annual growth rate of algae per square meter
 #' @seealso [getAlgaeConsumption()], [algae_dynamics()], [getAlgaeBoost()]
 #' @concept algae
+#' @examples
+#' data(caribbean_3_model)
+#' getAlgaeProduction(caribbean_3_model)
 #' @export
 getAlgaeProduction <- function(params, t = 0) {
     boost <- getAlgaeBoost(
