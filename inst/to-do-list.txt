@@ -1,3 +1,201 @@
+=== STOP AND READ FIRST (02/08, fifteenth session: third, independent
+pre-push release audit) ===
+
+User's explicit premise: a deliberately fresh session, not anchored to either
+the thirteenth or fourteenth sessions' conclusions -- including the
+fourteenth session's own claimed verification of its own fixes -- per
+[[feedback-repeat-audit-after-bugs-found]]. Scope: (1) independently
+re-verify the fourteenth session's own fixes with the same "did I fool
+myself" scrutiny it applied to the thirteenth session's work, (2) fresh
+test()/check() on both main and major_update, (3) genuinely fresh scrutiny
+of R/ files that had NOT yet been directly, individually audited across the
+first two rounds, (4) explicitly weigh whether a sixth round is warranted
+rather than defaulting to "found something, recommend another pass."
+
+** Ground-truth checks re-run this session **
+- Confirmed `git diff main major_update -- R/ tests/ man/` still empty
+  (branches in sync) before any changes, and again after this session's
+  fixes were cherry-picked.
+- Confirmed the tracked-file-list diff (`git ls-tree` comparison) still
+  shows exactly the expected difference: major_update additionally carries
+  the 28 dead inst/archive/ files and inst/to-do-list.txt itself, nothing
+  else -- unchanged since the fourteenth session.
+- devtools::test() on `main` before any changes: 709 pass, 0 fail, 1
+  pre-existing warning -- exactly matched the fourteenth session's final
+  count.
+- devtools::check(vignettes = TRUE, args = "--as-cran") on `main` before
+  changes: 0 errors, 0 warnings, same 2 known pre-existing NOTEs
+  (inst/LICENSE placement; tuneUR/tuneUR_cc codetools quirk) -- matched
+  exactly. Repeated on `major_update`: identical result.
+
+** Part 1: independent re-verification of the fourteenth session's own
+fixes (delegated to a background agent, explicitly told not to trust the
+fourteenth session's own numeric claims) **
+
+All four items independently re-derived from live source and CONFIRMED
+CORRECT, no problems found:
+
+1. algae_dynamics_cc()/detritus_dynamics_cc() zero-consumption fix: hand-
+   derived the closed-form solution to dB/dt = P*(1-B/K) - c*B at c=0
+   (B(t) = B0*e^(-Pt/K) + K*(1-e^(-Pt/K))) independently of the existing
+   Euler-integration test, then cross-checked with FOUR independent
+   methods at P=171.08, K=50, B0=5, dt=1: hand-derived closed form
+   (48.5302938398), the source code's actual branch replicated by hand
+   (exact match), a 2x10^6-step fine manual Euler integration
+   (48.5302981414), and deSolve::ode(method="ode45") (48.5302854393) --
+   all agree to 5 decimal places, matching the fourteenth session's
+   claimed 48.53. Algebraic c->0 limit of the general formula's
+   `frac <- (K*P)/(P+K*c)` confirmed -> K exactly. Both regression tests
+   independently re-derive the ODE via a fresh Euler loop inside the test
+   itself rather than mirroring the source formula -- not tautological.
+2. test-calibrateReefNumber.R's new postcondition test: confirmed non-
+   tautological (tests the actual behavioral invariant the function is
+   supposed to establish, not just "reproduce the source's arithmetic"),
+   mirrors calibrateReefBiomass's sibling test, passes live.
+3. new_refuge roxygen: confirmed it reads correctly and matches current
+   R/reef-steady.R behaviour exactly (freezes algae alongside detritus
+   during the fish-convergence loop when TRUE; skips the final
+   tuneUR()/tuneUR_cc() call). test-reefSteady.R's "does not retune
+   algae/detritus when new_refuge = TRUE" test still exists and passes.
+   Minor nuance noted (not a defect): the test verifies the tuning-target
+   parameters are unchanged, which directly confirms "final tuning step
+   skipped" but only indirectly implies "biomass frozen during the loop."
+4. inst/data-csv/ deletions: `git log --diff-filter=D` confirms exactly 7
+   files deleted in commit eda2f2a; the fourteenth session's to-do-list
+   text saying "8" was counting unreferenced-by-path files including
+   aquarius_refuge.csv (explicitly kept, not deleted) -- both numbers are
+   internally consistent, not contradictory, just a wording trap for a
+   careless reader. Full-repo grep confirms zero remaining references to
+   any of the 7 deleted filenames anywhere. aquarius_refuge.csv/.rda/.Rd
+   all confirmed present with substantive (non-stub) documentation.
+
+** Part 2: fresh scrutiny of previously-unaudited files (delegated to a
+second, parallel background agent) **
+
+Read R/reef-rates.R, R/reef-analysis_plots.R, R/reef-parameter_plots.R,
+R/reef-project_methods.R, R/mizerReef-class.R, R/MizerReefParams-class.R,
+R/reef-helpers.R, and R/reef-summary_methods.R in full -- the package's
+S4 class definitions, rate functions, and both plotting-function files,
+none of which had been individually, line-by-line audited in either prior
+round (most attention through the thirteenth/fourteenth sessions went to
+algae/detritus dynamics, calibration, tests, examples, and docs).
+6 of 8 files came back clean. Found two real, previously-unknown bugs,
+BOTH independently re-verified by hand (not just trusted from the agent's
+report) before fixing, per [[feedback-verify-before-commit]]:
+
+**Bug 1 (getProductivity() MizerSim branch, R/reef-summary_methods.R):**
+The MizerParams branch defaults `min_fishing_l` to 7 and `max_fishing_l`
+to the largest species' `l_max` before calling
+`mizer::get_size_range_array()`; the MizerSim branch never applied this
+default, passing NULL straight through -- so
+`mizer::get_size_range_array()`'s own NULL fallback (the *entire* weight
+spectrum) silently took over instead. Verified independently on
+caribbean_3_model: `getProductivity(sim, time_range = 0)` with no
+explicit args gave predators=119.0/herbivores=885.3/inverts=98.4 instead
+of the documented-default 81.4/741.3/51.6 -- a 30-90% overestimate
+depending on species, with no error or warning. This propagates into
+every caller that leaves the size range at default: plotProductivity(sim),
+plot2Productivity(sim), plotProductivityRelative(sim),
+plotRelativeContribution(sim), and their plotly wrappers -- i.e. the
+common "run a simulation, then plot productivity" path, not a rare edge
+case. test-plotProductivity.R's existing sim test didn't catch this
+because it computed its own "expected" value via the same (buggy)
+getProductivity(sim) call, so both sides agreed with each other but not
+with the documented behaviour -- the same self-consistency-test trap
+flagged in the fourteenth session's audit of a different function.
+Fixed by applying the same two-line default at the top of the MizerSim
+branch (commit 3d0ef12 on main / 00281b9 on major_update). Added a
+regression test asserting both the documented default and that it
+differs from the un-defaulted full-spectrum result.
+
+**Bug 2 (plotDegradationScale() roxygen, R/reef-parameter_plots.R):**
+The roxygen for a user-supplied custom `trajectory` matrix/data.frame
+said "bleaching year in first column, remaining columns as refuge size
+bins," but the code unconditionally melts the matrix with
+Var1 -> SizeBin, Var2 -> Year (rows = size bin, columns = year) -- the
+transpose of what was documented. Verified independently: the built-in
+rubble_scale/algae_scale/recovery_scale objects are all
+10-size-bin-rows x 15-year-columns (confirmed via dim()/dimnames()), and
+`deg_scale` as consumed by reefDegrade() (R/reef-project_methods.R) reads
+`deg_scale[, 1]` as the bleach year's per-bin scaling vector, not a "year
+label" column -- both match the code's actual assumption, not the
+roxygen's. A user following the documented format for a custom matrix
+would have silently gotten size bins and years transposed in the
+resulting heatmap, no error. test-plotDegradationScale.R's existing
+custom-matrix test happened to already use the correct (undocumented)
+orientation, so it never caught the doc/code mismatch. Fixed the roxygen
+(description, details, @param trajectory) to describe the actual
+orientation; no code change, since the code already matches every other
+object in the package using this convention (commit 09e6699 on main /
+6646dae on major_update). Added a regression test using a non-square
+matrix (so a transposed input can't accidentally pass) asserting
+individual cell values land on the correct SizeBin/Year combination.
+
+Both fixes: NEWS.md updated (new bullets under the existing "Plotting
+functions" Bug fixes subsection), devtools::document() re-run
+(man/plotDegradationScale.Rd, man/plotlyDegradationScale.Rd updated),
+committed on main first, then cherry-picked onto major_update unchanged
+(commit hashes differ only because of the cherry-pick rewrite, content
+identical) so the two branches stay in sync in substance.
+
+The other 6 files (R/reef-rates.R, R/mizerReef-class.R,
+R/MizerReefParams-class.R, R/reef-helpers.R, R/reef-project_methods.R,
+and R/reef-analysis_plots.R apart from inheriting Bug 1 through its
+getProductivity() calls) came back genuinely clean on this pass -- numeric
+cross-checks against caribbean_3_model for getBiomass.mizerReefSim(),
+getDegrade()/getVulnerable()/getEGrowthTime() MizerSim branches, and
+removeSpecies.mizerReef()'s rho subsetting all matched independently
+computed expectations. One trivial style nit noted (not fixed, not
+currently reachable as a bug): reefMort() uses `include_sen_mort == TRUE`
+while projectMort.mizerReef() uses the NULL-safe `isTRUE(...)` for the
+identical check -- inconsistent, but newReefParams()/upgradeReefParams()
+always set this slot to a definite TRUE/FALSE, so no live path can hit
+the difference.
+
+** Final ground-truth re-check after all fixes **
+devtools::test(): 715 pass, 0 fail, 1 pre-existing warning (up from 709 --
+new regression tests for both bugs above). devtools::check(vignettes =
+TRUE, args = "--as-cran"): 0 errors, 0 warnings, exactly the same 2 known
+pre-existing NOTEs. Re-ran on both `main` and `major_update` after
+cherry-picking to confirm identical clean results on both. Re-confirmed
+`git diff main major_update -- R/ tests/ man/` empty and the tracked-
+file-list diff unchanged after the cherry-picks.
+
+** Session status: found and fixed 2 real, previously-unknown bugs (one
+with meaningful user-facing impact -- a common "project() then plot
+productivity" path silently overestimating by 30-90% with no error; one a
+misleading doc for a less common custom-input path), independently
+re-verified all four of the fourteenth session's fixes hold up under a
+second, differently-derived check (nothing new needed there), and found
+6 of 8 previously-unaudited files genuinely clean. **
+
+Per [[feedback-repeat-audit-after-bugs-found]]: this round again found
+real, non-trivial bugs, so this is NOT reported as "ready to push" -- that
+call remains explicitly the user's. Honest severity assessment, as
+instructed this session rather than defaulting to "recommend another
+round" or "diminishing returns reached" without weighing it: Bug 1's
+practical impact (silently wrong numbers on a common plotting path, no
+error) is arguably *higher* than the fourteenth session's zero-consumption
+edge case (which requires a rare zero-consumption condition to trigger at
+all), so this round's findings are not obviously smaller/more marginal
+than the last round's -- the "diminishing returns" bar has not clearly
+been crossed on severity. On breadth, though: across all three rounds
+combined, essentially every file under R/ has now had genuine, individual,
+line-by-line scrutiny at least once (algae/detritus dynamics and
+calibration in the 13th/14th; rates, plots, project methods, and class
+definitions in this 15th) -- the one item explicitly flagged and still
+NOT resolved across all three rounds is the 13th session's original
+test-coverage finding: roughly a quarter of the 78 test files (calibration
+/scaling utilities plus five consumption/production primitives) still only
+assert "doesn't error," not that the computed value is correct. A sixth
+round, if the user wants one, would get more marginal value from
+targeting that specific known gap (write real assertions, or a targeted
+audit of whether any of those thinly-tested functions actually has a
+hidden bug behind its passing-but-empty tests) than from another full
+re-sweep of files that have now each been individually checked at least
+once. Whether that's worth doing before pushing, versus accepting the gap
+as documented but unresolved, is the user's call.
+
 === STOP AND READ FIRST (01/08, fourteenth session: second, independent
 pre-push release audit) ===
 
