@@ -100,9 +100,15 @@ getProductivity <- function(object,
         if (missing(time_range)) {
             time_range <- max(as.numeric(dimnames(sim@n)$time))
         }
-        
+
+        # Set default fishing sizes if not provided
+        if(is.null(min_fishing_l)){ min_fishing_l <- 7 }
+        if(is.null(max_fishing_l)){
+            max_fishing_l <- max(sim@params@species_params$l_max)
+        }
+
         # Get matrix of true false values for fish in size range
-        size_range <- mizer::get_size_range_array(sim@params, 
+        size_range <- mizer::get_size_range_array(sim@params,
                                                   min_l = min_fishing_l, 
                                                   max_l = max_fishing_l,...)
         

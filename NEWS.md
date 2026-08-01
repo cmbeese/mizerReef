@@ -180,6 +180,16 @@
   "all species" default silently never engaged through those wrappers.
   Switched to `is.null(species)`, which reflects intent correctly through
   any number of wrapper layers.
+- `getProductivity()`'s documented default fishing-length range (7cm
+  minimum, largest species' `l_max` maximum) was only applied on the
+  `MizerParams` branch; called on a `MizerSim` object (directly, or via
+  `plotProductivity()`, `plot2Productivity()`, `plotProductivityRelative()`,
+  or `plotRelativeContribution()`) with `min_fishing_l`/`max_fishing_l` left
+  at their default `NULL`, it silently fell through to
+  `mizer::get_size_range_array()`'s own default of the entire weight
+  spectrum instead, overestimating productivity by 30-90% depending on
+  species (confirmed on `caribbean_3_model`). Fixed to apply the same
+  default on both branches.
 
 ### Compatibility with other mizer extensions (e.g. mizerMR)
 
