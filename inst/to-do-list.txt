@@ -1,3 +1,126 @@
+=== EIGHTEENTH SESSION (02/08): caribbean_3_model recalibration DONE,
+caribbean_10_model still pending (deliberately deferred to its own session) ===
+
+** caribbean_3_model is now a genuine, stable steady state of the corrected
+mortality code, matching FORCE biomass essentially exactly: predators
+107.9 (target 107), herbivores 34.1 (target 34), inverts 40.1 (target 40).
+Verified via repeated reefSteady() calls leaving biomass bit-for-bit
+unchanged (107.9062/34.0625/40.1287 three times running). Predators are
+dominant on all three of abundance/biomass/productivity in
+plotRelativeContribution(), matching Chapter3.tex's stated result. **
+
+** How it was actually done, after two mechanically-looped attempts in the
+seventeenth session both diverged: **
+
+1. Never rebuild from raw CSVs via newReefParams() under the corrected
+   mortality -- diverges immediately (confirmed again this session: the
+   very first reefSteady() call after a fresh newReefParams() build failed
+   to converge after 99 years, biomass exploding to ~1e13). Start from the
+   EXISTING bundled model instead (a much smaller perturbation).
+2. matchReefGrowth()'s default is `keep = "egg"`, not `keep = "biomass"`.
+   Calling it with no argument (as the original script and both seventeenth-
+   session attempts did) lets biomass swing freely after every growth
+   correction, which fights matchBiomasses()'s hard rescale and produces
+   exactly the oscillation seen before (herbivore erepro clamped to its
+   floor, reproduction level collapsing to exactly zero, cycle after
+   cycle). Calling matchReefGrowth(keep = "biomass") explicitly fixes this
+   completely -- the alternating matchReefGrowth(keep="biomass")+steady(),
+   matchBiomasses()+steady() recipe (one at a time, not batched, per
+   mizer's own "refine your model" course page) converges smoothly within
+   ~8-10 alternations.
+3. Even with that fix, herbivores alone kept crashing to near-zero every
+   growth-correction cycle while their age_mat correctly converged toward
+   4 -- traced to a genuine, non-buggy finding: herbivores had
+   `satiation = FALSE` (unlimited intake, per the package's "satiation
+   exclusive to detritivory" design, Chapter3.tex L189), so nothing
+   density-dependent checked their growth once the corrected (lower)
+   senescence mortality let them survive to a realistic age at maturity --
+   forcing age_mat to match drove herbivore biomass to >800 g/m^2 with no
+   sign of settling. Setting `satiation = TRUE` for herbivores fixed this:
+   their realised feeding level converges to ~0.95-0.99 (essentially always
+   near capacity), which is actually a MORE literal reading of the cited
+   "gut full up to three times a day" (Ferreira 1998; Kopp 2010) than the
+   previous, formally-infinite intake ever was. This does NOT contradict
+   the citations behind the default: those are about grazing PRESSURE on
+   the shared algae pool not self-regulating, and algae_consumption() (the
+   resource-depletion rate) deliberately ignores feeding level regardless
+   of satiation, exactly as already documented -- confirmed by reading the
+   code, not assumed. This was checked with the user before adopting it,
+   per feedback-thesis-vs-code-ask-dont-assume; they were comfortable
+   keeping it once shown the mechanism.
+4. The user separately questioned whether age_mat = 4 for herbivores was
+   ever right (they trust the FORCE biomass_observed values, not the old
+   age_mat guess) and asked for literature on actual parrotfish maturity.
+   Rivera Hernandez & Shervette (2025, Environ Biol Fish 108:179-198 -- a
+   2013-2023 otolith/gonad-histology study of 1801 U.S. Caribbean stoplight
+   parrotfish, Sparisoma viride, the confirmed rep_species for this
+   package's herbivore/parrotfish groups per caribbean_10_species.csv)
+   report age at median sexual maturity (AM50) = 1.6 years, distinct from
+   age at median sexual transition (AT50) = 4.5 years (S. viride is a
+   protogynous hermaphrodite) -- the old age_mat = 4 almost certainly
+   conflated the two. Retargeting matchReefGrowth() at 1.6y instead of 4y
+   converged even more cleanly (age_mat lands exactly on 1.6, biomass
+   still matches FORCE data). Final reproduction_level = 0.5 step for
+   predators/herbivores (inverts left at its own computed level) is
+   otherwise unchanged from the original recipe.
+
+** What changed in the repo this session: **
+- `data/caribbean_3_model.rda`, `data/caribbean_3_species.rda`,
+  `data/caribbean_3_interaction.rda`, `data/tuning_profile.rda` (species/
+  interaction/tuning-profile data itself is unchanged except the two
+  species_params columns below; interaction/tuning_profile re-saved only
+  because the calibration script re-saves all four together).
+- `inst/data-csv/caribbean_3_species.csv`: herbivores' `satiation`
+  (FALSE -> TRUE) and `age_mat` (4 -> 1.6).
+- `inst/scripts/Caribbean_3_model-calibration.R`: rewritten to start from
+  the existing bundled model (not raw CSVs) and use the corrected recipe
+  above, with a full design note explaining why. Also fixed a pre-existing
+  bug (`plotRefuge()` isn't a real function, should be `plotRefugeProfile()`
+  -- was already wrong in the original script, unrelated to this session).
+- `R/data.R` roxygen for `caribbean_3_species`/`caribbean_3_model`, plus
+  `man/caribbean_3_species.Rd`/`man/caribbean_3_model.Rd` (regenerated via
+  devtools::document()).
+- `vignettes/model-description.Rmd`: fixed a pre-existing, unrelated
+  inconsistency in the satiation section (it claimed "resource consumers
+  (herbivores and detritivores) keep the type II response by default",
+  contradicting both the actual default rule in setRefuge()/reef-setParams.R
+  and this same vignette's own Algae section a few hundred lines down,
+  which correctly says satiation defaults to detritivory-exclusive) and
+  documented caribbean_3_model/caribbean_10_model's herbivore override.
+- `vignettes/caribbean_3_model-description.Rmd`: updated the Consumption
+  section's now-false "no maximum consumption rate is imposed for
+  herbivores" claim, and the maturation section to cite the corrected
+  age_mat source.
+- `vignettes/references.bib`: added RiveraHernandez2025.
+- `NEWS.md`: updated the existing reefSenMort() bug-fix entry, which
+  claimed "no other slot in either bundled model changed" -- no longer true
+  for caribbean_3_model.
+
+** What's still open: **
+1. caribbean_10_model/karpata recalibration -- deliberately deferred to its
+   own dedicated session at the user's request (this session's scope was
+   caribbean_3_model only). No equivalent calibration script survives for
+   it (only inst/archive/caribbean_10_model_untuned.rda) -- ask the user
+   how it was originally tuned before assuming it follows the same recipe.
+   Per the caribbean_10_species.csv rep_species column, its "parrotfish"
+   group's rep_species is also Sparisoma viride (age_mat currently 2, not
+   4 -- closer to but not identical to the literature 1.6), and all three
+   herbivore-side groups (parrotfish, farm_damsel, herbs) currently have
+   satiation = FALSE, the same pre-fix pattern found in caribbean_3. See
+   memory (project-caribbean10-recalibration-prep, if present) for the full
+   methodology transferred from this session.
+2. Full test suite / devtools::check() not yet re-run after this session's
+   changes -- do this before considering caribbean_3_model's fix closed.
+3. Once both bundled models are properly recalibrated: regenerate the
+   manuscript figure (inst/scripts/karpata_example_fig.R) and
+   vignettes/mizerReef.Rmd's "Changing the refuge profile" section, using
+   an apples-to-apples comparison (reconverge BOTH sides, not just "Flat"),
+   re-run the full test suite and devtools::check(), and re-raise "is main
+   ready to go live" -- still not yet answered yes.
+4. main still has NOT had this session's changes (or the seventeenth
+   session's two safe fixes) applied -- both branches need to stay in sync
+   per the standing convention.
+
 === STOP AND READ FIRST (02/08, CRITICAL, same day as seventeenth session:
 bundled caribbean_3_model/caribbean_10_model are no longer genuine steady
 states of their own current code -- discovered while regenerating the
