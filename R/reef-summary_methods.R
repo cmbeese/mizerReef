@@ -11,13 +11,13 @@
 #'  Productivity cannot be measured in situ.
 #'      
 #'  The productivity \eqn{P_i(w)} of species group \eqn{i} is given by
-#'  
-#'  \deqn{P_i(w) = \int_w^{w+dw} \left( N_i(w) + g_i(w) \right) w \, dw.}{
-#'       P_i(w) = \int_w^{w+dw} ( N_i(w) + g_i(w) ) w \, dw.}
-#'      
-#'  \eqn{N_i(w)} is the abundance density \eqn{(no./m^{2})} and 
-#'  \eqn{g_i(w)} is the energy rate available for growth after metabolism 
-#'  and movement have been accounted for \eqn{(grams/year)}.
+#'
+#'  \deqn{P_i(w) = \int_w^{w+dw} N_i(w)\, g_i(w) \, dw.}{
+#'       P_i(w) = \int_w^{w+dw} N_i(w) g_i(w) dw.}
+#'
+#'  \eqn{N_i(w)} is the abundance density \eqn{(no./m^{2})} and
+#'  \eqn{g_i(w)} is the energy rate available for growth after metabolism,
+#'  movement, and reproduction have been accounted for \eqn{(grams/year)}.
 #
 #'  The productivity is calculated for all fish in the size range between
 #'  `min_fishing_length` and `max_fishing_length`. These lengths can be the 
