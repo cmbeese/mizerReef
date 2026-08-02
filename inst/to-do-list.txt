@@ -207,6 +207,78 @@ suggests it's plausible, if not especially likely, that something's wrong
 there too. But this is a "just in case" suggestion, not a "still known to
 be broken" one, unlike every previous round's handoff.
 
+** IMPORTANT CORRECTION, same session, prompted by the user (not found
+independently): the reefSenMort() "doc fix" above was backwards -- the
+CODE had the bug, not the docs, and this session's own fix had made
+things worse before being caught **
+
+After the write-up above, the user asked for the algae/detritus
+consumption fixes to be explained in plain terms, and mentioned having the
+original thesis chapter (`ignore/thesis-materials/Chapter3.tex` and
+`c3_equations.qmd`, untracked, not in this repo) available to check
+against. Reading those files against what had just been "fixed" revealed
+the reefSenMort() fix above was wrong in a specific, important way:
+
+- The thesis's finished chapter text (`Chapter3.tex` eq-extmort, and the
+  equations-only companion file, consistently) documents
+  `mu_sen.i(w) = sen_prop * (log10(w)/log10(w_max.i))^sen_curve`, with
+  explicit prose stating the curve "approaches sen_prop" as w -> w_max.i.
+- `git log -S` traced the actual code: the package's very first commit
+  (8f955a9) matched the thesis exactly. Commit 2f817bf ("Addressing
+  comments") then moved `sen_prop` inside the ratio before the
+  floor-at-zero clip and the `^sen_curve` exponentiation -- almost
+  certainly an unintended side effect of fixing a real NaN-for-w-under-1g
+  edge case, not a deliberate redesign. This silently changed the formula
+  for every weight above 1g, not just the edge case it was meant to patch.
+- Numeric consequence, confirmed on caribbean_3_model: the rate at
+  w = w_max was 0.501/year under the shipped code vs. the intended
+  0.1/year -- a constant `sen_prop^(sen_curve - 1)` = 5.012x inflation at
+  every weight, not just near maximum size. `reefSenMort()` feeds directly
+  into `projectMort.mizerReef()`'s total mortality, so this had been
+  inflating fish mortality in every simulation and every bundled model
+  since that commit -- not a documentation-only issue at all.
+- This session's earlier fix (commits 6c9d03b-equivalent onward, before
+  this correction) had made the roxygen match the *buggy* code, i.e.
+  documented the 5x-too-high behaviour as if it were correct and matched
+  the thesis. It did not independently re-derive the formula against any
+  ground truth outside the code itself -- exactly the "trust the code
+  without an independent check" failure mode flagged repeatedly in prior
+  sessions' notes, just one level removed (this time applied to fixing
+  *documentation* to match code, not fixing tests to match code).
+
+Fixed properly this time, with the user's explicit go-ahead after being
+shown the numeric impact (commit `3ae0806` on main / `3c2d28b` on
+major_update): restored the original formula in R/reef-project_methods.R
+(`sen_prop * ratio^sen_curve`, with only the ratio floored at zero, not
+the product), fixed `test-reefSenMort.R` (which had hardcoded the buggy
+formula as its own "expected" value -- another instance of the
+tautological-test trap), corrected the roxygen and all three
+model-description vignettes to the verified thesis-matching formula (the
+first attempt at the vignette fix, earlier in this same session, had
+*also* mis-transcribed the precedence and needed a second correction).
+`caribbean_3_model`/`caribbean_10_model` both had
+`other_params$detritus$external` retuned (+48.87 / +39.36 respectively,
+computed to exactly cancel the resulting change in
+`getDetritusProduction()`'s decomp term) to restore their detritus
+production/consumption steady-state balance -- verified via `all.equal()`
+that no other slot in either object changed, per
+[[feedback-mizerreef-autonomy]]'s "never regenerate bundled .rda wholesale,
+patch the specific slot" rule. Final re-check: 718 pass / 0 fail (up from
+715), 0 errors / 0 warnings / same 2 known NOTEs, both branches back in
+sync including `data/`.
+
+Lesson for future sessions, stated plainly: when "fixing documentation to
+match code," that is only correct if the code is itself known-correct.
+Checking self-consistency (does the roxygen match the code?) is not the
+same as checking correctness (does the code match the actual intended
+model?) -- the latter needs an independent source of truth (the original
+thesis, a hand-derivation, a numerical check against the documented ODE),
+not just the shipped implementation. This session had that independent
+source available the whole time (the user's own thesis chapter) and
+didn't think to check it until asked to explain the fix in plain terms --
+worth checking proactively next time a roxygen/code mismatch is found,
+not just when the user happens to ask a clarifying question.
+
 === STOP AND READ FIRST (02/08, fifteenth session: third, independent
 pre-push release audit) ===
 
