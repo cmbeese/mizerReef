@@ -251,15 +251,34 @@
   "decomp" production term) -- but that patch alone left fish abundances
   stale relative to the corrected mortality, so neither bundled model was
   actually a genuine steady state of its own current code (confirmed:
-  running `reefSteady()` on them grew biomass 3-9x). `caribbean_3_model` has
-  since been fully recalibrated (fish abundances, growth/consumption rates
-  and reproduction parameters all re-tuned; verified stable under repeated
-  `reefSteady()` calls) -- see `inst/scripts/Caribbean_3_model-calibration.R`
-  and `vignettes/caribbean_3_model-description.Rmd` for the updated recipe,
-  including two herbivore `species_params` changes (`satiation`, `age_mat`)
+  running `reefSteady()` on them grew biomass 3-9x). Both `caribbean_3_model`
+  and `caribbean_10_model` have since been fully recalibrated (fish
+  abundances, growth/consumption rates and reproduction parameters all
+  re-tuned; verified stable under repeated `reefSteady()` calls) -- see
+  `inst/scripts/Caribbean_3_model-calibration.R`/
+  `inst/scripts/Caribbean_10_model-calibration.R` and
+  `vignettes/caribbean_3_model-description.Rmd` for the updated recipes,
+  including herbivore `species_params` changes (`satiation`, `age_mat`)
   needed to reach a stable calibration under the corrected mortality.
-  `caribbean_10_model` recalibration is not yet done (tracked separately;
-  has no surviving calibration script to build from, unlike caribbean_3).
+  `caribbean_10_model` had no surviving calibration script to build from
+  (unlike `caribbean_3_model`); the recipe was reconstructed interactively,
+  and needed two further fixes beyond `caribbean_3_model`'s: (1)
+  `matchReefGrowth()`/`matchBiomasses()` had to be applied one species at a
+  time rather than mizerExperimental's usual batched workflow, since batched
+  calls destabilised this 10-group model even where they worked fine for
+  `caribbean_3_model`'s 3 aggregated groups; and (2) `pred_grab`'s stored
+  `age_mat` of 2 years turned out to be inconsistent with its own stored
+  von Bertalanffy growth curve and an independently-sourced maturity length
+  for its representative species (*Lutjanus apodus*), and was corrected to
+  5.4 years. `eels` and `farm_damsel` -- the two groups without a
+  FORCE-observed biomass target -- were given soft, literature-derived
+  targets (not treated as exact) rather than left at the near-zero biomass
+  the corrected mortality otherwise drove them to. The
+  complexity-increases-biomass relationship central to the associated
+  manuscript was explicitly re-verified against both recalibrated models,
+  not merely assumed to still hold. See `caribbean_10_model`'s documentation
+  and `inst/scripts/Caribbean_10_model-calibration.R`'s design note for full
+  details and citations.
 
 ## Major changes
 
