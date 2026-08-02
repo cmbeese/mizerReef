@@ -66,20 +66,21 @@ Set the parameters for external mortality
  mortality caused by background sources such as illness or age. The
  rate of senescence mortality (in 1/year) is given by:
 
- \deqn{\mu_{sen.i}(w) = \left[\max\left(0,\;
-                             \mathtt{sen\_prop}\,
+ \deqn{\mu_{sen.i}(w) = \mathtt{sen\_prop}\,
+                             \left[\max\left(0,\;
                              \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
                              \right)\right]^{\mathtt{sen\_curve}}}{
-          \mu_{sen.i}(w) = max(0, sen_prop *
-          log10(w)/log10(w_{max.i}))^sen_curve}
+          \mu_{sen.i}(w) = sen_prop *
+          max(0, log10(w)/log10(w_{max.i}))^sen_curve}
 
- where \eqn{\mathtt{sen\_prop}} scales the ratio of \eqn{w}'s log size
- to group \eqn{i}'s log maximum size \eqn{w_{max.i}} before the curve
- is applied, and \eqn{\mathtt{sen\_curve}} is the exponent shaping the
- senescence curve. The scaled ratio is floored at zero before being
- raised to the \eqn{\mathtt{sen\_curve}} power, since it is negative
- for individuals below 1 gram (where \eqn{\log_{10}(w) < 0}), which
- would otherwise raise a negative number to a fractional power.
+ where \eqn{\mathtt{sen\_curve}} is the exponent shaping the
+ senescence curve and \eqn{\mathtt{sen\_prop}} is the rate the curve
+ approaches as \eqn{w \to w_{max.i}} (where the ratio is exactly 1).
+ The ratio is floored at zero before being raised to the
+ \eqn{\mathtt{sen\_curve}} power, since it is negative for individuals
+ below 1 gram (where \eqn{\log_{10}(w) < 0}), which would otherwise
+ raise a negative number to a fractional power -- those individuals
+ get exactly zero senescence mortality.
 }\if{html}{\out{</div>}}
 }
 
