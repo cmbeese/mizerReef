@@ -297,8 +297,8 @@ plotDetritusConsumption <- function(params) {
 #'  \eqn{p_{D.f}} comes from the biomass that is consumed but not
 #'  assimilated and is given by:
 #'
-#'  \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,dw}{
-#'        p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,dw}
+#'  \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}{
+#'        p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}
 #'
 #'  where \eqn{f_i(w)} is the feeding level (see [algae_consumption()]'s
 #'  "Algae consumption" section for how `satiation` controls it), so that
@@ -308,19 +308,23 @@ plotDetritusConsumption <- function(params) {
 #'  term uses the same feeding-level-adjusted consumption rate as
 #'  [getDetritusConsumption()] and [detritus_consumption()].
 #'
-#'  \eqn{p_{D.d}} comes from the biomass of fish that die as a result of
-#'  external mortality. External mortality includes local deaths that lead
-#'  to detritus but also deaths due to predation by species that are not
-#'  explicitly modelled, for example transient predators, mammals, or sea
-#'  birds. Thus, only a proportion `prop_decomp` of this material
-#'  decomposes to detritus. The detritus production from decomposing
-#'  dead organisms is given by:
+#'  \eqn{p_{D.d}} comes from the biomass of fish that die, combining two
+#'  mortality sources that each decompose to detritus at their own rate:
+#'  senescence mortality (see [getSenMort()]) and external mortality, i.e.
+#'  local deaths that lead directly to detritus as well as deaths due to
+#'  predation by species that are not explicitly modelled, for example
+#'  transient predators, mammals, or sea birds. Only a proportion of each
+#'  source's dead biomass decomposes to detritus, set independently by
+#'  `sen_decomp` (senescence, default 0.8) and `ext_decomp` (external
+#'  mortality, default 0.2; see [setDetritusParams()]). The detritus
+#'  production from decomposing dead organisms is given by:
 #'
-#'  \deqn{p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
-#'                  \mathtt{prop\_decomp}\,
+#'  \deqn{p_{D.d} = \mathtt{sen\_decomp}\,
+#'                  \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
+#'                  \mathtt{ext\_decomp}\,
 #'                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
-#'      p_{D.d} = \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
-#'                  \mathtt{prop\_decomp}\,
+#'      p_{D.d} = sen_decomp * \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
+#'                  ext_decomp *
 #'                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
 #'
 #'  \eqn{p_{D.ext}} is the rate at which detritus enters the system from

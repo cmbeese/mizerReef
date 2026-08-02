@@ -112,6 +112,15 @@
   flooring production at zero before it enters the analytic update; this
   has no effect at a `tuneUR()`/`tuneUR_cc()`-tuned steady state and only
   ever engages once a simulation has moved away from it.
+- `getDetritusProduction()`'s documented formula for the "decomp" term
+  applied a single, unnamed `prop_decomp` weight to only the
+  external-mortality contribution and none to the senescence-mortality
+  contribution, and its "feces" term's integral omitted the abundance
+  factor `N_i(w)` entirely. Neither matched the actual code, which weights
+  the senescence and external-mortality contributions by `sen_decomp` and
+  `ext_decomp` respectively (as `setDetritusParams()`'s own documentation
+  already correctly describes) and does integrate over abundance.
+  Documentation fixed to match actual behaviour; no code change.
 
 ### Refuge
 
