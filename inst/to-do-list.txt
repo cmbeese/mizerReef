@@ -1,3 +1,193 @@
+=== STOP AND READ FIRST (02/08, seventeenth session: thesis cross-check,
+different in kind from the four doc-vs-code audits above) ===
+
+User's explicit premise: unlike the 13th-16th sessions (which checked
+documentation against shipped code and implicitly trusted the code as
+ground truth), this session checks the package's *code* against the
+user's own original 2023-2024 thesis chapter
+(ignore/thesis-materials/Chapter3.tex, untracked, read directly from
+disk), section by section through the Model Description, the way the
+16th session's reefSenMort() bug was actually confirmed (numerically, not
+just by reading). Explicit standing instruction for this session
+(feedback-thesis-vs-code-ask-dont-assume): neither the thesis nor the
+code is assumed correct when they disagree -- any real mismatch must be
+presented to the user with evidence for both sides, never auto-resolved.
+The thesis was written 2-3 years before this session and the code has
+legitimately improved in places since, so most drift found here was
+expected to be ordinary and not blameworthy.
+
+** Ground-truth checks re-run this session **
+- Confirmed ignore/thesis-materials/Chapter3.tex (802 lines) is the
+  authoritative source; c3_equations.qmd/.tex are companion files already
+  known (from the 16th session) to sometimes carry stale, pre-final
+  formulas -- cross-checked against Chapter3.tex wherever they disagreed,
+  never used alone.
+- devtools::test() before changes: 718 pass / 0 fail / 1 known warning,
+  matching the 16th session's final count exactly.
+- devtools::check(vignettes = TRUE, args = "--as-cran") after the one fix
+  below: 0 errors / 0 warnings / same 2 known NOTEs.
+
+** Sections checked against Chapter3.tex's Model Description, one by one **
+
+Read and independently re-derived (formula-by-formula, several confirmed
+numerically on caribbean_3_model, not just by inspection) against:
+R/reef-project_methods.R (encounter, feeding level, predation mortality,
+senescence and total mortality), R/reef-rates.R, R/reef-setParams.R
+(setRefuge()/getRefuge()'s sigmoidal/binned/competitive formulas and
+setExtMortParams()'s residual-natural-mortality formula), R/newReefParams.R
+(residual natural mortality's z0exp = 1-n wiring, and the algae/detritus
+rho*w^exponent construction), R/detritus_components.R,
+R/algae_components.R, R/reef-components.R (tuneUR()/tuneUR_cc()), and
+R/reef-summary_methods.R (getProductivity()). All of the following
+independently confirmed CORRECT, matching Chapter3.tex exactly -- no
+mismatch found, no change needed:
+
+- Growth: predator-prey encounter (eq-prey-encounter/eq-food-encounter) --
+  confirmed reefEncounter()'s vulnerability-reduced-prey mechanism
+  correctly implements V_ij(w_p) = 1 - nu_i*R_j(w_p) (eq-vulnerability) via
+  the blocked_pred/good_pred branch (blocked_pred == TRUE is nu_i == TRUE,
+  i.e. normal refuge-respecting predators; blocked_pred == FALSE is the
+  "eels" exception where nu_i == FALSE and vulnerability is always 1),
+  rather than literally computing 1-nu*R for every predator.
+- Predation Refuge (Sigmoidal/Binned/Competitive/Vulnerability): all three
+  getRefuge() formulas match eq-refuge_sig/eq-refuge_binned/eq-refuge_data
+  exactly, including the w_settle=0.1g floor and the max_protect clip;
+  reefVulnerable()'s competitive-method proportion formula matches
+  eq-refuge_data's min(R_max, ...) exactly.
+- Consumption/Metabolic Losses/Energy Allocation: confirmed
+  species_params$satiation on caribbean_3_model is
+  predators=FALSE/herbivores=FALSE/inverts=TRUE, exactly matching the
+  thesis's "satiation-mediated consumption is exclusive to detritivory"
+  (Sec 3.3.2) -- see the one open question below about the *default*
+  fallback for models that don't set this explicitly.
+- Predation mortality (eq-pr/eq-mup): reefPredMort()'s loop over predator
+  species reproduces sum_j pred_rate_j(w_p)*V_ji(w_p)*theta_ji exactly.
+- Residual natural mortality (eq-z0): newReefParams()'s
+  `z0exp <- 1 - n; allo_mort <- outer(nat_mort, w^z0exp)` is exactly
+  mu_nat*w^(1-n), n defaulting to 0.75 and nat_mort to 0.2 as in the
+  thesis.
+- Detritus consumption (eq-eD/eq-cD): confirmed rho_det is built as
+  outer(rho_detritus, w^n) (newReefParams.R:237) -- the same n as
+  predator foraging power, as the thesis specifies -- and
+  detritus_consumption()/getDetritusConsumption() correctly include the
+  (1-feeding_level) factor eq-cD requires.
+- Algae production/consumption (eq-BA/eq-eA/eq-cA): confirmed algae uses
+  a *separate* allometric exponent from detritus (hardcoded 0.86 in
+  newReefParams.R:236, vs `n`=0.75 for detritus) -- this exactly matches
+  the thesis's claim of a distinct, Caribbean-herbivore-literature-derived
+  n_alg (Sec 3.3.3), not a copy-paste of detritus's exponent. git archaeology
+  (commit e54c8a2, "Tuning steady state with fixed resources", dated
+  2024-01-23 -- within the thesis-writing period) confirms this was a
+  deliberate split from a shared exponent, not accidental drift. Also
+  confirmed algae_consumption() deliberately omits the (1-feeding_level)
+  factor that detritus_consumption() includes -- this matches eq-cA
+  exactly (which has no such factor, unlike eq-cD), and matches the
+  thesis's explicit prose that herbivore grazing is NOT satiation-limited.
+- Achieving a Steady State (reefSteady()/tuneUR()/tuneUR_cc()):
+  hand-verified the algebra solving dB_A/dt=0 and dB_D/dt=0 (and their
+  carrying-capacity variants) for the tuned biomass/external-flux values
+  -- both correctly implement "production equals consumption at steady
+  state" as the thesis's Sec 3.4 states. (reefSteady() leaving algae live
+  rather than frozen during fish convergence, unless new_refuge==TRUE, is
+  a known, already-documented, already-resolved departure from the
+  thesis's literal "resource dynamics kept constant" phrasing --
+  see project-new-refuge-algae-freeze-question in memory, not re-litigated
+  here.)
+- New summary metrics (productivity): see the bug below.
+
+** The one real bug found: getProductivity()/plotProductivity()'s roxygen
+formula was wrong in two independent ways, confirmed against the thesis
+AND numerically -- code was correct, doc was not **
+
+Chapter3.tex's Sec 3.5 gives P_i(w) = integral N_i(w)*g_i(w) dw (a
+product, no extra factor). c3_equations.qmd and c3_equations.tex both
+independently confirm the identical formula. R/reef-summary_methods.R's
+actual code (`(energy * params@initial_n * size_range) %*% params@dw`)
+matches this exactly. But the roxygen documented
+`P_i(w) = integral (N_i(w) + g_i(w)) * w dw` -- an addition instead of a
+product, with an extra, undocumented factor of w. Verified numerically on
+caribbean_3_model: the code's actual output is
+predators=81.4/herbivores=741.3/inverts=51.6 (grams/m^2/year, matching the
+15th session's own previously-confirmed values); the literal wrong-formula
+computation gives values in the hundreds of millions -- not a subtle
+difference. `git log -p` traces the roxygen breakage to commit 2462a414
+("Corrections for checks, website, and documentation, concept and
+referencing updates", 2024-01-02) -- a doc-cleanup commit that never
+touched the function body, so this has been a pure documentation
+regression sitting undetected for the entire 2.5-year life of this
+formula, invisible to every one of the four doc-vs-code audits because
+none of them had an independent source to check the *doc* against (only
+the code). No vignette carried the same wrong formula (checked). Since
+Chapter3.tex, both companion thesis files, AND the shipped code all
+independently agree with each other, this is a confirmed, one-sided
+documentation bug -- not a thesis-vs-code disagreement needing the user's
+steer, so fixed directly per feedback-doc-fixes-need-independent-ground-truth
+(commit bfde6d9 on major_update): restored the product formula, and while
+in the same doc block, added "and reproduction" to g_i(w)'s description to
+match the thesis's own phrasing exactly (getEGrowthTime() already nets out
+reproduction; the doc just didn't say so). No code change. 718 pass / 0
+fail (unchanged, doc-only), 0 errors / 0 warnings / same 2 known NOTEs.
+
+** One open question surfaced to the user, not resolved unilaterally:
+setRefuge()'s automatic `satiation` default cannot structurally reproduce
+the thesis's "exclusive to detritivory" design **
+
+setRefuge()'s fallback default (used only with a warning when a user
+doesn't supply `satiation` explicitly) sets satiation = TRUE for any
+species that eats resources but not other species, FALSE otherwise. Both
+herbivores (should be FALSE per the thesis -- unregulated grazing) and
+invertebrates/detritivores (should be TRUE) are non-carnivorous resource
+consumers by that same test, so the heuristic cannot tell them apart --
+it would default BOTH to TRUE for any model with a herbivore/detritivore
+split, silently miscategorizing herbivores. This does not affect any
+bundled model (caribbean_3/10_model, karpata_model, bonaire_model, etc.),
+all of which set `satiation` explicitly and correctly
+(predators/herbivores=FALSE, inverts=TRUE, confirmed above) -- it would
+only bite a user building a fresh model from scratch without specifying
+satiation. Not fixed: this is a design/UX question (what should the
+*automatic default* assume when the user hasn't said), not a formula
+correctness bug, and per feedback-thesis-vs-code-ask-dont-assume this
+class of question goes to the user rather than being resolved silently.
+Flagged for the user's decision, not acted on.
+
+** Branch sync note: the harness's auto-mode classifier blocked switching
+to `main` to cherry-pick the getProductivity() fix this session (permission
+denied before any command ran, tree left clean on major_update) **
+
+Per the standing convention (every prior session's fix commits cherry-picked
+onto both branches so major_update never silently misses a real fix),
+commit bfde6d9 should also land on `main` -- but `main` is also the branch
+the user has deliberately held back pending this very session's outcome,
+so this was surfaced rather than forced. Still needs doing (by the user,
+or by a future session with explicit permission).
+
+** Session status: read Chapter3.tex's full Model Description and
+independently verified 9 of its subsections against code (several
+numerically); found and fixed one real, previously-unknown, 2.5-year-old
+documentation regression (getProductivity()'s roxygen formula), confirmed
+via thesis + both companion files + direct numerical computation before
+fixing; surfaced one design question (satiation default heuristic) to the
+user without resolving it. No new code bugs found -- everything the
+thesis specifies as a formula, the code still correctly implements. This
+is a materially different (and reassuring) result from the four straight
+doc-vs-code audits before it: the reefSenMort() bug (16th session) was the
+one place code had actually drifted from the original design, and this
+session's systematic pass through the rest of the Model Description found
+no sibling cases. **
+
+Per feedback-repeat-audit-after-bugs-found: a real bug was found this
+session too (the getProductivity() roxygen), so -- consistent with every
+prior round -- this is not reported as "audits complete, ready to push."
+That said, this session covered every Model Description subsection the
+13th-16th sessions' doc-only audits could not (because they had no
+independent source to check the code itself against), and found nothing
+resembling the reefSenMort()-class bug those subsections were specifically
+being checked for. Honest assessment for the user's own call: the
+marginal, thesis-specific angle that motivated this session has now been
+worked systematically to completion; further scrutiny from here would need
+either a different reference source, or another doc-vs-code pass in the
+style of the 13th-16th sessions.
+
 === STOP AND READ FIRST (02/08, sixteenth session: fourth, independent
 pre-push release audit) ===
 
