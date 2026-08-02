@@ -825,22 +825,15 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 
 #' Expanding external mortality rate to include senescence
 #'
-#' @section Senescence mortality:
+#' Senescence mortality represents mortality caused by background sources
+#' such as illness or age, in addition to residual natural mortality (see
+#' [setExtMortParams()]'s "Residual natural mortality" section), which
+#' represents all other mortality that is not due to fishing or predation
+#' by predators included in the model.
 #'
-#'      Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
-#'      mortality caused by external sources such as illness or age. This is
-#'      addition to external mortality, \eqn{\mu_{ext.i}(w)}, which represents
-#'      all mortality that is not due to fishing or predation by predators
-#'      included in the model. The rate of senescence mortality is given by:
+#' @inheritSection setExtMortParams Senescence mortality
 #'
-#'      \deqn{\mu_{sen.i}(w) = k_{sen}\left(\frac{w}{w_{max.i}}\right)^{p_{sen}}}
-#'           {\mu_{sen.i}(w) = k_{sen} (w/w_{max.i})^{p_{sen}}
-#'
-#'      where \eqn{k_{sen}} and \eqn{p_sen} are constants defining the shape
-#'      of the senescence curve and \eqn{w_max.i} is the maximum size
-#'      of species \eqn{i} in grams.
-#'
-#'      Users can change all constants with the `setSenMortParams()` function.
+#' @details Users can change `sen_prop`/`sen_curve` via [setExtMortParams()].
 #'
 #' @param params A MizerParams object
 #' @param ... Unused

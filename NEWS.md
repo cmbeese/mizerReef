@@ -229,6 +229,16 @@
   ...)`) so custom `ext_mort_params` actually works: it was previously
   broken for both a `data.frame` (crashed on first use) and a named `list`
   (failed validation outright with a misleading error) input.
+- `reefSenMort()`/`getSenMort()`'s documented senescence-mortality formula
+  didn't match either the actual code or `setExtMortParams()`'s own
+  (correct) documentation of the same formula: it used the raw size ratio
+  `w/w_max.i` instead of the log-size ratio the code actually computes, put
+  the `sen_prop`/`sen_curve` constants in the wrong place relative to the
+  exponent, and referenced a `setSenMortParams()` function that doesn't
+  exist (the real function is `setExtMortParams()`). `reefSenMort()` now
+  inherits its formula from `setExtMortParams()`'s corrected "Senescence
+  mortality" section instead of duplicating it, so the two can no longer
+  drift apart. Documentation-only fix; no code change.
 
 # MizerReef 2.0.0
 

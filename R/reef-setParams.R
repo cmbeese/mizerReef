@@ -330,15 +330,20 @@ setDetritusParams <- function(params,
 #'      mortality caused by background sources such as illness or age. The
 #'      rate of senescence mortality (in 1/year) is given by:
 #'
-#'      \deqn{\mu_{sen.i}(w) = k_{sen}\left(
+#'      \deqn{\mu_{sen.i}(w) = \left[\max\left(0,\;
+#'                              \mathtt{sen\_prop}\,
 #'                              \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
-#'                              \right)^{p_{sen}}}
-#'           {\mu_{sen.i}(w) = k_{sen}
-#'           (\log_{10}(w)/\log_{10}(w_{max.i}))^{p_{sen}}}
+#'                              \right)\right]^{\mathtt{sen\_curve}}}{
+#'           \mu_{sen.i}(w) = max(0, sen_prop *
+#'           log10(w)/log10(w_{max.i}))^sen_curve}
 #'
-#'      where \eqn{k_{sen}} is the rate of senescence mortality, \eqn{p_{sen}}
-#'      defines the slope of the senescence curve, \eqn{w_{max.i}} maximum body
-#'      size of group \eqn{i} in grams.
+#'      where \eqn{\mathtt{sen\_prop}} scales the ratio of \eqn{w}'s log size
+#'      to group \eqn{i}'s log maximum size \eqn{w_{max.i}} before the curve
+#'      is applied, and \eqn{\mathtt{sen\_curve}} is the exponent shaping the
+#'      senescence curve. The scaled ratio is floored at zero before being
+#'      raised to the \eqn{\mathtt{sen\_curve}} power, since it is negative
+#'      for individuals below 1 gram (where \eqn{\log_{10}(w) < 0}), which
+#'      would otherwise raise a negative number to a fractional power.
 #'
 #' @param params A `MizerParams` object.
 #' @param ext_mort_params Optional. A named list or matrix with columns/names
