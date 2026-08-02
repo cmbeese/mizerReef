@@ -1,4 +1,10 @@
-# MizerReef 2.1.0
+# MizerReef 2.0.0
+
+This is the first public release of mizerReef beyond 1.0.1, the version
+that accompanied the original thesis. Everything below describes how
+2.0.0 differs from that 1.0.1 release, which is what any existing user
+will actually have installed -- there is no released version in between
+for these notes to assume you've already seen.
 
 ## New features
 
@@ -16,10 +22,9 @@
   parameters) are carried over as-is, not reset to package defaults --
   `upgradeReefParams()` warns you about what changed and suggests running
   `reefSteady()` afterwards if you want a fresh steady state under the
-  current algae/detritus mechanism. (Objects already created with mizerReef
-  2.x -- including the earlier 2.0.0 release, which stored refuge/algae/
-  detritus data in dedicated S4 slots that have since been removed -- are
-  upgraded automatically by `validParams()` and don't need this function.)
+  current algae/detritus mechanism. (This function is only needed for 1.x
+  objects; any object already created with this 2.0.0 release stays current
+  automatically via `validParams()`.)
 - New vignette "Combining mizerReef with mizerMR: multiple background
   resources" showing how to chain mizerReef with
   [mizerMR](https://sizespectrum.org/mizerMR/) to give the reef model several
@@ -47,6 +52,28 @@
   - `FALSE`: each species converts the same refuge length bins to weight
     bins using its own `a`/`b`, so the weight boundaries -- and therefore
     the refuge profile in weight space -- are species-specific.
+- `setRefuge()`/`newReefParams()`'s `satiation` argument (which controls
+  which species get a satiation-limited feeding response, versus
+  unlimited intake) is now optional. 1.x required every model to specify
+  `satiation` explicitly and errored otherwise; it's now defaulted
+  automatically -- `TRUE` only for species whose diet is detritus without
+  also grazing algae or eating other species (pure detritivores), `FALSE`
+  for everyone else, including herbivores that graze algae, carnivores,
+  and species that eat both algae and detritus. This matches the design
+  intent that satiation-limited consumption applies to detritivory
+  specifically, not herbivory in general -- a species that grazes algae
+  behaves like an unregulated herbivore even if it also scavenges some
+  detritus. A warning is issued whenever the default is used, so it's
+  always visible when a model is relying on it rather than an explicit
+  choice.
+- Habitat degradation (bleaching) trajectories are now fully
+  user-parameterizable. 1.x had a single bleaching-severity trajectory
+  hardcoded directly into the rate-calculation code, with no way to
+  configure it without editing the package source. `reefDegrade()` now
+  takes a `deg_scale` trajectory matrix/data.frame and `algae_boost`/
+  `algae_growth_boost`/`algae_capacity_boost` vectors as ordinary
+  arguments, so post-bleaching algae/refuge dynamics can be customised per
+  model without touching package code.
 
 ## Bug fixes
 
@@ -98,7 +125,7 @@
   `inst/archive/caribbean_10_model_untuned.rda` for reference); every other
   slot, including all fish abundances, is unchanged.
 - The `algae_boost`/`algae_growth_boost`/`algae_capacity_boost` feature
-  (added in 2.0.0) now actually takes effect. Previously it silently did
+  now actually takes effect. Previously it silently did
   nothing: it tried to persist a boosted value by mutating `params` inside
   `reefDegrade()`, but `mizer::project()` treats `params` as read-only for
   the whole run, so the mutation was always discarded before the next
@@ -137,8 +164,8 @@
   `reefVulnerable()` silently found no matches and left the refuge matrix
   at its all-zero initial value: **every fish was 100% vulnerable to
   predation, with the competitive refuge profile having no effect at all.**
-  Both functions now default to `TRUE`, matching the package's pre-2.1.0
-  behaviour; the bundled `caribbean_3_model` now stores
+  Both functions now default to `TRUE`, matching the package's intended
+  original behaviour; the bundled `caribbean_3_model` now stores
   `use_dummy_fish_bins = TRUE` explicitly, and `reefVulnerable()` warns if
   a mismatch like this happens again.
 
@@ -279,41 +306,6 @@
   not merely assumed to still hold. See `caribbean_10_model`'s documentation
   and `inst/scripts/Caribbean_10_model-calibration.R`'s design note for full
   details and citations.
-
-## Major changes
-
-- New S4 class: `MizerReefParams`
-	- Added slots for refuge, algae, detritus
-- Refactor of the degradation system:
-	- Removed hardcoded bleaching trajectory logic.
-	- All bleaching and algae responses are now fully parameterizable via user inputs.
-	- New parameters: `algae_boost`, `algae_growth_boost`, `algae_capacity_boost` for flexible post-bleaching algal dynamics.
-	- Boost vectors allow compounding effects and custom duration.
-	- Auto-padding and validation for boost vectors.
-	- Recursive logic in `reefDegrade()` preserved, but now fully flexible.
-
-- Added comprehensive vignettes and user documentation for all major workflows and features.
-- All exported functions now have tests and examples to ensure reliability and reproducibility.
-
-## Bug fixes
-
-- Fixed double-application bug in algae growth boost during bleaching year.
-- Added validation for positive numeric boost values and deg_scale structure.
-- Improved type safety and maintainability in parameter handling.
-
-## Technical notes
-
-- All bleaching parameters are now stored in the params object for easy access.
-- Compatible with existing mizerReef models (backward compatible via defaults).
-- deg_scale structure unchanged: column 1 = bleaching, columns 2+ = post-bleaching.
-- Recursive call pattern in `reefDegrade()` preserved (base case at t < t_bleach).
-- `params@time_modified` updated on each bleaching event.
-
-## Minor changes
-
-- Added `progress` to Imports for progress bar support.
-- Updated minimum R version to 4.1.0.
-- Cleaned up example code and documentation blocks.
 
 ---
 See the reference manual and pkgdown site for details on new features and usage.
