@@ -468,7 +468,7 @@ all_prod11 <- plot2Productivity(non_complex, caribbean_10_model,
 patchwork::wrap_plots(all_biom11, all_prod11)
 ```
 
-As we can see in Figure 3, removing refuge availability reduces both biomass and productivity across all species.
+As we can see in Figure 3, removing refuge availability reduces total biomass substantially. Total productivity, by contrast, is only modestly affected here -- refuge changes *which* species contribute most to production more than it changes the total. Biomass and productivity can decouple like this because refuge protects juveniles from predation, letting populations skew toward larger, slower-growing individuals: standing biomass goes up, but production per unit biomass goes down.
 
 > <details><summary>💡 **Tip:** If your results look odd after changing the refuge profile, run `reefSteady()`.</summary> It needs to run enough times to reach a new steady state. To learn more about modifying refuge profiles and their parameters, see [setRefuge()].</details>
 
