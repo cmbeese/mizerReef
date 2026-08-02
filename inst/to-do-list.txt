@@ -1,3 +1,212 @@
+=== STOP AND READ FIRST (02/08, sixteenth session: fourth, independent
+pre-push release audit) ===
+
+User's explicit premise: a deliberately fresh session, not anchored to any
+prior round's conclusions -- including the fifteenth session's own severity
+judgement that a sixth round's marginal value is concentrated in one
+specific known gap (the ~19-file "doesn't error only" test-coverage gap)
+rather than spread across the whole codebase. Scope, in priority order: (1)
+either write real assertions for that ~19-file gap, or at minimum do a
+targeted correctness audit of the five consumption/production primitives
+other tests treat as ground truth; (2) fresh test()/check() on both
+branches; (3) a brief skeptical spot-check of the fifteenth session's two
+fixes; (4) own judgement on anything else worth a fresh look; (5) explicitly
+weigh whether a seventh round is still warranted.
+
+** Ground-truth checks re-run this session **
+- Confirmed `git diff main major_update -- R/ tests/ man/` (and, this
+  session, `vignettes/ NEWS.md` too) empty before any changes, and again
+  after this session's fixes were cherry-picked.
+- Confirmed the tracked-file-list diff (`git ls-tree` comparison) still
+  shows exactly the expected difference: major_update additionally carries
+  the 28 dead inst/archive/ files and inst/to-do-list.txt itself, nothing
+  else -- unchanged since the fourteenth session.
+- devtools::test() on `main` before any changes: 715 pass, 0 fail, 1
+  pre-existing warning -- exactly matched the fifteenth session's final
+  count.
+- devtools::check(vignettes = TRUE, args = "--as-cran") on `main` before
+  changes: 0 errors, 0 warnings, same 2 known pre-existing NOTEs -- matched
+  exactly. Repeated on `major_update`: identical result.
+
+** Part 1: the ~19-file test-coverage gap flagged since the thirteenth
+session turned out to already be closed -- and has been since partway
+through the thirteenth session itself **
+
+Before writing a single new test, checked whether the premise (roughly a
+quarter of the 78 test files, including the five ground-truth
+consumption/production primitives and the calibration/scaling utilities,
+"still only assert doesn't error") was still true. It was not. A
+programmatic sweep of all 78 test files under tests/testthat/ for the
+`expect_error(fn(...), NA)`-with-no-other-assertion anti-pattern found
+essentially every file already has genuine, independently-derived
+assertions (manual per-species loops, cross-checks of documented
+invariants, non-tautological expected values) -- confirmed by reading
+algae_consumption/detritus_consumption/getAlgaeConsumption/
+getDetritusConsumption/getDetritusProduction's test files directly, plus a
+sample of the calibration/scaling files (setURcapacity, scaleReefModel,
+rescale_detritus) named in the original finding.
+
+`git log --follow` on these files traced this to three commits already on
+`main`/`major_update`, all dated within the *thirteenth* session itself,
+*before* that session's own "Log pre-merge release audit" commit
+(20a2da2): `fa97c4f` ("...for algae/detritus primitives and setters", 10
+files including all five ground-truth primitives), `23bd229`
+("...for calibration/scaling utilities", covering
+calibrateReefBiomass/Number, rescale_algae/detritus, rescaleComponents,
+scaleReefAbundance/Background/Model, removeSpecies, matchReefGrowth), and
+`2a6c5ad` ("...for remaining biomass/productivity helpers"), whose own
+commit message states explicitly: "This closes out the test-quality
+audit's full ~26-file list: all files flagged as 'only checks it doesn't
+error' now have real assertions." The thirteenth session's own to-do-list
+entry (and both the fourteenth's and fifteenth's, which repeated it
+verbatim without re-checking) never updated this claim after those fixes
+landed -- so this specific detail has been stale in this file's own
+narrative for three consecutive sessions, even though the underlying work
+was already done. Worth remembering for future rounds: this file's own
+"still open" claims are not self-verifying and can go stale even across
+sessions that are otherwise careful.
+
+Only two files anywhere in the suite still have the literal anti-pattern:
+test-constant_dynamics.R and test-encounter_contribution.R, for
+`constant_dynamics()`/`encounter_contribution()` -- both genuinely
+one-line pass-through functions (`n_other[[component]]` and
+`params@other_params[[component]]$rho * n_other[[component]]`
+respectively) with no room for the implementation to diverge from that one
+line. Noted, not fixed -- not worth the churn.
+
+** Part 2: targeted correctness audit of the five named ground-truth
+primitives, done anyway despite Part 1's finding **
+
+Read algae_consumption()/getAlgaeConsumption() (R/algae_components.R) and
+detritus_consumption()/getDetritusConsumption()/getDetritusProduction()
+(R/detritus_components.R) end to end against their own roxygen formulas
+and against each other. All five functions' *code* is correct -- matches
+their own documented formulas and the independently-derived test
+assertions. But `getDetritusProduction()`'s roxygen formula for the
+"decomp" component was found to be a real, previously-unknown bug: it
+applied a single, unnamed `prop_decomp` weight to only the
+external-mortality contribution and left the senescence-mortality
+contribution unweighted, and separately, its "feces" formula's integral
+omitted the abundance factor `N_i(w)` entirely. Neither matches the actual
+code, which weights the senescence and external-mortality contributions
+independently by `sen_decomp` and `ext_decomp` respectively -- exactly as
+`setDetritusParams()`'s own documentation of those same two parameters
+already correctly describes, and exactly as
+test-getDetritusProduction.R's existing independently-derived assertions
+already confirm the code does. Fixed the roxygen only (commit `6c9d03b` on
+main / `3fb9aad` on major_update); no code change, since the code was
+already right.
+
+** Part 3: a bigger, related bug found while double-checking the fix above
+-- reefSenMort()/getSenMort()'s formula was wrong in two independent ways,
+in two different places **
+
+While confirming getDetritusProduction()'s decomp term correctly reuses
+getSenMort()'s mortality rate, checked getSenMort()/reefSenMort()'s own
+documented formula against their code (R/reef-project_methods.R). Found
+two independently-wrong copies of the senescence-mortality formula:
+- `setExtMortParams()`'s own "Senescence mortality" section (the more
+  authoritative one, since `newReefParams()` already `@inheritSection`s it)
+  had the right general shape (log-size ratio, not raw ratio) but placed
+  the `sen_prop` constant *outside* the exponent -- `k_sen * ratio^p_sen`
+  -- when the actual code computes `(sen_prop * ratio)^sen_curve`, a
+  different function whenever `sen_curve != 1` (the package default is
+  0.3, so this is not a degenerate case: `sen_prop^0.3 ≈ 0.501`, not
+  `sen_prop = 0.1` as the wrong formula implies).
+- `reefSenMort()`'s own separate, duplicated copy (rather than inheriting
+  the section above, unlike every comparable case elsewhere in the
+  package) was wronger still: it used the raw, non-log size ratio
+  `w/w_max.i`, and its prose referenced a `setSenMortParams()` function
+  that has never existed in this package (the real function is
+  `setExtMortParams()`).
+
+Verified independently against live source before fixing: computed
+`reefSenMort(caribbean_3_model)` and confirmed by hand that it exactly
+equals `max(0, sen_prop * log10(w)/log10(w_max))^sen_curve` (the formula
+now documented), not either of the two wrong versions. Also found that
+`model-description.Rmd` -- one of three vignettes describing this same
+formula -- already had the correct version (evidently fixed at some
+earlier, unlogged point), while `caribbean_3_model-description.Rmd` and
+`karpata_model-description.Rmd` still carried the old wrong formula, plus
+a doubly-wrong "senescence mortality is `sen_prop` per year at size 1
+gram" gloss (the rate is actually floored to exactly zero at 1g, since
+`log10(1) = 0`, under either formula version). Fixed `setExtMortParams()`'s
+section to the verified formula, made `reefSenMort()` inherit it via
+`@inheritSection` instead of duplicating it (matching the package's own
+existing convention, since `newReefParams()` already does this), and
+brought the two stale vignettes in line with the third (commits `a596885`
++ `6e8df2e` on main / `b8d9025` + `19b69b9` on major_update). All four
+doc-only fixes; no code changed at any point in this session -- every bug
+found was a documentation/roxygen bug, not a code bug.
+
+** Part 4 (per user instruction): spot-check of the fifteenth session's two
+fixes, not a full re-derivation **
+
+- `getProductivity()`: confirmed the MizerSim branch (R/reef-summary_
+  methods.R) now applies the same `min_fishing_l`/`max_fishing_l` default
+  as the MizerParams branch before calling `get_size_range_array()`.
+  Re-ran `getProductivity(sim, time_range = 0)` on caribbean_3_model:
+  81.40967/741.2648/51.62587 (predators/herbivores/inverts), exactly
+  matching the fifteenth session's claimed documented-default values
+  (81.4/741.3/51.6); with an explicit full-spectrum override,
+  119.0367/885.2699/98.37716, exactly matching the previously-buggy values
+  (119.0/885.3/98.4) the fifteenth session reported.
+- `plotDegradationScale()`: confirmed the roxygen now says refuge size
+  bins as rows and years as columns, confirmed `reshape2::melt()` on a
+  plain matrix maps Var1/Var2 to SizeBin/Year exactly that way (rows =
+  SizeBin, columns = Year), and confirmed the non-square-matrix regression
+  test from that session still exists and asserts individual cell values.
+
+Both confirmed genuine and unproblematic; nothing new needed.
+
+** Final ground-truth re-check after all fixes **
+devtools::test(): 715 pass, 0 fail, 1 pre-existing warning (unchanged --
+these were all doc-only fixes, no behavioural change expected or found).
+devtools::check(vignettes = TRUE, args = "--as-cran"): 0 errors, 0
+warnings, exactly the same 2 known pre-existing NOTEs. Re-ran on both
+`main` and `major_update` after each cherry-pick to confirm identical
+clean results on both. Re-confirmed `git diff main major_update -- R/
+tests/ man/ vignettes/ NEWS.md` empty and the tracked-file-list diff
+unchanged after all three cherry-picks.
+
+** Session status: found and fixed 3 real, previously-unknown documentation
+bugs (getDetritusProduction()'s decomp/feces formulas; reefSenMort()'s
+formula, duplicated wrong in two places; two stale vignette copies of the
+same wrong formula) across 6 commits, all doc-only, no code changes and no
+test-value changes. Also corrected this file's own three-session-stale
+claim that the ~19-file test-coverage gap was still open -- it was closed
+within the thirteenth session itself. **
+
+Per [[feedback-repeat-audit-after-bugs-found]]: this round again found
+real, previously-unknown bugs, so this is NOT reported as "ready to push"
+-- that call remains explicitly the user's. Honest severity assessment:
+these are doc-only bugs (roxygen/vignette formulas not matching their own
+code), not code bugs -- no computed value anywhere in the package was ever
+wrong as a result of them, unlike every one of the fourteenth and
+fifteenth sessions' findings, which were live code bugs or test gaps with
+real behavioural consequences. On breadth: the specific, concrete gap this
+round was scoped against (the ~19-file test claim) turned out to be
+already resolved, which is itself evidence of diminishing returns --
+sessions 14-16 have now each found strictly narrower, lower-severity
+issues than session 13's original sweep, and this round's targeted item
+turned out not to exist at all. Weighed plainly, as asked: a seventh round
+is not clearly warranted on the current evidence. Four consecutive rounds
+of genuine, independent scrutiny (13th-16th) have each found something,
+but the trend is toward smaller and lower-stakes findings, not larger
+ones, and this round's most substantial finding (the reefSenMort()
+formula bug) was found *incidentally*, while double-checking an unrelated
+fix, rather than through any systematic sweep -- there is no longer an
+identified, concrete, unscrutinized area of the codebase to point a
+seventh round at, the way there was for this one. If the user wants one
+anyway out of caution, the most defensible remaining target is the three
+refuge-profile formulas (sigmoidal/binned/competitive) in
+`setRefuge()`'s roxygen (R/reef-setParams.R) against `getRefuge()`'s
+actual code -- not verified this session, and the discovery pattern this
+round (roxygen formulas silently drifting from code, sometimes for years)
+suggests it's plausible, if not especially likely, that something's wrong
+there too. But this is a "just in case" suggestion, not a "still known to
+be broken" one, unlike every previous round's handoff.
+
 === STOP AND READ FIRST (02/08, fifteenth session: third, independent
 pre-push release audit) ===
 
