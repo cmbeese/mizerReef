@@ -1,3 +1,142 @@
+=== TWENTIETH SESSION (02/08): cleanup after the nineteenth session's mess,
+release renumbered 2.1.0 -> 2.0.0, and a real caribbean_10_model bug found
+and fixed while verifying everything ===
+
+** Repo cleanup (the nineteenth session's own explicit ask for a follow-up
+session): the untracked root-level thesis reference material
+(Appendix4a.tex, Appendix4b.tex, Chapter4.tex, c3_parameters.pdf,
+c4_parameters.pdf, diet.png, m528p289.pdf, s10641-005-2228-2.pdf) and the
+interactive calibration scratch dir (artifacts/, 56 files) were never
+committed -- confirmed via `git log --all -- <paths>` -- so this was a
+filesystem move, not a git operation. Moved both into the already-gitignored
+ignore/ directory and added an explicit /artifacts/ rule to .gitignore so a
+future session's scratch dir can't accidentally get committed. Also
+confirmed via `git ls-tree` that major_update has no other stray files at
+the repo root -- inst/to-do-list.txt (this file) is the only dev-log-style
+file that's actually tracked, matching the thirteenth session's original
+clean-merge plan (it's intentionally not on main). **
+
+** Version renumbering, 2.1.0 -> 2.0.0: DESCRIPTION/CITATION.cff/NEWS.md/
+README's citation example, plus internal roxygen comments in
+mizerReef-upgrade.R/MizerReefParams-class.R/data.R and
+extension_mechanism.Rmd, all said "2.1.0" or referred to an "earlier 2.0.0
+release" that never happened. Checked `origin/main` (the only branch any
+real user has ever pulled) directly: it's still 1.0.1, dated 2024-31-01 --
+nothing between 1.0.1 and this rewrite was ever published. Local `main`
+diverged with its own now-superseded S4-slot redesign (commits 579bcb1/
+829f3c4 etc.) that was never pushed either, then later had major_update
+merged into it (7167412) -- so local main's history is messier than
+origin/main's, but neither has ever shipped a "2.0.0" or "2.1.0". Renamed
+this release 2.0.0 per the user's explicit instruction, and reworded the
+handful of places that referenced a nonexistent prior release to describe
+internal, never-released development history instead. Regenerated the 3
+affected man/ pages via devtools::document() -- exactly the 3 files
+touched, nothing else drifted. **
+
+** NEWS.md audit: rewrote the framing throughout (see above), and deleted
+the entire trailing "Major changes"/duplicate "Bug fixes"/"Technical
+notes"/"Minor changes" block -- it described the abandoned local-main
+S4-slot design (contradicting the accurate description earlier in the same
+file), contained an outright false claim (progress was never added to
+Imports -- grepped DESCRIPTION/NAMESPACE, confirmed absent), and one claim
+that directly contradicts a verified fix elsewhere in the file (the
+deg_scale column-orientation claim -- confirmed against the actual
+rubble_scale data: refuge-size-bin rows, year columns, matching the fixed
+plotDegradationScale() doc, not the deleted section's claim). Added two
+"New features" entries that were previously undocumented as such: (1)
+setRefuge()/newReefParams()'s satiation argument becoming optional with an
+automatic detritivory-specific default (1.x required it and errored
+otherwise -- verified against origin/main's reef-setParams.R directly);
+(2) habitat degradation trajectories becoming user-parameterizable instead
+of hardcoded (verified 1.x hardcoded bleaching severities directly in
+reef-project_methods.R, no user-facing parameters existed). **
+
+** Fixed a real, live inaccuracy in vignettes/mizerReef.Rmd's "Changing the
+refuge profile" section: the prose claimed removing refuge "reduces both
+biomass and productivity across all species," left over from before the
+pred_grab age_mat correction. With the now-current caribbean_10_model,
+total productivity is roughly neutral between refuge states (see
+[[project-caribbean10-productivity-finding]] in memory) -- only biomass
+shows the clear reduction the old text described for both. Reworded to
+describe what the model's own current output actually shows. **
+
+** caribbean_10_model bug found and fixed while running the full test suite
+(devtools::test() found 4 real failures, not stale tests -- caribbean_3_model
+was checked in parallel and has neither problem). Root-caused properly, not
+guessed, after an initial wrong theory (thought tuneUR() had never been
+called -- wrong, reefSteady() does call it internally; the user correctly
+pushed back on that first theory):
+  - other_params still carried the dead algae_params/detritus_params/flat
+    legacy fields (method_params, refuge, bin.id, refuge_lengths,
+    carry_capacity, algae_capacity, detritus_capacity, sen_decomp,
+    ext_decomp, initial_algae_growth, initial_d_external) that the
+    algae/detritus consolidation fix was supposed to have removed --
+    resurrected by the nineteenth session's recalibration, which started
+    from (or was contaminated by) a pre-consolidation snapshot.
+  - other_params$algae$growth was stuck at 130.9335 -- confirmed identical
+    to inst/archive/caribbean_10_model_untuned.rda's value, i.e. it
+    predates even this session's recalibration and was never touched by
+    it. caribbean_3_model correctly uses the literature-informed default
+    of 2000 for the same reef site (Karpata); caribbean_10_model had no
+    justification for differing.
+  - Manually re-running tuneUR() on the saved object exactly reproduced its
+    existing near-zero algae/detritus biomass and made the steady-state
+    check pass -- proving tuneUR() itself works correctly and the
+    degenerate ~1e-10 g/m^2 biomass is a real (if tiny) mathematical fixed
+    point of the current parameters, NOT evidence of a skipped tuning step.
+  - Patched narrowly (algae_growth -> 2000, re-ran tuneUR(), stripped the
+    dead fields), verified via all.equal() that species_params, initial_n,
+    initial_n_pp, rates_funcs, refuge_params, ext_mort_params, new_refuge,
+    and gear_params are all byte-identical to before -- only algae/detritus
+    fields changed. test-caribbean_10_model.R: 4 failures -> 0. Full
+    devtools::test(): 719 pass / 0 fail (up from 715, since 4 fixed
+    failures now pass instead of being skipped/counted differently).
+    Because species_params/initial_n are untouched, the karpata_example.png
+    manuscript figure (built from plot2TotalBiomass()/plot2Productivity(),
+    fish-only) did NOT need regenerating -- confirmed by reading
+    inst/scripts/karpata_example_fig.R directly. **
+
+** IMPORTANT -- what this does NOT fix: the separate, already-known,
+deliberately-deferred "absolute biomass scale" issue. Both caribbean_3_model
+and caribbean_10_model report algae_biomass()/detritus_biomass() around
+1e-9 to 1e-10 g/m^2 -- mathematically self-consistent (a genuine fixed
+point of production=consumption) but ~9-10 orders of magnitude below the
+literature target of ~10-100 g DW/m^2 the user supplied on 28/07-01/08.
+Full plan already written up under "FUTURE WORK PLAN: give algae/detritus a
+real absolute biomass scale" further down this file -- needs the user's own
+target-value and wet-vs-dry-weight units decision before anyone touches it,
+per that plan's own explicit instruction. Do not attempt this without that
+decision. **
+
+** Verified upgradeReefParams() still works: its dedicated test file passes
+cleanly (13 blocks) with no changes needed -- this session touched roxygen
+wording (version numbers) but no logic in mizerReef-upgrade.R. **
+
+** Final verified baseline: devtools::test() - 719 pass / 0 fail / 7 benign
+pre-documented warnings. devtools::check() - 0 errors, 0 warnings, 2 NOTEs
+(inst/LICENSE top-level placement; tuneUR/tuneUR_cc codetools quirk +
+data() style note -- both pre-existing/benign per prior sessions' records).
+pkgdown: build_site()'s favicon step fails in this sandbox (blocked
+outbound call to realfavicongenerator.net) -- unrelated to any code change;
+worked around by calling build_home()/build_reference()/build_articles()/
+build_news()/build_redirects()/build_search() directly, which all succeeded
+with 0 errors -- exactly the expected 7 articles, reference pages, and news
+all built and spot-checked (version 2.0.0 renders correctly throughout;
+the corrected productivity text renders in the built mizerReef.Rmd
+article). Favicons need generating once, outside this sandbox, via
+pkgdown::build_favicons() with real internet access -- after that they
+persist in pkgdown/favicon/ and future builds won't need network access
+again. devtools::install() run mid-session (after the caribbean_10_model
+fix) and reflects it correctly. **
+
+** major_update pushed 6 commits ahead of origin as of this session's end
+(not pushed to origin -- per standing convention, that's a separate,
+explicit decision). Plan (per the user's explicit request this session):
+merge major_update into local main once everything above is verified, same
+pattern as the sixteenth session's 7167412 merge. Not yet done as of this
+entry -- check git log on main if picking this up to see whether it
+happened. **
+
 === NINETEENTH SESSION (02/08): caribbean_10_model recalibration DONE,
 completing the bundled-model-staleness fix started in the sixteenth session ===
 
