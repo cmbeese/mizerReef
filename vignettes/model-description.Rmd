@@ -226,16 +226,32 @@ encountered food is actually consumed, and the absorbed rate available for
 metabolism, growth and reproduction is $\alpha_i (1 - f_i(w)) E_i(w)$.
 
 mizerReef adds a per-group **satiation** switch (`satiation`). Groups with
-`satiation = FALSE` — by default the carnivores — have no upper limit on their
-intake, formally $h_i(w) = \infty$. For them the feeding level collapses to
+`satiation = FALSE` have no upper limit on their intake, formally
+$h_i(w) = \infty$. For them the feeding level collapses to
 $$
 f_i(w) = 0,
 $$
 so they consume everything they encounter and the absorbed rate is simply
-$\alpha_i E_i(w)$. Resource consumers (herbivores and detritivores) keep the
-type II response by default. This behaviour is implemented by
-`reefFeedingLevel()`, which sets the maximum intake to infinity for
-non-satiating groups and treats the resulting $0/0$ feeding level as zero.
+$\alpha_i E_i(w)$. This behaviour is implemented by `reefFeedingLevel()`,
+which sets the maximum intake to infinity for non-satiating groups and treats
+the resulting $0/0$ feeding level as zero.
+
+By default, only species that consume detritus but not algae (i.e. pure
+detritivores/invertebrates) keep the type II response (`satiation = TRUE`);
+carnivores and herbivores both default to `satiation = FALSE` (see
+`setRefuge()`), since satiation-mediated consumption is intended to be
+exclusive to detritivory — see the Algae section below for the citations
+behind this default for herbivores specifically. This is a default, not a
+hard rule: `caribbean_3_model` and `caribbean_10_model` (`karpata`) both
+override it to `satiation = TRUE` for their herbivore/parrotfish groups,
+because recalibrating those models against the corrected senescence-mortality
+formula showed herbivore biomass has no density-dependent brake at all
+without some cap on individual intake once mortality is realistically low
+(see `inst/scripts/Caribbean_3_model-calibration.R`'s design note for the
+full reasoning) — the underlying "herbivores don't reduce grazing pressure
+on the shared algae pool" claim these citations support is unaffected by
+this, since `algae_consumption()` (the resource-depletion rate) deliberately
+ignores feeding level regardless of any species' `satiation` setting.
 
 # Growth and reproduction
 

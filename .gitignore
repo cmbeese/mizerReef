@@ -58,3 +58,6 @@ ignore/
 .DS_Store
 .vscode/
 Rplots.pdf
+
+# Interactive calibration/tuning intermediates (session scratch, not package data)
+/artifacts/

@@ -116,7 +116,7 @@ still unfixed upstream; see `inst/to-do-list.txt` for the current state.
 | `projectMort.mizerReef()` | Adds senescence mortality on top of the standard mortality |
 | `getBiomass.mizerReefSim()` | Adds algae and detritus biomass to the species biomasses |
 | `removeSpecies.mizerReef()` | Updates the algae/detritus encounter-rate matrices `rho` |
-| `upgrade.mizerReef()` | Migrates objects created with mizerReef < 2.1.0 to the current layout |
+| `upgrade.mizerReef()` | Migrates objects created with an earlier mizerReef 2.x layout to the current one (automatic; for mizerReef 1.x objects, see `upgradeReefParams()` instead) |
 
 Every one of these methods calls `NextMethod()` at least once, so multiple
 *dispatching* extensions can modify the same rate or generic without silently
@@ -412,14 +412,16 @@ species_params(p2)$species
 
 # Upgrading objects saved with older mizerReef versions
 
-Versions of mizerReef before 2.1.0 stored refuge, algae, and detritus
-parameters in three custom S4 slots (`refuge_params`, `algae_params`,
-`detritus_params`) rather than in `other_params()`. Since a dispatching
-extension's data must live in `other_params()` rather than in new S4 slots
-(see the checklist in `vignette("creating-extension-packages", package =
-"mizer")`), those slots were removed from the class definition — which means
-an object saved with an older version needs to be migrated before it can be
-used. `upgrade.mizerReef()` does this automatically:
+An earlier internal design of mizerReef 2.x (never publicly released) stored
+refuge, algae, and detritus parameters in three custom S4 slots
+(`refuge_params`, `algae_params`, `detritus_params`) rather than in
+`other_params()`. Since a dispatching extension's data must live in
+`other_params()` rather than in new S4 slots (see the checklist in
+`vignette("creating-extension-packages", package = "mizer")`), those slots
+were removed from the class definition before release — which means an
+object saved with that design needs to be migrated before it can be used.
+`upgrade.mizerReef()` handles this automatically, and will also handle any
+future within-2.x layout changes the same way:
 
 ```r
 upgrade.mizerReef <- function(object, ...) {
