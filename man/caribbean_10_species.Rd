@@ -25,6 +25,26 @@ parrotfish, farming damselfish, other herbivores, and invertebrates.
 Parameters are derived from field measurements at Karpata Reef, Bonaire
 (FORCE dataset, Dryden 2017) and published life-history data (FishBase).
 }
+\details{
+\code{biomass_observed} is NA for \code{eels}, \code{pred_crypt},
+\code{farm_damsel}, and \code{inverts} -- the thesis's own visual-survey
+methodology excluded fish under 10cm and struggled to capture
+small-bodied/cryptic groups, so no FORCE observation exists for these four
+(Beese 2025, Chapter 4). Several parameters were revised in 2026 during
+recalibration against a corrected senescence-mortality formula (see
+\code{\link{caribbean_10_model}}'s documentation and
+\code{inst/scripts/Caribbean_10_model-calibration.R}'s design note for the
+full reasoning and citations): \code{satiation} for \code{parrotfish},
+\code{farm_damsel}, and \code{herbs} (FALSE -> TRUE, activating literature/
+thesis-derived intake caps that were previously gated off); \code{age_mat}
+for \code{parrotfish} (2 -> 1.6, Rivera Hernandez & Shervette 2025) and
+\code{pred_grab} (2 -> 5.4, derived from the thesis's own stored growth
+curve combined with an independently-reported maturity length for
+\emph{Lutjanus apodus}, FishBase); and \code{biomass_observed} for
+\code{eels} and \code{farm_damsel} (NA -> soft literature-derived targets
+of 10 and 0.4 g/m^2 respectively, Gilbert et al. 2005; Vermeij et al.
+2015 -- these are not FORCE observations and are not treated as exact).
+}
 \references{
 FORCE dataset. From: Dryden, C. (2017). Habitat structural
 complexity of Caribbean coral reefs and its relationships with fish
@@ -32,6 +52,22 @@ community structure. PhD Thesis, Newcastle University.
 
 Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
 https://doi.org/10.26686/wgtn.26421523
+
+Rivera Hernandez, J.M. & Shervette, V.R. (2025). Addressing
+life history information gaps for Caribbean parrotfishes: queen parrotfish
+Scarus vetula and stoplight parrotfish Sparisoma viride. Environmental
+Biology of Fishes, 108, 179-198. https://doi.org/10.1007/s10641-024-01651-x
+
+Gilbert, M., Rasmussen, J.B. & Kramer, D.L. (2005). Estimating
+the density and biomass of moray eels (Muraenidae) using a modified visual
+census method for hole-dwelling reef fauna. Environmental Biology of
+Fishes, 73, 415-426. https://doi.org/10.1007/s10641-005-2228-2
+
+Vermeij, M.J.A., DeBey, H., Grimsditch, G., Brown, J., Obura,
+D., DeLeon, R. & Sandin, S.A. (2015). Negative effects of gardening
+damselfish Stegastes planifrons on coral health depend on predator
+abundance. Marine Ecology Progress Series, 528, 289-296.
+https://doi.org/10.3354/meps11243
 }
 \seealso{
 \code{\link{caribbean_10_model}}, \code{\link{caribbean_10_interaction}},

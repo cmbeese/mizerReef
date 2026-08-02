@@ -191,6 +191,25 @@
 #' Parameters are derived from field measurements at Karpata Reef, Bonaire
 #' (FORCE dataset, Dryden 2017) and published life-history data (FishBase).
 #'
+#' \code{biomass_observed} is NA for \code{eels}, \code{pred_crypt},
+#' \code{farm_damsel}, and \code{inverts} -- the thesis's own visual-survey
+#' methodology excluded fish under 10cm and struggled to capture
+#' small-bodied/cryptic groups, so no FORCE observation exists for these four
+#' (Beese 2025, Chapter 4). Several parameters were revised in 2026 during
+#' recalibration against a corrected senescence-mortality formula (see
+#' \code{\link{caribbean_10_model}}'s documentation and
+#' \code{inst/scripts/Caribbean_10_model-calibration.R}'s design note for the
+#' full reasoning and citations): \code{satiation} for \code{parrotfish},
+#' \code{farm_damsel}, and \code{herbs} (FALSE -> TRUE, activating literature/
+#' thesis-derived intake caps that were previously gated off); \code{age_mat}
+#' for \code{parrotfish} (2 -> 1.6, Rivera Hernandez & Shervette 2025) and
+#' \code{pred_grab} (2 -> 5.4, derived from the thesis's own stored growth
+#' curve combined with an independently-reported maturity length for
+#' \emph{Lutjanus apodus}, FishBase); and \code{biomass_observed} for
+#' \code{eels} and \code{farm_damsel} (NA -> soft literature-derived targets
+#' of 10 and 0.4 g/m^2 respectively, Gilbert et al. 2005; Vermeij et al.
+#' 2015 -- these are not FORCE observations and are not treated as exact).
+#'
 #' @keywords datasets
 #' @seealso \code{\link{caribbean_10_model}}, \code{\link{caribbean_10_interaction}},
 #'   \code{\link{karpata_refuge}}
@@ -199,6 +218,19 @@
 #' community structure. PhD Thesis, Newcastle University.
 #' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
 #'   https://doi.org/10.26686/wgtn.26421523
+#' @references Rivera Hernandez, J.M. & Shervette, V.R. (2025). Addressing
+#' life history information gaps for Caribbean parrotfishes: queen parrotfish
+#' Scarus vetula and stoplight parrotfish Sparisoma viride. Environmental
+#' Biology of Fishes, 108, 179-198. https://doi.org/10.1007/s10641-024-01651-x
+#' @references Gilbert, M., Rasmussen, J.B. & Kramer, D.L. (2005). Estimating
+#' the density and biomass of moray eels (Muraenidae) using a modified visual
+#' census method for hole-dwelling reef fauna. Environmental Biology of
+#' Fishes, 73, 415-426. https://doi.org/10.1007/s10641-005-2228-2
+#' @references Vermeij, M.J.A., DeBey, H., Grimsditch, G., Brown, J., Obura,
+#' D., DeLeon, R. & Sandin, S.A. (2015). Negative effects of gardening
+#' damselfish Stegastes planifrons on coral health depend on predator
+#' abundance. Marine Ecology Progress Series, 528, 289-296.
+#' https://doi.org/10.3354/meps11243
 #' @format A data frame with one row per functional group and columns for
 #'   life-history parameters (w_max, w_mat, age_mat, h, beta, sigma, etc.),
 #'   refuge use (\code{refuge_user}, \code{blocked_pred}, \code{satiation}),
@@ -246,6 +278,33 @@
 #' an earlier untuned version of this object (algae biomass not yet solved
 #' for its steady state) is archived at
 #' \code{inst/archive/caribbean_10_model_untuned.rda} for reference.
+#'
+#' Recalibrated in 2026 against a corrected senescence-mortality formula
+#' (\code{reefSenMort()}), the same underlying issue that required
+#' recalibrating \code{\link{caribbean_3_model}}. Biomass, growth, and
+#' reproduction were all re-tuned (verified: repeated \code{reefSteady()}
+#' calls leave biomass unchanged). Final biomass is within 79-121\% of the
+#' six FORCE-observed targets (\code{pred_eng}, \code{pred_grab},
+#' \code{pred_inv}, \code{pred_plank}, \code{parrotfish}, \code{herbs});
+#' growth (age at maturity) matches its target closely for five of those six,
+#' and reasonably (within a factor of ~3) for \code{pred_grab} after
+#' correcting its own \code{age_mat} target (see
+#' \code{\link{caribbean_10_species}}'s documentation). \code{eels} and
+#' \code{farm_damsel} -- which have no FORCE-observed biomass target -- were
+#' given soft, literature-derived targets and brought up from near-zero to a
+#' modest, non-vanishing presence, deliberately not matched exactly (doing so
+#' costs disproportionate accuracy on the six well-observed groups). A
+#' version of this model that ignores \code{eels}/\code{farm_damsel} entirely
+#' and matches the six FORCE-observed groups more tightly is archived (not
+#' bundled as a package dataset, to avoid doubling the recalibration burden)
+#' at \code{inst/archive/caribbean_10_model_tight_biomass_fit.rds} -- load
+#' with \code{mizer::readParams()}. The complexity-increases-biomass
+#' relationship central to the associated manuscript/thesis chapter was
+#' explicitly re-verified against this recalibrated model (competitive vs.
+#' non-complex refuge), not merely assumed to still hold. See
+#' \code{inst/scripts/Caribbean_10_model-calibration.R}'s design note for the
+#' full reasoning, including why growth-matching required tuning one species
+#' at a time rather than mizerExperimental's usual batched workflow.
 #'
 #' @keywords datasets
 #' @seealso \code{\link{caribbean_10_species}}, \code{\link{caribbean_10_interaction}},

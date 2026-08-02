@@ -37,6 +37,33 @@ consumption, since real algal production is not driven by grazer demand;
 an earlier untuned version of this object (algae biomass not yet solved
 for its steady state) is archived at
 \code{inst/archive/caribbean_10_model_untuned.rda} for reference.
+
+Recalibrated in 2026 against a corrected senescence-mortality formula
+(\code{reefSenMort()}), the same underlying issue that required
+recalibrating \code{\link{caribbean_3_model}}. Biomass, growth, and
+reproduction were all re-tuned (verified: repeated \code{reefSteady()}
+calls leave biomass unchanged). Final biomass is within 79-121\\% of the
+six FORCE-observed targets (\code{pred_eng}, \code{pred_grab},
+\code{pred_inv}, \code{pred_plank}, \code{parrotfish}, \code{herbs});
+growth (age at maturity) matches its target closely for five of those six,
+and reasonably (within a factor of ~3) for \code{pred_grab} after
+correcting its own \code{age_mat} target (see
+\code{\link{caribbean_10_species}}'s documentation). \code{eels} and
+\code{farm_damsel} -- which have no FORCE-observed biomass target -- were
+given soft, literature-derived targets and brought up from near-zero to a
+modest, non-vanishing presence, deliberately not matched exactly (doing so
+costs disproportionate accuracy on the six well-observed groups). A
+version of this model that ignores \code{eels}/\code{farm_damsel} entirely
+and matches the six FORCE-observed groups more tightly is archived (not
+bundled as a package dataset, to avoid doubling the recalibration burden)
+at \code{inst/archive/caribbean_10_model_tight_biomass_fit.rds} -- load
+with \code{mizer::readParams()}. The complexity-increases-biomass
+relationship central to the associated manuscript/thesis chapter was
+explicitly re-verified against this recalibrated model (competitive vs.
+non-complex refuge), not merely assumed to still hold. See
+\code{inst/scripts/Caribbean_10_model-calibration.R}'s design note for the
+full reasoning, including why growth-matching required tuning one species
+at a time rather than mizerExperimental's usual batched workflow.
 }
 \references{
 FORCE dataset. From: Dryden, C. (2017). Habitat structural
