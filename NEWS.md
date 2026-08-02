@@ -239,8 +239,12 @@
   inherits its formula from `setExtMortParams()`'s corrected "Senescence
   mortality" section instead of duplicating it, so the two can no longer
   drift apart. Documentation-only fix; no code change.
-
-# MizerReef 2.0.0
+- `caribbean_3_model-description.Rmd` and `karpata_model-description.Rmd`
+  carried the same wrong senescence-mortality formula as the `reefSenMort()`
+  roxygen above (a stray "at size 1 gram" gloss also incorrectly implied
+  `sen_prop` was the mortality rate at 1g, when the formula is actually
+  floored to exactly zero there). `model-description.Rmd` already had the
+  correct formula; the two model-specific vignettes now match it.
 
 ## Major changes
 

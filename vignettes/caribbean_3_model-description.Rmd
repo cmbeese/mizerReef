@@ -284,15 +284,17 @@ Senescence mortality is assumed to increase allometrically with body
 size. The rate of senescence mortality is given by:
 
 $$
-\mu_{sen.i}(w) =  k_{sen} \left(\frac{log_{10}(w)}
+\mu_{sen.i}(w) = \left( k_{sen} \frac{log_{10}(w)}
                                      {log_{10}(w_{max.i})}\right)^{p_{sen}}
-$$ {#eq-extmort} where $k_{sen}$ is the rate of senescence mortality,
-$p_{sen}$ defines the slope of the senescence curve, and $w_{max.i}$ is
-the maximum body size of functional group $i$ in grams.
+$$ {#eq-extmort} floored at zero for $w < 1$ g. Here $k_{sen}$
+(`sen_prop`) sets the overall rate, $p_{sen}$ (`sen_curve`) controls the
+steepness with which mortality climbs as individuals approach their
+maximum size, and $w_{max.i}$ is the maximum body size of functional
+group $i$ in grams.
 
-The senescence mortality rate for mortalities due to illness and old age is
-set to $k_{sen} =$ `r ext_mort$sen_prop` per year at size 1 gram and increases
-allometrically with body size with slope $p_{sen} =$ `r ext_mort$sen_curve`.
+Senescence mortality due to illness and old age uses
+$k_{sen} =$ `r ext_mort$sen_prop` and $p_{sen} =$ `r ext_mort$sen_curve`
+for this model.
 
 ## Reproduction {#reproduction}
 The reproduction parameters $\epsilon_i$ and $R_{max.i}$ are not directly observable. The values were instead chosen so as to produce steady-state abundances of the groups that are in line with observations and to give reasonable values for the reproduction level.
