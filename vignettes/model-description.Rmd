@@ -291,13 +291,15 @@ plays the same role as $z0_i$ in mizer.
 To represent death from old age near a group's maximum size, mizerReef adds a
 size-increasing senescence term (`reefSenMort()`, `getSenMort()`):
 $$
-\mu_{sen.i}(w) = \left( k_{sen}\,
-  \frac{\log_{10} w}{\log_{10} w_{max.i}} \right)^{p_{sen}},
+\mu_{sen.i}(w) = k_{sen}\,
+  \left(\frac{\log_{10} w}{\log_{10} w_{max.i}} \right)^{p_{sen}},
 $$
-floored at zero for $w < 1$ g. Here $w_{max.i}$ is the maximum weight of group
-$i$, $k_{sen}$ (`sen_prop`) sets the overall rate, and $p_{sen}$ (`sen_curve`)
-controls the steepness with which mortality climbs as individuals approach their
-maximum size. Senescence mortality is included only when the model is set up to
+with the ratio floored at zero for $w < 1$ g. Here $w_{max.i}$ is the maximum
+weight of group $i$, $k_{sen}$ (`sen_prop`) is the rate the curve approaches
+as $w \to w_{max.i}$ (where the ratio is exactly 1), and $p_{sen}$
+(`sen_curve`) controls the steepness with which mortality climbs as
+individuals approach their maximum size. Senescence mortality is included
+only when the model is set up to
 use it; both it and the residual natural mortality are configured through
 `setExtMortParams()`.
 

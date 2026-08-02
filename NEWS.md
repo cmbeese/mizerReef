@@ -229,22 +229,27 @@
   ...)`) so custom `ext_mort_params` actually works: it was previously
   broken for both a `data.frame` (crashed on first use) and a named `list`
   (failed validation outright with a misleading error) input.
-- `reefSenMort()`/`getSenMort()`'s documented senescence-mortality formula
-  didn't match either the actual code or `setExtMortParams()`'s own
-  (correct) documentation of the same formula: it used the raw size ratio
-  `w/w_max.i` instead of the log-size ratio the code actually computes, put
-  the `sen_prop`/`sen_curve` constants in the wrong place relative to the
-  exponent, and referenced a `setSenMortParams()` function that doesn't
-  exist (the real function is `setExtMortParams()`). `reefSenMort()` now
-  inherits its formula from `setExtMortParams()`'s corrected "Senescence
-  mortality" section instead of duplicating it, so the two can no longer
-  drift apart. Documentation-only fix; no code change.
-- `caribbean_3_model-description.Rmd` and `karpata_model-description.Rmd`
-  carried the same wrong senescence-mortality formula as the `reefSenMort()`
-  roxygen above (a stray "at size 1 gram" gloss also incorrectly implied
-  `sen_prop` was the mortality rate at 1g, when the formula is actually
-  floored to exactly zero there). `model-description.Rmd` already had the
-  correct formula; the two model-specific vignettes now match it.
+- **`reefSenMort()`/`getSenMort()` computed senescence mortality
+  approximately 5x too high across the entire weight spectrum**, for every
+  model, since a since-lost commit meant to fix a `NaN`-for-`w`-under-1g
+  edge case. The original (and originally documented, thesis-matching)
+  formula is `sen_prop * max(0, log10(w)/log10(w_max.i))^sen_curve`, which
+  reaches exactly `sen_prop` at a group's maximum size; the edge-case fix
+  moved `sen_prop` inside the floored ratio before it gets raised to the
+  `sen_curve` power, so the rate at maximum size became `sen_prop^sen_curve`
+  instead (`0.501`, not the intended `0.1`, under the package defaults) --
+  a constant `sen_prop^(sen_curve - 1)` multiplier at every weight above 1g,
+  not just near maximum size. This directly inflated total mortality
+  (`reefMort()`) in every simulation. Fixed to the original formula; the
+  three roxygen/vignette copies of this formula (which had independently
+  drifted to describe three different, mutually-inconsistent versions, none
+  of which matched the buggy code either) are now all consistent with it
+  and with each other. `caribbean_3_model` and `caribbean_10_model` have
+  both had `other_params$detritus$external` retuned (the only slot
+  affected) to restore their detritus production/consumption balance,
+  which the corrected mortality rate had thrown off (senescence mortality
+  contributes to detritus's "decomp" production term); no other slot in
+  either bundled model changed.
 
 ## Major changes
 

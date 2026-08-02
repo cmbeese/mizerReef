@@ -866,9 +866,9 @@ reefSenMort <- function(params, ...) {
 
     # Loop through species
     for (i in seq_along(sen_weight)) {
-        sen <- sen_prop * (log_w / log_sw[i])
-        sen[sen < 0] <- 0
-        sen_mort[i, ] <- sen^sen_curve
+        ratio <- log_w / log_sw[i]
+        ratio[ratio < 0] <- 0
+        sen_mort[i, ] <- sen_prop * ratio^sen_curve
     }
     return(sen_mort)
 }

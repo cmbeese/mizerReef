@@ -284,10 +284,11 @@ Senescence mortality is assumed to increase allometrically with body
 size. The rate of senescence mortality is given by:
 
 $$
-\mu_{sen.i}(w) = \left( k_{sen} \frac{log_{10}(w)}
-                                     {log_{10}(w_{max.i})}\right)^{p_{sen}}
-$$ {#eq-extmort} floored at zero for $w < 1$ g. Here $k_{sen}$
-(`sen_prop`) sets the overall rate, $p_{sen}$ (`sen_curve`) controls the
+\mu_{sen.i}(w) = k_{sen} \left(\frac{log_{10}(w)}
+                                    {log_{10}(w_{max.i})}\right)^{p_{sen}}
+$$ {#eq-extmort} with the ratio floored at zero for $w < 1$ g. Here
+$k_{sen}$ (`sen_prop`) is the rate the curve approaches as $w \to
+w_{max.i}$, and $p_{sen}$ (`sen_curve`) controls the
 steepness with which mortality climbs as individuals approach their
 maximum size, and $w_{max.i}$ is the maximum body size of functional
 group $i$ in grams.
