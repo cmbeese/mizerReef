@@ -97,11 +97,19 @@ FALSE means the species can access prey within refuge
 (e.g. eels). Defaults to FALSE.}
 
 \item{satiation}{Logical vector (length = number of species). Indicates which
-groups are subject to satiation. If not provided, defaults
-are set automatically: FALSE for carnivores (species that
-eat other species, i.e. row sum of interaction matrix > 0),
-TRUE for pure resource consumers (species that do not eat
-other species but have positive resource interaction). A
+groups are subject to satiation. In mizerReef, satiation
+is intended to be exclusive to detritivory (see
+\code{\link[=algae_consumption]{algae_consumption()}}'s "Algae consumption" section) --
+if not provided, defaults are set automatically: TRUE
+only for detritivores (species with positive
+\code{interaction_detritus} that do NOT also graze algae, i.e.
+\code{interaction_algae} is zero or absent, and that do not
+eat other species, i.e. row sum of interaction matrix is
+0); FALSE for every other species, including carnivores,
+pure algae/plankton grazers, and species that consume
+both algae and detritus (their diet is herbivore-like, so
+they default to the unregulated, herbivore-style
+behaviour rather than the detritivore-style one). A
 warning is issued if defaults are used.}
 
 \item{a_bar}{Numeric. Length-weight conversion parameter for dummy fish.

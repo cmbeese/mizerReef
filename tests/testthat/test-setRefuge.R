@@ -89,8 +89,9 @@ test_that("setRefuge fills missing refuge_user/blocked_pred with FALSE and warns
 })
 
 test_that("setRefuge computes the documented default satiation rule and warns", {
-    # satiation default = !eats_other_species & eats_resources, derived from
-    # the interaction matrix and the interaction_* resource columns --
+    # satiation default = !eats_other_species & eats_detritus & !eats_algae,
+    # i.e. TRUE only for pure detritivores -- derived from the interaction
+    # matrix and the interaction_algae/interaction_detritus columns --
     # independently hand-computed here from caribbean_3_interaction/species,
     # not by re-deriving from setRefuge's own code.
     data(caribbean_3_species)
@@ -104,15 +105,24 @@ test_that("setRefuge computes the documented default satiation rule and warns", 
     params@species_params$satiation <- NULL
 
     eats_other_species <- rowSums(caribbean_3_interaction) > 0
-    resource_cols <- c("interaction_resource", "interaction_algae", "interaction_detritus")
-    eats_resources <- rowSums(sp[, resource_cols], na.rm = TRUE) > 0
-    expected_satiation <- !eats_other_species & eats_resources
+    eats_algae <- sp[["interaction_algae"]] > 0
+    eats_detritus <- sp[["interaction_detritus"]] > 0
+    expected_satiation <- !eats_other_species & eats_detritus & !eats_algae
 
     expect_warning(
         result <- setRefuge(params, method = "noncomplex"),
-        "default is FALSE for carnivores and TRUE for resource consumers"
+        "default is TRUE only for detritivores"
     )
     expect_equal(unname(result@species_params$satiation), unname(expected_satiation))
+    # For caribbean_3_species specifically, the tightened default reproduces
+    # the bundled caribbean_3_model's own explicit, thesis-matched values
+    # exactly (predators/herbivores = FALSE, inverts = TRUE) -- confirming
+    # the heuristic no longer conflates algae-grazing herbivores with
+    # detritivores the way the old "any resource consumer" rule did.
+    expect_equal(
+        unname(result@species_params$satiation),
+        c(FALSE, FALSE, TRUE)
+    )
 })
 
 test_that("setRefuge fills missing a/b with a_bar/b_bar and warns", {
