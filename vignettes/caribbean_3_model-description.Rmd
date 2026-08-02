@@ -153,11 +153,11 @@ plotRefugeProfile(params)
 
 ### Consumption
 
-Consumption of the detrital resource is subject to a Holling functional response type II to represent satiation. This relationship is defined by the maximum intake rate, which increases allometrically with body size at rate $n$. The parameter $h$ is the max consumption rate for an invertebrate consumer of size 1 gram. Values for $h$ were chosen so that invertebrates are neither too starved nor totally satiated.
+Consumption of the detrital and algal resources is subject to a Holling functional response type II to represent satiation. This relationship is defined by the maximum intake rate, which increases allometrically with body size at rate $n$. The parameter $h$ is the max consumption rate for a consumer of size 1 gram. Values for $h$ were chosen so that consumers subject to satiation are neither too starved nor totally satiated.
 
-Only a proportion $\alpha_i$ of consumed biomass is retained, while a proportion $1-\alpha_i$ is expelled in the form of feces, which contribute to the detritus. See the table below for the max consumption rate for invertebrates.
+Only a proportion $\alpha_i$ of consumed biomass is retained, while a proportion $1-\alpha_i$ is expelled in the form of feces, which contribute to the detritus. See the table below for the max consumption rate for species subject to satiation.
 
-No maximum consumption rate is imposed for herbivores or predators.
+No maximum consumption rate is imposed for predators. Herbivores are subject to satiation here, unlike the package default for herbivorous groups (see the [main model description](model-description.html#consumption-and-satiation)): recalibrating this model against the corrected senescence-mortality formula showed herbivore biomass has no density-dependent brake at all without some cap on individual intake once mortality is realistically low. The realised feeding level for herbivores is consistently close to 1, consistent with Caribbean herbivores' guts being observed to be full essentially continuously [@Ferreira1998; @Kopp2010] -- the citations behind the package's herbivore-satiation default describe grazing *pressure on the shared algae resource* not self-regulating when food is abundant, which is unaffected by this change (see the main model description's Algae section).
 
 ```{r, echo = FALSE}
 params@species_params %>%
@@ -181,6 +181,8 @@ params@species_params %>%
 A proportion $\psi_i(w)$ of the energy available for growth and reproduction is used for reproduction. This proportion changes from zero below the weight $w_{mat.i}$ of maturation to one at the maximum weight $w_{max.i}$, where all available energy is used for reproduction.
 
 Maturation length and age data were based on the most commonly observed species from each functional group in the FORCE data set [@Dryden2016; @Rogers_2014; @Newman_2015; @Williams_2015; @Williams_2016]. For predators, this was the graysby grouper, *Cephalopholis cruentata*. The most commonly observed herbivore was the stoplight parrotfish, *Sparisoma viride*. Relevant maturity parameters were pulled from FishBase [@FishBase].
+
+The herbivore `age_mat` value is set to 1.6 years, the age at median sexual maturity (AM50) reported for *S. viride* by @RiveraHernandez2025 -- a 2013-2023 otolith/gonad-histology study of 1801 U.S. Caribbean stoplight parrotfish. An earlier version of this model used `age_mat = 4`, which appears to have conflated AM50 with that same study's age at median sexual transition (AT50 = 4.5 years, the age at which female stoplight parrotfish -- a protogynous hermaphrodite species -- become male), a distinct milestone from first reproductive maturity.
 
 ```{r, echo = FALSE}
 params@species_params %>%

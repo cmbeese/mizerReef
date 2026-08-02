@@ -244,12 +244,22 @@
   three roxygen/vignette copies of this formula (which had independently
   drifted to describe three different, mutually-inconsistent versions, none
   of which matched the buggy code either) are now all consistent with it
-  and with each other. `caribbean_3_model` and `caribbean_10_model` have
-  both had `other_params$detritus$external` retuned (the only slot
-  affected) to restore their detritus production/consumption balance,
-  which the corrected mortality rate had thrown off (senescence mortality
-  contributes to detritus's "decomp" production term); no other slot in
-  either bundled model changed.
+  and with each other. `caribbean_3_model` and `caribbean_10_model` initially
+  had only `other_params$detritus$external` retuned to restore their
+  detritus production/consumption balance, which the corrected mortality
+  rate had thrown off (senescence mortality contributes to detritus's
+  "decomp" production term) -- but that patch alone left fish abundances
+  stale relative to the corrected mortality, so neither bundled model was
+  actually a genuine steady state of its own current code (confirmed:
+  running `reefSteady()` on them grew biomass 3-9x). `caribbean_3_model` has
+  since been fully recalibrated (fish abundances, growth/consumption rates
+  and reproduction parameters all re-tuned; verified stable under repeated
+  `reefSteady()` calls) -- see `inst/scripts/Caribbean_3_model-calibration.R`
+  and `vignettes/caribbean_3_model-description.Rmd` for the updated recipe,
+  including two herbivore `species_params` changes (`satiation`, `age_mat`)
+  needed to reach a stable calibration under the corrected mortality.
+  `caribbean_10_model` recalibration is not yet done (tracked separately;
+  has no surviving calibration script to build from, unlike caribbean_3).
 
 ## Major changes
 
