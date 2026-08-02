@@ -25,7 +25,7 @@ invertebrates. The model includes competitive predation refuge (using
 \details{
 Built from \code{\link{caribbean_10_species}},
 \code{\link{caribbean_10_interaction}}, and \code{\link{karpata_refuge}};
-calibrated to match observed biomasses and upgraded to mizerReef 2.1.0 /
+calibrated to match observed biomasses and built with mizerReef 2.0.0 /
 mizer 3.1.0. Detritus resource dynamics are tuned via \code{\link[=tuneUR]{tuneUR()}} so that
 they are genuinely at steady state (\code{dB/dt = 0}) for the model's
 calibrated abundances. Algae biomass is likewise tuned by \code{\link[=tuneUR]{tuneUR()}} to

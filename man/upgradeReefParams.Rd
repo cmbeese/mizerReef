@@ -2,7 +2,7 @@
 % Please edit documentation in R/mizerReef-upgrade.R
 \name{upgradeReefParams}
 \alias{upgradeReefParams}
-\title{Upgrade a mizerReef 1.x params object to the current (2.1.0+) layout}
+\title{Upgrade a mizerReef 1.x params object to the current (2.0.0+) layout}
 \usage{
 upgradeReefParams(params)
 }

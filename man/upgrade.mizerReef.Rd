@@ -18,6 +18,6 @@ An upgraded \code{mizerReef} object.
 Called automatically by \code{\link[mizer:validParams]{mizer::validParams()}} when an object created with
 an older version of mizerReef is loaded. Migrates data stored in the old
 custom S4 slots (\code{refuge_params}, \code{algae_params}, \code{detritus_params}) to the
-\code{other_params} sub-lists used since version 2.1.0 (\code{other_params$refuge_params},
+current \code{other_params} sub-lists (\code{other_params$refuge_params},
 \code{other_params$algae}, \code{other_params$detritus}).
 }
