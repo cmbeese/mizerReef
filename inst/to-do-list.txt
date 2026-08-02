@@ -1,3 +1,178 @@
+=== STOP AND READ FIRST (02/08, CRITICAL, same day as seventeenth session:
+bundled caribbean_3_model/caribbean_10_model are no longer genuine steady
+states of their own current code -- discovered while regenerating the
+manuscript figure, NOT caused by anything in this session, needs an
+interactive recalibration session before ANYTHING further ships ===
+
+** Do not push `main` live, and think twice before pushing `major_update`
+further, until this is resolved. Two small, independently-verified fixes
+from the seventeenth session (bfde6d9/02ebc5f getProductivity() roxygen,
+d3a6f56/a1cf41f satiation default heuristic) are NOT implicated in this and
+are safe on their own -- this entry is about a separate, pre-existing
+problem this session stumbled onto while doing unrelated follow-up work. **
+
+** How this was found **
+
+User asked (same session as the 17th thesis cross-check, immediately
+after it) to regenerate `vignettes/figures/karpata_example.png` (the
+manuscript figure, produced by `inst/scripts/karpata_example_fig.R`) and
+confirm the vignettes still show the expected result that habitat
+complexity increases biomass and productivity. Regenerating the figure
+with the current bundled `caribbean_10_model` produced a **flat (no
+refuge) biomass higher than complex (refuge) biomass** -- backwards from
+every prior version of this figure and from the thesis's own stated
+result. Productivity still pointed the right way (complex > flat), but
+biomass did not.
+
+** Root cause: the sixteenth session's reefSenMort() fix corrected the
+formula (~5x mortality reduction) but only patched the resource side
+(`other_params$detritus$external`); it never touched fish abundances,
+per the standing "patch the slot, don't regenerate wholesale" rule. That
+means both bundled models' `initial_n` are still literally the exact
+abundances that were tuned against the OLD (buggy, too-high) mortality
+formula -- they are no longer an actual fixed point of the package's
+CURRENT rate functions, even though the numbers still closely track the
+real `biomass_observed` field data (nothing was corrupted; see below). **
+
+Confirmed directly: running `reefSteady()` on the bundled models as they
+ship today (with today's corrected code) shows they are dynamically
+unstable at their current abundances -- population grows toward a much
+higher equilibrium once actually allowed to respond to the (correctly)
+lower mortality:
+- `caribbean_3_model`: 188.6 g/m^2 -> 1702.6 g/m^2 after re-convergence
+  (9.4x)
+- `caribbean_10_model`: 150.2 g/m^2 -> 476.8 g/m^2 after re-convergence
+  (3.2x)
+
+The manuscript figure's specific bug: it compares the bundled "Complex"
+object AS-IS (never re-run through `reefSteady()` in the script) against
+a freshly built "Flat" (`newRefuge()` + `reefSteady()` x3-8) object that
+DOES get re-equilibrated under the corrected formula -- an apples-to-
+oranges comparison between a frozen pre-fix snapshot and a freshly
+reconverged post-fix one, which is what flips the direction. The exact
+same bug exists in the shipped `vignettes/mizerReef.Rmd`'s "Changing the
+refuge profile" section (`eval=TRUE`, so this runs live on every vignette
+build) -- its own prose ("removing refuge availability reduces both
+biomass and productivity across all species") is currently FALSE for
+biomass if the vignette is rendered fresh today.
+
+** The reassuring, load-bearing finding: the underlying science is NOT
+broken. ** When both sides of the comparison are treated consistently --
+i.e. BOTH reconverged under today's corrected code, not one frozen and
+one fresh -- the expected relationship comes right back:
+- Complex (refuge), reconverged: 476.8 g/m^2
+- Flat (no refuge), reconverged: 286.7 g/m^2
+- Complex > Flat, as the thesis says it should be.
+
+So this is a real bug (the bundled objects are stale relative to their
+own code, and two pieces of shipped documentation currently make a false
+claim if regenerated), but it is NOT evidence the thesis's central claim
+about habitat complexity is wrong, and NOT evidence the package gives
+wrong answers about complexity's importance -- it's a narrower staleness/
+comparison-methodology problem, confirmed by direct numerical test.
+
+** Two automated recalibration attempts this session, BOTH diverged --
+this needs to be done interactively, not scripted end-to-end **
+
+User pointed to the original tuning approach: `inst/scripts/
+Caribbean_3_model-calibration.R` (dated 17/12/2025, fully logged with git
+head/seed/md5 checksums), which uses `calibrateReefBiomass()` ->
+`matchBiomasses()` -> `matchReefGrowth()` -> `reefSteady()` cycled
+several times, then manual reproduction-level tuning
+(`setBevertonHolt()`), all following the mizer blog's 5-step recipe
+(referenced directly in Chapter3.tex). User's own guidance: "the most
+concerning thing to tune were the diets" -- i.e. the interaction/theta
+structure needs real judgment, not automation. No equivalent dedicated,
+logged calibration script exists for `caribbean_10_model`/karpata (only
+`inst/archive/caribbean_10_model_untuned.rda`, no script) -- its original
+tuning history is less documented than caribbean_3's.
+
+Attempt 1 (rebuild `caribbean_3_model` from raw CSVs via `newReefParams()`,
+replaying the original script's exact recipe under today's corrected
+code): diverged partway through the "6x binned-method tuning cycles"
+loop -- the convergence distance got WORSE each cycle (46.8 -> 159.4 ->
+647.6) and `erepro` was pushed to requiring an "unrealistic value greater
+than 1" for herbivores, before crashing with `search_vol must not contain
+non-finite values`.
+
+Attempt 2 (start from the EXISTING, already-well-tuned bundled
+`caribbean_3_model` instead of rebuilding from scratch -- a much smaller
+perturbation in principle): looped `calibrateReefBiomass() |>
+matchBiomasses() |> matchReefGrowth() |> reefSteady()` for up to 8
+cycles, watching biomass each time. It oscillated wildly rather than
+converging: 191.8/475.2/818.1 (cycle 1) -> 51.3/37.8/1.9 (cycle 2) ->
+99.9/31.0/1.6 (cycle 3) -> 2279.1/9.7/1913.8 (cycle 4) ->
+192.1/0.8/5346.5 (cycle 5) -> 10.9/0.3/1.5 (cycle 6) -> 0.001/5.9/5.4e12
+(cycle 7) -> errored with "Some species have no reproduction" (cycle 8).
+
+**Conclusion, directly relevant to how the next session should approach
+this**: this instability is NOT specific to the corrected mortality
+formula or to today's code changes -- it demonstrates that `calibrateReefBiomass()`
++ `matchBiomasses()` + `matchReefGrowth()` + `reefSteady()`, cycled
+mechanically without inspection, is not a convergent/contracting
+procedure in general. The original script's own comments make this
+explicit in hindsight: it ran a small, fixed number of cycles (6-7) and
+then STOPPED because a human looked at `plotBiomassVsSpecies()` and
+`plotSpectra()` and judged the result "spot on" -- there is no automated
+stopping/convergence criterion here, only human visual judgment at each
+step, exactly per the mizer blog's 5-step recipe. Do not attempt to script
+this end-to-end again; do it one cycle at a time, checking
+`plotBiomassVsSpecies()`, `plotSpectra(power = 1/2)`, `plotDiet()`,
+`plotGrowthCurves()`, and reproduction levels (`getReproductionLevel()`,
+`getRDI()/getRDD()`) between every cycle, the way the original script's
+own inline comments show it was actually done, paying particular
+attention to diet/interaction tuning per the user's explicit guidance.
+
+** User's decision, explicitly given rather than assumed (per
+feedback-repeat-audit-after-bugs-found and feedback-thesis-vs-code-ask-
+dont-assume): defer the actual recalibration to its own dedicated,
+focused session rather than rushing it tonight. Nothing in data/ was
+changed this session -- both bundled .rda files are exactly as they were
+before this was discovered. Two scratch scripts and their outputs from
+the failed attempts are in the session's scratchpad directory only, not
+committed anywhere in the repo. **
+
+** What the next session needs to do, in order:
+1. Re-read this entry in full before touching data/ or re-attempting
+   anything.
+2. Do the caribbean_3_model recalibration interactively, one
+   calibrateReefBiomass()/matchBiomasses()/matchReefGrowth()/reefSteady()
+   cycle at a time, checking diagnostic plots between cycles exactly like
+   inst/scripts/Caribbean_3_model-calibration.R's own comments show,
+   stopping by judgment (not a fixed loop count) when biomass matches
+   `biomass_observed` and the fit "looks right" the way the original run
+   did.
+2b. Ask the user for their judgment specifically on diet/interaction
+    (theta_ij) tuning during this process -- flagged by the user as the
+    most concerning part to get right, not something to resolve
+    unilaterally.
+3. Ask the user how caribbean_10_model/karpata was originally tuned
+   (no equivalent script survives in the repo) before attempting its
+   recalibration -- don't assume it followed an identical recipe to
+   caribbean_3_model's.
+4. Re-verify the manuscript figure (`inst/scripts/karpata_example_fig.R`)
+   and `vignettes/mizerReef.Rmd`'s "Changing the refuge profile" section
+   both reproduce the expected complex > flat result for BOTH biomass and
+   productivity once both bundled models are properly recalibrated, using
+   an apples-to-apples comparison in both cases (i.e. also re-run
+   reefSteady() on the "Complex" reference in that comparison, not just
+   the "Flat" side, going forward -- this is worth fixing in
+   karpata_example_fig.R/mizerReef.Rmd regardless of recalibration, since
+   comparing a static reference against a freshly-reconverged comparison
+   model is fragile to exactly this kind of staleness recurring).
+5. Only after recalibration is confirmed sound: regenerate the manuscript
+   figure and rebuild affected vignettes, re-run the full test suite and
+   devtools::check(), and re-raise the "is main ready to go live" question
+   -- it was explicitly NOT answered yes this session because of this
+   finding, despite the user's initial inclination that it might be.
+6. Branch state as of this entry: `major_update` has 3 unpushed commits
+   ahead of origin (bfde6d9, 1acc6a6, d3a6f56 -- see the seventeenth
+   session entry below for the first and third); `main` has the first and
+   third cherry-picked (02ebc5f, a1cf41f) and is also unpushed. Whether to
+   push `major_update` with just these two safe, unrelated fixes while
+   this bigger issue is open is the user's call, not decided in this
+   entry.
+
 === STOP AND READ FIRST (02/08, seventeenth session: thesis cross-check,
 different in kind from the four doc-vs-code audits above) ===
 
