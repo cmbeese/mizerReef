@@ -602,11 +602,19 @@ setExtMortParams <- function(params,
 #'                     (e.g. eels). Defaults to FALSE.
 #'
 #' @param satiation Logical vector (length = number of species). Indicates which
-#'                  groups are subject to satiation. If not provided, defaults
-#'                  are set automatically: FALSE for carnivores (species that
-#'                  eat other species, i.e. row sum of interaction matrix > 0),
-#'                  TRUE for pure resource consumers (species that do not eat
-#'                  other species but have positive resource interaction). A
+#'                  groups are subject to satiation. In mizerReef, satiation
+#'                  is intended to be exclusive to detritivory (see
+#'                  [algae_consumption()]'s "Algae consumption" section) --
+#'                  if not provided, defaults are set automatically: TRUE
+#'                  only for detritivores (species with positive
+#'                  `interaction_detritus` that do NOT also graze algae, i.e.
+#'                  `interaction_algae` is zero or absent, and that do not
+#'                  eat other species, i.e. row sum of interaction matrix is
+#'                  0); FALSE for every other species, including carnivores,
+#'                  pure algae/plankton grazers, and species that consume
+#'                  both algae and detritus (their diet is herbivore-like, so
+#'                  they default to the unregulated, herbivore-style
+#'                  behaviour rather than the detritivore-style one). A
 #'                  warning is issued if defaults are used.
 #'
 #' @param a_bar Numeric. Length-weight conversion parameter for dummy fish.
@@ -743,33 +751,46 @@ setRefuge <- function(params, method, method_params = NULL,
     # Check that satiation is logical and the right length
     if (!("satiation" %in% colnames(params@species_params))) {
         if (is.null(satiation)) {
-            # Calculate default satiation values based on feeding behavior
-            # FALSE for carnivores (species that eat other species)
-            # TRUE for resource consumers (only eat resources, not other species)
+            # Calculate default satiation values based on feeding behavior.
+            # In mizerReef, satiation-mediated consumption is intended to be
+            # exclusive to detritivory (see algae_consumption()'s "Algae
+            # consumption" section, and setExtMortParams()'s thesis-matched
+            # design): species that graze algae behave like unregulated
+            # herbivores and should default to FALSE even if they also eat
+            # some detritus, since a species that both grazes and
+            # scavenges is herbivore-like in this respect, not a pure
+            # detritivore. Only species whose diet is detritus without any
+            # algae grazing, and that do not also eat other species,
+            # default to TRUE.
 
             # Check if species eat other species (row sums in interaction matrix > 0)
             interaction_rowsums <- rowSums(params@interaction)
             eats_other_species <- interaction_rowsums > 0
 
-            # Check if species eat any resources
-            resource_cols <- c(
-                "resource_interaction", "interaction_algae", "interaction_detritus", "interaction_sponge",
-                "interaction_encrusting", "interaction_massive", "interaction_cryptic", "interaction_branching"
-            )
-
-            existing_resource_cols <- resource_cols[resource_cols %in% names(params@species_params)]
-            if (length(existing_resource_cols) > 0) {
-                # Sum all resource interactions for each species (species are rows)
-                resource_interaction_sums <- rowSums(params@species_params[, existing_resource_cols, drop = FALSE], na.rm = TRUE)
-                eats_resources <- resource_interaction_sums > 0
-            } else {
-                eats_resources <- rep(FALSE, no_sp) # No resource interaction columns means no resource consumption
+            # Check whether species graze algae and/or consume detritus
+            has_positive_interaction <- function(col) {
+                if (!(col %in% names(params@species_params))) {
+                    return(rep(FALSE, no_sp))
+                }
+                vals <- params@species_params[[col]]
+                vals[is.na(vals)] <- 0
+                vals > 0
             }
+            eats_algae <- has_positive_interaction("interaction_algae")
+            eats_detritus <- has_positive_interaction("interaction_detritus")
 
-            # Set satiation: FALSE for carnivores, TRUE for pure resource consumers
-            satiation <- !eats_other_species & eats_resources
+            # Set satiation: TRUE only for detritivores -- species that
+            # consume detritus, do not also graze algae, and do not eat
+            # other species. Carnivores, pure algae/plankton grazers, and
+            # species that consume both algae and detritus all default to
+            # FALSE.
+            satiation <- !eats_other_species & eats_detritus & !eats_algae
 
-            warning("You have not specified whether species should have a satiation response. The default is FALSE for carnivores and TRUE for resource consumers.")
+            warning(
+                "You have not specified whether species should have a satiation response. ",
+                "The default is TRUE only for detritivores (species that consume detritus ",
+                "but do not also graze algae or eat other species) and FALSE otherwise."
+            )
         } else if (!is.logical(satiation)) {
             stop("The satiation values should be logical.")
         }
