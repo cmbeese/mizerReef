@@ -16,6 +16,6 @@ MizerReefParams <- function(...,
                             refuge_params = list(),
                             algae_params = list(),
                             detritus_params = list()) {
-    lifecycle::deprecate_warn("2.1.0", "MizerReefParams()", "newReefParams()")
+    lifecycle::deprecate_warn("2.0.0", "MizerReefParams()", "newReefParams()")
     newReefParams(...)
 }

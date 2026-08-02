@@ -1,6 +1,6 @@
 Package: mizerReef
 Title: Mizer Models with Benthic Coupling for Structurally Complex Systems
-Version: 2.1.0
+Version: 2.0.0
 Date: 2026-07-28
 Authors@R: c(
     person("Chelsey M.", "Beese",

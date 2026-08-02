@@ -3,7 +3,7 @@
 #' Called automatically by [mizer::validParams()] when an object created with
 #' an older version of mizerReef is loaded. Migrates data stored in the old
 #' custom S4 slots (`refuge_params`, `algae_params`, `detritus_params`) to the
-#' `other_params` sub-lists used since version 2.1.0 (`other_params$refuge_params`,
+#' current `other_params` sub-lists (`other_params$refuge_params`,
 #' `other_params$algae`, `other_params$detritus`).
 #'
 #' @param object A `mizerReef` params object (possibly from an older version).
@@ -14,8 +14,8 @@
 upgrade.mizerReef <- function(object, ...) {
     # Migrate old S4 slot data to other_params sub-lists if needed.
     # The old class had three extra slots: refuge_params, algae_params,
-    # and detritus_params. In mizerReef >= 2.1.0 these are stored as named
-    # lists inside other_params instead, at other_params$refuge_params,
+    # and detritus_params. These are stored as named lists inside
+    # other_params instead, at other_params$refuge_params,
     # other_params$algae, and other_params$detritus (the mizer-canonical
     # other_params[[component]] location for algae/detritus specifically,
     # matching mizer::setComponent()'s/getComponent()'s contract -- see
@@ -41,7 +41,7 @@ upgrade.mizerReef <- function(object, ...) {
     object
 }
 
-#' Upgrade a mizerReef 1.x params object to the current (2.1.0+) layout
+#' Upgrade a mizerReef 1.x params object to the current (2.0.0+) layout
 #'
 #' `mizerReef` 2.x replaced the direct rate-function overrides and flat
 #' `other_params` layout used by mizerReef 1.x (the version accompanying the
@@ -111,7 +111,7 @@ upgradeReefParams <- function(params) {
     # Structural signature of a genuine mizerReef 1.x object: the live
     # algae/detritus dynamics components exist (`other_params$algae`/
     # `$detritus`, set up by mizer::setComponent() in newReefParams() since
-    # 1.x), but none of the 2.1.0+ nesting/echo structure does.
+    # 1.x), but none of the current nesting/echo structure does.
     is_legacy <- !is.null(op$algae) &&
         !is.null(op$refuge_params) && is.null(op$refuge_params$method_params)
 
