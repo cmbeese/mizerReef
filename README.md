@@ -6,7 +6,7 @@
 
 ## Overview
 
-MizerReef is an R package that extends the [mizer](https://github.com/sizespectrum/mizer) framework to support modeling of structurally complex marine ecosystems—such as coral reefs, kelp forests, and rocky reefs. Predator-prey interactions are mediated by predation refuge to explicitly capture benthic habitat structure. It also adds features for benthic coupling, introducing additional resources such as detritus and algae that are not size-structured and can be consumed by all relevant species regardless of size. MizerReef is suitable for researchers studying any marine habitat where structural complexity influences ecosystem dynamics.
+MizerReef is an R package that extends the [mizer](https://github.com/sizespectrum/mizer) framework to support modeling of structurally complex marine ecosystems such as coral reefs, kelp forests, and rocky reefs. Predator-prey interactions are mediated by predation refuge to explicitly capture benthic habitat structure. It also adds features for benthic coupling, introducing additional resources such as detritus and algae that are not size-structured and can be consumed by all relevant species regardless of size. MizerReef is suitable for researchers studying any marine habitat where structural complexity influences ecosystem dynamics.
 
 > **Compatibility note:** MizerReef is not yet verified to work correctly
 > when loaded together with other mizer extension packages (e.g. mizerMR).
@@ -15,34 +15,26 @@ MizerReef is an R package that extends the [mizer](https://github.com/sizespectr
 > `vignette("extension_mechanism")` for details. MizerReef on its own is
 > unaffected.
 
-## Features
-
-- Models structurally complex marine ecosystems
-- Benthic habitat structures are represented through predation refuge
-- Adds benthic resources (detritus, algae) without size-structuring
-- Compatible with the mizer framework
-
 MizerReef was originally developed to support the creation and exploration of a generic model for tropical coral reefs as part of a PhD thesis. Example parameters for this system are included with the package. For details, see: [Modelling Coral Reef Futures: Exploring the role of structural complexity in sustaining ecosystem services](https://doi.org/10.26686/wgtn.26421523).
 
 ## Installation
 
-MizerReef is under active development. Feedback is welcome!
+MizerReef is under active development. Feedback is welcome! You can install the development version of MizerReef from GitHub:
 
-You can install the development version of MizerReef from GitHub:
-
-```{r}
+```r
 # If you don't have the remotes package, install it first:
 install.packages("remotes")
 
 # Then install MizerReef:
 remotes::install_github("cmbeese/mizerReef")
+
 ```
 
 Make sure you have the latest versions of [mizer](https://github.com/sizespectrum/mizer) and [mizerExperimental](https://github.com/sizespectrum/mizerExperimental), as MizerReef is designed to work with their most recent releases.
 
 ## Vignettes and Examples
 
-See the [pkgdown site](https://cmbeese.github.io/mizerReef/) for tutorials and example workflows.
+See the [mizerReef website](https://cmbeese.github.io/mizerReef/) for tutorials and example workflows.
 
 ## Getting Help
 

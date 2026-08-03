@@ -11,9 +11,35 @@ template:
 navbar:
   #bg: primary
   structure:
-    left: [home, reference, articles]
+    left: [home, getting_started, reference, articles]
     right: [github]
+  components:
+    getting_started:
+      text: Getting Started
+      href: articles/mizerReef.html
+    articles:
+      text: Articles
+      menu:
+      - text: All articles
+        href: articles/index.html
+      - text: Getting Started
+        href: articles/mizerReef.html
+      - text: Tuning and Simulation
+        href: articles/steady-state-recipe.html
+      - text: Functional Group Example
+        href: articles/karpata_model-description.html
+      - text: Simple 3-Group Example
+        href: articles/caribbean_3_model-description.html
+      - text: General Model Description
+        href: articles/model-description.html
+      - text: Extension Mechanism
+        href: articles/extension_mechanism.html
+      - text: Multiple Resources
+        href: articles/using-multiple-resources.html
 home:
+  links:
+  - text: Getting Started
+    href: articles/mizerReef.html
   sidebar:
     structure:
     - links
