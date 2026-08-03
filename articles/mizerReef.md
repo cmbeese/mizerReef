@@ -774,7 +774,16 @@ and after:
 patchwork::wrap_plots(
     plotRelativeContribution(params_yr1) + ggplot2::ggtitle("Year 1 (with refuge)") + ggplot2::theme_bw(),
     plotRelativeContribution(params_yr15) + ggplot2::ggtitle("Year 15 (refuge lost)") + ggplot2::theme_bw()
-)
+) +
+  patchwork::plot_layout(guides = "collect") &
+  ggplot2::theme(
+    legend.position = "bottom",
+    legend.title = ggplot2::element_blank(),
+    legend.text = ggplot2::element_text(size = 8),
+    legend.key.height = grid::unit(0.35, "cm"),
+    legend.key.width = grid::unit(0.6, "cm"),
+    legend.spacing.x = grid::unit(0.1, "cm")
+  )
 ```
 
 ![Two side-by-side stacked bar charts comparing the relative
