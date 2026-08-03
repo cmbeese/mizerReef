@@ -1,7 +1,6 @@
 # Plot the vulnerability to predation of species by weight
 
-When called with a MizerParams object the initial vulnerability is
-plotted. The complement of refuge.
+Plot the vulnerability to predation of species by weight
 
 ## Usage
 
@@ -10,6 +9,7 @@ plotVulnerable(
   object,
   species = NULL,
   all.sizes = FALSE,
+  time_step = NULL,
   return_data = FALSE,
   ...
 )
@@ -27,7 +27,12 @@ plotlyVulnerable(
 
 - object:
 
-  An object of class MizerParams
+  An object of class
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  or [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html).
+  If a
+  [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html)
+  object is provided, the abundance at the last time step is used.
 
 - species:
 
@@ -38,8 +43,15 @@ plotlyVulnerable(
 
 - all.sizes:
 
-  If TRUE, then feeding level is plotted also for sizes outside a
+  If TRUE, then vulnerability is plotted also for sizes outside a
   species' size range. Default FALSE.
+
+- time_step:
+
+  If `object` is a
+  [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html)
+  object, this optional parameter specifies which time step to use for
+  calculating vulnerability. Default is the last time step.
 
 - return_data:
 
@@ -56,21 +68,29 @@ plotlyVulnerable(
 A ggplot2 object, unless `return_data = TRUE`, in which case a data
 frame the vulnerability at each size
 
+## Details
+
+When called with a
+[MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+object the initial vulnerability is plotted. The complement of refuge.
+
 ## See also
 
-plotting_functions,
+[plotting_functions](https://sizespectrum.org/mizer/reference/plotting_functions.html),
 [`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md),
-[`plotRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md)
+[`plotRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md)
 
 Other plotting functions:
 [`plot2Productivity()`](https://cmbeese.github.io/mizerReef/reference/plot2Productivity.md),
 [`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotDegScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegScale.md),
+[`plotDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegradationScale.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
 [`plotProductivityRelative()`](https://cmbeese.github.io/mizerReef/reference/plotProductivityRelative.md),
-[`plotRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md),
+[`plotRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md),
+[`plotRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md),
 [`plotRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md),
-[`plotSpectraRelative()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.md),
+[`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md),
 [`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md),
 [`plotTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md),
 [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md)

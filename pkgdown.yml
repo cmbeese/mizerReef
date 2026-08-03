@@ -1,8 +1,15 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
-articles: {}
-last_built: 2026-05-11T21:19Z
+articles:
+  caribbean_3_model-description: caribbean_3_model-description.html
+  extension_mechanism: extension_mechanism.html
+  karpata_model-description: karpata_model-description.html
+  mizerReef: mizerReef.html
+  model-description: model-description.html
+  steady-state-recipe: steady-state-recipe.html
+  using-multiple-resources: using-multiple-resources.html
+last_built: 2026-08-03T05:04Z
 urls:
   reference: https://cmbeese.github.io/mizerReef/reference
   article: https://cmbeese.github.io/mizerReef/articles

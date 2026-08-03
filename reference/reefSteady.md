@@ -1,7 +1,7 @@
 # Project a mizerReef model to steady state
 
-This function tunes the detritus and algae parameters after running
-mizer's default projectToSteady function.
+This function tunes the detritus and algae biomass after running mizer's
+default `projectToSteady()` function on the fish sub-model.
 
 ## Usage
 
@@ -24,7 +24,9 @@ reefSteady(
 
 - params:
 
-  A MizerParams object
+  A
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - d_func:
 
@@ -64,8 +66,9 @@ reefSteady(
 
   **\[experimental\]** Specifies whether the `reproduction_level` should
   be preserved (default) or the maximum reproduction rate `R_max` or the
-  reproductive efficiency `erepro`. See `setBevertonHolt()` for an
-  explanation of the `reproduction_level`.
+  reproductive efficiency `erepro`. See
+  [`setBevertonHolt()`](https://sizespectrum.org/mizer/reference/setBevertonHolt.html)
+  for an explanation of the `reproduction_level`.
 
 - progress_bar:
 
@@ -74,11 +77,54 @@ reefSteady(
 
 - ...:
 
-  Arguments passed on to
-  [`tuneUR`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md)
-
-  :   
+  unused
 
 ## Value
 
-An object of type MizerParams
+An object of type
+[MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+
+## Details
+
+Algae and detritus are treated differently while the fish sub-model
+converges. Detritus is frozen at its current biomass throughout (its
+`other_dynamics` is temporarily replaced with
+[`constant_dynamics()`](https://cmbeese.github.io/mizerReef/reference/constant_dynamics.md)),
+because its production genuinely depends on a not-yet-tuned external
+flux (see
+[`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md)/[`tuneUR_cc()`](https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.md),
+[`getDetritusProduction()`](https://cmbeese.github.io/mizerReef/reference/getDetritusProduction.md))
+that isn't set until the very end. Algae, by contrast, is left live and
+evolving via its own dynamics function
+([`algae_dynamics()`](https://cmbeese.github.io/mizerReef/reference/algae_dynamics.md)/[`algae_dynamics_cc()`](https://cmbeese.github.io/mizerReef/reference/algae_dynamics_cc.md))
+throughout the loop, because algae production is a fixed,
+literature-informed constant (see
+[`setAlgaeParams()`](https://cmbeese.github.io/mizerReef/reference/setAlgaeParams.md))
+that never needs retuning – letting it co-adapt with the fish sub-model
+as it converges lets the two reach a genuine joint steady state
+together. (This matters because mizer's own convergence check,
+`distanceSSLogN()`, only looks at fish abundances, not at the resource
+pools – freezing algae and then moving it in one shot at the very end,
+as used to happen, could leave fish not actually adapted to the final
+algae biomass.) Algae is frozen instead, like detritus, when
+`new_refuge == TRUE`, matching the fact that the final tuning step is
+also skipped in that case (see `new_refuge` in
+[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)).
+
+After the fish sub-model converges,
+[`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md) or
+[`tuneUR_cc()`](https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.md)
+(chosen based on whether the model uses the carrying-capacity resource
+formulation) is called once to bring detritus to its own steady state
+and to make algae's (already live-evolved) biomass exact, unless
+`new_refuge == TRUE`, in which case algae and detritus are left
+completely untouched.
+
+## Examples
+
+``` r
+data(caribbean_3_model)
+params <- reefSteady(caribbean_3_model)
+#> Convergence was achieved in 1.5 years.
+#> Warning: The flux of external detritus is negative.
+```

@@ -1,4 +1,4 @@
-# mizerReef: A mizer extension package for modelling tropical coral reefs. Includes benthic complexity through the provision of predation refuge.
+# mizerReef: A mizer extension package for modelling structurally complex marine ecosystems. Captures the role of habitat complexity as predation refuge and add benthic coupling.
 
 This is an extension package for the mizer package
 (https://sizespectrum.org/mizer/) that makes it easy to set up a mizer
@@ -13,9 +13,9 @@ benthic complexity.
 
 Useful links:
 
-- <https://sizespectrum.org/mizerReef/>
-
 - <https://cmbeese.github.io/mizerReef/>
+
+- Report bugs at <https://github.com/cmbeese/mizerReef/issues>
 
 ## Author
 
@@ -23,6 +23,9 @@ Useful links:
 ([ORCID](https://orcid.org/0000-0003-0949-7888))
 
 Authors:
+
+- Chelsey M. Beese <beese.c.m@gmail.com>
+  ([ORCID](https://orcid.org/0000-0003-0949-7888))
 
 - Gustav Delius <gustav.delius@york.ac.uk>
   ([ORCID](https://orcid.org/0000-0003-4092-8228)) \[copyright holder\]

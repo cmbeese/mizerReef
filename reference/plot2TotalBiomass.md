@@ -1,7 +1,8 @@
 # Plot the total biomass of two models or of two different size ranges in the same plot
 
-When called with a MizerParams object the steady state biomasses are
-plotted.
+When called with a
+[MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+object the steady state biomasses are plotted.
 
 ## Usage
 
@@ -36,9 +37,9 @@ plotly2TotalBiomass(object1, object2, species = NULL, ...)
 
 - species:
 
-  The groups to be selected. Optional. By default all target groups are
-  selected. A vector of groups names, or a numeric vector with the
-  groups indices, or a logical vector indicating for each group whether
+  The species to be selected. Optional. By default all target species
+  are selected. A vector of species names, or a numeric vector with the
+  species indices, or a logical vector indicating for each group whether
   it is to be selected (TRUE) or not.
 
 - name1:
@@ -95,7 +96,13 @@ plotly2TotalBiomass(object1, object2, species = NULL, ...)
 
   `object`
 
-  :   An object of class MizerParams
+  :   An object of class
+      [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+      or
+      [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html).
+      If a
+      [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html)
+      object is provided, the biomass at the last time step is used.
 
   `min_fishing_l`
 
@@ -110,13 +117,13 @@ plotly2TotalBiomass(object1, object2, species = NULL, ...)
 ## Value
 
 A ggplot2 object, unless `return_data = TRUE`, in which case a data
-frame with the the total steady state biomass for each functional group
-by model is returned as well as another column called `rel_diff`that
-gives the relative difference between the two values.
+frame with the the total steady state biomass for each species by model
+is returned as well as another column called `rel_diff`that gives the
+relative difference between the two values.
 
 ## See also
 
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotBiomass()`](https://sizespectrum.org/mizer/reference/plotBiomass.html),
 `plot2TotalBiomass()`,
 [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
@@ -125,12 +132,14 @@ gives the relative difference between the two values.
 
 Other plotting functions:
 [`plot2Productivity()`](https://cmbeese.github.io/mizerReef/reference/plot2Productivity.md),
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotDegScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegScale.md),
+[`plotDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegradationScale.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
 [`plotProductivityRelative()`](https://cmbeese.github.io/mizerReef/reference/plotProductivityRelative.md),
-[`plotRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md),
+[`plotRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md),
+[`plotRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md),
 [`plotRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md),
-[`plotSpectraRelative()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.md),
+[`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md),
 [`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md),
 [`plotTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md),
 [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md),

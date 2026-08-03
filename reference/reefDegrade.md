@@ -1,6 +1,6 @@
 # Scales the refuge density by a given value at set times
 
-Allows for the degradation of coral reef habitat structure following an
+Allows for the gradual degradation of habitat structure following an
 acute disturbance by decreasing the availability of refuge over time.
 
 ## Usage
@@ -13,7 +13,9 @@ reefDegrade(params, n, n_pp, n_other, t, ...)
 
 - params:
 
-  A MizerParams object
+  A
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - n:
 
@@ -39,7 +41,24 @@ reefDegrade(params, n, n_pp, n_other, t, ...)
 
 ## Value
 
-A new methods parameters data frame scaled by bleaching
+A numeric vector of scaled refuge densities for each size bin
+
+## Details
+
+The degradation is controlled by a scaling matrix `deg_scale` where:
+
+- Column 1 represents the bleaching year (initial impact)
+
+- Columns 2+ represent years 1, 2, 3... post-bleaching
+
+At each timestep, the scaling factors are multiplied by the previous
+timestep's refuge density.
+[`setDegradation()`](https://cmbeese.github.io/mizerReef/reference/setDegradation.md)
+can also configure an independent, optional post-bleaching algae
+growth/capacity boost (see
+[`getAlgaeBoost()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeBoost.md));
+that boost is unrelated to refuge density and is not computed by this
+function.
 
 ## See also
 

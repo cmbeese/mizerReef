@@ -1,8 +1,8 @@
 # Constant refuge profile for tuning steady states
 
-This is a 2-dimensional array containing start and end lengths for size
-bins and `prop_protect` equal to 20% for all size bins up to 50 cm in
-length.
+This data frame provides a constant refuge profile for model calibration
+and steady-state tuning. It contains start and end lengths for size bins
+and sets `prop_protect` to 60% for all bins up to 50 cm in length.
 
 ## Usage
 
@@ -12,31 +12,20 @@ tuning_profile
 
 ## Format
 
-dataframe
+data frame
 
 ## Source
 
-PhD Thesis
+Beese PhD Thesis
 
 ## Details
 
-These refuge parameters are intended for tuning the steady state when
-using the density-dependent competitive method. The tuning profile
-provides a constant proportion of refuges to all fish up to 50 cm in
-length.
+These parameters are intended to be used with the "binned" method, which
+is independent of density. The tuning profile should be used while
+calibrating biomass and growth rates before switching to the competitive
+method. See the "Getting Started" vignette for more details.
 
-When creating a model using the competitive method, you should run
-[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
-with the "binned" method and a proportional tuning profile.
+## References
 
-After species biomasses and growth rates have been calibrated to match
-empirical observations, use the
-[`newRefuge()`](https://cmbeese.github.io/mizerReef/reference/newRefuge.md)
-function to implement your competitive refuge parameters. After using
-[`newRefuge()`](https://cmbeese.github.io/mizerReef/reference/newRefuge.md),
-make sure to iterate through
-[`mizer:: matchBiomasses()`](https://sizespectrum.org/mizer/reference/matchBiomasses.html),
-[`matchReefGrowth()`](https://cmbeese.github.io/mizerReef/reference/matchReefGrowth.md),
-and
-[`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
-again to regain the steady state.
+Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
+<https://doi.org/10.26686/thesis.123456>

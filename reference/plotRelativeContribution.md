@@ -19,16 +19,20 @@ plotRelativeContribution(
   object,
   min_size = NULL,
   min_fishing_l = NULL,
+  include_inverts = FALSE,
   return_data = FALSE,
   ...
 )
+
+plotlyRelativeContribution(object, ...)
 ```
 
 ## Arguments
 
 - object:
 
-  An object of class MizerParams
+  An object of class
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
 
 - min_size:
 
@@ -45,6 +49,12 @@ plotRelativeContribution(
   [`getProductivity()`](https://cmbeese.github.io/mizerReef/reference/getProductivity.md).
   The minimum length (cm) of fished individuals for productivity
   estimates. Defaults to 7 cm.
+
+- include_inverts:
+
+  A boolean value that determines whether the "inverts" species group is
+  included. Default is FALSE, since invertebrate productivity is
+  typically not relevant to fishing yield.
 
 - return_data:
 
@@ -75,8 +85,8 @@ plotRelativeContribution(
 
   :   A boolean value that determines whether bars are separated by
       species. Defaults to FALSE. If true, returns a stacked barplot
-      with the total biomass for each group instead of individual bars
-      for each group. Useful for comparison between steady states.
+      with the total biomass for each species instead of individual bars
+      for each species. Useful for comparison between steady states.
 
   `start_time`
 
@@ -98,6 +108,15 @@ plotRelativeContribution(
   :   A boolean value that determines whether the total productivity
       from all species is plotted as well. Default is TRUE.
 
+  `include_repro`
+
+  :   A boolean value that indicates whether to include energy for
+      reproduction in productivity estimates. Defaults to using
+      [`getEGrowthTime()`](https://cmbeese.github.io/mizerReef/reference/getEGrowthTime.md)
+      if FALSE or mizer's
+      [`mizer::getEReproAndGrowth()`](https://sizespectrum.org/mizer/reference/getEReproAndGrowth.html)
+      if TRUE.
+
 ## See also
 
 [`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md),
@@ -107,11 +126,13 @@ plotRelativeContribution(
 Other plotting functions:
 [`plot2Productivity()`](https://cmbeese.github.io/mizerReef/reference/plot2Productivity.md),
 [`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotDegScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegScale.md),
+[`plotDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegradationScale.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
 [`plotProductivityRelative()`](https://cmbeese.github.io/mizerReef/reference/plotProductivityRelative.md),
-[`plotRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md),
-[`plotSpectraRelative()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.md),
+[`plotRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md),
+[`plotRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md),
+[`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md),
 [`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md),
 [`plotTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md),
 [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md),

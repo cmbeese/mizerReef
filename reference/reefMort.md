@@ -1,7 +1,9 @@
 # Total mortality rate in the reef ecosystem model
 
-This function replaces the usual `mizerMort()` function and returns the
-sum of the usual mortality and size-based external/ senescence mortality
+This function replaces the usual
+[`mizerMort()`](https://sizespectrum.org/mizer/reference/mizerMort.html)
+function and returns the sum of the usual mortality and size-based
+external/ senescence mortality
 
 ## Usage
 

@@ -38,8 +38,11 @@ After using this function the total number in the model will match the
 total number, summed over all species. However the numbers of the
 individual species will not match observations yet, with some species
 having numbers that are too high and others too low. So after this
-function you may want to use `matchNumbers()`. This is described in the
-blog post at https://bit.ly/2YqXESV.
+function you may want to use
+[`matchNumbers()`](https://sizespectrum.org/mizer/reference/matchNumbers.html).
+This is described in the blog post at https://bit.ly/2YqXESV.
 
 If you have observations of the yearly yield instead of numbers, you can
-use `calibrateYield()` instead of this function.
+use
+[`calibrateYield()`](https://sizespectrum.org/mizer/reference/calibrateYield.html)
+instead of this function.

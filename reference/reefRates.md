@@ -13,7 +13,9 @@ reefRates(params, n, n_pp, n_other, t = 0, effort, rates_fns, ...)
 
 - params:
 
-  A MizerParams object
+  A
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - n:
 
@@ -63,13 +65,17 @@ By default this function returns a list with the following components:
 - feeding level from
   [`reefFeedingLevel()`](https://cmbeese.github.io/mizerReef/reference/reefFeedingLevel.md)
 
-- e from `mizerEReproAndGrowth()`
+- e from
+  [`mizerEReproAndGrowth()`](https://sizespectrum.org/mizer/reference/mizerEReproAndGrowth.html)
 
-- e_repro from `mizerERepro()`
+- e_repro from
+  [`mizerERepro()`](https://sizespectrum.org/mizer/reference/mizerERepro.html)
 
-- e_growth from `mizerEGrowth()`
+- e_growth from
+  [`mizerEGrowth()`](https://sizespectrum.org/mizer/reference/mizerEGrowth.html)
 
-- pred_rate from `mizerPredRate()`
+- pred_rate from
+  [`mizerPredRate()`](https://sizespectrum.org/mizer/reference/mizerPredRate.html)
 
 - pred_mort from
   [`reefPredMort()`](https://cmbeese.github.io/mizerReef/reference/reefPredMort.md)
@@ -77,19 +83,27 @@ By default this function returns a list with the following components:
 - sen_mort from
   [`reefSenMort()`](https://cmbeese.github.io/mizerReef/reference/reefSenMort.md)
 
-- f_mort from `mizerFMort()`
+- f_mort from
+  [`mizerFMort()`](https://sizespectrum.org/mizer/reference/mizerFMort.html)
 
 - mort from
   [`reefMort()`](https://cmbeese.github.io/mizerReef/reference/reefMort.md)
 
-- rdi from `mizerRDI()`
+- rdi from
+  [`mizerRDI()`](https://sizespectrum.org/mizer/reference/mizerRDI.html)
 
-- rdd from `BevertonHoltRDD()`
+- rdd from
+  [`BevertonHoltRDD()`](https://sizespectrum.org/mizer/reference/BevertonHoltRDD.html)
 
-- resource_mort from `mizerResourceMort()`
+- resource_mort from
+  [`mizerResourceMort()`](https://sizespectrum.org/mizer/reference/mizerResourceMort.html)
 
-However you can replace any of these rate functions by your own rate
-function if you wish, see `setRateFunction()` for details.
+However you can replace any of these rate functions by overriding the
+relevant `project*.mizerReef` S3 method (e.g.
+`projectEncounter.mizerReef`), following the
+[`NextMethod()`](https://rdrr.io/r/base/UseMethod.html)-based
+composition pattern used throughout this file so that other extension
+packages keep working.
 
 ## See also
 

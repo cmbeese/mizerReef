@@ -1,0 +1,81 @@
+# Plot the refuge profile, species by length
+
+When called with a
+[MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+object the initial refuge profile is plotted. The complement of
+vulnerability.
+
+## Usage
+
+``` r
+plotRefugeProfile(
+  object,
+  species = NULL,
+  all.sizes = FALSE,
+  return_data = FALSE,
+  ...
+)
+
+plotlyRefugeProfile(object, species = NULL, ...)
+```
+
+## Arguments
+
+- object:
+
+  An object of class
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+
+- species:
+
+  The species to be selected. Optional. By default all species are
+  selected. A vector of species names, or a numeric vector with the
+  species indices, or a logical vector indicating for each species
+  whether it is to be selected (TRUE) or not.
+
+- all.sizes:
+
+  If TRUE, then feeding level is plotted also for sizes outside a
+  species' size range. Default FALSE.
+
+- return_data:
+
+  A boolean value that determines whether the formatted data used for
+  the plot is returned instead of the plot itself. Default value is
+  FALSE.
+
+- ...:
+
+  unused
+
+## Value
+
+A ggplot2 object
+
+## See also
+
+[plotting_functions](https://sizespectrum.org/mizer/reference/plotting_functions.html),
+[`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md),
+[`plotVulnerable()`](https://cmbeese.github.io/mizerReef/reference/plotVulnerable.md)
+
+Other plotting functions:
+[`plot2Productivity()`](https://cmbeese.github.io/mizerReef/reference/plot2Productivity.md),
+[`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
+[`plotDegScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegScale.md),
+[`plotDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegradationScale.md),
+[`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
+[`plotProductivityRelative()`](https://cmbeese.github.io/mizerReef/reference/plotProductivityRelative.md),
+[`plotRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md),
+[`plotRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md),
+[`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md),
+[`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md),
+[`plotTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md),
+[`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md),
+[`plotVulnerable()`](https://cmbeese.github.io/mizerReef/reference/plotVulnerable.md)
+
+## Examples
+
+``` r
+data(caribbean_3_model)
+plotRefugeProfile(caribbean_3_model)
+```

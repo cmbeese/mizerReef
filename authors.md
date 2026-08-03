@@ -14,14 +14,18 @@
 
 ## Citation
 
-Beese C, Delius G, Mumby P, Rogers A (2026). *mizerReef: Mizer Models
-with Benthic Coupling for Coral Reefs*. R package version 1.0.1,
-<https://sizespectrum.org/mizerReef/>.
+Source:
+[`inst/CITATION`](https://github.com/cmbeese/mizerReef/blob/v2.0.0/inst/CITATION)
+
+Beese C, Delius G, Mumby P, Rogers A (2026). *MizerReef: an R package to
+create multi-species size spectrum models for structurally complex
+habitats*. R package version 2.1.0,
+<https://github.com/cmbeese/mizerReef>.
 
     @Manual{,
-      title = {mizerReef: Mizer Models with Benthic Coupling for Coral Reefs},
+      title = {MizerReef: an R package to create multi-species size spectrum models for structurally complex habitats},
       author = {Chelsey M. Beese and Gustav Delius and Peter J. Mumby and Alice Rogers},
       year = {2026},
-      note = {R package version 1.0.1},
-      url = {https://sizespectrum.org/mizerReef/},
+      note = {R package version 2.1.0},
+      url = {https://github.com/cmbeese/mizerReef},
     }

@@ -24,7 +24,8 @@ detritus_consumption(params, n = params@initial_n, rates = getRates(params))
 
 - rates:
 
-  A list of rates as returned by `getRates()`
+  A list of rates as returned by
+  [`getRates()`](https://sizespectrum.org/mizer/reference/getRates.html)
 
 ## Value
 
@@ -52,3 +53,11 @@ rate:
 
 \$\$c_D = \sum_i\int\rho\_{i.D}\\ w^{m\_{det}} N_i(w)
 \left(1-f_i(w)\right) \theta\_{i.D}\\dw\$\$
+
+## Examples
+
+``` r
+data(caribbean_3_model)
+detritus_consumption(caribbean_3_model)
+#> [1] 3.146801e+12
+```

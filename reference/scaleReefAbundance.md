@@ -28,7 +28,8 @@ scaleReefAbundance(params, factor)
 
 ## Value
 
-An object of type MizerParams
+An object of type
+[MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
 
 ## Details
 

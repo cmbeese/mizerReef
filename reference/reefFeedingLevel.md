@@ -1,7 +1,8 @@
 # Reef feeding level
 
-This function replaces the usual `mizerFeedingLevel()` function and
-returns the a feeding level of 0 for piscivores.
+This function replaces the usual
+[`mizerFeedingLevel()`](https://sizespectrum.org/mizer/reference/mizerFeedingLevel.html)
+function and returns the a feeding level of 0 for piscivores.
 
 ## Usage
 
@@ -13,7 +14,9 @@ reefFeedingLevel(params, n, n_pp, n_other, t, encounter, ...)
 
 - params:
 
-  A MizerParams object
+  A
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - n:
 

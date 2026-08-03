@@ -13,7 +13,9 @@ detritus_dynamics_cc(params, n, n_other, rates, dt, ...)
 
 - params:
 
-  A MizerParams object
+  A
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - n:
 
@@ -25,7 +27,8 @@ detritus_dynamics_cc(params, n, n_other, rates, dt, ...)
 
 - rates:
 
-  A list of rates as returned by `getRates()`
+  A list of rates as returned by
+  [`getRates()`](https://sizespectrum.org/mizer/reference/getRates.html)
 
 - dt:
 

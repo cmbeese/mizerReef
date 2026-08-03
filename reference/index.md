@@ -9,6 +9,8 @@ steady state for the dynamical system.
   : Set up parameters for a mizerReef model
 - [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
   : Project a mizerReef model to steady state
+- [`upgradeReefParams()`](https://cmbeese.github.io/mizerReef/reference/upgradeReefParams.md)
+  : Upgrade a mizerReef 1.x params object to the current (2.0.0+) layout
 
 ## Tuning a mizerReef model
 
@@ -26,8 +28,6 @@ observations.
   : Scale reef abundances
 - [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md)
   : Scale model parameters
-- [`step_tune`](https://cmbeese.github.io/mizerReef/reference/step_tune.md)
-  : Stepped refuge profile for tuning steady states
 - [`tuning_profile`](https://cmbeese.github.io/mizerReef/reference/tuning_profile.md)
   : Constant refuge profile for tuning steady states
 
@@ -38,8 +38,6 @@ state.
 
 - [`tuning_profile`](https://cmbeese.github.io/mizerReef/reference/tuning_profile.md)
   : Constant refuge profile for tuning steady states
-- [`step_tune`](https://cmbeese.github.io/mizerReef/reference/step_tune.md)
-  : Stepped refuge profile for tuning steady states
 
 ## Predation Refuge
 
@@ -49,11 +47,29 @@ These functions set up the mediation of predation with refuge.
 
 These functions allow users to set or change the refuge profile.
 
+- [`aquarius_refuge`](https://cmbeese.github.io/mizerReef/reference/aquarius_refuge.md)
+  : Competitive method refuge parameters for Aquarius reef research
+  station
+
 - [`getRefuge()`](https://cmbeese.github.io/mizerReef/reference/getRefuge.md)
-  : Finds the refuge length bins by functional group and stores them
-  params
+  :
+
+  This function is designed to be used after refuge parameters are set
+  by the
+  [`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md)
+  function. It calculates the proportion of fish that are in predation
+  refuge for the density-independent sigmoidal and binned methods. For
+  the competitive method, it finds the indices of fish within the
+  prescribed size bins. These values are used by
+  [`reefVulnerable()`](https://cmbeese.github.io/mizerReef/reference/reefVulnerable.md)
+  to set the vulnerability to predation at each time step.
+
+- [`karpata_refuge`](https://cmbeese.github.io/mizerReef/reference/karpata_refuge.md)
+  : Competitive method refuge parameters for Karpata reef in Bonaire
+
 - [`newRefuge()`](https://cmbeese.github.io/mizerReef/reference/newRefuge.md)
   : Change the refuge parameters for a model
+
 - [`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md)
   : Set the refuge profile parameters
 
@@ -80,17 +96,15 @@ that refuge impacts simulations.
 These functions prepare a mizer model for projections with degradation.
 
 - [`algae_scale`](https://cmbeese.github.io/mizerReef/reference/algae_scale.md)
-  : Algae trajectory refuge density scaling parameters
-- [`constant_scale`](https://cmbeese.github.io/mizerReef/reference/constant_scale.md)
-  : Trajectory with no refuge density scaling for testing
+  : Degradation scaling matrix for the algae trajectory
 - [`getDegrade()`](https://cmbeese.github.io/mizerReef/reference/getDegrade.md)
   : Get vulnerability level at in time range t
 - [`recovery_scale`](https://cmbeese.github.io/mizerReef/reference/recovery_scale.md)
-  : Recovery trajectory refuge density scaling parameters
+  : Degradation scaling matrix for the recovery trajectory
 - [`reefDegrade()`](https://cmbeese.github.io/mizerReef/reference/reefDegrade.md)
   : Scales the refuge density by a given value at set times
 - [`rubble_scale`](https://cmbeese.github.io/mizerReef/reference/rubble_scale.md)
-  : Rubble trajectory refuge density scaling parameters
+  : Degradation scaling matrix for the rubble trajectory
 - [`setDegradation()`](https://cmbeese.github.io/mizerReef/reference/setDegradation.md)
   : Prepare a steady state model for projections with degradation
 
@@ -99,12 +113,21 @@ These functions prepare a mizer model for projections with degradation.
 These functions allow users visualize the refuge profile for different
 functional groups in terms of their body length.
 
-- [`plotRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md)
-  [`plotlyRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md)
+- [`plotDegScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegScale.md)
+  : Compare built-in degradation trajectories as faceted heatmaps
+- [`plotDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegradationScale.md)
+  : Plot heatmap of degradation scaling parameters
+- [`plotRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md)
+  [`plotlyRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md)
+  : Plot refuge density through time
+- [`plotRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md)
+  [`plotlyRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md)
   : Plot the refuge profile, species by length
 - [`plotVulnerable()`](https://cmbeese.github.io/mizerReef/reference/plotVulnerable.md)
   [`plotlyVulnerable()`](https://cmbeese.github.io/mizerReef/reference/plotVulnerable.md)
   : Plot the vulnerability to predation of species by weight
+- [`plotlyDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotlyDegradationScale.md)
+  : Interactive Plotly version of plotDegradationScale
 
 ## Unstructured Resources
 
@@ -122,6 +145,8 @@ assess these dynamics.
   : Algae dynamics
 - [`algae_dynamics_cc()`](https://cmbeese.github.io/mizerReef/reference/algae_dynamics_cc.md)
   : Algae dynamics with carrying capacity
+- [`getAlgaeBoost()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeBoost.md)
+  : Post-bleaching boost multiplier for algae growth or capacity
 - [`getAlgaeConsumption()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeConsumption.md)
   : Get algae consumption rates
 - [`getAlgaeProduction()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeProduction.md)
@@ -130,6 +155,8 @@ assess these dynamics.
   : Plot algae consumption rates
 - [`rescale_algae()`](https://cmbeese.github.io/mizerReef/reference/rescale_algae.md)
   : Rescale algae biomass without changing anything else
+- [`setAlgaeParams()`](https://cmbeese.github.io/mizerReef/reference/setAlgaeParams.md)
+  : Set algae parameters for mizerReef
 
 ### Detritus
 
@@ -154,6 +181,8 @@ assess these dynamics.
   : Plot detritus production rates from each source
 - [`rescale_detritus()`](https://cmbeese.github.io/mizerReef/reference/rescale_detritus.md)
   : Rescale detritus biomass without changing anything else
+- [`setDetritusParams()`](https://cmbeese.github.io/mizerReef/reference/setDetritusParams.md)
+  : Set detritus parameters for mizerReef
 
 ### Other Components
 
@@ -165,8 +194,6 @@ assess these dynamics.
   : Rescale algae and detritus biomass without changing anything else
 - [`scaleReefBackground()`](https://cmbeese.github.io/mizerReef/reference/scaleReefBackground.md)
   : Scale background down by a factor
-- [`setURParams()`](https://cmbeese.github.io/mizerReef/reference/setURParams.md)
-  : Checks unstructured resource parameters and interaction matrix
 - [`setURcapacity()`](https://cmbeese.github.io/mizerReef/reference/setURcapacity.md)
   : Switch to unstructured resource dynamics with carrying capacities
 - [`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md)
@@ -203,6 +230,8 @@ models.
 These functions calculate and plot summary statistics and allow for the
 comparison of results between different models.
 
+- [`reef_plots`](https://cmbeese.github.io/mizerReef/reference/reef_plots.md)
+  : Description of mizerReef plotting functions
 - [`plot2Productivity()`](https://cmbeese.github.io/mizerReef/reference/plot2Productivity.md)
   [`plotly2Productivity()`](https://cmbeese.github.io/mizerReef/reference/plot2Productivity.md)
   : Plot the fisheries productivity of two models or two different size
@@ -211,10 +240,6 @@ comparison of results between different models.
   [`plotly2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md)
   : Plot the total biomass of two models or of two different size ranges
   in the same plot
-- [`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md)
-  [`plotlyBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md)
-  : Plot the biomass of Species Groups and unstructured components
-  through time
 - [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md)
   [`plotlyProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md)
   : Plot the total productivity for each species Group
@@ -224,60 +249,105 @@ comparison of results between different models.
   productivity rates of two models or two different size ranges in the
   same plot
 - [`plotRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md)
+  [`plotlyRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md)
   : Plot the relative contribution of each species group to total
   abundance, total biomass, and total productivity
-- [`plotSpectra2()`](https://cmbeese.github.io/mizerReef/reference/plotSpectra2.md)
-  : Show two size spectra in the same plot
-- [`plotSpectraRelative()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.md)
-  [`plotlySpectraRelative()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.md)
-  : Plot the relative difference or percent change between two spectra
+- [`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md)
+  [`plotlySpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md)
+  : Plot the change between two spectra
 - [`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md)
-  : Plot the total abundance for each species group at steady state
+  [`plotlyTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md)
+  : Plot the total abundance for each species in a size range
 - [`plotTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md)
   [`plotlyTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md)
-  : Plot the total fishable biomass for each Species Group at steady
-  state
+  : Plot the total biomass for each species in a size range
 - [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md)
   [`plotlyTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md)
-  : Plot the relative difference in between the total fishable biomasses
-  of each each Species Group at steady state
+  : Plot the relative difference in between the total biomasses of each
+  each species within a size range at steady state
 
 ## Helper Functions
 
-- [`different()`](https://cmbeese.github.io/mizerReef/reference/different.md)
-  : Check whether two objects are different
-- [`removeSpecies()`](https://cmbeese.github.io/mizerReef/reference/removeSpecies.md)
+- [`removeSpecies(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/removeSpecies.mizerReef.md)
   : Remove some species from the model
+
+## Extension Mechanism
+
+The S4 marker classes and S3 methods that let mizerReef participate in
+mizer’s extension mechanism. See
+[`vignette("extension_mechanism")`](https://cmbeese.github.io/mizerReef/articles/extension_mechanism.md)
+for details.
+
+- [`mizerReef-class`](https://cmbeese.github.io/mizerReef/reference/mizerReef-class.md)
+  : S4 marker class for mizerReef extension
+- [`getBiomass(`*`<mizerReefSim>`*`)`](https://cmbeese.github.io/mizerReef/reference/getBiomass.mizerReefSim.md)
+  : Get the biomass of species and unstructured components through time
+- [`upgrade(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/upgrade.mizerReef.md)
+  : Upgrade a mizerReef params object to the current layout
+
+## Deprecated
+
+- [`MizerReefParams()`](https://cmbeese.github.io/mizerReef/reference/MizerReefParams.md)
+  :
+
+  Deprecated: Use
+  [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
+  instead
 
 ## Example Models
 
-These files hold example parameters and mizer params object to explore
-models set up to emulate the coral reefs of Bonaire.
+These files hold example parameters and mizerReef params objects for
+generic Caribbean coral reef ecosystems.
 
-### Simple trait based model
+### Simple 3-group model
 
-- [`bonaire_int`](https://cmbeese.github.io/mizerReef/reference/bonaire_int.md)
-  : interaction matrix for for a simple, generic Caribbean reef
-- [`bonaire_refuge`](https://cmbeese.github.io/mizerReef/reference/bonaire_refuge.md)
-  : Competitive method refuge parameters for a simple, generic Caribbean
-  reef
-- [`bonaire_species`](https://cmbeese.github.io/mizerReef/reference/bonaire_species.md)
-  : species_params dataframe for a simple, generic Caribbean reef
-- [`bonaire_model`](https://cmbeese.github.io/mizerReef/reference/bonaire_model.md)
-  : MizerParams object for a simple, generic Caribbean reef
+A simple trait-based model with three functional groups (predators,
+herbivores, invertebrates) for a generic Caribbean reef.
 
-### Multi-species model
+- [`caribbean_3_species`](https://cmbeese.github.io/mizerReef/reference/caribbean_3_species.md)
+  : species_params dataframe for a simple, generic Caribbean reef with 3
+  species groups
+- [`caribbean_3_interaction`](https://cmbeese.github.io/mizerReef/reference/caribbean_3_interaction.md)
+  : interaction matrix for a simple, generic Caribbean reef with 3
+  species groups
+- [`caribbean_3_model`](https://cmbeese.github.io/mizerReef/reference/caribbean_3_model.md)
+  : mizerParams object for a simple, generic Caribbean reef with 3
+  species groups
 
-- [`karpata_int`](https://cmbeese.github.io/mizerReef/reference/karpata_int.md)
-  : Interaction matrix for a generic Caribbean reef
+### 10-group model (Karpata Reef, Bonaire)
+
+A 10-functional-group model parameterised from field data at Karpata
+Reef in Bonaire, including competitive predation refuge.
+
+- [`caribbean_10_species`](https://cmbeese.github.io/mizerReef/reference/caribbean_10_species.md)
+  : Species parameters for a generic Caribbean reef (10 functional
+  groups)
+- [`caribbean_10_interaction`](https://cmbeese.github.io/mizerReef/reference/caribbean_10_interaction.md)
+  : Interaction matrix for a generic Caribbean reef (10 functional
+  groups)
+- [`caribbean_10_model`](https://cmbeese.github.io/mizerReef/reference/caribbean_10_model.md)
+  : mizerReef model for a generic Caribbean reef (10 functional groups)
+
+### Empirical refuge profiles
+
+Refuge density profiles from field data, reusable across any mizerReef
+model - not tied to a particular example model.
+
 - [`karpata_refuge`](https://cmbeese.github.io/mizerReef/reference/karpata_refuge.md)
-  : Competitive method refuge parameters for a generic Caribbean reef
-- [`karpata_species`](https://cmbeese.github.io/mizerReef/reference/karpata_species.md)
-  : species_params dataframe for a generic Caribbean reef
-- [`karpata_model`](https://cmbeese.github.io/mizerReef/reference/karpata_model.md)
-  : MizerParams object for a multispecies generic reef
-
-### Refuge profiles
-
+  : Competitive method refuge parameters for Karpata reef in Bonaire
 - [`aquarius_refuge`](https://cmbeese.github.io/mizerReef/reference/aquarius_refuge.md)
-  : Competitive method refuge parameters for a generic Caribbean reef
+  : Competitive method refuge parameters for Aquarius reef research
+  station
+
+### Degradation trajectories
+
+Matrices of refuge-density scaling factors (multipliers) for three
+built-in habitat disturbance trajectories. Use with \[setDegradation()\]
+and \[reefDegrade()\].
+
+- [`rubble_scale`](https://cmbeese.github.io/mizerReef/reference/rubble_scale.md)
+  : Degradation scaling matrix for the rubble trajectory
+- [`algae_scale`](https://cmbeese.github.io/mizerReef/reference/algae_scale.md)
+  : Degradation scaling matrix for the algae trajectory
+- [`recovery_scale`](https://cmbeese.github.io/mizerReef/reference/recovery_scale.md)
+  : Degradation scaling matrix for the recovery trajectory

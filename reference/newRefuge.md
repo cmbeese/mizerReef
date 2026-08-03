@@ -35,7 +35,17 @@ newRefuge(
 
   A boolean value that states whether this new refuge profile is being
   used for simulation. Determines whether algae and detritus production
-  and tuned when the model is run to steady state. Defaults to false.
+  are tuned when the model is run to steady state. Defaults to FALSE.
+  Set this to `TRUE` when comparing fish outcomes under two refuge
+  profiles (e.g. before/after a habitat complexity or MPA-style change)
+  and you want to isolate the effect of the refuge change on fish by
+  holding the algae/detritus resource base fixed at its current values,
+  rather than letting it silently readjust and mask the comparison.
+  Leave at the default `FALSE` for ordinary steady-state tuning, where
+  algae/detritus should retune to match the (possibly still-changing)
+  fish community. This rationale is inferred from the code's behaviour,
+  not confirmed against original design notes – verify it matches your
+  intended use before relying on it for a scenario comparison.
 
 - new_method:
 
@@ -46,8 +56,11 @@ newRefuge(
 
 - new_method_params:
 
-  A data frame containing values specific to each method for calculating
-  refuge. Only necessary if changing methods.
+  A data frame or list specifying parameters required for the chosen
+  method. For 'sigmoidal', must include 'L_refuge' and 'prop_protect'.
+  For 'binned' and 'competitive', must include 'start_L', 'end_L', and
+  'prop_protect' (or 'refuge_density' for competitive). Only necessary
+  if changing methods.
 
 - new_L_refuge:
 
@@ -61,9 +74,11 @@ newRefuge(
 
 - scale_bin:
 
-  To be use with the "binned" method only. A number or vector of numbers
-  to multiply the `prop_protect` values by for each size bin. Changes
-  the proportion of fish protected.
+  To be used with the "binned" or "competitive" method only. A number or
+  vector (length = number of bins) to multiply the `prop_protect`
+  (binned) or `refuge_density` (competitive) values for each size bin.
+  Changes the proportion of fish protected. If a single value is given,
+  it is applied to all bins.
 
 - ...:
 
@@ -73,114 +88,98 @@ newRefuge(
 
 A mizer object with updated refuge profiles
 
+## Details
+
+At least one of the arguments new_method, new_method_params,
+new_L_refuge, new_prop_protect, or scale_bin must be provided. For
+'binned' and 'competitive' methods, scale_bin must be a value or vector
+matching the number of bins.
+
 ## Setting the refuge profile
 
-Refuge profiles account for the protective behavior of prey living in
-high complexity environments (e.g. coral reefs) with access to predation
-refuge. The refuge profile defines the proportion of fish within
-user-defined length bins that are protected from being encountered by a
-predator.
+     The mizerReef package provides three methods to define the refuge profile.
 
-mizerReef determines how much fish weight a refuge can hold by
-converting user provided fish length bins to weight bins with average
-length to weight conversion parameters \\\bar{a}\\ and \\\bar{b}\\,
-which describe the length to weight relationship for the fish dummies
-used during data collection. The default values are \\\bar{a} = 0.025,
-\bar{b} = 3\\. Assuming that fish in shelters are neutrally buoyant, the
-mass of the largest fish in each size category is proportional to the
-volume of refuges classified in that category.
+     \itemize{
 
-A unique refuge profile is generated for each predator group x prey
-group x prey size combination based on the given refuge profile
-parameters as well as four values from `params@species_params`: length
-to weight conversion values `a` and `b`, `refuge_user`, which is true
-for groups utilize that predation refuge, and `bad_pred`, which is false
-for predator groups whose body shape or predatory strategy allow them to
-access fish within refuge (e.g. eels).
+     \item **Sigmoidal Method**: \cr
 
-To ensure some food is always available to predators, the maximum
-proportion of fish protected by refuge in any size class is set by
-`max_protect`.
+         This method is preferred for data-poor reefs or reefs where the refuge
+         distribution is unknown. It is also ideal for systems where only one
+         species is expected to be utilizing refuge. The sigmoidal method defines
+         a smooth transition in refuge availability around a threshold body size.
 
-The refuge profile is used when calculating the food encounter rate in
-[`reefEncounter()`](https://cmbeese.github.io/mizerReef/reference/reefEncounter.md)
-and the predation mortality rate in
-[`reefPredMort()`](https://cmbeese.github.io/mizerReef/reference/reefPredMort.md).
-Its entries are dimensionless values between 0 and 1 which represent the
-proportion of fish in the corresponding prey and size categories that
-are hidden within refuge and thus cannot be encountered by predators. If
-no refuge is available then predator-prey interactions are determined
-entirely by size-preference.
+         The threshold for refuge can be set in two ways, depending on how your
+         refuge data was collected:
 
-The mizerReef package provides three methods to define the refuge
-profile.
+         - If `use_dummy_fish_bins = FALSE`, the threshold weight is calculated as:
+                 \deqn{ W_{i.refuge} = a_i \cdot L_{refuge}^{b_i} }
+          where \eqn{a_i} and \eqn{b_i} are the length-weight parameters for species i.
 
-- **Sigmoidal Method**:  
-  This method is preferred for data-poor reefs or reefs where the refuge
-  distribution is unknown. It is also ideal for systems where only one
-  functional group is expected to be utilizing refuge. The proportion of
-  fish with access to refuge \\ R_j(w_p) \\ is given by
+         - If `use_dummy_fish_bins = TRUE`, the weight threshold is:
 
-  \$\$ R_j(w_p) = \frac{r} {1 + e^{ \left( \Delta (w - W\_{refuge})
-  \right)} }\$\$
+                 \deqn{ W_{refuge} = a_{bar} \cdot L_{refuge}^{b_{bar}} }
 
-  Here \\W\_{refuge}\\ marks the body weight at which refuge becomes
-  scarcer for prey. \\r\\ defines the maximum proportion of fish with
-  access to predation refuge and is always less than or equal to
-  `max_protect`. \\\alpha\\ controls the rate at which the availability
-  of refuge decreases with increasing body size. It defaults to a steep
-  slope of 100.
+          The proportion of fish with access to refuge is then given by:
+                 \deqn{ R_{j}(w_p) = \frac{r}{1 + e^{\Delta(w - W_{refuge})}} }
+         where $r$ is the maximum proportion protected, $\Delta$ is the slope,
+         $w$ is body weight, and $W_{refuge}$ is the threshold (species-specific or dummy fish)
 
-  For this method, `method_params` should contain columns named
-  `prop_protect` and `L_refuge` that give the values for \\r\\ and the
-  length at which refuge becomes scarce in cm.
+         For this method, `method_params` should contain columns named
+         `prop_protect` and `L_refuge` that give the values for \eqn{r}
+         and the length at which refuge becomes scarce in cm.
 
-- **Binned Method**:  
-  This method is appropriate for theoretical applications and does not
-  rely on empirical data. It sets refuge to a constant proportion of
-  fish within a given size range. The proportion of fish in group \\j\\
-  with access to refuge is given by
+     \item **Binned Method**: \cr
 
-  \$\$ R_j(w_p) = r_k \~\~\~\~\~\~~ w_p ∈ (~w\_{k-1}, w_k~\] \$\$
+         This method is appropriate for theoretical applications
+         and does not rely on empirical data. It sets refuge to a constant
+         proportion of fish within a given size range. The proportion of fish
+         in group \eqn{j} with access to refuge is given by
 
-  where \\r_k\\ is the proportion of fish with access to refuge in size
-  class \\k\\.
+         \deqn{ R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }{
+                  R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }
 
-  For this method, `method_params` should contain columns named
-  `start_L`and `end_L` which contain the starting and ending lengths
-  [cm](https://rdrr.io/r/grDevices/cm.html) of each size bin and
-  `prop_protect`, the proportion of fish protected within each
-  corresponding size bin.
+             where \eqn{r_k} is the proportion of fish with access to refuge in
+         size class \eqn{k}.
 
-- **Competitive Method**:  
-  This method is appropriate when refuge density data is available for
-  the modelled reef. The refuge density describes the distribution of
-  refuges \\(no./m^2)\\ across defined fish body size categories. The
-  proportion of fish in size class \\k\\ with access to refuge is given
-  by
+         For this method, `method_params` should contain columns named
+         `start_L` and `end_L` which contain the starting and ending lengths [cm]
+         of each size bin and `prop_protect`, the proportion of fish protected
+         within each corresponding size bin.
 
-  \$\$R\_{j}(w_p) = \tau \cdot \frac{ \eta\_{k} } { \sum_i
-  \int\_{w\_{k-1}}^{w-k} N_i(w) \\ dw}\$\$
+     \item **Competitive Method**: \cr
+         This method is appropriate when refuge density data is available for
+         the modelled reef. The refuge density describes the distribution of
+         refuges \eqn{(no./m^2)} across predefined fish body size categories.
+         The proportion of fish in size class \eqn{k} with access to refuge
+         is given by
 
-  where \\ \tau \\ is the proportion of fish with access to refuge that
-  are expected to actually utilize it, \\ \eta\_{k}\\ is the density of
-  refuges in size range \\(w\_{k-1}, w_k\]\\ and \\\sum\_{i}
-  \int\_{w\_{k-1}}^{w_k} N_i(w)~dw\\ gives the density of fish from any
-  group in size range \\(w\_{k-1}, w_k\]\\. This represents the density
-  of competitors for refuges in size class \\k\\.
+         \deqn{R_{j}(w_p) = \tau \cdot \frac{ \eta_{k} }
+                                                { \sum_i \int_{w_{k-1}}^{w-k} N_i(w) \, dw}}{
+                  R_{j}(w_p) = \tau \eta_{k} /
+                              ( \sum_i \int_{w_{k-1}}^{w-k} N_i(w) \, dw ) }
 
-  For this method, `method_params` should contain columns named
-  `start_L`and `end_L` which contain the starting and ending lengths
-  [cm](https://rdrr.io/r/grDevices/cm.html) of each size bin and
-  `refuge_density`, the number of refuges available in each size bin
-  (no/m^2).
+         where \eqn{ \tau } is the proportion of fish with access to refuge that
+         are expected to actually utilize  it, \eqn{ \eta_{k}} is the density of
+         refuges in size range \eqn{(w_{k-1}, w_k]} and
+         \eqn{\sum_{i} \int_{w_{k-1}}^{w_k} N_i(w)~dw} gives the density
+         of fish from any group in size range \eqn{(w_{k-1}, w_k]}.
+         This represents the density of competitors for refuges in
+         size class \eqn{k}.
+
+         For this method, `method_params` should contain columns named
+         `start_L`and `end_L` which contain the starting and ending lengths [cm]
+         of each size bin and `refuge_density`, the number of refuges available
+         in each size bin (no/m^2).
+
+     }
 
 Users can also set a noncomplex reef with no habitat refuge. This option
-is convenient for finding steady state parameters.
+is convenient for finding steady state parameters and is the default
+when no parameters are provided.
 
 This function checks that the supplied refuge parameters are valid, adds
 relevant columns to the `species_params` data frame, and stores refuge
-parameters in the `other_params` slot of the `params` object.
+parameters in the `refuge_params` slot of the `params` object.
 
 Refuge profile parameters can be input in a spreadsheet program and
 saved as a .csv file. The data can then be read into R using the command

@@ -15,12 +15,15 @@ setURcapacity(params, cap = 1.5, ...)
 
 - params:
 
-  a MizerParams object
+  a
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - cap:
 
-  Value to scale the steady state biomass by. Defaults to 1.1, setting
-  the carrying capacity 10% higher than the current standing biomass.
+  Numeric. Value to scale the steady state biomass by. Defaults to 1.5,
+  setting the carrying capacity 50% higher than the current standing
+  biomass.
 
 - ...:
 
@@ -41,4 +44,4 @@ for additional detail.
 ## See also
 
 [`algae_dynamics_cc()`](https://cmbeese.github.io/mizerReef/reference/algae_dynamics_cc.md),[`detritus_dynamics_cc()`](https://cmbeese.github.io/mizerReef/reference/detritus_dynamics_cc.md),
-`tune_UR_cc()`
+[`tuneUR_cc()`](https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.md)

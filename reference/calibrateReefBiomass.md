@@ -37,3 +37,10 @@ individual species will not match observations yet, with some species
 having biomasses that are too high and others too low. So after this
 function use the mizer function matchReefBiomasses() to match the
 biomasses for each group.
+
+## Examples
+
+``` r
+data(caribbean_3_model)
+params <- calibrateReefBiomass(caribbean_3_model)
+```

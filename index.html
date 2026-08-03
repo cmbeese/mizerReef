@@ -5,14 +5,15 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Mizer Models with Benthic Coupling for Coral Reefs • mizerReef</title>
+<title>Mizer Models with Benthic Coupling for Structurally Complex Systems • mizerReef</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Mizer Models with Benthic Coupling for Coral Reefs">
-<meta name="description" content="This package provides the functionality for setting up and exploring mizer models with benthic coupling. New dynamics include predation refuges as well as algae, detritus, and plankton components. The package also includes two sets of example parameters for Caribbean coral reefs.">
-<meta property="og:description" content="This package provides the functionality for setting up and exploring mizer models with benthic coupling. New dynamics include predation refuges as well as algae, detritus, and plankton components. The package also includes two sets of example parameters for Caribbean coral reefs.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Mizer Models with Benthic Coupling for Structurally Complex Systems">
+<meta name="description" content="This package extends the mizer framework to support multi-species size spectrum models (MSSM) with benthic coupling for structurally complex marine ecosystems. It introduces predation refuges and additional benthic resources, such as algae and detritus, which are not size-structured. The package supports flexible habitat structures and includes example parameters for a generic Caribbean coral reef system.">
+<meta property="og:description" content="This package extends the mizer framework to support multi-species size spectrum models (MSSM) with benthic coupling for structurally complex marine ecosystems. It introduces predation refuges and additional benthic resources, such as algae and detritus, which are not size-structured. The package supports flexible habitat structures and includes example parameters for a generic Caribbean coral reef system.">
+<meta property="og:image" content="https://cmbeese.github.io/mizerReef/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,8 +33,11 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
       </ul>
-<ul class="navbar-nav"></ul>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cmbeese/mizerReef/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+      </ul>
 </div>
 
 
@@ -41,26 +45,78 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="section">
-<img src="reference/figures/mizerReef_logo.png" align="right"><a class="anchor" aria-label="anchor" href="#section"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="section"><a class="anchor" aria-label="anchor" href="#section"></a></h1>
+</div>
 <!-- badges: start -->
 
-<p>This is an extension package for the mizer package (<a href="https://sizespectrum.org/mizer/" class="external-link uri">https://sizespectrum.org/mizer/</a>) that makes it easy to set up a mizer model for tropical coral reef ecosystems. It includes unstructured algae and detritus resources in addition to plankton. Predator-prey interactions are mediated by predation refuge to simulate benthic complexity.</p>
-<p>This package was developed to support the creation and exploration of a generic model for tropical coral reefs.</p>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>MizerReef is an R package that extends the <a href="https://github.com/sizespectrum/mizer" class="external-link">mizer</a> framework to support modeling of structurally complex marine ecosystems—such as coral reefs, kelp forests, and rocky reefs. Predator-prey interactions are mediated by predation refuge to explicitly capture benthic habitat structure. It also adds features for benthic coupling, introducing additional resources such as detritus and algae that are not size-structured and can be consumed by all relevant species regardless of size. MizerReef is suitable for researchers studying any marine habitat where structural complexity influences ecosystem dynamics.</p>
+<blockquote>
+<p><strong>Compatibility note:</strong> MizerReef is not yet verified to work correctly when loaded together with other mizer extension packages (e.g. mizerMR). A mechanism meant to keep bundled example models correctly classed in that situation is not currently active; this is being worked on. See <code><a href="articles/extension_mechanism.html">vignette("extension_mechanism")</a></code> for details. MizerReef on its own is unaffected.</p>
+</blockquote>
+</div>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
+<ul>
+<li>Models structurally complex marine ecosystems</li>
+<li>Benthic habitat structures are represented through predation refuge</li>
+<li>Adds benthic resources (detritus, algae) without size-structuring</li>
+<li>Compatible with the mizer framework</li>
+</ul>
+<p>MizerReef was originally developed to support the creation and exploration of a generic model for tropical coral reefs as part of a PhD thesis. Example parameters for this system are included with the package. For details, see: <a href="https://doi.org/10.26686/wgtn.26421523" class="external-link">Modelling Coral Reef Futures: Exploring the role of structural complexity in sustaining ecosystem services</a>.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>mizerReef is still in development. Check back here for news.</p>
-<p>You can install the development version of mizerReef from GitHub with</p>
-<p><code>{r} remotes::install_github("cmbeese/mizerReef")</code></p>
-<p>If this gives an error saying “there is no package called remotes” then you also need to do</p>
-<p><code>{r} install.packages("remotes")</code></p>
-<p>before trying again to install mizerReef.</p>
-<p>You may be prompted to update some of your existing packages. The two packages that you should always update are <code>mizer</code> and <code>mizerExperimental</code>, because the mizerReef package will always be designed to work with the most recent version of these.</p>
+<p>MizerReef is under active development. Feedback is welcome!</p>
+<p>You can install the development version of MizerReef from GitHub:</p>
+<p>```{r} # If you don’t have the remotes package, install it first: install.packages(“remotes”)</p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="citation">
+<div class="section level1">
+<h1 id="then-install-mizerreef">Then install MizerReef:<a class="anchor" aria-label="anchor" href="#then-install-mizerreef"></a>
+</h1>
+<p>remotes::install_github(“cmbeese/mizerReef”) ```</p>
+<p>Make sure you have the latest versions of <a href="https://github.com/sizespectrum/mizer" class="external-link">mizer</a> and <a href="https://github.com/sizespectrum/mizerExperimental" class="external-link">mizerExperimental</a>, as MizerReef is designed to work with their most recent releases.</p>
+<div class="section level2">
+<h2 id="vignettes-and-examples">Vignettes and Examples<a class="anchor" aria-label="anchor" href="#vignettes-and-examples"></a>
+</h2>
+<p>See the <a href="https://cmbeese.github.io/mizerReef/">pkgdown site</a> for tutorials and example workflows.</p>
+</div>
+<div class="section level2">
+<h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
+</h2>
+<p>For questions, bug reports, or support, please open an issue on <a href="https://github.com/cmbeese/mizerReef/issues" class="external-link">GitHub</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>If you use MizerReef in your research, please cite:</p>
+<p>Beese C. M., Delius G., Mumby P. J., Rogers A. (2026). <em>MizerReef: an R package to create multi-species size spectrum models for structurally complex habitats</em>. R package version 2.0.0, <a href="https://github.com/cmbeese/mizerReef" class="external-link uri">https://github.com/cmbeese/mizerReef</a>.</p>
+<blockquote>
+<p>A peer-reviewed publication and DOI for MizerReef will be available soon. Please check back for the updated citation.</p>
+</blockquote>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>MizerReef is released under the GPL-3 license.</p>
+</div>
+</div>
+
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/cmbeese/mizerReef/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/cmbeese/mizerReef/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
 <li><a href="authors.html#citation">Citing mizerReef</a></li>
@@ -90,7 +146,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -3,7 +3,7 @@
 This function creates a barplot with the percent change in potential
 fisheries productivity between either: (1) two different mizerParams
 objects (2) two different size ranges. If comparing two mizerParams
-objects, they must have the same species groups.
+objects, they must have the same species.
 
 ## Usage
 
@@ -37,16 +37,16 @@ plotlyProductivityRelative(object1, object2, diff_method, ...)
 - diff_method:
 
   The method to calculate the relative change between models. If
-  `percent.change`, the percent change is calculated relative to the
-  value from object 1 with formula 100\*(new-old)/old. If `rel.diff` the
+  `percent_change`, the percent change is calculated relative to the
+  value from object 1 with formula 100\*(new-old)/old. If `rel_diff` the
   relative difference is returned given by (new - old)/(old + new).
 
 - species:
 
-  The groups to be selected. Optional. By default all target groups are
-  selected. A vector of groups names, or a numeric vector with the
-  groups indices, or a logical vector indicating for each group whether
-  it is to be selected (TRUE) or not.
+  The species to be selected. Optional. By default all target species
+  are selected. A vector of species names, or a numeric vector with the
+  species indices, or a logical vector indicating for each species
+  whether it is to be selected (TRUE) or not.
 
 - min_fishing_l1:
 
@@ -85,7 +85,10 @@ plotlyProductivityRelative(object1, object2, diff_method, ...)
 
   `object`
 
-  :   An object of class MizerParams or MizerSim
+  :   An object of class
+      [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+      or
+      [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html)
 
   `start_time`
 
@@ -107,26 +110,38 @@ plotlyProductivityRelative(object1, object2, diff_method, ...)
   :   A boolean value that determines whether the total productivity
       from all species is plotted as well. Default is TRUE.
 
+  `include_inverts`
+
+  :   A boolean value that determines whether the "inverts" species
+      group is included. Default is FALSE, since invertebrate
+      productivity is typically not relevant to fishing yield. Only
+      takes effect when `species` is not explicitly provided.
+
+  `include_repro`
+
+  :   A boolean value that indicates whether to include energy for
+      reproduction in productivity estimates. Defaults to using
+      [`getEGrowthTime()`](https://cmbeese.github.io/mizerReef/reference/getEGrowthTime.md)
+      if FALSE or mizer's
+      [`mizer::getEReproAndGrowth()`](https://sizespectrum.org/mizer/reference/getEReproAndGrowth.html)
+      if TRUE.
+
   `min_fishing_l`
 
-  :   parameters be passed to
-      [`getProductivity()`](https://cmbeese.github.io/mizerReef/reference/getProductivity.md).
-      The minimum length (cm) of fished individuals for productivity
+  :   The minimum length (cm) of fished individuals for productivity
       estimates. Defaults to 7 cm.
 
   `max_fishing_l`
 
-  :   parameters be passed to
-      [`getProductivity()`](https://cmbeese.github.io/mizerReef/reference/getProductivity.md).
-      The maximum length (cm) of fished individuals for productivity
+  :   The maximum length (cm) of fished individuals for productivity
       estimates. Defaults to max length.
 
 ## Value
 
 A ggplot2 object, unless `return_data = TRUE`, in which case a data
-frame with the the productivity for each Species Group by model is
-returned as well as another column called `rel_diff` that gives the
-relative difference between the two values.
+frame with the the productivity for each species by model is returned as
+well as another column called `rel_diff` that gives the relative
+difference between the two values.
 
 ## Details
 
@@ -146,7 +161,7 @@ To compare between different size ranges, use the `min_fishing_l1` and
 
 ## See also
 
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotBiomass()`](https://sizespectrum.org/mizer/reference/plotBiomass.html),
 [`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
 [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
@@ -156,11 +171,13 @@ To compare between different size ranges, use the `min_fishing_l1` and
 Other plotting functions:
 [`plot2Productivity()`](https://cmbeese.github.io/mizerReef/reference/plot2Productivity.md),
 [`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotDegScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegScale.md),
+[`plotDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegradationScale.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
-[`plotRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md),
+[`plotRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md),
+[`plotRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md),
 [`plotRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md),
-[`plotSpectraRelative()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.md),
+[`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md),
 [`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md),
 [`plotTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md),
 [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md),

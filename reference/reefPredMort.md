@@ -6,24 +6,16 @@ units of 1/year) on each prey species by prey size:
 ## Usage
 
 ``` r
-reefPredMort(
-  params,
-  n,
-  n_pp,
-  n_other,
-  t,
-  pred_rate,
-  vulnerable = reefVulnerable(params, n, n_pp, n_other, t, new_rd = reefDegrade(params,
-    n, n_pp, n_other, t)),
-  ...
-)
+reefPredMort(params, n, n_pp, n_other, t, pred_rate, vulnerable = NULL, ...)
 ```
 
 ## Arguments
 
 - params:
 
-  A MizerParams object
+  A
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - n:
 
@@ -68,7 +60,8 @@ mortality
 \theta\_{ji}.\$\$
 
 You would not usually call this function directly but instead use
-`getPredMort()`, which then calls this function.
+[`getPredMort()`](https://sizespectrum.org/mizer/reference/getPredMort.html),
+which then calls this function.
 
 ## See also
 

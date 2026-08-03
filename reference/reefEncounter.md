@@ -2,29 +2,23 @@
 
 Calculates the rate \\E_i(w)\\ at which a predator from group \\i\\ and
 weight \\w\\ encounters food (grams/year). You would not usually call
-this function directly but instead use `getEncounter()`, which then
-calls this function.
+this function directly but instead use
+[`getEncounter()`](https://sizespectrum.org/mizer/reference/getEncounter.html),
+which then calls this function.
 
 ## Usage
 
 ``` r
-reefEncounter(
-  params,
-  n,
-  n_pp,
-  n_other,
-  t,
-  vulnerable = reefVulnerable(params, n, n_pp, n_other, t, new_rd = reefDegrade(params,
-    n, n_pp, n_other, t)),
-  ...
-)
+reefEncounter(params, n, n_pp, n_other, t, vulnerable = NULL, ...)
 ```
 
 ## Arguments
 
 - params:
 
-  A MizerParams object
+  A
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - n:
 
@@ -72,9 +66,11 @@ sizes \\w_p\\, weighted by predation kernel \\\phi(w,w_p)\\:
 \\N_R(w)\\ is the abundance density of resource. The overall prefactor
 \\\gamma_i(w)\\ determines the predation power of the predator. It could
 be interpreted as a search volume and is set with the
-`setSearchVolume()` function.
+[`setSearchVolume()`](https://sizespectrum.org/mizer/reference/setSearchVolume.html)
+function.
 
-The predation kernel \\\phi(w,w_p)\\is set with the `setPredKernel()`
+The predation kernel \\\phi(w,w_p)\\is set with the
+[`setPredKernel()`](https://sizespectrum.org/mizer/reference/setPredKernel.html)
 function.
 
 The vulnerability to predation, \\V\_{ji}(w)\\ accounts for protective
@@ -83,24 +79,26 @@ behavior of the prey. The parameters that control this are set with the
 function.
 
 The species interaction matrix \\\theta\_{ij}\\ is set with
-`setInteraction()` and the resource interaction vector \\\theta\_{ip}\\
-is taken from the `interaction_resource`column in
-`params@species_params`.
+[`setInteraction()`](https://sizespectrum.org/mizer/reference/setInteraction.html)
+and the resource interaction vector \\\theta\_{ip}\\ is taken from the
+`interaction_resource`column in `params@species_params`.
 
 ## Details
 
 The encounter rate is multiplied by \\1-f_0\\ to obtain the consumption
 rate, where \\f_0\\ is the feeding level calculated with
-`getFeedingLevel()`. This is used by the `project()` function for
-performing simulations.
+[`getFeedingLevel()`](https://sizespectrum.org/mizer/reference/getFeedingLevel.html).
+This is used by the
+[`project()`](https://sizespectrum.org/mizer/reference/project.html)
+function for performing simulations.
 
 The function returns values also for sizes outside the size-range of the
 species. These values should not be used, as they are meaningless.
 
 If your model contains additional components that you added with
-`setComponent()` and for which you specified an `encounter_fun` function
-then the encounters of these components will be included in the returned
-value.
+[`setComponent()`](https://sizespectrum.org/mizer/reference/setComponent.html)
+and for which you specified an `encounter_fun` function then the
+encounters of these components will be included in the returned value.
 
 ## See also
 

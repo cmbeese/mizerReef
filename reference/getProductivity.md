@@ -22,16 +22,20 @@ getProductivity(
 
 - object:
 
-  An object of class `MizerParams` or `MizerSim`. If given a MizerSim
+  An object of class `MizerParams` or `MizerSim`. If given a
+  [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html)
   object, uses the growth rates at the final time of a simulation to
-  calculate productivity. If given a MizerParams object, uses the
-  initial growth rates.
+  calculate productivity. If given a
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object, uses the initial growth rates.
 
 - time_range:
 
   The time range (either a vector of values, a vector of min and max
   time, or a single value) to provide productivity for. Default is the
-  final time step. Ignored when called with a MizerParams object.
+  final time step. Ignored when called with a
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object.
 
 - include_repro:
 
@@ -96,16 +100,17 @@ Productivity cannot be measured in situ.
 
 The productivity \\P_i(w)\\ of species group \\i\\ is given by
 
-\$\$P_i(w) = \int_w^{w+dw} \left( N_i(w) + g_i(w) \right) w \\ dw.\$\$
+\$\$P_i(w) = \int_w^{w+dw} N_i(w)\\ g_i(w) \\ dw.\$\$
 
 \\N_i(w)\\ is the abundance density \\(no./m^{2})\\ and \\g_i(w)\\ is
-the energy rate available for growth after metabolism and movement have
-been accounted for \\(grams/year)\\. The productivity is calculated for
-all fish in the size range between `min_fishing_length` and
-`max_fishing_length`. These lengths can be the same for all groups or
-can be specified as a vector with one value for each species in the
-model. The minimum length defaults to \\7 cm\\ regardless of species
-group and maximum length defaults to the maximum weight in the model.
+the energy rate available for growth after metabolism, movement, and
+reproduction have been accounted for \\(grams/year)\\. The productivity
+is calculated for all fish in the size range between
+`min_fishing_length` and `max_fishing_length`. These lengths can be the
+same for all groups or can be specified as a vector with one value for
+each species in the model. The minimum length defaults to \\7 cm\\
+regardless of species group and maximum length defaults to the maximum
+weight in the model.
 
 ## See also
 

@@ -9,7 +9,7 @@ group.
 getSenMort(
   params,
   n = initialN(params),
-  n_pp = initialNResource(params),
+  n_pp = params@initial_n_pp,
   n_other = initialNOther(params),
   t = 0,
   ...
@@ -49,22 +49,32 @@ getSenMort(
 A named two dimensional array (species x size) with the senescence
 mortality rates.
 
+## Details
+
+Users can change `sen_prop`/`sen_curve` via
+[`setExtMortParams()`](https://cmbeese.github.io/mizerReef/reference/setExtMortParams.md).
+
 ## Senescence mortality
 
      Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
-     mortality caused by external sources such as illness or age. This is
-     addition to external mortality, \eqn{\mu_{ext.i}(w)}, which represents
-     all mortality that is not due to fishing or predation by predators
-     included in the model. The rate of senescence mortality is given by:
+     mortality caused by background sources such as illness or age. The
+     rate of senescence mortality (in 1/year) is given by:
 
-     \deqn{\mu_{sen.i}(w) = k_{sen}\left(\frac{w}{w_{max.i}}\right)^{p_{sen}}}
-          {\mu_{sen.i}(w) = k_{sen} (w/w_{max.i})^{p_{sen}}
+     \deqn{\mu_{sen.i}(w) = \mathtt{sen\_prop}\,
+                                 \left[\max\left(0,\;
+                                 \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
+                                 \right)\right]^{\mathtt{sen\_curve}}}{
+              \mu_{sen.i}(w) = sen_prop *
+              max(0, log10(w)/log10(w_{max.i}))^sen_curve}
 
-     where \eqn{k_{sen}} and \eqn{p_sen} are constants defining the shape
-     of the senescence curve and \eqn{w_max.i} is the maximum size
-     of species \eqn{i} in grams.
-
-     Users can change all constants with the `setSenMortParams()` function.
+     where \eqn{\mathtt{sen\_curve}} is the exponent shaping the
+     senescence curve and \eqn{\mathtt{sen\_prop}} is the rate the curve
+     approaches as \eqn{w \to w_{max.i}} (where the ratio is exactly 1).
+     The ratio is floored at zero before being raised to the
+     \eqn{\mathtt{sen\_curve}} power, since it is negative for individuals
+     below 1 gram (where \eqn{\log_{10}(w) < 0}), which would otherwise
+     raise a negative number to a fractional power -- those individuals
+     get exactly zero senescence mortality.
 
 ## See also
 

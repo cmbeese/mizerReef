@@ -2,8 +2,8 @@
 
 The encounter rate \\E_i(w)\\ for an unstructured resource like algae or
 detritus is proportional to the total biomass \\B\\ with a coefficient
-\\\rho_i(w)\\ that depends on the functional group \\i\\ and the size of
-the consumer:
+\\\rho_i(w)\\ that depends on the species \\i\\ and the size of the
+consumer:
 
 ## Usage
 

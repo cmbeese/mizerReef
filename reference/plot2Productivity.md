@@ -1,7 +1,8 @@
 # Plot the fisheries productivity of two models or two different size ranges in the same plot
 
-When called with a MizerParams object the steady state productivities
-are plotted.
+When called with a
+[MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+object the steady state productivities are plotted.
 
 ## Usage
 
@@ -36,9 +37,9 @@ plotly2Productivity(object1, object2, ...)
 
 - species:
 
-  The groups to be selected. Optional. By default all target groups are
-  selected. A vector of groups names, or a numeric vector with the
-  groups indices, or a logical vector indicating for each group whether
+  The species to be selected. Optional. By default all target species
+  are selected. A vector of species names, or a numeric vector with the
+  species indices, or a logical vector indicating for each group whether
   it is to be selected (TRUE) or not.
 
 - name1:
@@ -95,7 +96,10 @@ plotly2Productivity(object1, object2, ...)
 
   `object`
 
-  :   An object of class MizerParams or MizerSim
+  :   An object of class
+      [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+      or
+      [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html)
 
   `start_time`
 
@@ -117,18 +121,30 @@ plotly2Productivity(object1, object2, ...)
   :   A boolean value that determines whether the total productivity
       from all species is plotted as well. Default is TRUE.
 
+  `include_inverts`
+
+  :   A boolean value that determines whether the "inverts" species
+      group is included. Default is FALSE, since invertebrate
+      productivity is typically not relevant to fishing yield. Only
+      takes effect when `species` is not explicitly provided.
+
+  `include_repro`
+
+  :   A boolean value that indicates whether to include energy for
+      reproduction in productivity estimates. Defaults to using
+      [`getEGrowthTime()`](https://cmbeese.github.io/mizerReef/reference/getEGrowthTime.md)
+      if FALSE or mizer's
+      [`mizer::getEReproAndGrowth()`](https://sizespectrum.org/mizer/reference/getEReproAndGrowth.html)
+      if TRUE.
+
   `min_fishing_l`
 
-  :   parameters be passed to
-      [`getProductivity()`](https://cmbeese.github.io/mizerReef/reference/getProductivity.md).
-      The minimum length (cm) of fished individuals for productivity
+  :   The minimum length (cm) of fished individuals for productivity
       estimates. Defaults to 7 cm.
 
   `max_fishing_l`
 
-  :   parameters be passed to
-      [`getProductivity()`](https://cmbeese.github.io/mizerReef/reference/getProductivity.md).
-      The maximum length (cm) of fished individuals for productivity
+  :   The maximum length (cm) of fished individuals for productivity
       estimates. Defaults to max length.
 
 ## Value
@@ -139,7 +155,7 @@ returned.
 
 ## See also
 
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotBiomass()`](https://sizespectrum.org/mizer/reference/plotBiomass.html),
 [`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
 [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
@@ -148,12 +164,14 @@ returned.
 
 Other plotting functions:
 [`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotDegScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegScale.md),
+[`plotDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegradationScale.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
 [`plotProductivityRelative()`](https://cmbeese.github.io/mizerReef/reference/plotProductivityRelative.md),
-[`plotRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md),
+[`plotRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md),
+[`plotRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md),
 [`plotRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md),
-[`plotSpectraRelative()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.md),
+[`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md),
 [`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md),
 [`plotTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md),
 [`plotTotalBiomassRelative()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomassRelative.md),

@@ -17,3 +17,10 @@ plotDetritusConsumption(params)
 ## Value
 
 A pie chart.
+
+## Examples
+
+``` r
+data(caribbean_3_model)
+plotDetritusConsumption(caribbean_3_model)
+```

@@ -6,14 +6,16 @@ algae biomass
 ## Usage
 
 ``` r
-algae_dynamics_cc(params, n, n_other, rates, dt, ...)
+algae_dynamics_cc(params, n, n_other, rates, dt, t = 0, ...)
 ```
 
 ## Arguments
 
 - params:
 
-  A MizerParams object
+  A
+  [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+  object
 
 - n:
 
@@ -25,11 +27,19 @@ algae_dynamics_cc(params, n, n_other, rates, dt, ...)
 
 - rates:
 
-  A list of rates as returned by `getRates()`
+  A list of rates as returned by
+  [`getRates()`](https://sizespectrum.org/mizer/reference/getRates.html)
 
 - dt:
 
   Time step size
+
+- t:
+
+  The current time, used to determine the post-bleaching algae growth
+  and capacity boosts, if any (see
+  [`getAlgaeBoost()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeBoost.md)).
+  Defaults to `0`, which is always before any bleaching event.
 
 - ...:
 
@@ -63,4 +73,5 @@ The dynamical equation is solved analytically to
 [`detritus_dynamics()`](https://cmbeese.github.io/mizerReef/reference/detritus_dynamics.md),
 [`algae_consumption()`](https://cmbeese.github.io/mizerReef/reference/algae_consumption.md),
 [`getAlgaeConsumption()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeConsumption.md),
-[`getAlgaeProduction()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeProduction.md)
+[`getAlgaeProduction()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeProduction.md),
+[`getAlgaeBoost()`](https://cmbeese.github.io/mizerReef/reference/getAlgaeBoost.md)

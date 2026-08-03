@@ -1,7 +1,7 @@
-# Plot the relative difference in between the total fishable biomasses of each each Species Group at steady state
+# Plot the relative difference in between the total biomasses of each each species within a size range at steady state
 
 This functions creates a barplot with the relative change in biomass of
-each Species Group within a size range between either (1) two different
+each species within a size range between either (1) two different
 mizerParams objects (two models) or (2) two different size ranges.
 
 ## Usage
@@ -36,16 +36,16 @@ plotlyTotalBiomassRelative(object1, object2, diff_method, ...)
 - diff_method:
 
   The method to calculate the relative change between models. If
-  `percent.change`, the percent change is calculated relative to the
-  value from object 1 with formula 100\*(new-old)/old. If `rel.diff` the
+  `percent_change`, the percent change is calculated relative to the
+  value from object 1 with formula 100\*(new-old)/old. If `rel_diff` the
   relative difference is returned given by (new - old)/(old + new).
 
 - species:
 
-  The groups to be selected. Optional. By default all target groups are
-  selected. A vector of groups names, or a numeric vector with the
-  groups indices, or a logical vector indicating for each group whether
-  it is to be selected (TRUE) or not.
+  The species to be selected. Optional. By default all target species
+  are selected. A vector of species names, or a numeric vector with the
+  species indices, or a logical vector indicating for each species
+  whether it is to be selected (TRUE) or not.
 
 - min_fishing_l1:
 
@@ -84,7 +84,13 @@ plotlyTotalBiomassRelative(object1, object2, diff_method, ...)
 
   `object`
 
-  :   An object of class MizerParams
+  :   An object of class
+      [MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html)
+      or
+      [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html).
+      If a
+      [MizerSim](https://sizespectrum.org/mizer/reference/MizerSim.html)
+      object is provided, the biomass at the last time step is used.
 
   `min_fishing_l`
 
@@ -121,7 +127,7 @@ To compare between different size ranges, use the `min_fishing_l1` and
 
 ## See also
 
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotBiomass()`](https://sizespectrum.org/mizer/reference/plotBiomass.html),
 [`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
 `plotTotalBiomassRelative()`,
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
@@ -131,12 +137,14 @@ To compare between different size ranges, use the `min_fishing_l1` and
 Other plotting functions:
 [`plot2Productivity()`](https://cmbeese.github.io/mizerReef/reference/plot2Productivity.md),
 [`plot2TotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plot2TotalBiomass.md),
-[`plotBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotBiomass.md),
+[`plotDegScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegScale.md),
+[`plotDegradationScale()`](https://cmbeese.github.io/mizerReef/reference/plotDegradationScale.md),
 [`plotProductivity()`](https://cmbeese.github.io/mizerReef/reference/plotProductivity.md),
 [`plotProductivityRelative()`](https://cmbeese.github.io/mizerReef/reference/plotProductivityRelative.md),
-[`plotRefuge()`](https://cmbeese.github.io/mizerReef/reference/plotRefuge.md),
+[`plotRefugeDensity()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeDensity.md),
+[`plotRefugeProfile()`](https://cmbeese.github.io/mizerReef/reference/plotRefugeProfile.md),
 [`plotRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md),
-[`plotSpectraRelative()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraRelative.md),
+[`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md),
 [`plotTotalAbundance()`](https://cmbeese.github.io/mizerReef/reference/plotTotalAbundance.md),
 [`plotTotalBiomass()`](https://cmbeese.github.io/mizerReef/reference/plotTotalBiomass.md),
 [`plotVulnerable()`](https://cmbeese.github.io/mizerReef/reference/plotVulnerable.md)

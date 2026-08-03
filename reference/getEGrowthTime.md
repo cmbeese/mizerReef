@@ -30,9 +30,9 @@ getEGrowthTime(object, n, n_pp, n_other, time_range, drop = FALSE, ...)
 
 - time_range:
 
-  A vector of times. Only the range of times is relevant, i.e., all
-  times between the smallest and largest will be selected. The
-  time_range can be character or numeric.
+  A numeric or character vector of times. Only the range of values
+  matters, so all saved times between `min(time_range)` and
+  `max(time_range)` are selected.
 
 - drop:
 

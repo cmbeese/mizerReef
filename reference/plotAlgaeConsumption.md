@@ -17,3 +17,10 @@ plotAlgaeConsumption(params)
 ## Value
 
 A pie chart.
+
+## Examples
+
+``` r
+data(caribbean_3_model)
+plotAlgaeConsumption(caribbean_3_model)
+```
