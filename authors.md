@@ -15,7 +15,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/cmbeese/mizerReef/blob/v2.0.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/cmbeese/mizerReef/blob/main/inst/CITATION)
 
 Beese C, Delius G, Mumby P, Rogers A (2026). *MizerReef: an R package to
 create multi-species size spectrum models for structurally complex
