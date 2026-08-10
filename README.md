@@ -1,4 +1,6 @@
-# <img src="man/figures/logo.png" align="right" alt="mizerReef logo" />
+<p align="center">
+  <img src="man/figures/logo.png" alt="mizerReef logo" width="300" />
+</p>
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
