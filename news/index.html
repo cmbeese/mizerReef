@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,14 @@
       <small>Source: <a href="https://github.com/cmbeese/mizerReef/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.1" id="mizerreef-201">MizerReef 2.0.1<a class="anchor" aria-label="anchor" href="#mizerreef-201"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-2-0-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-0-1"></a></h3>
+<ul><li>
+<code><a href="../reference/scaleReefModel.html">scaleReefModel()</a></code> (called by <code><a href="../reference/calibrateReefBiomass.html">calibrateReefBiomass()</a></code> and <code><a href="../reference/calibrateReefNumber.html">calibrateReefNumber()</a></code>) no longer rescales <code>algae_growth</code>. The 2.0.0 algae redesign (see “Algae and detritus dynamics” under 2.0.0 below) fixed <code>algae_growth</code> as a constant, literature-informed production rate that <code><a href="../reference/tuneUR.html">tuneUR()</a></code>/<code><a href="../reference/tuneUR_cc.html">tuneUR_cc()</a></code> solve algae’s biomass around, but <code><a href="../reference/scaleReefModel.html">scaleReefModel()</a></code> was never updated to match – it still applied the same fish-abundance-correction factor to <code>algae_growth</code> that it correctly applies to fish abundance and to the algae/detritus encounter coefficients (<code>rho</code>/<code>rho_algae</code>/<code>rho_detritus</code>). Since nothing downstream ever resets <code>algae_growth</code> afterwards, a single <code><a href="../reference/calibrateReefBiomass.html">calibrateReefBiomass()</a></code> call against a starting point far from the observed target could silently collapse it by many orders of magnitude, corrupting algae’s production for the rest of the calibration pipeline. <code>rho</code>/<code>rho_algae</code>/<code>rho_detritus</code> continue to rescale as before – that part keeps algae/detritus consumption pressure invariant under the abundance rescale, the same role <code>search_vol</code>/<code>gamma</code> play for fish-fish encounters, and was already correct.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.0" id="mizerreef-200">MizerReef 2.0.0<a class="anchor" aria-label="anchor" href="#mizerreef-200"></a></h2>
 <p>This is the first public release of mizerReef beyond 1.0.1, the version that accompanied the original thesis. Everything below describes how 2.0.0 differs from that 1.0.1 release, which is what any existing user will actually have installed – there is no released version in between for these notes to assume you’ve already seen.</p>

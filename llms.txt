@@ -1,4 +1,4 @@
-# 
+![mizerReef logo](reference/figures/logo.png)
 
 ## Overview
 

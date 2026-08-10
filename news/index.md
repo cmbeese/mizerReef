@@ -1,5 +1,34 @@
 # Changelog
 
+## MizerReef 2.0.1
+
+### Bug fixes
+
+- [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md)
+  (called by
+  [`calibrateReefBiomass()`](https://cmbeese.github.io/mizerReef/reference/calibrateReefBiomass.md)
+  and
+  [`calibrateReefNumber()`](https://cmbeese.github.io/mizerReef/reference/calibrateReefNumber.md))
+  no longer rescales `algae_growth`. The 2.0.0 algae redesign (see
+  “Algae and detritus dynamics” under 2.0.0 below) fixed `algae_growth`
+  as a constant, literature-informed production rate that
+  [`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md)/[`tuneUR_cc()`](https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.md)
+  solve algae’s biomass around, but
+  [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md)
+  was never updated to match – it still applied the same
+  fish-abundance-correction factor to `algae_growth` that it correctly
+  applies to fish abundance and to the algae/detritus encounter
+  coefficients (`rho`/`rho_algae`/`rho_detritus`). Since nothing
+  downstream ever resets `algae_growth` afterwards, a single
+  [`calibrateReefBiomass()`](https://cmbeese.github.io/mizerReef/reference/calibrateReefBiomass.md)
+  call against a starting point far from the observed target could
+  silently collapse it by many orders of magnitude, corrupting algae’s
+  production for the rest of the calibration pipeline.
+  `rho`/`rho_algae`/`rho_detritus` continue to rescale as before – that
+  part keeps algae/detritus consumption pressure invariant under the
+  abundance rescale, the same role `search_vol`/`gamma` play for
+  fish-fish encounters, and was already correct.
+
 ## MizerReef 2.0.0
 
 This is the first public release of mizerReef beyond 1.0.1, the version

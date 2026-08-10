@@ -67,17 +67,17 @@ print(params)
 #> list()
 #> 
 #> Slot "mizer_version":
-#> [1] '3.2.0'
+#> [1] '3.2.1'
 #> 
 #> Slot "extensions":
 #>                mizerReef 
 #> "sizespectrum/mizerReef" 
 #> 
 #> Slot "time_created":
-#> [1] "2026-08-03 07:34:03 UTC"
+#> [1] "2026-08-10 23:47:14 UTC"
 #> 
 #> Slot "time_modified":
-#> [1] "2026-08-03 07:34:03 UTC"
+#> [1] "2026-08-10 23:47:14 UTC"
 #> 
 #> Slot "w":
 #>   [1] 1.000000e-03 1.167237e-03 1.362441e-03 1.590291e-03 1.856246e-03
@@ -8941,11 +8941,11 @@ caribbean_10_model <- reefSteady(params)
     #> other attached packages:
     #> [1] knitr_1.51                   dplyr_1.2.1                 
     #> [3] ggplot2_4.0.3                mizerExperimental_3.1.0.9000
-    #> [5] mizerReef_2.0.0              mizer_3.2.0                 
+    #> [5] mizerReef_2.0.1              mizer_3.2.1                 
     #> 
     #> loaded via a namespace (and not attached):
     #>  [1] plotly_4.12.1      sass_0.4.10        generics_0.1.4     tidyr_1.3.2       
-    #>  [5] stringi_1.8.7      digest_0.6.39      magrittr_2.0.5     timechange_0.4.0  
+    #>  [5] stringi_1.8.9      digest_0.6.39      magrittr_2.0.5     timechange_0.4.0  
     #>  [9] evaluate_1.0.5     grid_4.6.1         RColorBrewer_1.1-3 fastmap_1.2.0     
     #> [13] plyr_1.8.9         jsonlite_2.0.0     httr_1.4.8         purrr_1.2.2       
     #> [17] viridisLite_0.4.3  scales_1.4.0       textshaping_1.0.5  jquerylib_0.1.4   
@@ -8954,7 +8954,7 @@ caribbean_10_model <- reefSteady(params)
     #> [29] assertthat_0.2.1   vctrs_0.7.3        R6_2.6.1           lubridate_1.9.5   
     #> [33] lifecycle_1.0.5    stringr_1.6.0      fs_2.1.0           htmlwidgets_1.6.4 
     #> [37] ragg_1.5.2         pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.2.1     
-    #> [41] pillar_1.11.1      bslib_0.11.0       gtable_0.3.6       glue_1.8.1        
+    #> [41] pillar_1.11.1      bslib_0.12.0       gtable_0.3.6       glue_1.8.1        
     #> [45] data.table_1.18.4  Rcpp_1.1.2         systemfonts_1.3.2  xfun_0.60         
     #> [49] tibble_3.3.1       tidyselect_1.2.1   farver_2.1.2       htmltools_0.5.9   
     #> [53] labeling_0.4.3     rmarkdown_2.31     compiler_4.6.1     S7_0.2.2          
