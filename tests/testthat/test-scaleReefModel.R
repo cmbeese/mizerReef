@@ -9,9 +9,23 @@ test_that("scaleReefModel scales algae/detritus parameters as documented", {
     result <- scaleReefModel(params, factor = 3)
 
     expect_equal(result@other_params$algae$rho, old_algae_rho / 3)
-    expect_equal(result@other_params$algae$growth, old_algae_growth * 3)
     expect_equal(result@other_params$detritus$rho, old_detritus_rho / 3)
     expect_equal(result@other_params$detritus$external, old_detritus_external * 3)
+})
+
+test_that("scaleReefModel leaves algae growth unscaled", {
+    # algae_growth is a fixed, literature-informed production rate (see
+    # getAlgaeProduction()) that the algae redesign deliberately holds
+    # constant, independent of the model's abundance scale -- unlike rho,
+    # which is an encounter-rate coefficient and must still be rescaled
+    # to keep algae consumption pressure invariant under the rescale.
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    old_algae_growth <- params@other_params$algae$growth
+
+    result <- scaleReefModel(params, factor = 3)
+
+    expect_equal(result@other_params$algae$growth, old_algae_growth)
 })
 
 test_that("scaleReefModel scales core mizer state (abundances, resource, search_vol) as mizer::scaleModel documents", {

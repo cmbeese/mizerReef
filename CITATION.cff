@@ -1,4 +1,4 @@
-cff-version: 1.0.0
+cff-version: 2.0.0
 title: "MizerReef: an R package to create multi-species size spectrum models for structurally complex habitats"
 message: "If you use this package, please cite it as below."
 authors:
@@ -14,5 +14,5 @@ authors:
   - family-names: "Rogers"
     given-names: "Alice"
     orcid: "https://orcid.org/0000-0002-7244-0860"
-date-released: 2026-07-28
-version: "2.0.0"
+date-released: 2026-08-11
+version: "2.0.1"
