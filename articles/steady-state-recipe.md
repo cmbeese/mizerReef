@@ -74,10 +74,10 @@ print(params)
 #> "sizespectrum/mizerReef" 
 #> 
 #> Slot "time_created":
-#> [1] "2026-08-10 23:47:14 UTC"
+#> [1] "2026-08-20 09:57:33 UTC"
 #> 
 #> Slot "time_modified":
-#> [1] "2026-08-10 23:47:14 UTC"
+#> [1] "2026-08-20 09:57:33 UTC"
 #> 
 #> Slot "w":
 #>   [1] 1.000000e-03 1.167237e-03 1.362441e-03 1.590291e-03 1.856246e-03
@@ -8096,7 +8096,7 @@ print(params)
 #>        Resource           Total      Background         Fishing        External 
 #> "lightseagreen"         "black"          "grey"          "blue"          "grey" 
 #>           algae        detritus 
-#>          "grey"          "grey" 
+#> "darkseagreen3"         "plum4" 
 #> 
 #> Slot "linetype":
 #>    pred_eng   pred_grab        eels  pred_crypt    pred_inv  pred_plank 
@@ -8939,9 +8939,8 @@ caribbean_10_model <- reefSteady(params)
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #> [1] knitr_1.51                   dplyr_1.2.1                 
-    #> [3] ggplot2_4.0.3                mizerExperimental_3.1.0.9000
-    #> [5] mizerReef_2.0.1              mizer_3.2.1                 
+    #> [1] knitr_1.51              dplyr_1.2.1             ggplot2_4.0.3          
+    #> [4] mizerExperimental_3.2.0 mizerReef_2.0.1         mizer_3.2.1            
     #> 
     #> loaded via a namespace (and not attached):
     #>  [1] plotly_4.12.1      sass_0.4.10        generics_0.1.4     tidyr_1.3.2       
