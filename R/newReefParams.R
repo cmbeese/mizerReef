@@ -287,6 +287,10 @@ newReefParams <- function( # Original mizer parameters
         )
     }
 
+    # Set resource line colours for plotting
+    params@linecolour["algae"] <- algae_colour
+    params@linecolour["detritus"] <- detritus_colour
+
     # External mortality - Weight dependent ----
     if (include_ext_mort == TRUE) {
         ext_mort_params <- params@other_params[["ext_mort_params"]]

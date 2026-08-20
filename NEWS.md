@@ -20,6 +20,8 @@
   pressure invariant under the abundance rescale, the same role
   `search_vol`/`gamma` play for fish-fish encounters, and was already
   correct.
+- Detritus and algae colors are now correctly set in `newReefParams()`
+  to not be overwritten by `setComponent()`
 
 # MizerReef 2.0.0
 
