@@ -1,0 +1,93 @@
+# mizer 3.3 routes what a model-building function tells the user through
+# signal_info()/with_info_level(), controlled by an `info_level` argument.
+# These tests check that mizerReef's own reports go through that mechanism
+# rather than being bare message()/warning() calls the user cannot turn down.
+
+warnings_from <- function(expr) {
+    w <- character()
+    withCallingHandlers(
+        force(expr),
+        warning = function(cnd) {
+            w <<- c(w, conditionMessage(cnd))
+            invokeRestart("muffleWarning")
+        },
+        message = function(cnd) invokeRestart("muffleMessage")
+    )
+    w
+}
+
+test_that("setAlgaeParams reports the interaction_algae default through info_level", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params@species_params$interaction_algae <- NULL
+
+    expect_match(warnings_from(setAlgaeParams(params)), "interaction_algae",
+                 all = FALSE)
+    expect_length(warnings_from(setAlgaeParams(params, info_level = 0)), 0)
+})
+
+test_that("setDetritusParams reports the interaction_detritus default through info_level", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params@species_params$interaction_detritus <- NULL
+
+    expect_match(warnings_from(setDetritusParams(params)), "interaction_detritus",
+                 all = FALSE)
+    expect_length(warnings_from(setDetritusParams(params, info_level = 0)), 0)
+})
+
+test_that("tuneUR and tuneUR_cc report the negative external detritus flux through info_level", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+
+    expect_match(warnings_from(tuneUR(params)),
+                 "flux of external detritus is negative", all = FALSE)
+    expect_length(warnings_from(tuneUR(params, info_level = 0)), 0)
+
+    cc_params <- suppressWarnings(setURcapacity(params, cap = 1.5))
+    expect_length(warnings_from(tuneUR_cc(cc_params, info_level = 0)), 0)
+})
+
+test_that("reefSteady carries info_level down to the algae/detritus tuning", {
+    # The reports raised by tuneUR()/tuneUR_cc() are collected by the handler
+    # reefSteady() installs, so a caller can quiet the whole call.
+    data(caribbean_3_model)
+    expect_match(warnings_from(reefSteady(caribbean_3_model, progress_bar = FALSE)),
+                 "flux of external detritus is negative", all = FALSE)
+    expect_length(
+        warnings_from(reefSteady(caribbean_3_model, progress_bar = FALSE,
+                                 info_level = 0)),
+        0
+    )
+})
+
+test_that("newReefParams collects the reports of the setters it calls", {
+    # newReefParams() installs one handler for the whole construction and does
+    # not forward info_level to the setters: handlers nest by themselves, and
+    # forwarding it while it can also arrive through `...` would give
+    # "formal argument 'info_level' matched by multiple actual arguments".
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    build <- function(...) {
+        newReefParams(species_params = caribbean_3_species,
+                      interaction = caribbean_3_interaction,
+                      method = "binned", method_params = tuning_profile, ...)
+    }
+    expect_length(warnings_from(build(info_level = 0)), 0)
+    expect_s4_class(suppressMessages(suppressWarnings(build(info_level = 0))),
+                    "mizerReef")
+})
+
+test_that("the reports keep the wording they had as bare warnings", {
+    # Converting to signal_info() must not change what the user reads, so that
+    # existing scripts matching on these messages keep working.
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params@species_params$refuge_user <- NULL
+
+    w <- warnings_from(setRefuge(params,
+                                 method = params@other_params$refuge_params$method,
+                                 method_params = params@other_params$refuge_params$method_params))
+    expect_match(w, "You have not provided values for refuge_user", all = FALSE)
+})

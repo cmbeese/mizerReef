@@ -71,6 +71,10 @@
 #'                  is stored in the other_params slot.
 #' @param algae_colour Character. Colour to use for algae in plots.
 #'                     Default is "darkseagreen3".
+#' @param info_level How much mizer should say about the choices it makes
+#'   here. Level 1 keeps only the reports that tell you something went
+#'   differently from how you asked; 0 is silence. See
+#'   [mizer::default_info_level()].
 #' @details All algae-related parameters (growth rate, capacity) are stored in
 #'          the `algae` component of `other_params` (i.e. `other_params(params)$algae`),
 #'          the same location `mizer::getComponent()`/`mizer::removeComponent()`
@@ -88,7 +92,9 @@ setAlgaeParams <- function(params,
                            algae_capacity = NULL,
                            UR_interaction = NULL,
                            use_UR_cc = FALSE,
-                           algae_colour = "darkseagreen3") {
+                           algae_colour = "darkseagreen3",
+                           info_level = mizer::default_info_level()) {
+    mizer::with_info_level(info_level = info_level, {
     assert_that(is(params, "MizerParams"))
     no_sp <- nrow(params@species_params)
     assert_that(is.flag(use_UR_cc))
@@ -107,7 +113,10 @@ setAlgaeParams <- function(params,
     if (is.null(UR_interaction)) {
         if (!("interaction_algae" %in% names(sp))) {
             sp$interaction_algae <- rep(0, no_sp)
-            warning("You have not provided any values for interaction_algae, so no species feed on algae.")
+            mizer::signal_info(
+                "interaction_algae",
+                "You have not provided any values for interaction_algae, so no species feed on algae.",
+                level = 1, severity = "warning", unhandled = "show")
         }
     } else {
         # UR_interaction should be a named list/array with possible multiple resources
@@ -153,7 +162,8 @@ setAlgaeParams <- function(params,
     }
     params@linetype["algae"] <- "solid"
     params@time_modified <- lubridate::now()
-    return(params)
+    params
+    })
 }
 
 #' Set detritus parameters for mizerReef
@@ -209,6 +219,10 @@ setAlgaeParams <- function(params,
 #'                  is FALSE. This flag is stored in the other_params slot.
 #' @param detritus_colour Character. Colour to use for detritus in plots. Default is "plum4".
 #'
+#' @param info_level How much mizer should say about the choices it makes
+#'   here. Level 1 keeps only the reports that tell you something went
+#'   differently from how you asked; 0 is silence. See
+#'   [mizer::default_info_level()].
 #' @details All detritus-related parameters (capacity, decomposition rates, external input) are
 #'          stored in the `detritus` component of `other_params` (i.e.
 #'          `other_params(params)$detritus`), the same location
@@ -228,7 +242,9 @@ setDetritusParams <- function(params,
                               external = NULL,
                               UR_interaction = NULL,
                               use_UR_cc = FALSE,
-                              detritus_colour = "plum4") {
+                              detritus_colour = "plum4",
+                              info_level = mizer::default_info_level()) {
+    mizer::with_info_level(info_level = info_level, {
     assert_that(is(params, "MizerParams"))
     no_sp <- nrow(params@species_params)
     assert_that(is.flag(use_UR_cc))
@@ -243,7 +259,10 @@ setDetritusParams <- function(params,
     if (is.null(UR_interaction)) {
         if (!("interaction_detritus" %in% names(sp))) {
             sp$interaction_detritus <- rep(0, no_sp)
-            warning("You have not provided any values for interaction_detritus, so no species currently feed on detritus.")
+            mizer::signal_info(
+                "interaction_detritus",
+                "You have not provided any values for interaction_detritus, so no species currently feed on detritus.",
+                level = 1, severity = "warning", unhandled = "show")
         }
         ur_names <- grep("^interaction_", names(sp), value = TRUE)
         for (ur in ur_names) {
@@ -297,7 +316,8 @@ setDetritusParams <- function(params,
     }
     params@linetype["detritus"] <- "solid"
     params@time_modified <- lubridate::now()
-    return(params)
+    params
+    })
 }
 
 #' Set the parameters for external mortality
@@ -647,6 +667,10 @@ setExtMortParams <- function(params,
 #'
 #' @param ... Unused.
 #'
+#' @param info_level How much mizer should say about the choices it makes
+#'   here. Level 1 keeps only the reports that tell you something went
+#'   differently from how you asked; 0 is silence. See
+#'   [mizer::default_info_level()].
 #' @seealso
 #'   [reefEncounter()], [reefPredMort()], [setAlgaeParams()], [setDetritusParams()]
 #'
@@ -667,7 +691,9 @@ setRefuge <- function(params, method, method_params = NULL,
                       a_bar = NULL, b_bar = NULL,
                       w_settle = NULL, max_protect = NULL, tau = NULL,
                       use_dummy_fish_bins = TRUE,
+                      info_level = mizer::default_info_level(),
                       ...) {
+    mizer::with_info_level(info_level = info_level, {
     # Object validation
     assert_that(is(params, "MizerParams"))
 
@@ -724,10 +750,11 @@ setRefuge <- function(params, method, method_params = NULL,
     if (any(missing_a) || any(missing_b)) {
         sp[["a"]][missing_a] <- a_bar
         sp[["b"]][missing_b] <- b_bar
-        warning(
-            "Missing values in species_params columns 'a' and/or 'b' have been set to average values (a_bar = ",
-            a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters."
-        )
+        mizer::signal_info(
+            "a", paste0(
+                "Missing values in species_params columns 'a' and/or 'b' have been set to average values (a_bar = ",
+                a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters."),
+            level = 1, severity = "warning", unhandled = "show")
     }
     params@species_params$a <- sp$a
     params@species_params$b <- sp$b
@@ -744,7 +771,10 @@ setRefuge <- function(params, method, method_params = NULL,
     # Check that refuge_user is logical and the right length
     if (!("refuge_user" %in% colnames(sp))) {
         if (is.null(refuge_user)) {
-            warning("You have not provided values for refuge_user, so no species use refuge.")
+            mizer::signal_info(
+                "refuge_user",
+                "You have not provided values for refuge_user, so no species use refuge.",
+                level = 1, severity = "warning", unhandled = "show")
             refuge_user <- rep(FALSE, no_sp)
         } else if (!is.logical(refuge_user)) {
             stop("The refuge_user values should be logical.")
@@ -758,7 +788,10 @@ setRefuge <- function(params, method, method_params = NULL,
     # Check that blocked_pred is logical and the right length
     if (!("blocked_pred" %in% colnames(sp))) {
         if (is.null(blocked_pred)) {
-            warning("You have not provided values for blocked_pred, so all predators can access prey within refuge.")
+            mizer::signal_info(
+                "blocked_pred",
+                "You have not provided values for blocked_pred, so all predators can access prey within refuge.",
+                level = 1, severity = "warning", unhandled = "show")
             blocked_pred <- rep(FALSE, no_sp)
         } else if (!is.logical(blocked_pred)) {
             stop("The blocked_pred values should be logical.")
@@ -807,11 +840,12 @@ setRefuge <- function(params, method, method_params = NULL,
             # FALSE.
             satiation <- !eats_other_species & eats_detritus & !eats_algae
 
-            warning(
-                "You have not specified whether species should have a satiation response. ",
-                "The default is TRUE only for detritivores (species that consume detritus ",
-                "but do not also graze algae or eat other species) and FALSE otherwise."
-            )
+            mizer::signal_info(
+                "satiation", paste0(
+                    "You have not specified whether species should have a satiation response. ",
+                    "The default is TRUE only for detritivores (species that consume detritus ",
+                    "but do not also graze algae or eat other species) and FALSE otherwise."),
+                level = 1, severity = "warning", unhandled = "show")
         } else if (!is.logical(satiation)) {
             stop("The satiation values should be logical.")
         }
@@ -984,7 +1018,8 @@ setRefuge <- function(params, method, method_params = NULL,
 
     params@time_modified <- lubridate::now()
 
-    return(params)
+    params
+    })
 }
 
 ## Finds the refuge length bins by species and stores them in params
@@ -1278,6 +1313,10 @@ getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
 #'
 #' @param ... Unused
 #'
+#' @param info_level How much mizer should say about the choices it makes
+#'   here. Level 1 keeps only the reports that tell you something went
+#'   differently from how you asked; 0 is silence. See
+#'   [mizer::default_info_level()].
 #' @return A mizer object with updated refuge profiles
 #' @concept refugeParams
 #' @export
@@ -1287,7 +1326,9 @@ newRefuge <- function(params, new_refuge = FALSE,
                       # Sigmoidal - changing refuge length prop protect
                       new_L_refuge = NULL, new_prop_protect = NULL,
                       # Binned - scaling bin prop
-                      scale_bin = NULL, ...) {
+                      scale_bin = NULL,
+                      info_level = mizer::default_info_level(), ...) {
+    mizer::with_info_level(info_level = info_level, {
     # Check that the user provided at least one new input
     inputs <- list(
         new_method, new_method_params,
@@ -1312,8 +1353,11 @@ newRefuge <- function(params, new_refuge = FALSE,
     # Check if the user provided one of the available refuge profile methods
     m_opt <- c("sigmoidal", "binned", "competitive", "noncomplex")
     if (is.null(new_method)) {
-        warning("Since you did not provide a new method to set the refuge profile,
-                    I will use the one currently stored in params@other_params$refuge_params$method.")
+        mizer::signal_info(
+            "method",
+            paste("Since you did not provide a new method to set the refuge profile,",
+                  "I will use the one currently stored in params@other_params$refuge_params$method."),
+            level = 1, severity = "warning", unhandled = "show")
         # If user did not provide a method, use old one
         new_method <- refuge_params$method
         # If user did provide a method, check that it's one of the options
@@ -1413,7 +1457,8 @@ newRefuge <- function(params, new_refuge = FALSE,
     params@time_modified <- lubridate::now()
 
     # Return mizer params object
-    return(params)
+    params
+    })
 }
 
 

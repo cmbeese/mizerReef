@@ -14,6 +14,7 @@ reefSteady(
   return_sim = FALSE,
   preserve = c("reproduction_level", "erepro", "R_max"),
   progress_bar = TRUE,
+  info_level = mizer::default_info_level(),
   ...
 )
 }
@@ -53,6 +54,11 @@ of the \code{reproduction_level}.}
 
 \item{progress_bar}{A shiny progress object to implement a progress bar in a
 shiny app. Default FALSE.}
+
+\item{info_level}{How much mizer should say about the choices it makes
+here. Level 1 keeps only the reports that tell you something went
+differently from how you asked; 0 is silence. See
+\code{\link[mizer:default_info_level]{mizer::default_info_level()}}.}
 
 \item{...}{Passed on to \code{\link[mizer:findSteadyState]{mizer::findSteadyState()}} (or, when
 \code{return_sim = TRUE}, to \code{\link[mizer:projectUntilSettled]{mizer::projectUntilSettled()}}), so that

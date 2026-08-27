@@ -1,3 +1,49 @@
+# MizerReef 2.0.3
+
+## New features
+
+- The reports mizerReef makes while building or changing a model go through
+  mizer 3.3's `signal_info()`/`with_info_level()` mechanism instead of bare
+  `message()`/`warning()` calls, so they can be turned down. `newReefParams()`,
+  `reefSteady()`, `setAlgaeParams()`, `setDetritusParams()`, `setRefuge()`,
+  `newRefuge()`, `tuneUR()` and `tuneUR_cc()` gain an `info_level` argument,
+  defaulting to `mizer::default_info_level()`:
+
+  ```r
+  params <- newReefParams(..., info_level = 1)   # only what went differently
+  params <- reefSteady(params, info_level = 0)   # silence
+  ```
+
+  The wording is unchanged, and every report is still a warning at the default
+  level, so scripts matching on these messages keep working.
+
+  `newReefParams()` and `reefSteady()` install one handler for the whole call,
+  so the reports raised by the setters and by `tuneUR()`/`tuneUR_cc()` are
+  collected and given together. They deliberately do not forward `info_level`
+  to those inner calls: handlers nest by themselves, and forwarding it while it
+  can also arrive through `...` would give `formal argument "info_level"
+  matched by multiple actual arguments`.
+
+- `scaleReefModel()` reports the `r_max` -> `R_max` rename with
+  `signal_info()`, matching mizer's own `scaleModel()`, which this part of the
+  function reproduces.
+
+## Not converted, deliberately
+
+Ten reports stay as plain `message()`/`warning()` calls:
+
+- The `is.nan(consumption)` guards in `algae_dynamics()`,
+  `algae_dynamics_cc()`, `detritus_dynamics()` and `detritus_dynamics_cc()`,
+  and the refuge-misconfiguration warning in `reefVulnerable()`. These run
+  inside `project()`'s per-timestep loop, where there is no wrapped entry point
+  to collect them and end-of-call delivery would be the wrong semantics. They
+  are also genuine fault alarms rather than a choice mizer made, which is what
+  `signal_info()` is documented for.
+- The four migration reports in `upgradeReefParams()`, which fire once during a
+  deliberate one-off migration.
+- The warning in `plotRefugeProfile()`: a plotting function has no `info_level`
+  convention.
+
 # MizerReef 2.0.2
 
 Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and

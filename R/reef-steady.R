@@ -81,6 +81,10 @@
 #'   `return_sim = TRUE`, to [mizer::projectUntilSettled()]), so that
 #'   arguments such as `effort`, `method` or `info_level` can be given.
 #'
+#' @param info_level How much mizer should say about the choices it makes
+#'   here. Level 1 keeps only the reports that tell you something went
+#'   differently from how you asked; 0 is silence. See
+#'   [mizer::default_info_level()].
 #' @return An object of type [MizerParams]
 #' @concept setup
 #' @examples
@@ -92,7 +96,12 @@ reefSteady <- function(params, d_func = NULL,
                        t_max = 100, t_per = 1.5, dt = 0.1,
                        tol = 0.1 * dt, return_sim = FALSE,
                        preserve = c("reproduction_level", "erepro", "R_max"),
-                       progress_bar = TRUE, ...) {
+                       progress_bar = TRUE,
+                       info_level = mizer::default_info_level(), ...) {
+    # One handler for the whole call, so that the reports raised by
+    # tuneUR()/tuneUR_cc() below arrive together with anything mizer's
+    # steady-state machinery has to say.
+    mizer::with_info_level(info_level = info_level, {
     # Check if params are valid
     params <- mizer::validParams(params)
 
@@ -161,7 +170,7 @@ reefSteady <- function(params, d_func = NULL,
             t_check = t_per, t_max = t_max,
             dt = dt, t_save = t_per, distance_tol = tol,
             require_steady = FALSE,
-            progress_bar = progress_bar
+            progress_bar = progress_bar, info_level = info_level
         ),
         list(...)
     )
@@ -211,11 +220,12 @@ reefSteady <- function(params, d_func = NULL,
 
     if (return_sim) {
         object@params <- params
-        return(object)
+        object
     } else {
         params@time_modified <- lubridate::now()
-        return(params)
+        params
     }
+    })
 }
 
 #' Steady state methods for mizerReef models

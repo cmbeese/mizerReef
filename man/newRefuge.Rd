@@ -12,6 +12,7 @@ newRefuge(
   new_L_refuge = NULL,
   new_prop_protect = NULL,
   scale_bin = NULL,
+  info_level = mizer::default_info_level(),
   ...
 )
 }
@@ -61,6 +62,11 @@ or vector (length = number of bins) to multiply the \code{prop_protect}
 (binned) or \code{refuge_density} (competitive) values for each size bin.
 Changes the proportion of fish protected. If a single value is given,
 it is applied to all bins.}
+
+\item{info_level}{How much mizer should say about the choices it makes
+here. Level 1 keeps only the reports that tell you something went
+differently from how you asked; 0 is silence. See
+\code{\link[mizer:default_info_level]{mizer::default_info_level()}}.}
 
 \item{...}{Unused}
 }

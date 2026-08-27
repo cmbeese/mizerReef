@@ -63,6 +63,10 @@
 #'
 #' @param ... Extra parameters to be passed to [newMultispeciesParams()]
 #'
+#' @param info_level How much mizer should say about the choices it makes
+#'   here. Level 1 keeps only the reports that tell you something went
+#'   differently from how you asked; 0 is silence. See
+#'   [mizer::default_info_level()].
 #' @concept setup
 #' @return An object of type [MizerParams]
 #' @examples
@@ -109,7 +113,15 @@ newReefParams <- function( # Original mizer parameters
                           ext_mort_params = NULL,
                           include_ext_mort = TRUE,
                           include_sen_mort = TRUE,
-                          z0pre = 0.2, ...) {
+                          z0pre = 0.2,
+                          info_level = mizer::default_info_level(), ...) {
+    # One handler for the whole construction: the reports raised by
+    # setRefuge(), setAlgaeParams(), setDetritusParams() and the rest are
+    # collected here and given together. `info_level` is deliberately *not*
+    # forwarded to them -- handlers nest by themselves, and passing it down
+    # while it can also arrive through `...` gives "formal argument
+    # 'info_level' matched by multiple actual arguments".
+    mizer::with_info_level(info_level = info_level, {
     ## Initialize model with newMultispeciesParams ----
     params <- newMultispeciesParams(
         species_params = species_params,
@@ -351,5 +363,6 @@ newReefParams <- function( # Original mizer parameters
     params <- mizer::coerceToExtensionClass(params)
 
     # Return object ----
-    return(params)
+    params
+    })
 }

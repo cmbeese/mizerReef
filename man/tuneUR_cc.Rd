@@ -5,10 +5,15 @@
 \title{Tune unstructured resources with carrying capacities
 (algae and detritus) to steady state}
 \usage{
-tuneUR_cc(params, ...)
+tuneUR_cc(params, info_level = mizer::default_info_level(), ...)
 }
 \arguments{
 \item{params}{A MizerParams object}
+
+\item{info_level}{How much mizer should say about the choices it makes
+here. Level 1 keeps only the reports that tell you something went
+differently from how you asked; 0 is silence. See
+\code{\link[mizer:default_info_level]{mizer::default_info_level()}}.}
 
 \item{...}{unused}
 }

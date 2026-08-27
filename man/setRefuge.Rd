@@ -17,6 +17,7 @@ setRefuge(
   max_protect = NULL,
   tau = NULL,
   use_dummy_fish_bins = TRUE,
+  info_level = mizer::default_info_level(),
   ...
 )
 }
@@ -95,6 +96,11 @@ thresholds are calculated for sigmoidal, binned, and competitive methods:
 Set according to your data collection method. The setting is stored in
 \code{params@other_params$refuge_params$use_dummy_fish_bins} and used by \code{\link[=getRefuge]{getRefuge()}}.
 }}
+
+\item{info_level}{How much mizer should say about the choices it makes
+here. Level 1 keeps only the reports that tell you something went
+differently from how you asked; 0 is silence. See
+\code{\link[mizer:default_info_level]{mizer::default_info_level()}}.}
 
 \item{...}{Unused.}
 }
