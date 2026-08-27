@@ -1,9 +1,11 @@
-# Overwrite mizer's steady() function to also set the detritus and algae
+# Reef-aware steady state: mizer's steady-state machinery on the fish
+# sub-model, plus the algae and detritus tuning that mizer knows nothing
+# about.
 
 #' Project a mizerReef model to steady state
 #'
 #' This function tunes the detritus and algae biomass after running mizer's
-#' default `projectToSteady()` function on the fish sub-model.
+#' [mizer::findSteadyState()] on the fish sub-model.
 #'
 #' @details
 #' Algae and detritus are treated differently while the fish sub-model
@@ -32,6 +34,12 @@
 #' and to make algae's (already live-evolved) biomass exact, unless
 #' `new_refuge == TRUE`, in which case algae and detritus are left
 #' completely untouched.
+#'
+#' `reefSteady()` is also registered as the [mizer::steady()] and
+#' [mizer::tuneSteadyState()] method for `mizerReef` objects, so calling
+#' either of those on a reef model does the reef-aware thing. Earlier
+#' versions instead replaced `mizer::steady()` in mizer's namespace, which
+#' broke `steady()` for every non-reef model in the session.
 #'
 #' @param params A [MizerParams] object
 #'
@@ -69,7 +77,9 @@
 #' @param progress_bar  A shiny progress object to implement a progress bar in a
 #'                      shiny app. Default FALSE.
 #'
-#' @param ... unused
+#' @param ... Passed on to [mizer::findSteadyState()] (or, when
+#'   `return_sim = TRUE`, to [mizer::projectUntilSettled()]), so that
+#'   arguments such as `effort`, `method` or `info_level` can be given.
 #'
 #' @return An object of type [MizerParams]
 #' @concept setup
@@ -93,8 +103,14 @@ reefSteady <- function(params, d_func = NULL,
     old_R_max <- params@species_params$R_max
     old_erepro <- params@species_params$erepro
 
-    # Force the reproduction to stay at the current level
-    params@species_params$constant_reproduction <- getRDD(params)
+    # Force the reproduction to stay at the current level.
+    # `constant_reproduction` is written into the slot on purpose, and taken
+    # out again below: it is a temporary flag read by `constantRDD()` for the
+    # duration of this call only, exactly as mizer's own
+    # `tune_steady_project()` sets it. Routing it through
+    # `species_params<-()` would record it as a given species parameter and
+    # then withdraw the column again on every call.
+    params@species_params$constant_reproduction <- mizer::getRDD(params)
     old_rdd_fun <- params@rates_funcs$RDD
     params@rates_funcs$RDD <- "constantRDD"
 
@@ -122,20 +138,37 @@ reefSteady <- function(params, d_func = NULL,
     }
 
     if (is.null(d_func)) {
-        d_func <- distanceSSLogN
+        d_func <- mizer::distanceSSLogN
     }
 
-    object <- mizer::projectToSteady(params,
-        distance_func = d_func,
-        t_per = t_per, t_max = t_max,
-        dt = dt, tol = tol,
-        return_sim = return_sim,
-        progress_bar = progress_bar
-    )
-
+    # mizer 3.3 renamed projectToSteady() to findSteadyState(), with
+    # projectUntilSettled() for the trajectory, and renamed t_per/tol to
+    # t_check/distance_tol. The new finders stop only once the biomass
+    # drift has settled as well (require_steady = TRUE); reefSteady()'s
+    # documented stopping rule is the distance function alone, so we ask
+    # for the old rule explicitly, exactly as mizer's own steady() and
+    # projectToSteady() wrappers do. t_save = t_per keeps the trajectory
+    # spacing these functions have always returned.
     if (return_sim) {
+        object <- mizer::projectUntilSettled(
+            params,
+            distance_func = d_func,
+            t_check = t_per, t_max = t_max,
+            dt = dt, t_save = t_per, distance_tol = tol,
+            require_steady = FALSE,
+            progress_bar = progress_bar, ...
+        )
         params <- object@params
     } else {
+        object <- mizer::findSteadyState(
+            params,
+            solver = "project",
+            distance_func = d_func,
+            t_check = t_per, t_max = t_max,
+            dt = dt, t_save = t_per, distance_tol = tol,
+            require_steady = FALSE,
+            progress_bar = progress_bar, ...
+        )
         params <- object
     }
 
@@ -143,12 +176,6 @@ reefSteady <- function(params, d_func = NULL,
     params@rates_funcs$RDD <- old_rdd_fun
     params@other_dynamics <- old_other_dynamics
     params@species_params$constant_reproduction <- NULL
-
-    # bring algae and detritus back into steady state
-    # n <- params@initial_n
-    # n_pp <- params@initial_n_pp
-    # n_other <- params@initial_n_other
-    # rates <- mizer::getRates(params)
 
     # algae and detritus ----
     if (params@other_params$new_refuge == FALSE) {
@@ -158,9 +185,9 @@ reefSteady <- function(params, d_func = NULL,
         # formulation, so treat that as FALSE rather than erroring.
         cc <- isTRUE(params@other_params$use_UR_cc)
         if (cc) {
-            params <- tuneUR_cc(params = params, ...)
+            params <- tuneUR_cc(params = params)
         } else {
-            params <- tuneUR(params = params, ...)
+            params <- tuneUR(params = params)
         }
     }
 
@@ -185,5 +212,93 @@ reefSteady <- function(params, d_func = NULL,
     }
 }
 
-environment(reefSteady) <- asNamespace("mizer")
-utils::assignInNamespace("steady", reefSteady, ns = "mizer")
+#' Steady state methods for mizerReef models
+#'
+#' `mizerReef` methods for mizer's steady-state generics, both of which run
+#' [reefSteady()] so that the algae and detritus pools are tuned along with
+#' the fish sub-model. `mizer::steady()` is the superseded name;
+#' `mizer::tuneSteadyState()` is the current one.
+#'
+#' `tuneSteadyState()` supports only `solver = "project"` here, because
+#' `reefSteady()` needs the projection in order to let algae co-adapt with
+#' the fish spectra (see [reefSteady()]).
+#'
+#' @param params A `mizerReef` object
+#' @param t_max,t_per,dt,t_save,tol Control the projection. `t_save` is
+#'   accepted for compatibility with the generic and, as in mizer's own
+#'   method, does not affect the result.
+#' @param amplitude_tol,amp_rel_tol,extinction_threshold,method,info_level
+#'   Passed on to mizer's steady-state machinery.
+#' @param return_sim If TRUE, return the `MizerSim` of the run rather than
+#'   the tuned `MizerParams`.
+#' @param preserve See [reefSteady()].
+#' @param progress_bar A shiny progress object, or FALSE.
+#' @param solver Only `"project"` is supported for reef models.
+#' @param effort The fishing effort to hold during the run.
+#' @param ... Passed on to [reefSteady()].
+#'
+#' @return A [MizerParams] object, or a `MizerSim` when `return_sim = TRUE`.
+#' @seealso [reefSteady()]
+#' @concept setup
+#' @name reef-steady-methods
+NULL
+
+#' @rdname reef-steady-methods
+#' @method steady mizerReef
+#' @export
+steady.mizerReef <- function(params, t_max = 100, t_per = 1.5, dt = 0.1,
+                             t_save = dt, tol = 0.1 * dt,
+                             amplitude_tol = 0.01, amp_rel_tol = 0.01,
+                             extinction_threshold = 1e-6,
+                             return_sim = FALSE,
+                             preserve = c("reproduction_level", "erepro",
+                                          "R_max"),
+                             progress_bar = TRUE,
+                             info_level = mizer::default_info_level(),
+                             method = c("euler", "predictor_corrector",
+                                        "tr_bdf2")) {
+    # Forward the cycle-detection and integration arguments only when the
+    # caller actually gave them. Their defaults on mizer's `steady()` generic
+    # are not all the same as the ones `findSteadyState()` uses -- `steady()`
+    # documents `amp_rel_tol = 0.01`, the finder uses 0.1 -- and passing the
+    # generic's default through would quietly change what `steady()` does to
+    # a reef model relative to calling `reefSteady()` directly.
+    extra <- list()
+    if (!missing(amplitude_tol)) extra$amplitude_tol <- amplitude_tol
+    if (!missing(amp_rel_tol)) extra$amp_rel_tol <- amp_rel_tol
+    if (!missing(extinction_threshold)) {
+        extra$extinction_threshold <- extinction_threshold
+    }
+    if (!missing(method)) extra$method <- method
+    if (!missing(info_level)) extra$info_level <- info_level
+
+    do.call(reefSteady, c(
+        list(params,
+             t_max = t_max, t_per = t_per, dt = dt, tol = tol,
+             return_sim = return_sim, preserve = preserve,
+             progress_bar = progress_bar),
+        extra
+    ))
+}
+
+#' @rdname reef-steady-methods
+#' @method tuneSteadyState mizerReef
+#' @export
+tuneSteadyState.mizerReef <- function(params,
+                                      solver = c("project", "newton"),
+                                      effort = params@initial_effort,
+                                      preserve = c("reproduction_level",
+                                                   "erepro", "R_max"),
+                                      info_level = mizer::default_info_level(),
+                                      ...) {
+    solver <- match.arg(solver)
+    if (solver == "newton") {
+        stop("`tuneSteadyState()` on a mizerReef model supports only ",
+             "`solver = \"project\"`: reefSteady() lets algae co-adapt with ",
+             "the fish spectra as they settle, which the Newton solver ",
+             "cannot do. See `?reefSteady`.")
+    }
+    reefSteady(params,
+        preserve = preserve, effort = effort, info_level = info_level, ...
+    )
+}

@@ -54,14 +54,16 @@ of the \code{reproduction_level}.}
 \item{progress_bar}{A shiny progress object to implement a progress bar in a
 shiny app. Default FALSE.}
 
-\item{...}{unused}
+\item{...}{Passed on to \code{\link[mizer:findSteadyState]{mizer::findSteadyState()}} (or, when
+\code{return_sim = TRUE}, to \code{\link[mizer:projectUntilSettled]{mizer::projectUntilSettled()}}), so that
+arguments such as \code{effort}, \code{method} or \code{info_level} can be given.}
 }
 \value{
 An object of type \link[mizer:MizerParams]{MizerParams}
 }
 \description{
 This function tunes the detritus and algae biomass after running mizer's
-default \code{projectToSteady()} function on the fish sub-model.
+\code{\link[mizer:findSteadyState]{mizer::findSteadyState()}} on the fish sub-model.
 }
 \details{
 Algae and detritus are treated differently while the fish sub-model
@@ -90,6 +92,12 @@ formulation) is called once to bring detritus to its own steady state
 and to make algae's (already live-evolved) biomass exact, unless
 \code{new_refuge == TRUE}, in which case algae and detritus are left
 completely untouched.
+
+\code{reefSteady()} is also registered as the \code{\link[mizer:steady]{mizer::steady()}} and
+\code{\link[mizer:tuneSteadyState]{mizer::tuneSteadyState()}} method for \code{mizerReef} objects, so calling
+either of those on a reef model does the reef-aware thing. Earlier
+versions instead replaced \code{mizer::steady()} in mizer's namespace, which
+broke \code{steady()} for every non-reef model in the session.
 }
 \examples{
 data(caribbean_3_model)

@@ -98,9 +98,15 @@ setAlgaeParams <- function(params,
     if (is.null(params@other_params$algae)) params@other_params$algae <- list()
 
     # Interaction setup (array for all URs)
+    # These interaction_<resource> columns are mizerReef's own, so
+    # `recalculate = FALSE`: mizer derives no rate array from them and a
+    # rebuild here would recompute the fish rates. The setter is still used
+    # rather than the `@species_params` slot, so the table is validated and
+    # the values are recorded as given.
+    sp <- mizer::species_params(params)
     if (is.null(UR_interaction)) {
-        if (!("interaction_algae" %in% names(params@species_params))) {
-            params@species_params$interaction_algae <- rep(0, no_sp)
+        if (!("interaction_algae" %in% names(sp))) {
+            sp$interaction_algae <- rep(0, no_sp)
             warning("You have not provided any values for interaction_algae, so no species feed on algae.")
         }
     } else {
@@ -114,9 +120,10 @@ setAlgaeParams <- function(params,
             if (length(vals) != no_sp) stop(paste0(ur, " must have a value for every species."))
             if (!is.numeric(vals)) stop(paste0(ur, " must be numeric."))
             if (any(vals < 0) || any(vals > 1)) stop(paste0(ur, " values must be between 0 and 1."))
-            params@species_params[[ur]] <- vals
+            sp[[ur]] <- vals
         }
     }
+    mizer::species_params(params, recalculate = FALSE) <- sp
 
     # Store algae params in slot with checks
     # algae_growth_initial check
@@ -231,15 +238,17 @@ setDetritusParams <- function(params,
     if (is.null(params@other_params$detritus)) params@other_params$detritus <- list()
 
     # Interaction setup (array for all URs)
+    # See setAlgaeParams() above for why `recalculate = FALSE`.
+    sp <- mizer::species_params(params)
     if (is.null(UR_interaction)) {
-        if (!("interaction_detritus" %in% names(params@species_params))) {
-            params@species_params$interaction_detritus <- rep(0, no_sp)
+        if (!("interaction_detritus" %in% names(sp))) {
+            sp$interaction_detritus <- rep(0, no_sp)
             warning("You have not provided any values for interaction_detritus, so no species currently feed on detritus.")
         }
-        ur_names <- grep("^interaction_", names(params@species_params), value = TRUE)
+        ur_names <- grep("^interaction_", names(sp), value = TRUE)
         for (ur in ur_names) {
-            if (is.null(params@species_params[[ur]])) {
-                params@species_params[[ur]] <- rep(0, no_sp)
+            if (is.null(sp[[ur]])) {
+                sp[[ur]] <- rep(0, no_sp)
             }
         }
     } else {
@@ -251,9 +260,10 @@ setDetritusParams <- function(params,
             if (length(vals) != no_sp) stop(paste0(ur, " must have a value for every species."))
             if (!is.numeric(vals)) stop(paste0(ur, " must be numeric."))
             if (any(vals < 0) || any(vals > 1)) stop(paste0(ur, " values must be between 0 and 1."))
-            params@species_params[[ur]] <- vals
+            sp[[ur]] <- vals
         }
     }
+    mizer::species_params(params, recalculate = FALSE) <- sp
 
     # Store detritus params with checks
     params@other_params$detritus$capacity <- ifelse(is.null(detritus_capacity), 1, detritus_capacity)
@@ -688,40 +698,43 @@ setRefuge <- function(params, method, method_params = NULL,
         }
     }
 
-    # Check and create a and b columns if missing, set defaults for NAs
-    missing_cols <- !c("a", "b") %in% names(params@species_params)
-    if (any(missing_cols)) {
-        if (missing_cols[1]) { # 'a' column missing
-            params@species_params$a <- rep(NA_real_, nrow(params@species_params))
-        }
-        if (missing_cols[2]) { # 'b' column missing
-            params@species_params$b <- rep(NA_real_, nrow(params@species_params))
-        }
-    }
+    # Check and create a and b columns if missing, set defaults for NAs.
+    # `a` and `b` are mizer's own length-weight parameters, so filling them
+    # from a_bar/b_bar is real input and has to be recorded as given -- the
+    # `@species_params` slot write this replaces left mizer free to treat
+    # them as its own defaults and recalculate over them. `recalculate =
+    # FALSE` keeps this a pure bookkeeping fix: a and b build no rate array
+    # (they are used directly), so nothing here needs rebuilding, and the
+    # rates stay exactly as the slot write left them.
+    sp <- mizer::species_params(params)
+    no_sp_ab <- nrow(sp)
+    if (!("a" %in% names(sp))) sp$a <- rep(NA_real_, no_sp_ab)
+    if (!("b" %in% names(sp))) sp$b <- rep(NA_real_, no_sp_ab)
 
     # Set defaults for missing a and b parameters using a_bar and b_bar
-    if (anyNA(params@species_params[["a"]]) || anyNA(params@species_params[["b"]])) {
-        missing_a <- is.na(params@species_params[["a"]])
-        missing_b <- is.na(params@species_params[["b"]])
-
-        if (any(missing_a)) {
-            params@species_params[["a"]][missing_a] <- a_bar
-        }
-        if (any(missing_b)) {
-            params@species_params[["b"]][missing_b] <- b_bar
-        }
-
-        if (any(missing_a) || any(missing_b)) {
-            warning(
-                "Missing values in species_params columns 'a' and/or 'b' have been set to average values (a_bar = ",
-                a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters."
-            )
-        }
+    missing_a <- is.na(sp[["a"]])
+    missing_b <- is.na(sp[["b"]])
+    if (any(missing_a) || any(missing_b)) {
+        sp[["a"]][missing_a] <- a_bar
+        sp[["b"]][missing_b] <- b_bar
+        warning(
+            "Missing values in species_params columns 'a' and/or 'b' have been set to average values (a_bar = ",
+            a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters."
+        )
     }
+    mizer::species_params(params, recalculate = FALSE) <- sp
 
     # === SPECIES PARAMETER CHECKS ===
+    # refuge_user, blocked_pred and satiation are mizerReef's own columns.
+    # Collect them into one table and assign it once through the setter with
+    # `recalculate = FALSE`: mizer builds no rate array from them, so there
+    # is nothing to rebuild, but the assignment validates the table and
+    # records the values as given, which writing the `@species_params` slot
+    # did not.
+    sp <- mizer::species_params(params)
+
     # Check that refuge_user is logical and the right length
-    if (!("refuge_user" %in% colnames(params@species_params))) {
+    if (!("refuge_user" %in% colnames(sp))) {
         if (is.null(refuge_user)) {
             warning("You have not provided values for refuge_user, so no species use refuge.")
             refuge_user <- rep(FALSE, no_sp)
@@ -731,11 +744,11 @@ setRefuge <- function(params, method, method_params = NULL,
         if (length(refuge_user) != no_sp) {
             stop("refuge_user should have a value for every group.")
         }
-        params@species_params$refuge_user <- refuge_user
+        sp$refuge_user <- refuge_user
     }
 
     # Check that blocked_pred is logical and the right length
-    if (!("blocked_pred" %in% colnames(params@species_params))) {
+    if (!("blocked_pred" %in% colnames(sp))) {
         if (is.null(blocked_pred)) {
             warning("You have not provided values for blocked_pred, so all predators can access prey within refuge.")
             blocked_pred <- rep(FALSE, no_sp)
@@ -745,11 +758,11 @@ setRefuge <- function(params, method, method_params = NULL,
         if (length(blocked_pred) != no_sp) {
             stop("blocked_pred should have a value for every group.")
         }
-        params@species_params$blocked_pred <- blocked_pred
+        sp$blocked_pred <- blocked_pred
     }
 
     # Check that satiation is logical and the right length
-    if (!("satiation" %in% colnames(params@species_params))) {
+    if (!("satiation" %in% colnames(sp))) {
         if (is.null(satiation)) {
             # Calculate default satiation values based on feeding behavior.
             # In mizerReef, satiation-mediated consumption is intended to be
@@ -769,10 +782,10 @@ setRefuge <- function(params, method, method_params = NULL,
 
             # Check whether species graze algae and/or consume detritus
             has_positive_interaction <- function(col) {
-                if (!(col %in% names(params@species_params))) {
+                if (!(col %in% names(sp))) {
                     return(rep(FALSE, no_sp))
                 }
-                vals <- params@species_params[[col]]
+                vals <- sp[[col]]
                 vals[is.na(vals)] <- 0
                 vals > 0
             }
@@ -797,8 +810,9 @@ setRefuge <- function(params, method, method_params = NULL,
         if (length(satiation) != no_sp) {
             stop("satiation should have a value for every group.")
         }
-        params@species_params$satiation <- satiation
+        sp$satiation <- satiation
     }
+    mizer::species_params(params, recalculate = FALSE) <- sp
 
     # === REFUGE METHOD VALIDATION ===
     # Check if the user provided one of the available refuge profile methods

@@ -135,9 +135,10 @@ compensation) to 1 (no compensation):
 
 ### Why does pure density-independence (default) fail in reef models?
 
-During `steady()` or `reefSteady()`, the algorithm iteratively adjusts `erepro` 
-(egg production efficiency) to drive each species toward equilibrium where 
-births equal deaths. 
+During `reefSteady()` (which is also what mizer's `tuneSteadyState()`, and its
+superseded alias `steady()`, run on a reef model), the algorithm iteratively
+adjusts `erepro` (egg production efficiency) to drive each species toward
+equilibrium where births equal deaths. 
 
 **With pure density-independence (reproduction_level = 1, the mizer default):**
 
@@ -268,7 +269,7 @@ params <- params |>
     reefSteady() |> reefSteady() |> reefSteady()
 
 # Check convergence by plotting spectra
-plotSpectra(params, power = 1) + 
+plotSpectra(params, biomass = TRUE) + 
   ggtitle("Initial steady state spectra")
 ```
 
@@ -423,7 +424,7 @@ Let's examine the final model performance across multiple metrics:
 
 ```{r final-validation, eval=FALSE}
 # Overall spectra
-plotSpectra(params, total = TRUE, power = 2) + 
+plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE) + 
   ggtitle("Final total spectra")
 
 # Diet composition

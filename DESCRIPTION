@@ -1,7 +1,7 @@
 Package: mizerReef
 Title: Mizer Models with Benthic Coupling for Structurally Complex Systems
-Version: 2.0.1
-Date: 2026-08-11
+Version: 2.0.2
+Date: 2026-08-27
 Authors@R: c(
     person("Chelsey M.", "Beese",
            email = "beese.c.m@gmail.com",
@@ -26,15 +26,14 @@ Description: This package extends the mizer framework to support multi-species s
 License: GPL-3
 Depends:
     R (>= 4.1.0),
-    mizer (>= 3.2.0)
+    mizer (>= 3.3.0)
 Imports:
-    mizerExperimental (>= 2.4.0),
+    mizerExperimental (>= 3.3.0),
     assertthat,
     lubridate,
     methods,
     ggplot2,
     plotly,
-    splus2R,
     stats,
     dplyr,
     plyr,
@@ -43,7 +42,7 @@ Imports:
     scales
 Suggests:
     knitr,
-    mizerMR,
+    mizerMR (>= 0.3.1.2),
     patchwork,
     rmarkdown,
     testthat (>= 3.0.0)
@@ -76,4 +75,4 @@ Collate:
     'reef-steady.R'
     'reef-summary_methods.R'
 VignetteBuilder: knitr
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

@@ -61,3 +61,4 @@ Rplots.pdf
 
 # Interactive calibration/tuning intermediates (session scratch, not package data)
 /artifacts/
+.posit/assistant

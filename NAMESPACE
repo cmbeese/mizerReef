@@ -6,6 +6,8 @@ S3method(projectFeedingLevel,mizerReef)
 S3method(projectMort,mizerReef)
 S3method(projectPredMort,mizerReef)
 S3method(removeSpecies,mizerReef)
+S3method(steady,mizerReef)
+S3method(tuneSteadyState,mizerReef)
 S3method(utils::upgrade,mizerReef)
 export("detritus_lifetime<-")
 export(MizerReefParams)
@@ -93,26 +95,34 @@ export(upgradeReefParams)
 import(ggplot2)
 import(mizer)
 import(mizerExperimental)
-importFrom(assertthat,assert_that)
-importFrom(assertthat,is.flag)
-importFrom(assertthat,is.number)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,arrange)
-importFrom(dplyr,filter)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,rename)
-importFrom(dplyr,select)
-importFrom(dplyr,summarise)
+importFrom(assertthat,
+  assert_that,
+  is.flag,
+  is.number
+)
+importFrom(dplyr,
+  "%>%",
+  arrange,
+  filter,
+  left_join,
+  mutate,
+  rename,
+  select,
+  summarise
+)
 importFrom(lifecycle,deprecated)
 importFrom(lubridate,now)
-importFrom(methods,.hasSlot)
-importFrom(methods,is)
-importFrom(methods,slot)
+importFrom(methods,
+  .hasSlot,
+  is,
+  slot
+)
 importFrom(plotly,ggplotly)
 importFrom(plyr,aaply)
 importFrom(reshape2,melt)
 importFrom(scales,rescale)
-importFrom(stats,complete.cases)
-importFrom(stats,mvfft)
+importFrom(stats,
+  complete.cases,
+  mvfft
+)
 importFrom(utils,data)

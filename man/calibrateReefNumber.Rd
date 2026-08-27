@@ -33,7 +33,10 @@ having numbers that are too high and others too low. So after this
 function you may want to use \code{\link[mizer:matchNumbers]{matchNumbers()}}. This is described in the
 blog post at https://bit.ly/2YqXESV.
 
-If you have observations of the yearly yield instead of numbers, you can
-use \code{\link[mizer:calibrateYield]{calibrateYield()}} instead of this function.
+If you have observations of the yearly yield instead of numbers, mizer's
+\code{calibrateYield()} was removed in mizer 3.3 and has no replacement. Use
+\code{\link[=calibrateReefBiomass]{calibrateReefBiomass()}} with observed biomasses to set the scale of the
+model, and \code{\link[mizerExperimental:matchYield]{mizerExperimental::matchYield()}} to bring the individual
+yields into line by adjusting catchability.
 }
 \concept{calibration}

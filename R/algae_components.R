@@ -450,8 +450,9 @@ getAlgaeBoost <- function(params, t, boost_vector) {
 rescale_algae <- function(params, factor) {
     params@initial_n_other[["algae"]] <-
         params@initial_n_other[["algae"]] * factor
-    params@species_params$rho_algae <-
-        params@species_params$rho_algae / factor
+    sp <- mizer::species_params(params)
+    sp$rho_algae <- sp$rho_algae / factor
+    mizer::species_params(params, recalculate = FALSE) <- sp
     params@other_params$algae$rho <-
         params@other_params$algae$rho / factor
     params

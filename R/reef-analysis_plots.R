@@ -77,6 +77,34 @@ utils::globalVariables(c(
     "Productivity", "time"
 ))
 
+
+# Name the quantity that plotSpectra() plots, following mizer 3.3's rule that
+# the power of weight multiplying the number density is
+# `biomass + per_log_size`. Only needed when the plotSpectra() method that ran
+# did not name its value column after the quantity (see plotSpectraChange()).
+# By the time this is called plotSpectra() has already rejected any
+# contradictory combination, so the arguments can be trusted to agree.
+spectra_quantity <- function(power = NULL, biomass = NULL,
+                             per_log_size = NULL) {
+    if (!is.null(power) && !power %in% c(0, 1, 2)) {
+        return(paste0("Number density * w^", power))
+    }
+    if (is.null(biomass)) {
+        # mizer plots the biomass density unless told otherwise.
+        biomass <- if (is.null(power)) TRUE else power >= 1
+    }
+    if (is.null(per_log_size)) {
+        per_log_size <- !is.null(power) && power - as.numeric(biomass) > 0
+    }
+    if (isTRUE(biomass)) {
+        "Biomass density"
+    } else if (isTRUE(per_log_size)) {
+        "Number density in log weight"
+    } else {
+        "Number density"
+    }
+}
+
 #' Plot the change between two spectra
 #'
 #' This plots the change between the steady state spectra of two mizer
@@ -106,41 +134,66 @@ utils::globalVariables(c(
 #'                  vector indicating for each species whether it is to be
 #'                  selected (TRUE) or not.
 #' @param power The abundance is plotted as the number density times the weight
-#'   raised to this power. The default power = 1 gives the biomass density,
-#'   whereas power = 2 gives the biomass density with respect to logarithmic
-#'   size bins.
+#'   raised to this power. `power = 1` gives the biomass density, `power = 2`
+#'   the biomass density with respect to logarithmic size. Superseded by
+#'   `biomass` and `per_log_size`, which mizer 3.3 introduced in its place;
+#'   `power` still works and is still the only way to ask for a power that is
+#'   not the sum of the two flags.
+#' @param biomass Whether to plot the biomass density rather than the number
+#'   density. Passed on to [mizer::plotSpectra()].
+#' @param per_log_size Whether to plot the density with respect to logarithmic
+#'   size rather than with respect to size. Passed on to
+#'   [mizer::plotSpectra()].
 #' @param use_percent Logical. If TRUE (default), the change is expressed as
 #'   a percentage (e.g. 50 for a 50% increase). If FALSE, the raw relative
 #'   proportion is plotted instead (e.g. 0.5).
 #' @param return_data Logical. If TRUE, returns the data frame underlying the
 #'   plot instead of the plot itself. Default FALSE.
-#' @param ... Parameters passed to `plotSpectra()`
+#' @param ... Parameters passed to `plotSpectra()`, including `size_axis`,
+#'   which switches both spectra and the plot onto a length axis.
 #' @concept sumplots
 #' @family plotting functions
 #' @return A ggplot2 object, or a data frame if `return_data = TRUE`.
 #' @export
 plotSpectraChange <- function(object1, object2, species = NULL,
-                              power, use_percent = TRUE,
+                              power = NULL, biomass = NULL,
+                              per_log_size = NULL, use_percent = TRUE,
                               return_data = FALSE, ...) {
     sf1 <- mizer::plotSpectra(object1,
-        power = power,
+        power = power, biomass = biomass, per_log_size = per_log_size,
         species = species,
         return_data = TRUE, ...
     )
     sf2 <- mizer::plotSpectra(object2,
-        power = power,
+        power = power, biomass = biomass, per_log_size = per_log_size,
         species = species,
         return_data = TRUE, ...
     )
-    # plotSpectra() names the value column after the chosen power (e.g.
-    # "Biomass density"); normalise it so the join below is stable.
+    # plotSpectra() names the value column after the plotted quantity (e.g.
+    # "Biomass density", "Number density [1/g]"); keep the name for the axis
+    # label, then normalise it so the join below is stable. The change is a
+    # ratio, so the units in the name are dropped. Some extension packages'
+    # methods rename the column generically -- mizerMR calls it "value" --
+    # so fall back to naming the quantity ourselves in that case.
+    quantity <- sub(" \\[.*\\]$", "", names(sf1)[2])
+    if (identical(quantity, "value")) {
+        quantity <- spectra_quantity(power, biomass, per_log_size)
+    }
     names(sf1)[2] <- "value"
     names(sf2)[2] <- "value"
 
+    # plotSpectra() names its size column "w" or, with size_axis = "l", "l",
+    # so join and plot against whichever one came back.
+    size_var <- names(sf1)[1]
+
     multiplier <- if (isTRUE(use_percent)) 100 else 1
-    sf <- dplyr::left_join(sf1, sf2, by = c("w", "Legend")) |>
+    sf <- dplyr::left_join(sf1, sf2, by = c(size_var, "Legend")) |>
         dplyr::mutate(rel_diff = multiplier * (value.y - value.x) / value.x)
-    yLabel <- if (isTRUE(use_percent)) "% Change in Biomass" else "Relative Change in Biomass"
+    yLabel <- if (isTRUE(use_percent)) {
+        paste("% Change in", quantity)
+    } else {
+        paste("Relative Change in", quantity)
+    }
 
     if (is(object1, "MizerSim")) {
         params <- object1@params
@@ -167,8 +220,8 @@ plotSpectraChange <- function(object1, object2, species = NULL,
         return(sf)
     }
 
-    min_size <- min(sf$w)
-    max_size <- max(sf$w)
+    min_size <- min(sf[[size_var]])
+    max_size <- max(sf[[size_var]])
 
     legend_levels <- intersect(
         names(params@linecolour),
@@ -176,9 +229,11 @@ plotSpectraChange <- function(object1, object2, species = NULL,
     )
     linecolours <- params@linecolour[legend_levels]
 
-    ggplot(sf, aes(x = w, y = rel_diff, colour = Legend)) +
+    xLabel <- if (size_var == "l") "Length [cm]" else "Weight [g]"
+
+    ggplot(sf, aes(x = .data[[size_var]], y = rel_diff, colour = Legend)) +
         geom_line(linewidth = 0.95) +
-        labs(x = "Weight [g]", y = yLabel) +
+        labs(x = xLabel, y = yLabel) +
         scale_x_log10(limits = c(min_size, max_size)) +
         scale_color_manual(
             values = linecolours,
@@ -194,9 +249,11 @@ plotSpectraChange <- function(object1, object2, species = NULL,
 #' @rdname plotSpectraChange
 #' @export
 plotlySpectraChange <- function(object1, object2, ...) {
-    ggplotly(plotSpectraChange(object1, object2, ...),
-        tooltip = c("Legend", "w", "rel_diff")
-    )
+    p <- plotSpectraChange(object1, object2, ...)
+    # The size axis is "w" by default and "l" when size_axis = "l" was passed
+    # on to plotSpectra(); name whichever one the plot actually uses.
+    size_var <- intersect(c("w", "l"), names(p$data))[1]
+    ggplotly(p, tooltip = c("Legend", size_var, "rel_diff"))
 }
 
 

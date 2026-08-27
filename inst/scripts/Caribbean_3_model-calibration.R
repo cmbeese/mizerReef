@@ -216,8 +216,8 @@ plotTotalBiomass(params)
 
 # Spectra should be reasonably straight to match predictions of Sheldon's
 # spectrum but also have nonlinearities at refuge sizes
-plotSpectra(params, total = TRUE, power = 1)
-plotSpectra(params, total = TRUE, power = 2)
+plotSpectra(params, total = TRUE, biomass = TRUE)
+plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE)
 log_msg("spectra check before reproduction tuning")
 
 # Herbivore feeding level should now be consistently near 1 (satiated) --
@@ -259,7 +259,7 @@ plotTotalAbundance(params)
 plotTotalBiomass(params)
 plotBiomassVsSpecies(params)
 plotRefugeProfile(params)
-plotSpectra(params, power = 1, total = TRUE)
+plotSpectra(params, biomass = TRUE, total = TRUE)
 plotDiet(params)
 plotGrowthCurves(params)
 plotPredMort(params)
@@ -290,8 +290,8 @@ save_plot <- function(name, fn) {
 }
 
 save_plot("biomass-final", function() plotBiomassVsSpecies(params))
-save_plot("spectra-power1-final", function() plotSpectra(params, total = TRUE, power = 1))
-save_plot("spectra-power2-final", function() plotSpectra(params, total = TRUE, power = 2))
+save_plot("spectra-power1-final", function() plotSpectra(params, total = TRUE, biomass = TRUE))
+save_plot("spectra-power2-final", function() plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE))
 save_plot("reproduction-level", function() {
     barplot(getReproductionLevel(params), main = "Reproduction level")
 })

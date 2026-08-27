@@ -14,3 +14,13 @@ test_i2.rda
 ^\.claude$
 ^LICENSE$
 ^CITATION\.cff$
+^\.posit/assistant$
+^\.agents$
+^\.codex$
+^\.cursor$
+^\.gemini$
+^\.mcp\.json$
+^AGENTS\.md$
+^CLAUDE\.md$
+^GEMINI\.md$
+^MIZER-AGENTS\.md$
