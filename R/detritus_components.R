@@ -444,8 +444,9 @@ detritus_lifetime <- function(params) {
 rescale_detritus <- function(params, factor) {
     params@initial_n_other[["detritus"]] <-
         params@initial_n_other[["detritus"]] * factor
-    params@species_params$rho_detritus <-
-        params@species_params$rho_detritus / factor
+    sp <- mizer::species_params(params)
+    sp$rho_detritus <- sp$rho_detritus / factor
+    mizer::species_params(params, recalculate = FALSE) <- sp
     params@other_params$detritus$rho <-
         params@other_params$detritus$rho / factor
     params

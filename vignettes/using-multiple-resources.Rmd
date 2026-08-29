@@ -113,7 +113,7 @@ vignette shows how to:
 
 We assume you have read `vignette("mizerReef")` and are comfortable with the
 basic reef workflow. Familiarity with
-`vignette("using-extension-packages", package = "mizer")` is helpful but not
+`vignette("guide-use-extension-packages", package = "mizer")` is helpful but not
 required.
 
 ## Loading both extensions
@@ -278,7 +278,7 @@ model. `plotSpectra()` shows the fish community together with the two
 background resources, which tile the size axis:
 
 ```{r}
-plotSpectra(params, power = 2)
+plotSpectra(params, biomass = TRUE, per_log_size = TRUE)
 ```
 
 The diet composition resolves the two resources separately, so you can see the
@@ -371,7 +371,7 @@ which mechanism each uses, is still an evolving part of the mizer ecosystem.
 # too, mis-dispatching to methods (like mizerMR's plotSpectra()) that
 # assume a multiple-resource structure the object doesn't actually have.
 # mizer:::clearExtensionChain() is unexported but is mizer's own documented
-# mechanism for this (see creating-extension-packages.Rmd's discussion of
+# mechanism for this (see guide-create-extension-package's discussion of
 # tests that manipulate the extension chain), so this resets the session
 # back to a clean, mizerReef-only chain once this vignette is done.
 if (requireNamespace("mizerMR", quietly = TRUE)) {
@@ -382,4 +382,4 @@ if (requireNamespace("mizerMR", quietly = TRUE)) {
 
 For more on the extension chain — including how the load order is recorded in
 the object and restored when you save and reload it — see
-`vignette("using-extension-packages", package = "mizer")`.
+`vignette("guide-use-extension-packages", package = "mizer")`.

@@ -193,7 +193,7 @@ getSenMort <- function(params, n = initialN(params),
         is.array(n),
         is.numeric(n_pp),
         is.list(n_other),
-        splus2R::is.number(t),
+        is.number(t),
         identical(dim(n), dim(params@initial_n)),
         identical(length(n_pp), length(params@initial_n_pp)),
         identical(length(n_other), length(params@initial_n_other))

@@ -9,8 +9,10 @@ plotSpectraChange(
   object1,
   object2,
   species = NULL,
-  power,
+  power = NULL,
   use_percent = TRUE,
+  biomass = NULL,
+  per_log_size = NULL,
   return_data = FALSE,
   ...
 )
@@ -29,18 +31,28 @@ vector indicating for each species whether it is to be
 selected (TRUE) or not.}
 
 \item{power}{The abundance is plotted as the number density times the weight
-raised to this power. The default power = 1 gives the biomass density,
-whereas power = 2 gives the biomass density with respect to logarithmic
-size bins.}
+raised to this power. \code{power = 1} gives the biomass density, \code{power = 2}
+the biomass density with respect to logarithmic size. Superseded by
+\code{biomass} and \code{per_log_size}, which mizer 3.3 introduced in its place;
+\code{power} still works and is still the only way to ask for a power that is
+not the sum of the two flags.}
 
 \item{use_percent}{Logical. If TRUE (default), the change is expressed as
 a percentage (e.g. 50 for a 50\% increase). If FALSE, the raw relative
 proportion is plotted instead (e.g. 0.5).}
 
+\item{biomass}{Whether to plot the biomass density rather than the number
+density. Passed on to \code{\link[mizer:plotSpectra]{mizer::plotSpectra()}}.}
+
+\item{per_log_size}{Whether to plot the density with respect to logarithmic
+size rather than with respect to size. Passed on to
+\code{\link[mizer:plotSpectra]{mizer::plotSpectra()}}.}
+
 \item{return_data}{Logical. If TRUE, returns the data frame underlying the
 plot instead of the plot itself. Default FALSE.}
 
-\item{...}{Parameters passed to \code{plotSpectra()}}
+\item{...}{Parameters passed to \code{plotSpectra()}, including \code{size_axis},
+which switches both spectra and the plot onto a length axis.}
 }
 \value{
 A ggplot2 object, or a data frame if \code{return_data = TRUE}.

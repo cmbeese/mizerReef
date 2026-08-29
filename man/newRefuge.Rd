@@ -122,7 +122,7 @@ methods, scale_bin must be a value or vector matching the number of bins.
      \deqn{ R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }{
               R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }
 
-         where \eqn{r_k} is the proportion of fish with access to refuge in
+     where \eqn{r_k} is the proportion of fish with access to refuge in
      size class \eqn{k}.
 
      For this method, `method_params` should contain columns named

@@ -239,3 +239,28 @@ test_that("newReefParams stores the algae/detritus consumption matrix under the 
     expect_null(result@other_params$algae_params)
     expect_null(result@other_params$detritus_params)
 })
+
+test_that("newReefParams records only mizerReef, not every loaded extension", {
+    # newReefParams() used to do `params@extensions <-
+    # mizer::getRegisteredExtensions()`, copying the whole *session* registry
+    # into the object. An extension can be loaded without having been applied
+    # to this particular model, so with mizerMR merely loaded the model came
+    # back recording mizerMR and classed `mizerMR` -- with no `MR` component
+    # for mizerMR's methods to read. Each extension records itself as it is
+    # actually applied, so the chain still builds when they are combined.
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    params <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile
+    ))
+    expect_named(params@extensions, "mizerReef")
+    expect_equal(unname(params@extensions[["mizerReef"]][["version"]]),
+                 as.character(utils::packageVersion("mizerReef")))
+    # This is what the bundled example model has always recorded.
+    data(caribbean_3_model)
+    expect_named(caribbean_3_model@extensions, "mizerReef")
+})

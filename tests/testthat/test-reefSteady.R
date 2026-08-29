@@ -115,3 +115,41 @@ test_that("reefSteady with return_sim = TRUE returns a MizerSim-like object wrap
     c_A <- algae_consumption(sim@params, n = sim@params@initial_n, rates = getRates(sim@params))
     expect_equal(P_A - c_A * algae_biomass(sim@params), 0)
 })
+
+test_that("loading mizerReef leaves mizer::steady() working for non-reef models", {
+    # mizerReef used to install reefSteady() over mizer::steady() with
+    # assignInNamespace(), which replaced mizer's S3 generic outright: every
+    # non-reef model in the session then hit reefSteady()'s reef-only code
+    # (`params@other_params$new_refuge` is NULL there, so `if (NULL == FALSE)`
+    # errored), and no other extension's steady() method could dispatch.
+    expect_true(grepl("UseMethod", paste(deparse(body(mizer::steady)),
+                                         collapse = " ")))
+    # NS_params is nowhere near steady after 3 years, so setBevertonHolt()
+    # warns about erepro; that is beside the point being tested here.
+    reef_free <- suppressWarnings(suppressMessages(
+        mizer::steady(mizer::NS_params, t_max = 3, progress_bar = FALSE)
+    ))
+    expect_s4_class(reef_free, "MizerParams")
+    expect_false(is(reef_free, "mizerReef"))
+})
+
+test_that("steady() and tuneSteadyState() dispatch to reefSteady() for reef models", {
+    data(caribbean_3_model)
+    expected <- reefSteady(caribbean_3_model, progress_bar = FALSE)
+
+    via_steady <- mizer::steady(caribbean_3_model, progress_bar = FALSE)
+    via_tune <- mizer::tuneSteadyState(caribbean_3_model, progress_bar = FALSE)
+
+    expect_s4_class(via_steady, "mizerReef")
+    expect_s4_class(via_tune, "mizerReef")
+    expect_equal(via_steady@initial_n, expected@initial_n)
+    expect_equal(via_tune@initial_n, expected@initial_n)
+    expect_equal(via_steady@initial_n_other, expected@initial_n_other)
+    expect_equal(via_tune@initial_n_other, expected@initial_n_other)
+})
+
+test_that("tuneSteadyState() on a reef model refuses the Newton solver", {
+    data(caribbean_3_model)
+    expect_error(mizer::tuneSteadyState(caribbean_3_model, solver = "newton"),
+                 "supports only")
+})

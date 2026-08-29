@@ -43,3 +43,63 @@ test_that("matchReefGrowth restricted to a species subset only rescales that sub
     result <- matchReefGrowth(params, species = target)
     expect_equal(result@other_params$algae$rho[other_known_idx, ], old_rho[other_known_idx, ])
 })
+
+test_that("matchReefGrowth records the scaled parameters, so a recalculation cannot undo the match", {
+    # matchReefGrowth() scales search_vol/intake_max/metab by hand and scales
+    # gamma/h/ks/k to match. It used to write those scalars into the
+    # `@species_params` slot, which left `species_params()` disagreeing with
+    # `given_species_params()`: the next call that triggered a recalculation
+    # restored the unscaled `ks` and moved the metabolic rate with it,
+    # undoing the match. mizer's own matchGrowth() assigns through
+    # `species_params(params, recalculate = FALSE) <-` for this reason.
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    params <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile
+    ))
+    matched <- suppressWarnings(suppressMessages(matchReefGrowth(params)))
+
+    # The scaled values are recorded as given, not left only in species_params().
+    expect_equal(unname(given_species_params(matched)$ks),
+                 unname(species_params(matched)$ks))
+
+    # Forcing a recalculation leaves both the parameters and the rates alone.
+    recalculated <- matched
+    suppressMessages(
+        species_params(recalculated) <- species_params(matched)
+    )
+    expect_equal(unname(species_params(recalculated)$ks),
+                 unname(species_params(matched)$ks))
+    # Compare the numbers: these arrays carry a `params` attribute holding
+    # the whole model, which differs in column order after a recalculation.
+    bare <- function(x) as.numeric(unclass(x))
+    expect_equal(bare(metab(recalculated)), bare(metab(matched)))
+    expect_equal(bare(search_vol(recalculated)), bare(search_vol(matched)))
+})
+
+test_that("a freshly built reef model is self-consistent: recalculating changes nothing", {
+    # Every species parameter mizerReef sets goes in through
+    # `species_params(params, recalculate = FALSE) <-`, so it is recorded as
+    # given. A model built that way survives a recalculation untouched;
+    # writing the `@species_params` slot instead did not.
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    params <- suppressMessages(newReefParams(
+        species_params = caribbean_3_species,
+        interaction = caribbean_3_interaction,
+        method = "binned",
+        method_params = tuning_profile
+    ))
+    recalculated <- params
+    suppressMessages(species_params(recalculated) <- species_params(params))
+
+    bare <- function(x) as.numeric(unclass(x))
+    expect_equal(bare(metab(recalculated)), bare(metab(params)))
+    expect_equal(bare(search_vol(recalculated)), bare(search_vol(params)))
+    expect_equal(bare(intake_max(recalculated)), bare(intake_max(params)))
+})

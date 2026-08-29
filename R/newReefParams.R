@@ -228,9 +228,17 @@ newReefParams <- function( # Original mizer parameters
     # rho_alg[is.na(rho_alg)] <- 0
     # rho_det[is.na(rho_det)] <- 0
 
-    # Store new rho values in species_params data frame
-    params@species_params$rho_algae <- rho_alg
-    params@species_params$rho_detritus <- rho_det
+    # Store new rho values in species_params data frame.
+    # `recalculate = FALSE` because rho_algae/rho_detritus are mizerReef's own
+    # columns: mizer derives no rate array from them, so there is nothing for
+    # it to rebuild, and a rebuild here would recompute the fish rates from
+    # the species parameters. Going through the setter rather than the
+    # `@species_params` slot still validates the table and records the values
+    # as given, so a later recalculation cannot quietly drop them.
+    sp <- mizer::species_params(params)
+    sp$rho_algae <- rho_alg
+    sp$rho_detritus <- rho_det
+    mizer::species_params(params, recalculate = FALSE) <- sp
 
     # Calculate rho * w^n for use in algae and detritus dynamic functions
     rho_alg <- outer(params@species_params$rho_algae, params@w^0.86)
@@ -315,12 +323,23 @@ newReefParams <- function( # Original mizer parameters
         mizer::ext_mort(params) <- allo_mort
     }
 
-    # Register the extension chain and promote to the mizerReef S4 class ----
+    # Record the extension and promote to the mizerReef S4 class ----
     # Rate overrides (Encounter, FeedingLevel, PredMort, Mort) are handled via
     # project*.mizerReef S3 methods defined in reef-project_methods.R, which
     # participate in the daisy-chain via NextMethod() rather than
     # setRateFunction(), making them composable with other extension packages.
-    params@extensions <- mizer::getRegisteredExtensions()
+    #
+    # Record only mizerReef, not the whole session registry: another
+    # extension can be loaded without having been applied to *this* model,
+    # and copying the registry in made the object claim it. With mizerMR
+    # merely loaded, this model came back classed `mizerMR` with no `MR`
+    # component, so mizerMR's methods dispatched on a model that had no
+    # multiple-resource data. Each extension records itself as it is applied
+    # -- mizerMR's setMultipleResources() calls recordExtension() too -- so
+    # the chain still builds correctly when extensions really are combined.
+    params <- mizer::recordExtension(
+        params, "mizerReef",
+        version = as.character(utils::packageVersion("mizerReef")))
     params <- mizer::coerceToExtensionClass(params)
 
     # Return object ----

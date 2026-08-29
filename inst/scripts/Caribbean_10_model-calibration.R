@@ -340,7 +340,7 @@ plotBiomassVsSpecies(params)
 plotRelativeContribution(params) # parrotfish/grabbers dominant, matches Chapter4.tex
 plotDiet(params) + ggplot2::scale_x_log10(limits = c(1, 1e4))
 plotGrowthCurves(params)
-plotSpectra(params, power = 1, total = TRUE)
+plotSpectra(params, biomass = TRUE, total = TRUE)
 
 ## Verify the complexity effect survives (see design note "Verification" above)
 non_complex <- newRefuge(params, new_method = "noncomplex")

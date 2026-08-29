@@ -133,7 +133,12 @@ upgradeReefParams <- function(params) {
             names(sp)[names(sp) == "bad_pred"] <- "blocked_pred"
         }
     }
-    params@species_params <- sp
+    # Assign through the setter rather than the slot: a column missing from
+    # the assigned table is one mizer takes out of `given_species_params()`
+    # too, which is what makes the bad_pred -> blocked_pred rename complete.
+    # `recalculate = FALSE` keeps this a structural migration -- the rate
+    # arrays are the caller's to rebuild, and validParams() below does it.
+    mizer::species_params(params, recalculate = FALSE) <- sp
 
     # --- rates_funcs: drop the old direct overrides --------------------------
     # v2 gets reef behaviour via S3 dispatch (project*.mizerReef methods)
@@ -234,8 +239,13 @@ upgradeReefParams <- function(params) {
         params@other_params[[nm]] <- NULL
     }
 
-    # --- register the extension chain and promote to the mizerReef class ------
-    params@extensions <- mizer::getRegisteredExtensions()
+    # --- record the extension and promote to the mizerReef class -------------
+    # Record only mizerReef, for the reason given in newReefParams(): copying
+    # the whole session registry made the object claim extensions that had
+    # merely been loaded, not applied to it.
+    params <- mizer::recordExtension(
+        params, "mizerReef",
+        version = as.character(utils::packageVersion("mizerReef")))
     params <- mizer::coerceToExtensionClass(params)
     params <- mizer::validParams(params)
 

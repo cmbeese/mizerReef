@@ -256,20 +256,38 @@ scaleReefAbundance <- function(params, factor) {
 #' @concept calibration
 #' @export
 scaleReefModel <- function(params, factor) {
-    # Algae
+    # Algae and detritus. `recalculate = FALSE` because the rho arrays in
+    # other_params are scaled by the same factor right here, so there is
+    # nothing to rebuild -- but the scaled scalars are recorded as given, so
+    # a later recalculation cannot quietly restore the unscaled values.
+    sp <- mizer::species_params(params)
+
     params@other_params$algae$rho <- params@other_params$algae$rho / factor
-    params@species_params$rho_algae <- params@species_params$rho_algae / factor
-    
+    sp$rho_algae <- sp$rho_algae / factor
+
     # Deprecated in mizerReef 2.0.0, but still here for backward compatibility
     # algae growth is now a fixed parameter and not scaled with the model
     # params@other_params$algae$growth <- params@other_params$algae$growth * factor
 
     # Detritus
     params@other_params$detritus$rho <- params@other_params$detritus$rho / factor
-    params@species_params$rho_detritus <- params@species_params$rho_detritus / factor
+    sp$rho_detritus <- sp$rho_detritus / factor
     params@other_params$detritus$external <- params@other_params$detritus$external * factor
 
-    # now comes the code of mizer's standard scaleModel()
+    mizer::species_params(params, recalculate = FALSE) <- sp
+
+    # Now comes the code of mizer's standard scaleModel(), with one
+    # deliberate change: mizer's own version writes the scaled R_max and
+    # gamma directly into the `@species_params` slot, which has the same
+    # given-value bug fixed above (and throughout this package, following
+    # matchGrowth()'s precedent) for rho_algae/rho_detritus/
+    # matchReefGrowth() -- a later recalculation would silently revert
+    # R_max/gamma back to their pre-scale values. Reported upstream at
+    # https://github.com/sizespectrum/mizer/issues/599; routed through
+    # `recalculate = FALSE` here rather than waiting on that fix. The
+    # r_max -> R_max rename just below is left as a direct slot write, as it
+    # always was -- it only relabels an existing column -- and the
+    # `species_params<-()` call after it records the *scaled* result.
     params <- validParams(params)
     assert_that(is.number(factor), factor > 0)
     params@cc_pp <- params@cc_pp * factor
@@ -279,13 +297,15 @@ scaleReefModel <- function(params, factor) {
         params@species_params$r_max <- NULL
         message("The 'r_max' column has been renamed to 'R_max'.")
     }
-    if ("R_max" %in% names(params@species_params)) {
-        params@species_params$R_max <- params@species_params$R_max * factor
+    sp <- mizer::species_params(params)
+    if ("R_max" %in% names(sp)) {
+        sp$R_max <- sp$R_max * factor
     }
     params@search_vol <- params@search_vol / factor
-    if ("gamma" %in% names(params@species_params)) {
-        params@species_params$gamma <- params@species_params$gamma / factor
+    if ("gamma" %in% names(sp)) {
+        sp$gamma <- sp$gamma / factor
     }
+    mizer::species_params(params, recalculate = FALSE) <- sp
     initial_n_other <- params@initial_n_other
     for (res in names(initial_n_other)) {
         initial_n_other[[res]] <- initial_n_other[[res]] * factor
@@ -386,8 +406,11 @@ calibrateReefBiomass <- function(params) {
 #' function you may want to use [matchNumbers()]. This is described in the
 #' blog post at https://bit.ly/2YqXESV.
 #'
-#' If you have observations of the yearly yield instead of numbers, you can
-#' use [calibrateYield()] instead of this function.
+#' If you have observations of the yearly yield instead of numbers, mizer's
+#' `calibrateYield()` was removed in mizer 3.3 and has no replacement. Use
+#' [calibrateReefBiomass()] with observed biomasses to set the scale of the
+#' model, and [mizerExperimental::matchYield()] to bring the individual
+#' yields into line by adjusting catchability.
 #'
 #' @param params A MizerParams object
 #' @return A MizerParams object
@@ -482,22 +505,32 @@ matchReefGrowth <- function(params, species = NULL,
     params@search_vol[sel, ] <- params@search_vol[sel, ] * factor
     params@intake_max[sel, ] <- params@intake_max[sel, ] * factor
     params@metab[sel, ] <- params@metab[sel, ] * factor
-    params@species_params$gamma[sel] <- sp$gamma[sel] * factor
-    params@species_params[sel, "h"] <- sp[sel, "h"] * factor
+    sp_new <- mizer::species_params(params)
+    sp_new$gamma[sel] <- sp$gamma[sel] * factor
+    sp_new[sel, "h"] <- sp[sel, "h"] * factor
     if ("ks" %in% names(sp)) {
-        params@species_params$ks[sel] <- sp$ks[sel] * factor
+        sp_new$ks[sel] <- sp$ks[sel] * factor
     }
     if ("k" %in% names(sp)) {
-        params@species_params[sel, "k"] <- sp[sel, "k"] * factor
+        sp_new[sel, "k"] <- sp[sel, "k"] * factor
     }
 
     # rescale consumption of algae and detritus
-
     params@other_params$algae$rho[sel, ] <- params@other_params$algae$rho[sel, ] * factor
-    params@species_params$rho_algae[sel] <- params@species_params$rho_algae[sel] * factor
+    sp_new$rho_algae[sel] <- sp_new$rho_algae[sel] * factor
 
     params@other_params$detritus$rho[sel, ] <- params@other_params$detritus$rho[sel, ] * factor
-    params@species_params$rho_detritus[sel] <- params@species_params$rho_detritus[sel] * factor
+    sp_new$rho_detritus[sel] <- sp_new$rho_detritus[sel] * factor
+
+    # As in mizer's own matchGrowth(): `recalculate = FALSE` records the
+    # scaled parameters, so that a later recalculation does not undo the
+    # match, without recalculating the rates -- they have already been scaled
+    # by the same factor above. Writing them into the `@species_params` slot
+    # instead, as this used to, left `species_params()` disagreeing with
+    # `given_species_params()`: the next call that triggered a recalculation
+    # silently restored the unscaled `ks` and moved the metabolic rate with
+    # it, undoing the growth match.
+    mizer::species_params(params, recalculate = FALSE) <- sp_new
 
     params <- steadySingleSpecies(params, species = sel)
 
