@@ -62,11 +62,24 @@ The first step is to create a `MizerReefParams` object using your species
 parameters and interaction matrix. For initial tuning, we use a simple binned 
 refuge method rather than the full competitive method.
 
-**Why use a tuning profile first?** The competitive refuge method is 
-density-dependent, which makes it difficult to achieve a stable steady state 
-before the biomasses are calibrated to observed values. We start with a 
+**Why use a tuning profile first?** The competitive refuge method is
+density-dependent, which makes it difficult to achieve a stable steady state
+before the biomasses are calibrated to observed values. We start with a
 simpler constant binned profile so that
-we can tune abundances first. Let's examine the species groups and their key parameters:
+we can tune abundances first.
+
+```{r create-initial-params, eval=TRUE}
+# Create initial parameters object with tuning refuge profile
+params <- newReefParams(species_params = caribbean_10_species,
+                        interaction = caribbean_10_interaction,
+                        method = "binned",
+                        method_params = tuning_profile)
+
+# Display the basic model structure
+print(params)
+```
+
+Let's examine the species groups and their key parameters:
 
 ```{r species-overview, eval=FALSE}
 # Show key species parameters
