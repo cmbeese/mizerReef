@@ -56,7 +56,7 @@ data("tuning_profile")
 data("karpata_refuge")
 ```
 
-# Step 1: Create Initial Parameters Object
+# Step 1: Create the Initial Parameters Object
 
 The first step is to create a `MizerReefParams` object using your species 
 parameters and interaction matrix. For initial tuning, we use a simple binned 
@@ -74,10 +74,9 @@ params <- newReefParams(species_params = caribbean_10_species,
                         interaction = caribbean_10_interaction,
                         method = "binned",
                         method_params = tuning_profile)
-
-# Display the basic model structure
-print(params)
 ```
+
+These warnings let us know when the packages set default values for some parameters such as the search volume, natural mortality, and maximum consumption rates. You can change these defaults later if you have better estimates using `species_params()` or one of the `set*()` functions. 
 
 Let's examine the species groups and their key parameters:
 
