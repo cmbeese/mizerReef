@@ -295,9 +295,17 @@ newReefParams <- function( # Original mizer parameters
         )
     }
 
-    # Set resource line colours for plotting
-    params@linecolour["algae"] <- algae_colour
-    params@linecolour["detritus"] <- detritus_colour
+    # Set resource line colours for plotting. setComponent() above resets
+    # both to its own default ("grey"), overwriting what setAlgaeParams()/
+    # setDetritusParams() already set, so re-apply here -- but only when a
+    # colour was actually given; NULL is a valid "leave it as set" input,
+    # same as in setAlgaeParams()/setDetritusParams().
+    if (!is.null(algae_colour)) {
+        params@linecolour["algae"] <- algae_colour
+    }
+    if (!is.null(detritus_colour)) {
+        params@linecolour["detritus"] <- detritus_colour
+    }
 
     # External mortality - Weight dependent ----
     if (include_ext_mort == TRUE) {

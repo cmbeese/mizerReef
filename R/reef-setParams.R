@@ -149,8 +149,8 @@ setAlgaeParams <- function(params,
         if (!is.character(algae_colour) || length(algae_colour) != 1 || is.na(grDevices::col2rgb(algae_colour)[1])) {
             stop("algae_colour must be a valid color name or hex code.")
         }
+        params@linecolour["algae"] <- algae_colour
     }
-    params@linecolour["algae"] <- algae_colour
     params@linetype["algae"] <- "solid"
     params@time_modified <- lubridate::now()
     return(params)
@@ -293,8 +293,8 @@ setDetritusParams <- function(params,
         if (!is.character(detritus_colour) || length(detritus_colour) != 1 || is.na(grDevices::col2rgb(detritus_colour)[1])) {
             stop("detritus_colour must be a valid color name or hex code.")
         }
+        params@linecolour["detritus"] <- detritus_colour
     }
-    params@linecolour["detritus"] <- detritus_colour
     params@linetype["detritus"] <- "solid"
     params@time_modified <- lubridate::now()
     return(params)

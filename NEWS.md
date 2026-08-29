@@ -214,7 +214,14 @@ Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and
   `search_vol`/`gamma` play for fish-fish encounters, and was already
   correct.
 - Detritus and algae colors are now correctly set in `newReefParams()`
-  to not be overwritten by `setComponent()`
+  to not be overwritten by `setComponent()`. That fix's own re-assignment,
+  plus the equivalent assignments in `setAlgaeParams()`/`setDetritusParams()`,
+  unconditionally wrote `algae_colour`/`detritus_colour` into `@linecolour`
+  even when `NULL` -- a documented, valid "leave it as set" input for both
+  -- which throws `replacement has length zero` on a plain character
+  vector. All three now skip the assignment when the colour is `NULL`,
+  matching how every other optional parameter in these functions already
+  handles `NULL`.
 
 # MizerReef 2.0.0
 
