@@ -270,7 +270,15 @@ scaleReefModel <- function(params, factor) {
     # else in this function, it doesn't track fish abundance. See NEWS.md
     # (2.0.1) for why this used to be scaled and what that broke.
 
-    # Detritus
+    # Detritus. Unlike algae$growth above, detritus$external genuinely is
+    # scaled here: detritus production (unlike algae's) is actively retuned
+    # by tuneUR()/tuneUR_cc() around the model's current fish abundances, so
+    # scaling it to match keeps the same relative starting point for that
+    # retuning. It's also the value reefSteady(new_refuge = TRUE) freezes
+    # resources at instead of retuning them -- deliberately, to simulate a
+    # reef that has just been suddenly decimated and hasn't had time to
+    # respond -- so keeping it proportional to the (also scaled) fish
+    # abundance here is what makes that frozen snapshot self-consistent.
     params@other_params$detritus$rho <- params@other_params$detritus$rho / factor
     sp$rho_detritus <- sp$rho_detritus / factor
     params@other_params$detritus$external <- params@other_params$detritus$external * factor
