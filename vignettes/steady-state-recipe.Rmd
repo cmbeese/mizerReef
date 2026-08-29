@@ -65,30 +65,8 @@ refuge method rather than the full competitive method.
 **Why use a tuning profile first?** The competitive refuge method is 
 density-dependent, which makes it difficult to achieve a stable steady state 
 before the biomasses are calibrated to observed values. We start with a 
-simpler binned profile that approximates the final refuge shape so that 
-we can tune abundances first.
-
-```{r create-initial-params, eval=TRUE}
-# Create initial parameters object with tuning refuge profile
-params <- newReefParams(species_params = caribbean_10_species,
-                        interaction = caribbean_10_interaction,
-                        method = "binned",
-                        method_params = tuning_profile)
-
-# Display the basic model structure
-print(params)
-```
-
-The tuning profile approximates the refuge shape we'll eventually switch to,
-so it's worth visualizing before we start tuning:
-
-```{r tuning-profile-plot, eval=TRUE}
-# Visualize the initial (tuning) refuge profile
-plotRefugeProfile(params) +
-  ggtitle("Initial refuge profile (tuning method)")
-```
-
-Let's examine the species groups and their key parameters:
+simpler constant binned profile so that
+we can tune abundances first. Let's examine the species groups and their key parameters:
 
 ```{r species-overview, eval=FALSE}
 # Show key species parameters
@@ -97,18 +75,43 @@ kable(caribbean_10_species[, c("species", "w_max", "w_mat", "refuge_user",
       caption = "Key species parameters for the Karpata model")
 ```
 
-# Step 2: Set Intermediate Reproduction Level
+# Step 2: Find an Initial Steady State
 
-To achieve a stable initial steady state, we set reproduction levels to an 
-intermediate value (typically 0.5), which adds moderate density-dependence 
-compared to the mizer default of pure density-independence.
+Project the model forward to reach an initial steady state. This may require 
+multiple iterations of `reefSteady()`.
 
-**Why use moderate density-dependence?** Pure density-independence (the mizer 
-default) can cause instability when combined with reef-specific non-linearities 
-(multiple resources, refuge dynamics). Moderate density-dependence provides 
+```{r initial-steady-state, eval=TRUE}
+# Project to steady state - multiple calls ensure convergence
+params <- params |>
+    reefSteady() |> reefSteady() |> reefSteady() |> 
+    reefSteady() |> reefSteady() |> reefSteady()
+
+# Check convergence by plotting spectra
+plotSpectra(params, biomass = TRUE) +
+  ggtitle("Initial steady state spectra")
+```
+
+If you're having trouble reaching a steady state, consider providing the species parameter `R_max` or adjusting the `reproduction_level` like this:
+
+```{r reduce-reproduction, eval=TRUE}
+# Set reproduction levels to 0.5 for all species
+rdi <- rep(0.5, nrow(caribbean_10_species))
+names(rdi) <- caribbean_10_species$species
+
+params <- setBevertonHolt(params, reproduction_level = rdi)
+
+# Check the reproduction levels
+reproduction_levels <- getReproductionLevel(params)
+kable(data.frame(Species = names(reproduction_levels), 
+                 Reproduction_Level = reproduction_levels),
+      caption = "Initial reproduction levels")
+```
+
+**Why use density-dependence?** Pure density-independence (the mizer 
+default) can cause instability in any model, but models with reef-specific non-linearities 
+(multiple resources, refuge dynamics) are especially prone to this. Moderate density-dependence provides 
 stabilizing feedback without creating the steep response curves that cause 
-oscillations. This is also biologically realistic for reef systems with open 
-recruitment and larval connectivity.
+oscillations. 
 
 <details>
 <summary>**Click for detailed explanation of reproduction dynamics**</summary>
@@ -243,37 +246,7 @@ convenient—it often better reflects reef fish biology than either extreme
 
 </details>
 
-```{r reduce-reproduction, eval=TRUE}
-# Set reproduction levels to 0.5 for all species
-rdi <- rep(0.5, nrow(caribbean_10_species))
-names(rdi) <- caribbean_10_species$species
-
-params <- setBevertonHolt(params, reproduction_level = rdi)
-
-# Check the reproduction levels
-reproduction_levels <- getReproductionLevel(params)
-kable(data.frame(Species = names(reproduction_levels), 
-                 Reproduction_Level = reproduction_levels),
-      caption = "Initial reproduction levels")
-```
-
-# Step 3: Reach Initial Steady State
-
-Project the model forward to reach an initial steady state. This may require 
-multiple iterations of `reefSteady()`.
-
-```{r initial-steady-state, eval=TRUE}
-# Project to steady state - multiple calls ensure convergence
-params <- params |>
-    reefSteady() |> reefSteady() |> reefSteady() |> 
-    reefSteady() |> reefSteady() |> reefSteady()
-
-# Check convergence by plotting spectra
-plotSpectra(params, biomass = TRUE) + 
-  ggtitle("Initial steady state spectra")
-```
-
-# Step 4: Calibrate Biomasses and Growth
+# Step 3: Calibrate Biomasses and Growth
 
 This is the core tuning step where we iteratively match observed biomasses 
 and growth rates.
