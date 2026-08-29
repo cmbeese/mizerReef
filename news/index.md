@@ -314,7 +314,15 @@ Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and
 - Detritus and algae colors are now correctly set in
   [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
   to not be overwritten by
-  [`setComponent()`](https://sizespectrum.org/mizer/reference/setComponent.html)
+  [`setComponent()`](https://sizespectrum.org/mizer/reference/setComponent.html).
+  That fix’s own re-assignment, plus the equivalent assignments in
+  [`setAlgaeParams()`](https://cmbeese.github.io/mizerReef/reference/setAlgaeParams.md)/[`setDetritusParams()`](https://cmbeese.github.io/mizerReef/reference/setDetritusParams.md),
+  unconditionally wrote `algae_colour`/`detritus_colour` into
+  `@linecolour` even when `NULL` – a documented, valid “leave it as set”
+  input for both – which throws `replacement has length zero` on a plain
+  character vector. All three now skip the assignment when the colour is
+  `NULL`, matching how every other optional parameter in these functions
+  already handles `NULL`.
 
 ## MizerReef 2.0.0
 
