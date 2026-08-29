@@ -5,6 +5,49 @@ Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and
 
 ## Bug fixes
 
+- `setRefuge()`'s `a`/`b` default-fill (from `a_bar`/`b_bar`, for species
+  missing their own length-weight parameters) is kept as a direct
+  `@species_params` slot write, unlike the rest of this function and unlike
+  every other conversion in this release. Routing it through
+  `species_params(params, recalculate = FALSE) <-` -- even with
+  `recalculate = FALSE` -- runs mizer's built-in `a`/`b`-vs-`l_max`/`w_max`
+  consistency check, which silently overwrites `l_max` to match whenever
+  `a * l_max^b` disagrees with the model's real `w_max`. A generic
+  `a_bar`/`b_bar` fallback disagreeing with a specific species' real
+  `l_max`/`w_max` is the normal case, not an edge case -- it's exactly the
+  situation this fallback exists for. Confirmed directly: filling missing
+  `a`/`b` with `a_bar = 0.04`, `b_bar = 3.2` on `caribbean_3_model` silently
+  moved `l_max` from 50 to 33.8 (32%) when routed through the setter, and
+  the same corruption resurfaces at the *next* full-table
+  `species_params<-()` write anywhere downstream (e.g. `setAlgaeParams()`/
+  `setDetritusParams()`, both called right after `setRefuge()` inside
+  `newReefParams()`) for as long as the mismatched `a`/`b` remain stored.
+  `a`/`b` filled this way are therefore not recorded as given -- a
+  subsequent recalculation could revert them to `NA` -- but that is far
+  more benign than silently corrupting `l_max`.
+
+- `plotSpectraChange()`'s new `biomass` and `per_log_size` arguments were
+  inserted between `power` and `use_percent`, silently reinterpreting old
+  positional calls: `power` used to be required (so commonly supplied
+  positionally), and any caller also supplying `use_percent` positionally
+  (previously the 5th argument, now the 7th) had that value silently
+  reinterpreted as `biomass` instead, with `use_percent` quietly falling
+  back to its default. Reordered so `use_percent` keeps its original
+  position and the two new arguments come after it.
+
+- `plotSpectraChange(..., size_axis = "l")` joined `object1`'s and
+  `object2`'s spectra on their length columns, but length is derived
+  per-object from that object's own `a`/`b` -- so whenever the two objects
+  being compared don't share identical `a`/`b` (the normal case: comparing
+  two different objects is this function's whole purpose), the two length
+  columns disagree at the same underlying size, and the join silently
+  dropped those rows as `NA` instead of erroring. Confirmed: comparing two
+  models differing only in a 10% change to species `a` produced 300 `NA`
+  rows out of 376. The join now always happens on `w` -- the model's
+  shared discretisation grid -- with `object1`'s own length values attached
+  afterwards for display when a length axis is requested, so no rows are
+  dropped regardless of how the two objects' `a`/`b` differ.
+
 - `matchReefGrowth()` records the parameters it scales, so a later
   recalculation can no longer undo the growth match. It scales
   `search_vol`/`intake_max`/`metab` by hand and scales `gamma`/`h`/`ks`/`k`

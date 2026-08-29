@@ -139,14 +139,14 @@ spectra_quantity <- function(power = NULL, biomass = NULL,
 #'   `biomass` and `per_log_size`, which mizer 3.3 introduced in its place;
 #'   `power` still works and is still the only way to ask for a power that is
 #'   not the sum of the two flags.
+#' @param use_percent Logical. If TRUE (default), the change is expressed as
+#'   a percentage (e.g. 50 for a 50% increase). If FALSE, the raw relative
+#'   proportion is plotted instead (e.g. 0.5).
 #' @param biomass Whether to plot the biomass density rather than the number
 #'   density. Passed on to [mizer::plotSpectra()].
 #' @param per_log_size Whether to plot the density with respect to logarithmic
 #'   size rather than with respect to size. Passed on to
 #'   [mizer::plotSpectra()].
-#' @param use_percent Logical. If TRUE (default), the change is expressed as
-#'   a percentage (e.g. 50 for a 50% increase). If FALSE, the raw relative
-#'   proportion is plotted instead (e.g. 0.5).
 #' @param return_data Logical. If TRUE, returns the data frame underlying the
 #'   plot instead of the plot itself. Default FALSE.
 #' @param ... Parameters passed to `plotSpectra()`, including `size_axis`,
@@ -156,19 +156,33 @@ spectra_quantity <- function(power = NULL, biomass = NULL,
 #' @return A ggplot2 object, or a data frame if `return_data = TRUE`.
 #' @export
 plotSpectraChange <- function(object1, object2, species = NULL,
-                              power = NULL, biomass = NULL,
-                              per_log_size = NULL, use_percent = TRUE,
+                              power = NULL, use_percent = TRUE,
+                              biomass = NULL, per_log_size = NULL,
                               return_data = FALSE, ...) {
-    sf1 <- mizer::plotSpectra(object1,
-        power = power, biomass = biomass, per_log_size = per_log_size,
-        species = species,
-        return_data = TRUE, ...
-    )
-    sf2 <- mizer::plotSpectra(object2,
-        power = power, biomass = biomass, per_log_size = per_log_size,
-        species = species,
-        return_data = TRUE, ...
-    )
+    # Always fetch sf1/sf2 on the w axis, regardless of what the caller
+    # asked for via size_axis in `...`: w is the model's shared
+    # discretisation grid, the same for both objects, so it's a safe join
+    # key below. l, by contrast, is derived per-object from that object's
+    # own species-specific a/b, so sf1$l and sf2$l can differ at the same
+    # grid point whenever object1 and object2 don't share identical a/b --
+    # joining on l directly (as this used to) silently dropped those rows
+    # as NA instead of erroring, exactly when the two objects being compared
+    # are different models (this function's whole purpose).
+    dots <- list(...)
+    requested_size_axis <- if (is.null(dots$size_axis)) "w" else dots$size_axis
+    dots$size_axis <- "w"
+    sf1 <- do.call(mizer::plotSpectra, c(
+        list(object1, power = power, biomass = biomass,
+             per_log_size = per_log_size, species = species,
+             return_data = TRUE),
+        dots
+    ))
+    sf2 <- do.call(mizer::plotSpectra, c(
+        list(object2, power = power, biomass = biomass,
+             per_log_size = per_log_size, species = species,
+             return_data = TRUE),
+        dots
+    ))
     # plotSpectra() names the value column after the plotted quantity (e.g.
     # "Biomass density", "Number density [1/g]"); keep the name for the axis
     # label, then normalise it so the join below is stable. The change is a
@@ -182,12 +196,30 @@ plotSpectraChange <- function(object1, object2, species = NULL,
     names(sf1)[2] <- "value"
     names(sf2)[2] <- "value"
 
-    # plotSpectra() names its size column "w" or, with size_axis = "l", "l",
-    # so join and plot against whichever one came back.
-    size_var <- names(sf1)[1]
+    # sf1/sf2 are always on the w axis at this point (forced above), so w is
+    # always the join key -- l, if wanted, is attached to sf1 afterwards and
+    # rides along through the join as an ordinary (non-key) column.
+    join_var <- names(sf1)[1]
+    size_var <- join_var
+
+    if (identical(requested_size_axis, "l")) {
+        # Length has no single value that's simultaneously correct for two
+        # objects with different a/b -- w is what's actually being compared,
+        # row for row. Label the shared w grid with object1's own lengths
+        # (same row order as sf1, confirmed by construction: only size_axis
+        # differs between this call and the one that produced sf1).
+        l1 <- do.call(mizer::plotSpectra, c(
+            list(object1, power = power, biomass = biomass,
+                 per_log_size = per_log_size, species = species,
+                 return_data = TRUE, size_axis = "l"),
+            dots[setdiff(names(dots), "size_axis")]
+        ))
+        sf1$l <- l1$l
+        size_var <- "l"
+    }
 
     multiplier <- if (isTRUE(use_percent)) 100 else 1
-    sf <- dplyr::left_join(sf1, sf2, by = c(size_var, "Legend")) |>
+    sf <- dplyr::left_join(sf1, sf2, by = c(join_var, "Legend")) |>
         dplyr::mutate(rel_diff = multiplier * (value.y - value.x) / value.x)
     yLabel <- if (isTRUE(use_percent)) {
         paste("% Change in", quantity)
@@ -231,7 +263,7 @@ plotSpectraChange <- function(object1, object2, species = NULL,
 
     xLabel <- if (size_var == "l") "Length [cm]" else "Weight [g]"
 
-    ggplot(sf, aes(x = .data[[size_var]], y = rel_diff, colour = Legend)) +
+    p <- ggplot(sf, aes(x = .data[[size_var]], y = rel_diff, colour = Legend)) +
         geom_line(linewidth = 0.95) +
         labs(x = xLabel, y = yLabel) +
         scale_x_log10(limits = c(min_size, max_size)) +
@@ -243,6 +275,12 @@ plotSpectraChange <- function(object1, object2, species = NULL,
             yintercept = 0, linetype = 1,
             colour = "dark grey", linewidth = 1
         )
+    # sf's data now always carries a "w" column (the join key) and, only
+    # when a length axis was requested, an "l" column alongside it -- so
+    # plotlySpectraChange() can no longer tell which one the plot actually
+    # uses just by checking which columns are present. Record it explicitly.
+    attr(p, "size_var") <- size_var
+    p
 }
 
 #' @importFrom plotly ggplotly
@@ -250,9 +288,12 @@ plotSpectraChange <- function(object1, object2, species = NULL,
 #' @export
 plotlySpectraChange <- function(object1, object2, ...) {
     p <- plotSpectraChange(object1, object2, ...)
-    # The size axis is "w" by default and "l" when size_axis = "l" was passed
-    # on to plotSpectra(); name whichever one the plot actually uses.
-    size_var <- intersect(c("w", "l"), names(p$data))[1]
+    size_var <- attr(p, "size_var")
+    if (is.null(size_var)) {
+        # Fallback for a plot object that didn't come from this version of
+        # plotSpectraChange() (e.g. a cached/serialized one).
+        size_var <- intersect(c("w", "l"), names(p$data))[1]
+    }
     ggplotly(p, tooltip = c("Legend", size_var, "rel_diff"))
 }
 

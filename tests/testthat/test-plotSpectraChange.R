@@ -86,14 +86,18 @@ test_that("plotSpectraChange defaults to the biomass density, as plotSpectra() d
 })
 
 test_that("plotSpectraChange follows plotSpectra() onto a length axis", {
-    # `...` goes to plotSpectra(), so size_axis = "l" reaches it and the
-    # returned data frame has an `l` column instead of `w`. The join, the
-    # x aesthetic and the axis label all have to follow.
+    # size_axis = "l" changes the x aesthetic and axis label, but the join
+    # between the two objects always happens on w -- the model's shared
+    # discretisation grid -- because l is derived per-object from that
+    # object's own a/b and isn't guaranteed to line up between two
+    # different objects (see the "different a/b" test below). So the
+    # returned data frame carries both w (the join key) and l (the
+    # requested display axis), not l instead of w.
     data(caribbean_3_model)
     d <- plotSpectraChange(caribbean_3_model, caribbean_3_model,
                            size_axis = "l", return_data = TRUE)
     expect_true("l" %in% names(d))
-    expect_false("w" %in% names(d))
+    expect_true("w" %in% names(d))
 
     p <- plotSpectraChange(caribbean_3_model, caribbean_3_model,
                            size_axis = "l")
@@ -104,6 +108,27 @@ test_that("plotSpectraChange follows plotSpectra() onto a length axis", {
         plotSpectraChange(caribbean_3_model, caribbean_3_model)$labels$x,
         "Weight [g]"
     )
+})
+
+test_that("plotSpectraChange on a length axis doesn't drop rows when the two objects have different a/b", {
+    # Regression test: l is derived per-object from that object's own a/b,
+    # so joining on l directly (as this function used to) silently dropped
+    # rows as NA whenever object1 and object2 didn't share identical a/b --
+    # exactly the case this function exists for (comparing two objects).
+    # Joining on w (their shared grid) instead, and attaching object1's own
+    # l values for display, keeps every row.
+    data(caribbean_3_model)
+    p1 <- caribbean_3_model
+    p2 <- p1
+    sp2 <- species_params(p2)
+    sp2$a <- sp2$a * 1.1
+    species_params(p2, recalculate = FALSE) <- sp2
+
+    d <- suppressWarnings(plotSpectraChange(p1, p2, size_axis = "l", return_data = TRUE))
+    expect_equal(sum(is.na(d$rel_diff)), 0)
+
+    p <- suppressWarnings(plotSpectraChange(p1, p2, size_axis = "l"))
+    expect_equal(attr(p, "size_var"), "l")
 })
 
 test_that("spectra_quantity() names the quantity exactly as mizer's own column does", {

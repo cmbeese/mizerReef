@@ -10,9 +10,9 @@ plotSpectraChange(
   object2,
   species = NULL,
   power = NULL,
+  use_percent = TRUE,
   biomass = NULL,
   per_log_size = NULL,
-  use_percent = TRUE,
   return_data = FALSE,
   ...
 )
@@ -37,16 +37,16 @@ the biomass density with respect to logarithmic size. Superseded by
 \code{power} still works and is still the only way to ask for a power that is
 not the sum of the two flags.}
 
+\item{use_percent}{Logical. If TRUE (default), the change is expressed as
+a percentage (e.g. 50 for a 50\% increase). If FALSE, the raw relative
+proportion is plotted instead (e.g. 0.5).}
+
 \item{biomass}{Whether to plot the biomass density rather than the number
 density. Passed on to \code{\link[mizer:plotSpectra]{mizer::plotSpectra()}}.}
 
 \item{per_log_size}{Whether to plot the density with respect to logarithmic
 size rather than with respect to size. Passed on to
 \code{\link[mizer:plotSpectra]{mizer::plotSpectra()}}.}
-
-\item{use_percent}{Logical. If TRUE (default), the change is expressed as
-a percentage (e.g. 50 for a 50\% increase). If FALSE, the raw relative
-proportion is plotted instead (e.g. 0.5).}
 
 \item{return_data}{Logical. If TRUE, returns the data frame underlying the
 plot instead of the plot itself. Default FALSE.}

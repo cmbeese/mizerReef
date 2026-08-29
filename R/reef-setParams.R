@@ -699,13 +699,20 @@ setRefuge <- function(params, method, method_params = NULL,
     }
 
     # Check and create a and b columns if missing, set defaults for NAs.
-    # `a` and `b` are mizer's own length-weight parameters, so filling them
-    # from a_bar/b_bar is real input and has to be recorded as given -- the
-    # `@species_params` slot write this replaces left mizer free to treat
-    # them as its own defaults and recalculate over them. `recalculate =
-    # FALSE` keeps this a pure bookkeeping fix: a and b build no rate array
-    # (they are used directly), so nothing here needs rebuilding, and the
-    # rates stay exactly as the slot write left them.
+    # This is a direct `@species_params` slot write, kept that way
+    # deliberately (unlike the rest of this function): mizer's
+    # `species_params<-()` setter always reconciles a/b against l_max/w_max,
+    # even with `recalculate = FALSE` (via check_and_convert_species_params()),
+    # and silently overwrites l_max to match whenever a*l_max^b disagrees
+    # with the model's real w_max. Generic a_bar/b_bar fallbacks disagree
+    # with a real species' l_max/w_max by construction -- that's precisely
+    # the case this code exists to handle -- so routing this write through
+    # the setter corrupts l_max for exactly the species it's meant to help.
+    # Confirmed directly: filling missing a/b with a_bar = 0.04, b_bar = 3.2
+    # on caribbean_3_model silently moved l_max from 50 to 33.8 (32%) when
+    # routed through the setter. a/b filled this way are therefore not
+    # recorded as given -- a subsequent recalculation could revert them to
+    # NA -- but that is far more benign than silently corrupting l_max.
     sp <- mizer::species_params(params)
     no_sp_ab <- nrow(sp)
     if (!("a" %in% names(sp))) sp$a <- rep(NA_real_, no_sp_ab)
@@ -722,7 +729,8 @@ setRefuge <- function(params, method, method_params = NULL,
             a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters."
         )
     }
-    mizer::species_params(params, recalculate = FALSE) <- sp
+    params@species_params$a <- sp$a
+    params@species_params$b <- sp$b
 
     # === SPECIES PARAMETER CHECKS ===
     # refuge_user, blocked_pred and satiation are mizerReef's own columns.
