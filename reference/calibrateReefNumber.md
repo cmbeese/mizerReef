@@ -42,7 +42,9 @@ function you may want to use
 [`matchNumbers()`](https://sizespectrum.org/mizer/reference/matchNumbers.html).
 This is described in the blog post at https://bit.ly/2YqXESV.
 
-If you have observations of the yearly yield instead of numbers, you can
-use
-[`calibrateYield()`](https://sizespectrum.org/mizer/reference/calibrateYield.html)
-instead of this function.
+If you have observations of the yearly yield instead of numbers, mizer's
+`calibrateYield()` was removed in mizer 3.3 and has no replacement. Use
+[`calibrateReefBiomass()`](https://cmbeese.github.io/mizerReef/reference/calibrateReefBiomass.md)
+with observed biomasses to set the scale of the model, and
+[`mizerExperimental::matchYield()`](https://sizespectrum.org/mizerExperimental/reference/matchYield.html)
+to bring the individual yields into line by adjusting catchability.

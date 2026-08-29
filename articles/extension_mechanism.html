@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,7 @@ mortality term representing non-predation death close to a species’
 maximum size.</li>
 </ul>
 <p>The package uses the mechanisms described in
-<code><a href="https://sizespectrum.org/mizer/articles/creating-extension-packages.html" class="external-link">vignette("creating-extension-packages", package = "mizer")</a></code>:</p>
+<code><a href="https://sizespectrum.org/mizer/articles/guide-create-extension-package.html" class="external-link">vignette("guide-create-extension-package", package = "mizer")</a></code>:</p>
 <table class="table">
 <colgroup>
 <col width="50%">
@@ -147,7 +147,7 @@ the single entry point for building a reef model.</p>
 algae and detritus parameters) lives in
 <code>other_params(params)</code>. The classes exist purely to trigger
 S3 dispatch, exactly as described for marker classes in
-<code><a href="https://sizespectrum.org/mizer/articles/creating-extension-packages.html" class="external-link">vignette("creating-extension-packages", package = "mizer")</a></code>.</p>
+<code><a href="https://sizespectrum.org/mizer/articles/guide-create-extension-package.html" class="external-link">vignette("guide-create-extension-package", package = "mizer")</a></code>.</p>
 <div class="section level3">
 <h3 id="registration-via--onload">Registration via <code>.onLoad</code><a class="anchor" aria-label="anchor" href="#registration-via--onload"></a>
 </h3>
@@ -246,6 +246,17 @@ vulnerability</td>
 <td>Migrates objects created with an earlier mizerReef 2.x layout to the
 current one (automatic; for mizerReef 1.x objects, see
 <code><a href="../reference/upgradeReefParams.html">upgradeReefParams()</a></code> instead)</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/reef-steady-methods.html">steady.mizerReef()</a></code></td>
+<td>Runs <code><a href="../reference/reefSteady.html">reefSteady()</a></code>, so the algae and detritus pools are
+tuned along with the fish sub-model</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/reef-steady-methods.html">tuneSteadyState.mizerReef()</a></code></td>
+<td>The same, under mizer 3.3’s current name for
+<code><a href="https://sizespectrum.org/mizer/reference/superseded_steady.html" class="external-link">steady()</a></code>
+</td>
 </tr>
 </tbody>
 </table>
@@ -569,7 +580,7 @@ stored refuge, algae, and detritus parameters in three custom S4 slots
 <code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">other_params()</a></code>. Since a dispatching extension’s data must
 live in <code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">other_params()</a></code> rather than in new S4 slots (see the
 checklist in
-<code><a href="https://sizespectrum.org/mizer/articles/creating-extension-packages.html" class="external-link">vignette("creating-extension-packages", package = "mizer")</a></code>),
+<code><a href="https://sizespectrum.org/mizer/articles/guide-create-extension-package.html" class="external-link">vignette("guide-create-extension-package", package = "mizer")</a></code>),
 those slots were removed from the class definition before release —
 which means an object saved with that design needs to be migrated before
 it can be used. <code><a href="../reference/upgrade.mizerReef.html">upgrade.mizerReef()</a></code> handles this
@@ -610,7 +621,7 @@ directly rather than
 <code>other_params$algae_params</code>/<code>detritus_params</code>.</p>
 <p>This method is idempotent and never touches the version stamp, per
 the upgrade contract described in
-<code><a href="https://sizespectrum.org/mizer/articles/creating-extension-packages.html" class="external-link">vignette("creating-extension-packages", package = "mizer")</a></code>:
+<code><a href="https://sizespectrum.org/mizer/articles/guide-create-extension-package.html" class="external-link">vignette("guide-create-extension-package", package = "mizer")</a></code>:
 mizer’s own orchestrator (triggered by <code><a href="https://sizespectrum.org/mizer/reference/validParams.html" class="external-link">validParams()</a></code>, which
 runs on essentially every entry point) calls it once and re-stamps the
 object afterwards.</p>
@@ -651,7 +662,7 @@ object afterwards.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The marker-class promotion happens last, after every other slot has
 been populated — exactly as
-<code><a href="https://sizespectrum.org/mizer/articles/creating-extension-packages.html" class="external-link">vignette("creating-extension-packages", package = "mizer")</a></code>
+<code><a href="https://sizespectrum.org/mizer/articles/guide-create-extension-package.html" class="external-link">vignette("guide-create-extension-package", package = "mizer")</a></code>
 recommends, so that no earlier step in construction accidentally
 dispatches to a reef-specific method on a not-yet-fully-built
 object.</p>
@@ -670,10 +681,19 @@ mizer’s extension chain as soon as the package is loaded.</p></li>
 reef-specific methods (<code>projectEncounter</code>,
 <code>projectFeedingLevel</code>, <code>projectPredMort</code>,
 <code>projectMort</code>, <code>getBiomass</code>,
-<code>removeSpecies</code>) are dispatched automatically, with every
+<code>removeSpecies</code>, <code>steady</code>,
+<code>tuneSteadyState</code>) are dispatched automatically, with every
 method calling <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> at least once so the standard
 mizer pipeline, and any other extension package stacked below mizerReef,
-keeps working.</p></li>
+keeps working. The rate methods all chain through
+<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>; the two steady-state methods instead replace
+the run wholesale, because reaching a reef steady state means tuning the
+algae and detritus pools that mizer knows nothing about (see
+<code><a href="../reference/reefSteady.html">?reefSteady</a></code>). Before mizerReef 2.0.2 those two were not
+methods at all: <code><a href="../reference/reefSteady.html">reefSteady()</a></code> was written over
+<code><a href="https://sizespectrum.org/mizer/reference/superseded_steady.html" class="external-link">mizer::steady()</a></code> with <code><a href="https://rdrr.io/r/utils/getFromNamespace.html" class="external-link">assignInNamespace()</a></code>,
+which replaced mizer’s generic for every model in the session, reef or
+not.</p></li>
 <li><p><strong><code><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">setComponent()</a></code></strong> — algae and detritus
 are scalar dynamical variables whose biomass evolves each time step and
 whose contribution to the encounter rate is automatically included via a

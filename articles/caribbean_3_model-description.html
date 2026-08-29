@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1051,8 +1051,8 @@ Show the full steady-state calibration script
 <span></span>
 <span><span class="co"># Spectra should be reasonably straight to match predictions of Sheldon's</span></span>
 <span><span class="co"># spectrum but also have nonlinearities at refuge sizes</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, power <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, power <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span>, per_log_size <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotFeedingLevel.html" class="external-link">plotFeedingLevel</a></span><span class="op">(</span><span class="va">params</span>, species <span class="op">=</span> <span class="st">"inverts"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Tune reproduction -----------------------------------------------------------</span></span>
@@ -1061,7 +1061,7 @@ Show the full steady-state calibration script
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Increase reproduction level to reduce excessive density dependence</span></span>
-<span><span class="va">rep_level</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fu"><a href="https://sizespectrum.org/mizer/reference/getReproductionLevel.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">[</span><span class="st">"inverts"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">rep_level</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fu"><a href="https://sizespectrum.org/mizer/reference/superseded_accessors.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">[</span><span class="st">"inverts"</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">rep_level</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"predators"</span>, <span class="st">"herbivores"</span>, <span class="st">"inverts"</span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/setBevertonHolt.html" class="external-link">setBevertonHolt</a></span><span class="op">(</span><span class="va">params</span>, reproduction_level <span class="op">=</span> <span class="va">rep_level</span><span class="op">)</span></span>
 <span></span>
@@ -1071,7 +1071,7 @@ Show the full steady-state calibration script
 <span><span class="co"># Final diagnostic plots</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizerExperimental/reference/plotBiomassVsSpecies.html" class="external-link">plotBiomassVsSpecies</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plotRefugeProfile.html">plotRefugeProfile</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, power <span class="op">=</span> <span class="fl">1</span>, total <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span>, total <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotDiet.html" class="external-link">plotDiet</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotGrowthCurves.html" class="external-link">plotGrowthCurves</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotPredMort.html" class="external-link">plotPredMort</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>

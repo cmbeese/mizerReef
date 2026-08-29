@@ -56,9 +56,9 @@ params <- newReefParams(species_params = caribbean_10_species,
                         interaction = caribbean_10_interaction,
                         method = "binned",
                         method_params = tuning_profile)
-#> No h provided for some species, so using age at maturity to calculate it.
-#> Using z0 = z0pre * w_inf ^ z0exp for missing z0 values.
-#> Using f0, h, lambda, kappa and the predation kernel to calculate gamma.
+#> ℹ No h provided for some species, so using age at maturity to calculate it.
+#> ℹ Using z0 = z0pre * w_inf ^ z0exp for calculated z0 values.
+#> ℹ Using f0, h, lambda, kappa and the predation kernel to calculate gamma.
 
 # Display the basic model structure
 print(params)
@@ -67,17 +67,19 @@ print(params)
 #> list()
 #> 
 #> Slot "mizer_version":
-#> [1] '3.2.1'
+#> [1] '3.3.0'
 #> 
 #> Slot "extensions":
-#>                mizerReef 
-#> "sizespectrum/mizerReef" 
+#> $mizerReef
+#>              requirement                  version 
+#> "sizespectrum/mizerReef"                  "2.0.2" 
+#> 
 #> 
 #> Slot "time_created":
-#> [1] "2026-08-20 09:57:33 UTC"
+#> [1] "2026-08-29 07:24:15 UTC"
 #> 
 #> Slot "time_modified":
-#> [1] "2026-08-20 09:57:33 UTC"
+#> [1] "2026-08-29 07:24:15 UTC"
 #> 
 #> Slot "w":
 #>   [1] 1.000000e-03 1.167237e-03 1.362441e-03 1.590291e-03 1.856246e-03
@@ -6308,11 +6310,17 @@ print(params)
 #> $lambda
 #> [1] 2.05
 #> 
+#> $n
+#> [1] 0.75
+#> 
 #> $w_pp_cutoff
 #> [1] 1
 #> 
-#> $n
-#> [1] 0.75
+#> $a
+#> [1] 0.5235988
+#> 
+#> $b
+#> [1] 3
 #> 
 #> $r_pp
 #> [1] 10
@@ -7128,7 +7136,7 @@ print(params)
 #>  farm_damsel   41.540096   1.0 0.10    13     1.0 0.30
 #>        herbs 1269.327573 105.0 0.10    39     2.0 0.40
 #>      inverts  675.000000   0.1 0.10    30      NA 3.00
-#> With 20 other parameters: beta, sigma, biomass_cutoff, biomass_observed, a, b, interaction_resource, interaction_detritus, interaction_algae, refuge_user, blocked_pred, satiation, linecolour, rep_species, group_names, Resilience, old_groups, n, p, w_max 
+#> With 23 other parameters: beta, sigma, biomass_cutoff, biomass_observed, a, b, interaction_resource, interaction_detritus, interaction_algae, refuge_user, blocked_pred, satiation, linecolour, rep_species, group_names, Resilience, old_groups, n, p, w_max, w_min, rho_algae, rho_detritus 
 #> 
 #> Slot "interaction":
 #>              prey
@@ -7157,7 +7165,7 @@ print(params)
 #>   inverts               0     0       0
 #> 
 #> Slot "gear_params":
-#> An object of class "gear_params" containing gear parameters for 10 gears:
+#> An object of class "gear_params" containing 10 gear-species pairs for 1 gear:
 #>             gear     species   sel_func catchability
 #>  knife_edge_gear    pred_eng knife_edge            1
 #>  knife_edge_gear   pred_grab knife_edge            1
@@ -8446,10 +8454,14 @@ the Beverton-Holt stock-recruitment relationship. It ranges from 0
 #### Why does pure density-independence (default) fail in reef models?
 
 During
-[`steady()`](https://sizespectrum.org/mizer/reference/steady.html) or
-[`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md),
-the algorithm iteratively adjusts `erepro` (egg production efficiency)
-to drive each species toward equilibrium where births equal deaths.
+[`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
+(which is also what mizer’s
+[`tuneSteadyState()`](https://sizespectrum.org/mizer/reference/tuneSteadyState.html),
+and its superseded alias
+[`steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html),
+run on a reef model), the algorithm iteratively adjusts `erepro` (egg
+production efficiency) to drive each species toward equilibrium where
+births equal deaths.
 
 **With pure density-independence (reproduction_level = 1, the mizer
 default):**
@@ -8606,15 +8618,15 @@ require multiple iterations of
 params <- params |>
     reefSteady() |> reefSteady() |> reefSteady() |> 
     reefSteady() |> reefSteady() |> reefSteady()
-#> Convergence was achieved in 24 years.
-#> Convergence was achieved in 1.5 years.
-#> Convergence was achieved in 1.5 years.
-#> Convergence was achieved in 1.5 years.
-#> Convergence was achieved in 1.5 years.
-#> Convergence was achieved in 1.5 years.
+#> Reached the convergence tolerance after 24 years. The biomasses change at up to 0.0015 per year.
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 0.00062 per year.
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 0.00025 per year.
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 1e-04 per year.
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 4.1e-05 per year.
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 1.6e-05 per year.
 
 # Check convergence by plotting spectra
-plotSpectra(params, power = 1) + 
+plotSpectra(params, biomass = TRUE) + 
   ggtitle("Initial steady state spectra")
 ```
 
@@ -8739,10 +8751,14 @@ params <- params |>
     matchBiomasses() |> reefSteady() |>
     matchBiomasses() |> reefSteady() |>
     matchBiomasses() |> reefSteady()
-#> Convergence was achieved in 15 years.
-#> Convergence was achieved in 7.5 years.
-#> Convergence was achieved in 6 years.
-#> Convergence was achieved in 3 years.
+#> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
+#> Reached the convergence tolerance after 15 years. The biomasses change at up to 5.1e-05 per year.
+#> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
+#> Reached the convergence tolerance after 7.5 years. The biomasses change at up to 0.0031 per year.
+#> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
+#> Reached the convergence tolerance after 6 years. The biomasses change at up to 0.011 per year.
+#> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
+#> Reached the convergence tolerance after 3 years. The biomasses change at up to 0.059 per year. Reduce the tolerance on the distance function to converge further.
 
 # Check vulnerability with new method
 plotVulnerable(params) + 
@@ -8797,7 +8813,7 @@ Let’s examine the final model performance across multiple metrics:
 ``` r
 
 # Overall spectra
-plotSpectra(params, total = TRUE, power = 2) + 
+plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE) + 
   ggtitle("Final total spectra")
 
 # Diet composition
@@ -8940,21 +8956,25 @@ caribbean_10_model <- reefSteady(params)
     #> 
     #> other attached packages:
     #> [1] knitr_1.51              dplyr_1.2.1             ggplot2_4.0.3          
-    #> [4] mizerExperimental_3.2.0 mizerReef_2.0.1         mizer_3.2.1            
+    #> [4] mizerExperimental_3.3.0 mizerReef_2.0.2         mizer_3.3.0            
     #> 
     #> loaded via a namespace (and not attached):
-    #>  [1] plotly_4.12.1      sass_0.4.10        generics_0.1.4     tidyr_1.3.2       
-    #>  [5] stringi_1.8.9      digest_0.6.39      magrittr_2.0.5     timechange_0.4.0  
-    #>  [9] evaluate_1.0.5     grid_4.6.1         RColorBrewer_1.1-3 fastmap_1.2.0     
-    #> [13] plyr_1.8.9         jsonlite_2.0.0     httr_1.4.8         purrr_1.2.2       
-    #> [17] viridisLite_0.4.3  scales_1.4.0       textshaping_1.0.5  jquerylib_0.1.4   
-    #> [21] cli_3.6.6          rlang_1.3.0        withr_3.0.3        cachem_1.1.0      
-    #> [25] yaml_2.3.12        otel_0.2.0         tools_4.6.1        reshape2_1.4.5    
-    #> [29] assertthat_0.2.1   vctrs_0.7.3        R6_2.6.1           lubridate_1.9.5   
-    #> [33] lifecycle_1.0.5    stringr_1.6.0      fs_2.1.0           htmlwidgets_1.6.4 
-    #> [37] ragg_1.5.2         pkgconfig_2.0.3    desc_1.4.3         pkgdown_2.2.1     
-    #> [41] pillar_1.11.1      bslib_0.12.0       gtable_0.3.6       glue_1.8.1        
-    #> [45] data.table_1.18.4  Rcpp_1.1.2         systemfonts_1.3.2  xfun_0.60         
-    #> [49] tibble_3.3.1       tidyselect_1.2.1   farver_2.1.2       htmltools_0.5.9   
-    #> [53] labeling_0.4.3     rmarkdown_2.31     compiler_4.6.1     S7_0.2.2          
-    #> [57] splus2R_1.3-5
+    #>  [1] plotly_4.12.1       sass_0.4.10         generics_0.1.4     
+    #>  [4] tidyr_1.3.2         stringi_1.8.9       digest_0.6.39      
+    #>  [7] magrittr_2.0.5      timechange_0.4.0    evaluate_1.0.5     
+    #> [10] grid_4.6.1          RColorBrewer_1.1-3  fastmap_1.2.0      
+    #> [13] plyr_1.8.9          jsonlite_2.0.0      httr_1.4.8         
+    #> [16] purrr_1.2.2         viridisLite_0.4.3   scales_1.4.0       
+    #> [19] textshaping_1.0.5   jquerylib_0.1.4     cli_3.6.6          
+    #> [22] rlang_1.3.0         withr_3.0.3         cachem_1.1.0       
+    #> [25] yaml_2.3.12         otel_0.2.0          tools_4.6.1        
+    #> [28] reshape2_1.4.5      assertthat_0.2.1    vctrs_0.7.3        
+    #> [31] R6_2.6.1            lubridate_1.9.5     lifecycle_1.0.5    
+    #> [34] stringr_1.6.0       fs_2.1.0            htmlwidgets_1.6.4  
+    #> [37] ragg_1.5.2          pkgconfig_2.0.3     desc_1.4.3         
+    #> [40] pkgdown_2.2.1       pillar_1.11.1       bslib_0.12.0       
+    #> [43] gtable_0.3.6        glue_1.8.1          data.table_1.18.6.1
+    #> [46] Rcpp_1.1.2          systemfonts_1.3.2   xfun_0.60          
+    #> [49] tibble_3.3.1        tidyselect_1.2.1    farver_2.1.2       
+    #> [52] htmltools_0.5.9     labeling_0.4.3      rmarkdown_2.31     
+    #> [55] compiler_4.6.1      S7_0.2.2

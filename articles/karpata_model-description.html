@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1324,7 +1324,7 @@ Show the full steady-state calibration script
 <span><span class="va">rdi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">karpata_int</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/setBevertonHolt.html" class="external-link">setBevertonHolt</a></span><span class="op">(</span><span class="va">params</span>, reproduction_level <span class="op">=</span> <span class="va">rdi</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/getReproductionLevel.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/superseded_accessors.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Project to first steady state -------------------------------</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">params</span> <span class="op">|&gt;</span></span>
@@ -1363,7 +1363,7 @@ Show the full steady-state calibration script
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotPredMort.html" class="external-link">plotPredMort</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">Species</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotFeedingLevel.html" class="external-link">plotFeedingLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotDiet.html" class="external-link">plotDiet</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1e4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, power <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Now switch to competitive method ----------------------------</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newRefuge.html">newRefuge</a></span><span class="op">(</span><span class="va">params</span>,</span>
@@ -1392,8 +1392,8 @@ Show the full steady-state calibration script
 <span></span>
 <span><span class="co"># Resource looks low - should match sheldon's spectrum</span></span>
 <span><span class="co"># looks fairly straight not bad but some bumps</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, power <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, power <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span>, per_log_size <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># plot feeding level to check if resource is too low</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotFeedingLevel.html" class="external-link">plotFeedingLevel</a></span><span class="op">(</span><span class="va">params</span>, species <span class="op">=</span> <span class="st">"inverts"</span><span class="op">)</span></span>
@@ -1411,7 +1411,7 @@ Show the full steady-state calibration script
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="co"># Check reproduction level (value between 0 and 1) - should be higher for</span></span>
 <span><span class="co"># larger, slow growing species and low for small, fast growing ones</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/getReproductionLevel.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/superseded_accessors.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="co"># A reproduction level closer to one means reproduction rate is </span></span>
 <span><span class="co"># almost totally independent of the investment into reproduction</span></span>
 <span><span class="co"># These are near one for all species except farming damsels</span></span>
@@ -1431,15 +1431,15 @@ Show the full steady-state calibration script
 <span>    <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Check new reproduction - these look better</span></span>
-<span><span class="va">rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/getReproductionLevel.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span><span class="va">rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/superseded_accessors.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/getRDI.html" class="external-link">getRDI</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/getRDD.html" class="external-link">getRDD</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Check new spectra &amp; plots</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, power <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span>, per_log_size <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotPredMort.html" class="external-link">plotPredMort</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">Species</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotFeedingLevel.html" class="external-link">plotFeedingLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotDiet.html" class="external-link">plotDiet</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1e4</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, power <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Save!</span></span>
 <span><span class="va">caribbean_10_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span></code></pre></div>

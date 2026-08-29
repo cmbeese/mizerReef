@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,8 +108,8 @@ different resource preferences</a> with an interaction matrix.</li>
 </ol>
 <p>We assume you have read <code><a href="../articles/mizerReef.html">vignette("mizerReef")</a></code> and are
 comfortable with the basic reef workflow. Familiarity with
-<code><a href="https://sizespectrum.org/mizer/articles/using-extension-packages.html" class="external-link">vignette("using-extension-packages", package = "mizer")</a></code> is
-helpful but not required.</p>
+<code><a href="https://sizespectrum.org/mizer/articles/guide-use-extension-packages.html" class="external-link">vignette("guide-use-extension-packages", package = "mizer")</a></code>
+is helpful but not required.</p>
 </div>
 <div class="section level2">
 <h2 id="loading-both-extensions">Loading both extensions<a class="anchor" aria-label="anchor" href="#loading-both-extensions"></a>
@@ -289,7 +289,7 @@ combined model. <code><a href="https://sizespectrum.org/mizer/reference/plotSpec
 together with the two background resources, which tile the size
 axis:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, power <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span>, per_log_size <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="using-multiple-resources_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="1800"></p>
 <p>The diet composition resolves the two resources separately, so you
 can see the ontogenetic shift between them. Predators lean on large
@@ -382,7 +382,7 @@ extensions, regardless of which mechanism each uses, is still an
 evolving part of the mizer ecosystem.</p>
 <p>For more on the extension chain — including how the load order is
 recorded in the object and restored when you save and reload it — see
-<code><a href="https://sizespectrum.org/mizer/articles/using-extension-packages.html" class="external-link">vignette("using-extension-packages", package = "mizer")</a></code>.</p>
+<code><a href="https://sizespectrum.org/mizer/articles/guide-use-extension-packages.html" class="external-link">vignette("guide-use-extension-packages", package = "mizer")</a></code>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

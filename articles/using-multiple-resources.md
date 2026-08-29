@@ -34,7 +34,7 @@ This vignette shows how to:
 We assume you have read
 [`vignette("mizerReef")`](https://cmbeese.github.io/mizerReef/articles/mizerReef.md)
 and are comfortable with the basic reef workflow. Familiarity with
-[`vignette("using-extension-packages", package = "mizer")`](https://sizespectrum.org/mizer/articles/using-extension-packages.html)
+[`vignette("guide-use-extension-packages", package = "mizer")`](https://sizespectrum.org/mizer/articles/guide-use-extension-packages.html)
 is helpful but not required.
 
 ## Loading both extensions
@@ -261,7 +261,7 @@ which tile the size axis:
 
 ``` r
 
-plotSpectra(params, power = 2)
+plotSpectra(params, biomass = TRUE, per_log_size = TRUE)
 ```
 
 ![](using-multiple-resources_files/figure-html/unnamed-chunk-14-1.png)
@@ -384,4 +384,4 @@ the mizer ecosystem.
 
 For more on the extension chain — including how the load order is
 recorded in the object and restored when you save and reload it — see
-[`vignette("using-extension-packages", package = "mizer")`](https://sizespectrum.org/mizer/articles/using-extension-packages.html).
+[`vignette("guide-use-extension-packages", package = "mizer")`](https://sizespectrum.org/mizer/articles/guide-use-extension-packages.html).

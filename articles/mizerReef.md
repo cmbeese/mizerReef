@@ -661,7 +661,7 @@ illustrate the *mechanism*: shrink the refuge threshold length and the
 maximum protected proportion a little each year for five years,
 projecting one year at a time and carrying the model’s state forward
 with
-[`mizer::finalParams()`](https://sizespectrum.org/mizer/reference/finalParams.html).
+[`mizer::finalParams()`](https://sizespectrum.org/mizer/reference/getParams.html).
 The refuge is then left at its final, most-degraded setting for ten more
 years so the community has time to settle into a new steady state.
 
@@ -878,22 +878,27 @@ relative share rather than its absolute biomass.
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] knitr_1.51              mizerReef_2.0.1         mizerExperimental_3.2.0
-    ## [4] mizer_3.2.1            
+    ## [1] knitr_1.51              mizerReef_2.0.2         mizerExperimental_3.3.0
+    ## [4] mizer_3.3.0            
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] plotly_4.12.1      sass_0.4.10        generics_0.1.4     tidyr_1.3.2       
-    ##  [5] stringi_1.8.9      digest_0.6.39      magrittr_2.0.5     timechange_0.4.0  
-    ##  [9] evaluate_1.0.5     grid_4.6.1         RColorBrewer_1.1-3 fastmap_1.2.0     
-    ## [13] plyr_1.8.9         jsonlite_2.0.0     httr_1.4.8         purrr_1.2.2       
-    ## [17] viridisLite_0.4.3  scales_1.4.0       textshaping_1.0.5  jquerylib_0.1.4   
-    ## [21] cli_3.6.6          rlang_1.3.0        withr_3.0.3        cachem_1.1.0      
-    ## [25] yaml_2.3.12        otel_0.2.0         tools_4.6.1        reshape2_1.4.5    
-    ## [29] dplyr_1.2.1        ggplot2_4.0.3      assertthat_0.2.1   vctrs_0.7.3       
-    ## [33] R6_2.6.1           lubridate_1.9.5    lifecycle_1.0.5    stringr_1.6.0     
-    ## [37] fs_2.1.0           htmlwidgets_1.6.4  ragg_1.5.2         pkgconfig_2.0.3   
-    ## [41] desc_1.4.3         pkgdown_2.2.1      pillar_1.11.1      bslib_0.12.0      
-    ## [45] gtable_0.3.6       glue_1.8.1         data.table_1.18.4  Rcpp_1.1.2        
-    ## [49] systemfonts_1.3.2  xfun_0.60          tibble_3.3.1       tidyselect_1.2.1  
-    ## [53] farver_2.1.2       patchwork_1.3.2    htmltools_0.5.9    labeling_0.4.3    
-    ## [57] rmarkdown_2.31     compiler_4.6.1     S7_0.2.2           splus2R_1.3-5
+    ##  [1] plotly_4.12.1       sass_0.4.10         generics_0.1.4     
+    ##  [4] tidyr_1.3.2         stringi_1.8.9       digest_0.6.39      
+    ##  [7] magrittr_2.0.5      timechange_0.4.0    evaluate_1.0.5     
+    ## [10] grid_4.6.1          RColorBrewer_1.1-3  fastmap_1.2.0      
+    ## [13] plyr_1.8.9          jsonlite_2.0.0      httr_1.4.8         
+    ## [16] purrr_1.2.2         viridisLite_0.4.3   scales_1.4.0       
+    ## [19] textshaping_1.0.5   jquerylib_0.1.4     cli_3.6.6          
+    ## [22] rlang_1.3.0         withr_3.0.3         cachem_1.1.0       
+    ## [25] yaml_2.3.12         otel_0.2.0          tools_4.6.1        
+    ## [28] reshape2_1.4.5      dplyr_1.2.1         ggplot2_4.0.3      
+    ## [31] assertthat_0.2.1    vctrs_0.7.3         R6_2.6.1           
+    ## [34] lubridate_1.9.5     lifecycle_1.0.5     stringr_1.6.0      
+    ## [37] fs_2.1.0            htmlwidgets_1.6.4   ragg_1.5.2         
+    ## [40] pkgconfig_2.0.3     desc_1.4.3          pkgdown_2.2.1      
+    ## [43] pillar_1.11.1       bslib_0.12.0        gtable_0.3.6       
+    ## [46] glue_1.8.1          data.table_1.18.6.1 Rcpp_1.1.2         
+    ## [49] systemfonts_1.3.2   xfun_0.60           tibble_3.3.1       
+    ## [52] tidyselect_1.2.1    farver_2.1.2        patchwork_1.3.2    
+    ## [55] htmltools_0.5.9     labeling_0.4.3      rmarkdown_2.31     
+    ## [58] compiler_4.6.1      S7_0.2.2

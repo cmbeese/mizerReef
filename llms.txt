@@ -82,6 +82,9 @@ steady state for the dynamical system.
 
 - [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
   : Set up parameters for a mizerReef model
+- [`steady(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md)
+  [`tuneSteadyState(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md)
+  : Steady state methods for mizerReef models
 - [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
   : Project a mizerReef model to steady state
 - [`upgradeReefParams()`](https://cmbeese.github.io/mizerReef/reference/upgradeReefParams.md)

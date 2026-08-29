@@ -1,5 +1,288 @@
 # Changelog
 
+## MizerReef 2.0.2
+
+Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and
+`mizerExperimental (>= 3.3.0)`.
+
+### Bug fixes
+
+- [`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md)‘s
+  `a`/`b` default-fill (from `a_bar`/`b_bar`, for species missing their
+  own length-weight parameters) is kept as a direct `@species_params`
+  slot write, unlike the rest of this function and unlike every other
+  conversion in this release. Routing it through
+  `species_params(params, recalculate = FALSE) <-` – even with
+  `recalculate = FALSE` – runs mizer’s built-in
+  `a`/`b`-vs-`l_max`/`w_max` consistency check, which silently
+  overwrites `l_max` to match whenever `a * l_max^b` disagrees with the
+  model’s real `w_max`. A generic `a_bar`/`b_bar` fallback disagreeing
+  with a specific species’ real `l_max`/`w_max` is the normal case, not
+  an edge case – it’s exactly the situation this fallback exists for.
+  Confirmed directly: filling missing `a`/`b` with `a_bar = 0.04`,
+  `b_bar = 3.2` on `caribbean_3_model` silently moved `l_max` from 50 to
+  33.8 (32%) when routed through the setter, and the same corruption
+  resurfaces at the *next* full-table `species_params<-()` write
+  anywhere downstream
+  (e.g. [`setAlgaeParams()`](https://cmbeese.github.io/mizerReef/reference/setAlgaeParams.md)/
+  [`setDetritusParams()`](https://cmbeese.github.io/mizerReef/reference/setDetritusParams.md),
+  both called right after
+  [`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md)
+  inside
+  [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md))
+  for as long as the mismatched `a`/`b` remain stored. `a`/`b` filled
+  this way are therefore not recorded as given – a subsequent
+  recalculation could revert them to `NA` – but that is far more benign
+  than silently corrupting `l_max`.
+
+- [`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md)’s
+  new `biomass` and `per_log_size` arguments were inserted between
+  `power` and `use_percent`, silently reinterpreting old positional
+  calls: `power` used to be required (so commonly supplied
+  positionally), and any caller also supplying `use_percent`
+  positionally (previously the 5th argument, now the 7th) had that value
+  silently reinterpreted as `biomass` instead, with `use_percent`
+  quietly falling back to its default. Reordered so `use_percent` keeps
+  its original position and the two new arguments come after it.
+
+- `plotSpectraChange(..., size_axis = "l")` joined `object1`‘s and
+  `object2`’s spectra on their length columns, but length is derived
+  per-object from that object’s own `a`/`b` – so whenever the two
+  objects being compared don’t share identical `a`/`b` (the normal case:
+  comparing two different objects is this function’s whole purpose), the
+  two length columns disagree at the same underlying size, and the join
+  silently dropped those rows as `NA` instead of erroring. Confirmed:
+  comparing two models differing only in a 10% change to species `a`
+  produced 300 `NA` rows out of 376. The join now always happens on `w`
+  – the model’s shared discretisation grid – with `object1`’s own length
+  values attached afterwards for display when a length axis is
+  requested, so no rows are dropped regardless of how the two objects’
+  `a`/`b` differ.
+
+- [`matchReefGrowth()`](https://cmbeese.github.io/mizerReef/reference/matchReefGrowth.md)
+  records the parameters it scales, so a later recalculation can no
+  longer undo the growth match. It scales
+  `search_vol`/`intake_max`/`metab` by hand and scales
+  `gamma`/`h`/`ks`/`k` to match, but wrote those scalars into the
+  `@species_params` slot. That left
+  [`species_params()`](https://sizespectrum.org/mizer/reference/species_params.html)
+  disagreeing with
+  [`given_species_params()`](https://sizespectrum.org/mizer/reference/species_params.html),
+  and the next call that triggered a recalculation restored the unscaled
+  values: on a model built this way, a no-op
+  `species_params(p) <- species_params(p)` moved the metabolic rate by
+  88% and the search volume by 95%. The scalars now go in through
+  `species_params(params, recalculate = FALSE) <-`, which is what
+  mizer’s own
+  [`matchGrowth()`](https://sizespectrum.org/mizer/reference/matchGrowth.html)
+  does and for the same reason. A freshly built reef model is now
+  unchanged by a recalculation.
+
+  **The bundled `caribbean_3_model` and `caribbean_10_model` were built
+  with the old code and still carry the inconsistency** (`given` `ks` of
+  0.15 vs a `used` 0.0797 in `caribbean_3_model`). They are unaffected
+  in ordinary use, but any call that recalculates the species parameters
+  will shift their rates. They need rebuilding from `inst/scripts/` to
+  be fully consistent.
+
+- Every species parameter mizerReef sets now goes in through
+  `species_params(params, recalculate = FALSE) <-` rather than by
+  writing the `params@species_params` slot: `rho_algae`/`rho_detritus`
+  in
+  [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md),
+  [`rescale_algae()`](https://cmbeese.github.io/mizerReef/reference/rescale_algae.md),
+  [`rescale_detritus()`](https://cmbeese.github.io/mizerReef/reference/rescale_detritus.md)
+  and
+  [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md);
+  the `interaction_<resource>` columns in
+  [`setAlgaeParams()`](https://cmbeese.github.io/mizerReef/reference/setAlgaeParams.md)/[`setDetritusParams()`](https://cmbeese.github.io/mizerReef/reference/setDetritusParams.md);
+  `a`/`b`, `refuge_user`, `blocked_pred` and `satiation` in
+  [`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md);
+  and the `bad_pred` -\> `blocked_pred` rename in
+  [`upgradeReefParams()`](https://cmbeese.github.io/mizerReef/reference/upgradeReefParams.md).
+  The values are unchanged – `recalculate = FALSE` rebuilds nothing,
+  exactly as the slot write did – but the table is now validated and the
+  values are recorded as given, so mizer will not treat them as its own
+  defaults and recalculate over them.
+
+  One slot write is deliberately kept: the `constant_reproduction` flag
+  in
+  [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md),
+  which is set and removed within the one call exactly as mizer’s own
+  `tune_steady_project()` does it.
+
+- [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md)’s
+  block that reproduces mizer’s
+  [`scaleModel()`](https://sizespectrum.org/mizer/reference/scaleModel.html)
+  also wrote its scaled `R_max` and `gamma` directly into the
+  `@species_params` slot, the same bug as above, inherited from mizer’s
+  own
+  [`scaleModel()`](https://sizespectrum.org/mizer/reference/scaleModel.html)
+  (confirmed against mizer 3.3.1: `scaleModel(NS_params, factor = 2)`
+  leaves `given_species_params()$R_max` untouched while
+  [`species_params()`](https://sizespectrum.org/mizer/reference/species_params.html)
+  doubles, and a later no-op recalculation silently reverts it –
+  reported upstream as
+  [sizespectrum/mizer#599](https://github.com/sizespectrum/mizer/issues/599)).
+  [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md)
+  now routes these through
+  `species_params(params, recalculate = FALSE) <-` too, rather than
+  waiting on the upstream fix, so
+  [`calibrateReefBiomass()`](https://cmbeese.github.io/mizerReef/reference/calibrateReefBiomass.md)
+  and
+  [`calibrateReefNumber()`](https://cmbeese.github.io/mizerReef/reference/calibrateReefNumber.md)
+  (which both call
+  [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md))
+  no longer risk this drift.
+
+- [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)’s
+  `...` was spliced into its
+  [`mizer::findSteadyState()`](https://sizespectrum.org/mizer/reference/findSteadyState.html)/
+  [`mizer::projectUntilSettled()`](https://sizespectrum.org/mizer/reference/projectUntilSettled.html)
+  calls alongside arguments those calls already hardcode by name
+  (`distance_func`, `t_check`, `t_save`, `distance_tol`,
+  `require_steady`, `solver`). Passing any of those names through `...`
+  – e.g. `reefSteady(params, distance_tol = 0.05)`, or the same via
+  [`steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)/[`tuneSteadyState()`](https://sizespectrum.org/mizer/reference/tuneSteadyState.html)
+  – errored with `formal argument matched by multiple actual arguments`
+  instead of overriding the value. The defaults are now merged with
+  `...` via [`modifyList()`](https://rdrr.io/r/utils/modifyList.html)
+  (user values win) instead of being passed alongside it, so any of
+  these mizer 3.3 arguments can be overridden as documented.
+
+### Breaking changes
+
+- [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
+  is no longer written over
+  [`mizer::steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)
+  in mizer’s namespace. It is registered as the
+  [`steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)
+  **and**
+  [`tuneSteadyState()`](https://sizespectrum.org/mizer/reference/tuneSteadyState.html)
+  method for `mizerReef` objects instead, so `steady(reef_params)` and
+  `tuneSteadyState(reef_params)` both do the reef-aware thing while
+  every non-reef model in the session is left alone.
+
+  The old `utils::assignInNamespace("steady", reefSteady, ns = "mizer")`
+  replaced mizer’s S3 *generic*, not just its `MizerParams` method.
+  Under mizer 3.3 that had three consequences:
+  [`steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)
+  on any non-reef model errored with `argument is of length zero`
+  (reefSteady() reads `params@other_params$new_refuge`, which is `NULL`
+  there); no other extension package’s
+  [`steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)
+  method could ever dispatch; and mizer 3.3’s new
+  [`steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)
+  arguments (`t_save`, `amplitude_tol`, `amp_rel_tol`,
+  `extinction_threshold`, `info_level`, `method`) were silently
+  swallowed. Note that a session that loaded an older mizerReef keeps
+  the patched
+  [`mizer::steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)
+  until R is restarted.
+
+- [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
+  passes `...` on to mizer’s steady-state finder rather than to
+  [`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md),
+  which ignored it. This is what lets `effort`, `method` and
+  `info_level` reach the projection. A misspelled argument that used to
+  be silently discarded is now an error.
+
+- [`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md)
+  labels its y axis after the quantity actually plotted, so the default
+  is now `"% Change in Biomass density"` rather than
+  `"% Change in Biomass"`.
+
+- [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
+  and
+  [`upgradeReefParams()`](https://cmbeese.github.io/mizerReef/reference/upgradeReefParams.md)
+  record only mizerReef in `@extensions`, via
+  [`mizer::recordExtension()`](https://sizespectrum.org/mizer/reference/recordExtension.html),
+  instead of copying the whole session extension registry with
+  [`getRegisteredExtensions()`](https://sizespectrum.org/mizer/reference/getRegisteredExtensions.html).
+  An extension can be loaded without having been applied to a particular
+  model, so the old code made the model claim it: with mizerMR merely
+  loaded,
+  [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
+  returned an object recording mizerMR and promoted to S4 class
+  `mizerMR`, with no `MR` component for mizerMR’s methods to read.
+  Chaining is unaffected – each extension records itself as it is
+  applied, and the bundled `caribbean_3_model` has only ever recorded
+  mizerReef – so
+  [`setMultipleResources()`](https://sizespectrum.org/mizerMR/reference/setMultipleResources.html)
+  still produces a properly chained `mizerMR`/`mizerReef` object.
+
+### New features
+
+- [`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md)
+  gained the `biomass` and `per_log_size` arguments that mizer 3.3
+  introduced in place of `power`, and `power` is now optional,
+  defaulting to the biomass density as in
+  [`plotSpectra()`](https://sizespectrum.org/mizer/reference/plotSpectra.html).
+  Passing `biomass` through `...` alongside `power` previously reached
+  [`plotSpectra()`](https://sizespectrum.org/mizer/reference/plotSpectra.html)
+  as a contradictory pair, which mizer 3.3 rejects.
+
+### Internal
+
+- [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
+  calls
+  [`mizer::findSteadyState()`](https://sizespectrum.org/mizer/reference/findSteadyState.html)
+  (or
+  [`mizer::projectUntilSettled()`](https://sizespectrum.org/mizer/reference/projectUntilSettled.html)
+  when `return_sim = TRUE`) instead of the superseded
+  [`mizer::projectToSteady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html).
+  It asks for the old stopping rule explicitly
+  (`require_steady = FALSE`), exactly as mizer’s own
+  [`steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)
+  and
+  [`projectToSteady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html)
+  wrappers do, so convergence behaviour is unchanged:
+  [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
+  still stops on its documented `tol` criterion and does not
+  additionally require the biomass drift to settle.
+
+- Dropped the `splus2R` dependency. It was used for a single
+  [`splus2R::is.number()`](https://rdrr.io/pkg/splus2R/man/is.number.html)
+  call in
+  [`getSenMort()`](https://cmbeese.github.io/mizerReef/reference/getSenMort.md),
+  where every other predicate in the same
+  [`assert_that()`](https://rdrr.io/pkg/assertthat/man/assert_that.html)
+  came from `assertthat`, which the package already imports and whose
+  [`is.number()`](https://rdrr.io/pkg/assertthat/man/scalar.html) makes
+  the same check.
+
+- Documentation and vignettes updated for mizer 3.3: `calibrateYield()`
+  has been removed from mizer, and mizer’s extension articles were
+  renamed to `guide-use-extension-packages` and
+  `guide-create-extension-package`. Example code now uses
+  `biomass`/`per_log_size` in place of `power`. This needs mizerMR
+  0.3.1.2 or later in
+  [`vignette("using-multiple-resources")`](https://cmbeese.github.io/mizerReef/articles/using-multiple-resources.md):
+  0.3.1.1’s
+  [`plotSpectra()`](https://sizespectrum.org/mizer/reference/plotSpectra.html)
+  method still had the pre-3.3 signature and passed its own `power` down
+  to [`NextMethod()`](https://rdrr.io/r/base/UseMethod.html), so the
+  flags reached mizer as a contradictory pair on a mizerReef+mizerMR
+  model. `Suggests` now requires `mizerMR (>= 0.3.1.2)`.
+
+- [`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md)
+  names its y axis correctly on a model whose
+  [`plotSpectra()`](https://sizespectrum.org/mizer/reference/plotSpectra.html)
+  method renames the value column generically, as mizerMR’s does (it
+  calls it `value`, so the label came out as `"% Change in value"`). The
+  plotted quantity is then derived from `power`/`biomass`/`per_log_size`
+  using mizer’s own rule instead.
+
+- [`plotSpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md)
+  and
+  [`plotlySpectraChange()`](https://cmbeese.github.io/mizerReef/reference/plotSpectraChange.md)
+  follow
+  [`plotSpectra()`](https://sizespectrum.org/mizer/reference/plotSpectra.html)
+  onto a length axis: `size_axis = "l"` used to error in the join,
+  because
+  [`plotSpectra()`](https://sizespectrum.org/mizer/reference/plotSpectra.html)
+  returns an `l` column rather than a `w` one.
+
 ## MizerReef 2.0.1
 
 ### Bug fixes

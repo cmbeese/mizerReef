@@ -593,8 +593,8 @@ plotBiomassVsSpecies(params) # spot on
 
 # Spectra should be reasonably straight to match predictions of Sheldon's
 # spectrum but also have nonlinearities at refuge sizes
-plotSpectra(params, total = TRUE, power = 1)
-plotSpectra(params, total = TRUE, power = 2)
+plotSpectra(params, total = TRUE, biomass = TRUE)
+plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE)
 plotFeedingLevel(params, species = "inverts")
 
 # Tune reproduction -----------------------------------------------------------
@@ -613,7 +613,7 @@ params <- params |> reefSteady() |> reefSteady() |> reefSteady()
 # Final diagnostic plots
 plotBiomassVsSpecies(params)
 plotRefugeProfile(params)
-plotSpectra(params, power = 1, total = TRUE)
+plotSpectra(params, biomass = TRUE, total = TRUE)
 plotDiet(params)
 plotGrowthCurves(params)
 plotPredMort(params)

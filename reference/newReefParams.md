@@ -457,7 +457,7 @@ An object of type
          \deqn{ R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }{
                   R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }
 
-             where \eqn{r_k} is the proportion of fish with access to refuge in
+         where \eqn{r_k} is the proportion of fish with access to refuge in
          size class \eqn{k}.
 
          For this method, `method_params` should contain columns named
@@ -513,9 +513,10 @@ params <- newReefParams(
     method = "binned",
     method_params = tuning_profile
 )
-#> For species where no growth information is available the parameter h has been set to h = 30.
-#> Using z0 = z0pre * w_inf ^ z0exp for missing z0 values.
-#> Using f0, h, lambda, kappa and the predation kernel to calculate gamma.
+#> ℹ No h provided for some species, so using age at maturity to calculate it.
+#> ℹ For species where no growth information is available the parameter h has been set to h = 30.
+#> ℹ Using z0 = z0pre * w_inf ^ z0exp for calculated z0 values.
+#> ℹ Using f0, h, lambda, kappa and the predation kernel to calculate gamma.
 class(params)
 #> [1] "mizerReef"
 #> attr(,"package")

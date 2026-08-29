@@ -17,7 +17,7 @@ the model agrees with the total observed number."><meta property="og:image" cont
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,8 +89,11 @@ individual species will not match observations yet, with some species
 having numbers that are too high and others too low. So after this
 function you may want to use <code><a href="https://sizespectrum.org/mizer/reference/matchNumbers.html" class="external-link">matchNumbers()</a></code>. This is described in the
 blog post at https://bit.ly/2YqXESV.</p>
-<p>If you have observations of the yearly yield instead of numbers, you can
-use <code><a href="https://sizespectrum.org/mizer/reference/calibrateYield.html" class="external-link">calibrateYield()</a></code> instead of this function.</p>
+<p>If you have observations of the yearly yield instead of numbers, mizer's
+<code>calibrateYield()</code> was removed in mizer 3.3 and has no replacement. Use
+<code><a href="calibrateReefBiomass.html">calibrateReefBiomass()</a></code> with observed biomasses to set the scale of the
+model, and <code><a href="https://sizespectrum.org/mizerExperimental/reference/matchYield.html" class="external-link">mizerExperimental::matchYield()</a></code> to bring the individual
+yields into line by adjusting catchability.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

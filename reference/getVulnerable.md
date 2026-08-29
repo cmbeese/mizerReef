@@ -103,7 +103,7 @@ to calculate the vulnerability to predation.
          \deqn{ R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }{
                   R_j(w_p) = r_k ~~~~~~~ w_p ∈ (~w_{k-1}, w_k~] }
 
-             where \eqn{r_k} is the proportion of fish with access to refuge in
+         where \eqn{r_k} is the proportion of fish with access to refuge in
          size class \eqn{k}.
 
          For this method, `method_params` should contain columns named

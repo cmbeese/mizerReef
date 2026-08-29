@@ -17,7 +17,7 @@ expressed as a percentage (multiplied by 100) when use_percent = TRUE
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,8 +66,10 @@ expressed as a percentage (multiplied by 100) when <code>use_percent = TRUE</cod
 <span>  <span class="va">object1</span>,</span>
 <span>  <span class="va">object2</span>,</span>
 <span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">power</span>,</span>
+<span>  power <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  use_percent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  biomass <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  per_log_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  return_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -97,9 +99,11 @@ selected (TRUE) or not.</p></dd>
 
 <dt id="arg-power">power<a class="anchor" aria-label="anchor" href="#arg-power"></a></dt>
 <dd><p>The abundance is plotted as the number density times the weight
-raised to this power. The default power = 1 gives the biomass density,
-whereas power = 2 gives the biomass density with respect to logarithmic
-size bins.</p></dd>
+raised to this power. <code>power = 1</code> gives the biomass density, <code>power = 2</code>
+the biomass density with respect to logarithmic size. Superseded by
+<code>biomass</code> and <code>per_log_size</code>, which mizer 3.3 introduced in its place;
+<code>power</code> still works and is still the only way to ask for a power that is
+not the sum of the two flags.</p></dd>
 
 
 <dt id="arg-use-percent">use_percent<a class="anchor" aria-label="anchor" href="#arg-use-percent"></a></dt>
@@ -108,13 +112,25 @@ a percentage (e.g. 50 for a 50% increase). If FALSE, the raw relative
 proportion is plotted instead (e.g. 0.5).</p></dd>
 
 
+<dt id="arg-biomass">biomass<a class="anchor" aria-label="anchor" href="#arg-biomass"></a></dt>
+<dd><p>Whether to plot the biomass density rather than the number
+density. Passed on to <code><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">mizer::plotSpectra()</a></code>.</p></dd>
+
+
+<dt id="arg-per-log-size">per_log_size<a class="anchor" aria-label="anchor" href="#arg-per-log-size"></a></dt>
+<dd><p>Whether to plot the density with respect to logarithmic
+size rather than with respect to size. Passed on to
+<code><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">mizer::plotSpectra()</a></code>.</p></dd>
+
+
 <dt id="arg-return-data">return_data<a class="anchor" aria-label="anchor" href="#arg-return-data"></a></dt>
 <dd><p>Logical. If TRUE, returns the data frame underlying the
 plot instead of the plot itself. Default FALSE.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Parameters passed to <code>plotSpectra()</code></p></dd>
+<dd><p>Parameters passed to <code>plotSpectra()</code>, including <code>size_axis</code>,
+which switches both spectra and the plot onto a length axis.</p></dd>
 
 </dl></div>
     <div class="section level2">

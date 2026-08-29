@@ -597,7 +597,7 @@ data.frame(age_mat_model, age_mat_observed)
 plotPredMort(params) + facet_wrap(~Species)
 plotFeedingLevel(params)
 plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
-plotSpectra(params, power = 1)
+plotSpectra(params, biomass = TRUE)
 
 ## Now switch to competitive method ----------------------------
 params <- newRefuge(params,
@@ -626,8 +626,8 @@ data.frame(age_mat_model, age_mat_observed)
 
 # Resource looks low - should match sheldon's spectrum
 # looks fairly straight not bad but some bumps
-plotSpectra(params, total = TRUE, power = 1)
-plotSpectra(params, total = TRUE, power = 2)
+plotSpectra(params, total = TRUE, biomass = TRUE)
+plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE)
 
 # plot feeding level to check if resource is too low
 plotFeedingLevel(params, species = "inverts")
@@ -669,11 +669,11 @@ rep <- getReproductionLevel(params)
 getRDI(params) / getRDD(params)
 
 # Check new spectra & plots
-plotSpectra(params, total = TRUE, power = 2)
+plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE)
 plotPredMort(params) + facet_wrap(~Species)
 plotFeedingLevel(params)
 plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
-plotSpectra(params, power = 1)
+plotSpectra(params, biomass = TRUE)
 
 # Save!
 caribbean_10_model <- reefSteady(params)
