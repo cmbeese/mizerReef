@@ -46,8 +46,8 @@ simple binned refuge method rather than the full competitive method.
 **Why use a tuning profile first?** The competitive refuge method is
 density-dependent, which makes it difficult to achieve a stable steady
 state before the biomasses are calibrated to observed values. We start
-with a simpler binned profile that approximates the final refuge shape
-so that we can tune abundances first.
+with a simpler constant binned profile so that we can tune abundances
+first.
 
 ``` r
 
@@ -76,10 +76,10 @@ print(params)
 #> 
 #> 
 #> Slot "time_created":
-#> [1] "2026-08-29 07:28:56 UTC"
+#> [1] "2026-08-29 07:50:49 UTC"
 #> 
 #> Slot "time_modified":
-#> [1] "2026-08-29 07:28:56 UTC"
+#> [1] "2026-08-29 07:50:49 UTC"
 #> 
 #> Slot "w":
 #>   [1] 1.000000e-03 1.167237e-03 1.362441e-03 1.590291e-03 1.856246e-03
@@ -8391,18 +8391,6 @@ print(params)
 #> [1] FALSE
 ```
 
-The tuning profile approximates the refuge shape we’ll eventually switch
-to, so it’s worth visualizing before we start tuning:
-
-``` r
-
-# Visualize the initial (tuning) refuge profile
-plotRefugeProfile(params) +
-  ggtitle("Initial refuge profile (tuning method)")
-```
-
-![](steady-state-recipe_files/figure-html/tuning-profile-plot-1.png)
-
 Let’s examine the species groups and their key parameters:
 
 ``` r
@@ -8413,20 +8401,92 @@ kable(caribbean_10_species[, c("species", "w_max", "w_mat", "refuge_user",
       caption = "Key species parameters for the Karpata model")
 ```
 
-## Step 2: Set Intermediate Reproduction Level
+## Step 2: Find an Initial Steady State
 
-To achieve a stable initial steady state, we set reproduction levels to
-an intermediate value (typically 0.5), which adds moderate
-density-dependence compared to the mizer default of pure
-density-independence.
+Project the model forward to reach an initial steady state. This may
+require multiple iterations of
+[`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md).
 
-**Why use moderate density-dependence?** Pure density-independence (the
-mizer default) can cause instability when combined with reef-specific
-non-linearities (multiple resources, refuge dynamics). Moderate
-density-dependence provides stabilizing feedback without creating the
-steep response curves that cause oscillations. This is also biologically
-realistic for reef systems with open recruitment and larval
-connectivity.
+``` r
+
+# Project to steady state - multiple calls ensure convergence
+params <- params |>
+    reefSteady() |> reefSteady() |> reefSteady() |> 
+    reefSteady() |> reefSteady() |> reefSteady()
+#> Reached the convergence tolerance after 31.5 years. The biomasses change at up
+#> to 1.3e-07 per year.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_grab, pred_plank, farm_damsel
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up
+#> to 5.4e-08 per year.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_grab, pred_plank, farm_damsel
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up
+#> to 2.2e-08 per year.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_grab, pred_plank, farm_damsel
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up
+#> to 9.2e-09 per year.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_grab, pred_plank, farm_damsel
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up
+#> to 3.8e-09 per year.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_grab, pred_plank, farm_damsel
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up
+#> to 1.5e-09 per year.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_grab, pred_plank, farm_damsel
+
+# Check convergence by plotting spectra
+plotSpectra(params, biomass = TRUE) +
+  ggtitle("Initial steady state spectra")
+```
+
+![](steady-state-recipe_files/figure-html/initial-steady-state-1.png)
+
+If you’re having trouble reaching a steady state, consider providing the
+species parameter `R_max` or adjusting the `reproduction_level` like
+this:
+
+``` r
+
+# Set reproduction levels to 0.5 for all species
+rdi <- rep(0.5, nrow(caribbean_10_species))
+names(rdi) <- caribbean_10_species$species
+
+params <- setBevertonHolt(params, reproduction_level = rdi)
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_grab, pred_plank, farm_damsel, herbs
+
+# Check the reproduction levels
+reproduction_levels <- getReproductionLevel(params)
+kable(data.frame(Species = names(reproduction_levels), 
+                 Reproduction_Level = reproduction_levels),
+      caption = "Initial reproduction levels")
+```
+
+|             | Species     | Reproduction_Level |
+|:------------|:------------|-------------------:|
+| pred_eng    | pred_eng    |                0.5 |
+| pred_grab   | pred_grab   |                0.5 |
+| eels        | eels        |                0.5 |
+| pred_crypt  | pred_crypt  |                0.5 |
+| pred_inv    | pred_inv    |                0.5 |
+| pred_plank  | pred_plank  |                0.5 |
+| parrotfish  | parrotfish  |                0.5 |
+| farm_damsel | farm_damsel |                0.5 |
+| herbs       | herbs       |                0.5 |
+| inverts     | inverts     |                0.5 |
+
+Initial reproduction levels {.table}
+
+**Why use density-dependence?** Pure density-independence (the mizer
+default) can cause instability in any model, but models with
+reef-specific non-linearities (multiple resources, refuge dynamics) are
+especially prone to this. Moderate density-dependence provides
+stabilizing feedback without creating the steep response curves that
+cause oscillations.
 
 **Click for detailed explanation of reproduction dynamics**
 
@@ -8576,63 +8636,7 @@ extreme (pure density-independence or maximum compensation).
     biologically defensible for most reef fish with moderate
     connectivity.
 
-``` r
-
-# Set reproduction levels to 0.5 for all species
-rdi <- rep(0.5, nrow(caribbean_10_species))
-names(rdi) <- caribbean_10_species$species
-
-params <- setBevertonHolt(params, reproduction_level = rdi)
-
-# Check the reproduction levels
-reproduction_levels <- getReproductionLevel(params)
-kable(data.frame(Species = names(reproduction_levels), 
-                 Reproduction_Level = reproduction_levels),
-      caption = "Initial reproduction levels")
-```
-
-|             | Species     | Reproduction_Level |
-|:------------|:------------|-------------------:|
-| pred_eng    | pred_eng    |                0.5 |
-| pred_grab   | pred_grab   |                0.5 |
-| eels        | eels        |                0.5 |
-| pred_crypt  | pred_crypt  |                0.5 |
-| pred_inv    | pred_inv    |                0.5 |
-| pred_plank  | pred_plank  |                0.5 |
-| parrotfish  | parrotfish  |                0.5 |
-| farm_damsel | farm_damsel |                0.5 |
-| herbs       | herbs       |                0.5 |
-| inverts     | inverts     |                0.5 |
-
-Initial reproduction levels {.table}
-
-## Step 3: Reach Initial Steady State
-
-Project the model forward to reach an initial steady state. This may
-require multiple iterations of
-[`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md).
-
-``` r
-
-# Project to steady state - multiple calls ensure convergence
-params <- params |>
-    reefSteady() |> reefSteady() |> reefSteady() |> 
-    reefSteady() |> reefSteady() |> reefSteady()
-#> Reached the convergence tolerance after 24 years. The biomasses change at up to 0.0015 per year.
-#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 0.00062 per year.
-#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 0.00025 per year.
-#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 1e-04 per year.
-#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 4.1e-05 per year.
-#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 1.6e-05 per year.
-
-# Check convergence by plotting spectra
-plotSpectra(params, biomass = TRUE) + 
-  ggtitle("Initial steady state spectra")
-```
-
-![](steady-state-recipe_files/figure-html/initial-steady-state-1.png)
-
-## Step 4: Calibrate Biomasses and Growth
+## Step 3: Calibrate Biomasses and Growth
 
 This is the core tuning step where we iteratively match observed
 biomasses and growth rates.
@@ -8751,14 +8755,27 @@ params <- params |>
     matchBiomasses() |> reefSteady() |>
     matchBiomasses() |> reefSteady() |>
     matchBiomasses() |> reefSteady()
+#> `matchBiomasses()` has rescaled the model and so moved it off its steady state.
+#> Run `tuneSteadyState()` to settle it again. You can check with
+#> `getSteadyResidual()`.
+#> Warning: For the following species `erepro` has been increased to the smallest
+#> possible value: erepro[eels] = 0.00929
+#> Reached the convergence tolerance after 13.5 years. The biomasses change at up
+#> to 0.007 per year.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_plank, farm_damsel
 #> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
-#> Reached the convergence tolerance after 15 years. The biomasses change at up to 5.1e-05 per year.
+#> Reached the convergence tolerance after 10.5 years. The biomasses change at up to 0.11 per year. Reduce the tolerance on the distance function to converge further.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_plank, farm_damsel
 #> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
-#> Reached the convergence tolerance after 7.5 years. The biomasses change at up to 0.0031 per year.
+#> Reached the convergence tolerance after 9 years. The biomasses change at up to 0.11 per year. Reduce the tolerance on the distance function to converge further.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_plank, farm_damsel
 #> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
-#> Reached the convergence tolerance after 6 years. The biomasses change at up to 0.011 per year.
-#> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
-#> Reached the convergence tolerance after 3 years. The biomasses change at up to 0.059 per year. Reduce the tolerance on the distance function to converge further.
+#> Reached the convergence tolerance after 9 years. The biomasses change at up to 0.025 per year.
+#> Warning: The following species require an unrealistic value greater than 1 for
+#> `erepro`: pred_plank, farm_damsel
 
 # Check vulnerability with new method
 plotVulnerable(params) + 

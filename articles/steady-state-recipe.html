@@ -121,8 +121,8 @@ competitive method.</p>
 <p><strong>Why use a tuning profile first?</strong> The competitive
 refuge method is density-dependent, which makes it difficult to achieve
 a stable steady state before the biomasses are calibrated to observed
-values. We start with a simpler binned profile that approximates the
-final refuge shape so that we can tune abundances first.</p>
+values. We start with a simpler constant binned profile so that we can
+tune abundances first.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create initial parameters object with tuning refuge profile</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newReefParams.html">newReefParams</a></span><span class="op">(</span>species_params <span class="op">=</span> <span class="va">caribbean_10_species</span>,</span>
@@ -149,10 +149,10 @@ final refuge shape so that we can tune abundances first.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Slot "time_created":</span></span>
-<span><span class="co">#&gt; [1] "2026-08-29 07:28:56 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2026-08-29 07:50:49 UTC"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Slot "time_modified":</span></span>
-<span><span class="co">#&gt; [1] "2026-08-29 07:28:56 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2026-08-29 07:50:49 UTC"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Slot "w":</span></span>
 <span><span class="co">#&gt;   [1] 1.000000e-03 1.167237e-03 1.362441e-03 1.590291e-03 1.856246e-03</span></span>
@@ -8462,34 +8462,135 @@ final refuge shape so that we can tune abundances first.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $bin_average</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
-<p>The tuning profile approximates the refuge shape we’ll eventually
-switch to, so it’s worth visualizing before we start tuning:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Visualize the initial (tuning) refuge profile</span></span>
-<span><span class="fu"><a href="../reference/plotRefugeProfile.html">plotRefugeProfile</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Initial refuge profile (tuning method)"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="steady-state-recipe_files/figure-html/tuning-profile-plot-1.png" class="r-plt" alt="" width="672"></p>
 <p>Let’s examine the species groups and their key parameters:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Show key species parameters</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">caribbean_10_species</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"species"</span>, <span class="st">"w_max"</span>, <span class="st">"w_mat"</span>, <span class="st">"refuge_user"</span>, </span>
 <span>                          <span class="st">"blocked_pred"</span>, <span class="st">"biomass_observed"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"Key species parameters for the Karpata model"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="step-2-set-intermediate-reproduction-level">Step 2: Set Intermediate Reproduction Level<a class="anchor" aria-label="anchor" href="#step-2-set-intermediate-reproduction-level"></a>
+<h2 id="step-2-find-an-initial-steady-state">Step 2: Find an Initial Steady State<a class="anchor" aria-label="anchor" href="#step-2-find-an-initial-steady-state"></a>
 </h2>
-<p>To achieve a stable initial steady state, we set reproduction levels
-to an intermediate value (typically 0.5), which adds moderate
-density-dependence compared to the mizer default of pure
-density-independence.</p>
-<p><strong>Why use moderate density-dependence?</strong> Pure
-density-independence (the mizer default) can cause instability when
-combined with reef-specific non-linearities (multiple resources, refuge
-dynamics). Moderate density-dependence provides stabilizing feedback
-without creating the steep response curves that cause oscillations. This
-is also biologically realistic for reef systems with open recruitment
-and larval connectivity.</p>
+<p>Project the model forward to reach an initial steady state. This may
+require multiple iterations of <code><a href="../reference/reefSteady.html">reefSteady()</a></code>.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Project to steady state - multiple calls ensure convergence</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">params</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 31.5 years. The biomasses change at up</span></span>
+<span><span class="co">#&gt; to 1.3e-07 per year.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_grab, pred_plank, farm_damsel</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up</span></span>
+<span><span class="co">#&gt; to 5.4e-08 per year.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_grab, pred_plank, farm_damsel</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up</span></span>
+<span><span class="co">#&gt; to 2.2e-08 per year.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_grab, pred_plank, farm_damsel</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up</span></span>
+<span><span class="co">#&gt; to 9.2e-09 per year.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_grab, pred_plank, farm_damsel</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up</span></span>
+<span><span class="co">#&gt; to 3.8e-09 per year.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_grab, pred_plank, farm_damsel</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up</span></span>
+<span><span class="co">#&gt; to 1.5e-09 per year.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_grab, pred_plank, farm_damsel</span></span>
+<span></span>
+<span><span class="co"># Check convergence by plotting spectra</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Initial steady state spectra"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="steady-state-recipe_files/figure-html/initial-steady-state-1.png" class="r-plt" alt="" width="672"></p>
+<p>If you’re having trouble reaching a steady state, consider providing
+the species parameter <code>R_max</code> or adjusting the
+<code>reproduction_level</code> like this:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Set reproduction levels to 0.5 for all species</span></span>
+<span><span class="va">rdi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">caribbean_10_species</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">rdi</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">caribbean_10_species</span><span class="op">$</span><span class="va">species</span></span>
+<span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/setBevertonHolt.html" class="external-link">setBevertonHolt</a></span><span class="op">(</span><span class="va">params</span>, reproduction_level <span class="op">=</span> <span class="va">rdi</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_grab, pred_plank, farm_damsel, herbs</span></span>
+<span></span>
+<span><span class="co"># Check the reproduction levels</span></span>
+<span><span class="va">reproduction_levels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/superseded_accessors.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Species <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">reproduction_levels</span><span class="op">)</span>, </span>
+<span>                 Reproduction_Level <span class="op">=</span> <span class="va">reproduction_levels</span><span class="op">)</span>,</span>
+<span>      caption <span class="op">=</span> <span class="st">"Initial reproduction levels"</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<caption>Initial reproduction levels</caption>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">Species</th>
+<th align="right">Reproduction_Level</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">pred_eng</td>
+<td align="left">pred_eng</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="left">pred_grab</td>
+<td align="left">pred_grab</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="left">eels</td>
+<td align="left">eels</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="left">pred_crypt</td>
+<td align="left">pred_crypt</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="left">pred_inv</td>
+<td align="left">pred_inv</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="left">pred_plank</td>
+<td align="left">pred_plank</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="left">parrotfish</td>
+<td align="left">parrotfish</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="left">farm_damsel</td>
+<td align="left">farm_damsel</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="left">herbs</td>
+<td align="left">herbs</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="left">inverts</td>
+<td align="left">inverts</td>
+<td align="right">0.5</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why use density-dependence?</strong> Pure
+density-independence (the mizer default) can cause instability in any
+model, but models with reef-specific non-linearities (multiple
+resources, refuge dynamics) are especially prone to this. Moderate
+density-dependence provides stabilizing feedback without creating the
+steep response curves that cause oscillations.</p>
 <details><summary><strong>Click for detailed explanation of reproduction dynamics</strong>
 </summary><div class="section level3">
 <h3 id="understanding-reproduction-level-and-convergence">Understanding Reproduction Level and Convergence<a class="anchor" aria-label="anchor" href="#understanding-reproduction-level-and-convergence"></a>
@@ -8646,106 +8747,12 @@ from overfishing.</p></li>
 throughout is usually both numerically stable and biologically
 defensible for most reef fish with moderate connectivity.</p></li>
 </ol>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Set reproduction levels to 0.5 for all species</span></span>
-<span><span class="va">rdi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">caribbean_10_species</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">rdi</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">caribbean_10_species</span><span class="op">$</span><span class="va">species</span></span>
-<span></span>
-<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/setBevertonHolt.html" class="external-link">setBevertonHolt</a></span><span class="op">(</span><span class="va">params</span>, reproduction_level <span class="op">=</span> <span class="va">rdi</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Check the reproduction levels</span></span>
-<span><span class="va">reproduction_levels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/superseded_accessors.html" class="external-link">getReproductionLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Species <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">reproduction_levels</span><span class="op">)</span>, </span>
-<span>                 Reproduction_Level <span class="op">=</span> <span class="va">reproduction_levels</span><span class="op">)</span>,</span>
-<span>      caption <span class="op">=</span> <span class="st">"Initial reproduction levels"</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Initial reproduction levels</caption>
-<thead><tr class="header">
-<th align="left"></th>
-<th align="left">Species</th>
-<th align="right">Reproduction_Level</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">pred_eng</td>
-<td align="left">pred_eng</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="even">
-<td align="left">pred_grab</td>
-<td align="left">pred_grab</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="odd">
-<td align="left">eels</td>
-<td align="left">eels</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="even">
-<td align="left">pred_crypt</td>
-<td align="left">pred_crypt</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="odd">
-<td align="left">pred_inv</td>
-<td align="left">pred_inv</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="even">
-<td align="left">pred_plank</td>
-<td align="left">pred_plank</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="odd">
-<td align="left">parrotfish</td>
-<td align="left">parrotfish</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="even">
-<td align="left">farm_damsel</td>
-<td align="left">farm_damsel</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="odd">
-<td align="left">herbs</td>
-<td align="left">herbs</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="even">
-<td align="left">inverts</td>
-<td align="left">inverts</td>
-<td align="right">0.5</td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 </details>
 </div>
 <div class="section level2">
-<h2 id="step-3-reach-initial-steady-state">Step 3: Reach Initial Steady State<a class="anchor" aria-label="anchor" href="#step-3-reach-initial-steady-state"></a>
-</h2>
-<p>Project the model forward to reach an initial steady state. This may
-require multiple iterations of <code><a href="../reference/reefSteady.html">reefSteady()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Project to steady state - multiple calls ensure convergence</span></span>
-<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">params</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 24 years. The biomasses change at up to 0.0015 per year.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up to 0.00062 per year.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up to 0.00025 per year.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up to 1e-04 per year.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up to 4.1e-05 per year.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 1.5 years. The biomasses change at up to 1.6e-05 per year.</span></span>
-<span></span>
-<span><span class="co"># Check convergence by plotting spectra</span></span>
-<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Initial steady state spectra"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="steady-state-recipe_files/figure-html/initial-steady-state-1.png" class="r-plt" alt="" width="672"></p>
-</div>
-<div class="section level2">
-<h2 id="step-4-calibrate-biomasses-and-growth">Step 4: Calibrate Biomasses and Growth<a class="anchor" aria-label="anchor" href="#step-4-calibrate-biomasses-and-growth"></a>
+<h2 id="step-3-calibrate-biomasses-and-growth">Step 3: Calibrate Biomasses and Growth<a class="anchor" aria-label="anchor" href="#step-3-calibrate-biomasses-and-growth"></a>
 </h2>
 <p>This is the core tuning step where we iteratively match observed
 biomasses and growth rates.</p>
@@ -8754,7 +8761,7 @@ biomasses and growth rates.</p>
 </h3>
 <p>Use <code><a href="../reference/calibrateReefBiomass.html">calibrateReefBiomass()</a></code> to adjust reproduction
 parameters so that modeled biomasses match observations.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calibrate biomasses to match observations</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrateReefBiomass.html">calibrateReefBiomass</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/matchBiomasses.html" class="external-link">matchBiomasses</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
@@ -8769,7 +8776,7 @@ parameters so that modeled biomasses match observations.</p>
 </h3>
 <p>Adjust growth-related parameters to match observed growth rates using
 <code><a href="../reference/matchReefGrowth.html">matchReefGrowth()</a></code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Match growth rates</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/matchReefGrowth.html">matchReefGrowth</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
@@ -8794,7 +8801,7 @@ parameters so that modeled biomasses match observations.</p>
 </h3>
 <p>Repeat the biomass and growth matching process to fine-tune the
 model.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Iterate to refine biomass and growth matches</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">params</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/calibrateReefBiomass.html">calibrateReefBiomass</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/matchBiomasses.html" class="external-link">matchBiomasses</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/matchReefGrowth.html">matchReefGrowth</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -8808,7 +8815,7 @@ model.</p>
 <span><span class="fu"><a href="https://sizespectrum.org/mizerExperimental/reference/plotBiomassVsSpecies.html" class="external-link">plotBiomassVsSpecies</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Final biomass comparison after iterative tuning"</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s examine the model performance after tuning:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check feeding levels</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotFeedingLevel.html" class="external-link">plotFeedingLevel</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Feeding levels after tuning"</span><span class="op">)</span></span>
@@ -8828,7 +8835,7 @@ density-dependent refuge dynamics.</p>
 <p><strong>Why switch methods?</strong> The competitive method provides
 more realistic refuge dynamics but requires a stable baseline to work
 from.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Switch to competitive refuge method</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/newRefuge.html">newRefuge</a></span><span class="op">(</span><span class="va">params</span>,</span>
 <span>                    new_method <span class="op">=</span> <span class="st">"competitive"</span>, </span>
@@ -8840,27 +8847,40 @@ from.</p>
 <p><img src="steady-state-recipe_files/figure-html/switch-refuge-method-1.png" class="r-plt" alt="" width="672"></p>
 <p>After switching refuge methods, we need to re-match biomasses as the
 refuge dynamics will have changed:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Re-match biomasses with new refuge method</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">params</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://sizespectrum.org/mizer/reference/matchBiomasses.html" class="external-link">matchBiomasses</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://sizespectrum.org/mizer/reference/matchBiomasses.html" class="external-link">matchBiomasses</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://sizespectrum.org/mizer/reference/matchBiomasses.html" class="external-link">matchBiomasses</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://sizespectrum.org/mizer/reference/matchBiomasses.html" class="external-link">matchBiomasses</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `matchBiomasses()` has rescaled the model and so moved it off its steady state.</span></span>
+<span><span class="co">#&gt; Run `tuneSteadyState()` to settle it again. You can check with</span></span>
+<span><span class="co">#&gt; `getSteadyResidual()`.</span></span>
+<span><span class="co">#&gt; Warning: For the following species `erepro` has been increased to the smallest</span></span>
+<span><span class="co">#&gt; possible value: erepro[eels] = 0.00929</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 13.5 years. The biomasses change at up</span></span>
+<span><span class="co">#&gt; to 0.007 per year.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_plank, farm_damsel</span></span>
 <span><span class="co">#&gt; `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 15 years. The biomasses change at up to 5.1e-05 per year.</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 10.5 years. The biomasses change at up to 0.11 per year. Reduce the tolerance on the distance function to converge further.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_plank, farm_damsel</span></span>
 <span><span class="co">#&gt; `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 7.5 years. The biomasses change at up to 0.0031 per year.</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 9 years. The biomasses change at up to 0.11 per year. Reduce the tolerance on the distance function to converge further.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_plank, farm_damsel</span></span>
 <span><span class="co">#&gt; `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 6 years. The biomasses change at up to 0.011 per year.</span></span>
-<span><span class="co">#&gt; `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.</span></span>
-<span><span class="co">#&gt; Reached the convergence tolerance after 3 years. The biomasses change at up to 0.059 per year. Reduce the tolerance on the distance function to converge further.</span></span>
+<span><span class="co">#&gt; Reached the convergence tolerance after 9 years. The biomasses change at up to 0.025 per year.</span></span>
+<span><span class="co">#&gt; Warning: The following species require an unrealistic value greater than 1 for</span></span>
+<span><span class="co">#&gt; `erepro`: pred_plank, farm_damsel</span></span>
 <span></span>
 <span><span class="co"># Check vulnerability with new method</span></span>
 <span><span class="fu"><a href="../reference/plotVulnerable.html">plotVulnerable</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Vulnerability to predation with competitive refuge"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="steady-state-recipe_files/figure-html/rematch-after-refuge-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Final biomass check</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizerExperimental/reference/plotBiomassVsSpecies.html" class="external-link">plotBiomassVsSpecies</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">+</span> </span>
@@ -8874,7 +8894,7 @@ refuge dynamics will have changed:</p>
 </h2>
 <p>The final step involves tuning reproduction parameters to achieve the
 desired reproduction levels and density-dependence.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set reproduction efficiency to allow some density dependence</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/setBevertonHolt.html" class="external-link">setBevertonHolt</a></span><span class="op">(</span><span class="va">params</span>, erepro <span class="op">=</span> <span class="fl">0.35</span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reefSteady.html">reefSteady</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
@@ -8898,7 +8918,7 @@ desired reproduction levels and density-dependence.</p>
 </h3>
 <p>Let’s examine the final model performance across multiple
 metrics:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Overall spectra</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, total <span class="op">=</span> <span class="cn">TRUE</span>, biomass <span class="op">=</span> <span class="cn">TRUE</span>, per_log_size <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Final total spectra"</span><span class="op">)</span></span>
@@ -8959,7 +8979,7 @@ realistic dynamics</li>
 <h3 id="complete-tuning-script">Complete Tuning Script<a class="anchor" aria-label="anchor" href="#complete-tuning-script"></a>
 </h3>
 <p>Here’s the complete script used for the Karpata model:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Complete tuning script for Karpata model</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cmbeese.github.io/mizerReef/">mizerReef</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sizespectrum.org/mizer/" class="external-link">mizer</a></span><span class="op">)</span></span>
