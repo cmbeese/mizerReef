@@ -276,9 +276,18 @@ scaleReefModel <- function(params, factor) {
 
     mizer::species_params(params, recalculate = FALSE) <- sp
 
-    # now comes the code of mizer's standard scaleModel(), reproduced
-    # verbatim -- including its writes into the `@species_params` slot, which
-    # are deliberately left as they are upstream so that the two stay in step.
+    # Now comes the code of mizer's standard scaleModel(), with one
+    # deliberate change: mizer's own version writes the scaled R_max and
+    # gamma directly into the `@species_params` slot, which has the same
+    # given-value bug fixed above (and throughout this package, following
+    # matchGrowth()'s precedent) for rho_algae/rho_detritus/
+    # matchReefGrowth() -- a later recalculation would silently revert
+    # R_max/gamma back to their pre-scale values. Reported upstream at
+    # https://github.com/sizespectrum/mizer/issues/599; routed through
+    # `recalculate = FALSE` here rather than waiting on that fix. The
+    # r_max -> R_max rename just below is left as a direct slot write, as it
+    # always was -- it only relabels an existing column -- and the
+    # `species_params<-()` call after it records the *scaled* result.
     params <- validParams(params)
     assert_that(is.number(factor), factor > 0)
     params@cc_pp <- params@cc_pp * factor
@@ -288,13 +297,15 @@ scaleReefModel <- function(params, factor) {
         params@species_params$r_max <- NULL
         message("The 'r_max' column has been renamed to 'R_max'.")
     }
-    if ("R_max" %in% names(params@species_params)) {
-        params@species_params$R_max <- params@species_params$R_max * factor
+    sp <- mizer::species_params(params)
+    if ("R_max" %in% names(sp)) {
+        sp$R_max <- sp$R_max * factor
     }
     params@search_vol <- params@search_vol / factor
-    if ("gamma" %in% names(params@species_params)) {
-        params@species_params$gamma <- params@species_params$gamma / factor
+    if ("gamma" %in% names(sp)) {
+        sp$gamma <- sp$gamma / factor
     }
+    mizer::species_params(params, recalculate = FALSE) <- sp
     initial_n_other <- params@initial_n_other
     for (res in names(initial_n_other)) {
         initial_n_other[[res]] <- initial_n_other[[res]] * factor

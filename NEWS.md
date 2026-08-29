@@ -36,10 +36,34 @@ Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and
   recorded as given, so mizer will not treat them as its own defaults and
   recalculate over them.
 
-  Two slot writes are deliberately kept: the `constant_reproduction` flag in
+  One slot write is deliberately kept: the `constant_reproduction` flag in
   `reefSteady()`, which is set and removed within the one call exactly as
-  mizer's own `tune_steady_project()` does it, and the block of
-  `scaleReefModel()` that reproduces mizer's `scaleModel()` verbatim.
+  mizer's own `tune_steady_project()` does it.
+
+- `scaleReefModel()`'s block that reproduces mizer's `scaleModel()` also
+  wrote its scaled `R_max` and `gamma` directly into the `@species_params`
+  slot, the same bug as above, inherited from mizer's own `scaleModel()`
+  (confirmed against mizer 3.3.1: `scaleModel(NS_params, factor = 2)`
+  leaves `given_species_params()$R_max` untouched while `species_params()`
+  doubles, and a later no-op recalculation silently reverts it -- reported
+  upstream as
+  [sizespectrum/mizer#599](https://github.com/sizespectrum/mizer/issues/599)).
+  `scaleReefModel()` now routes these through
+  `species_params(params, recalculate = FALSE) <-` too, rather than waiting
+  on the upstream fix, so `calibrateReefBiomass()` and
+  `calibrateReefNumber()` (which both call `scaleReefModel()`) no longer
+  risk this drift.
+
+- `reefSteady()`'s `...` was spliced into its `mizer::findSteadyState()`/
+  `mizer::projectUntilSettled()` calls alongside arguments those calls
+  already hardcode by name (`distance_func`, `t_check`, `t_save`,
+  `distance_tol`, `require_steady`, `solver`). Passing any of those names
+  through `...` -- e.g. `reefSteady(params, distance_tol = 0.05)`, or the
+  same via `steady()`/`tuneSteadyState()` -- errored with `formal argument
+  matched by multiple actual arguments` instead of overriding the value.
+  The defaults are now merged with `...` via `modifyList()` (user values
+  win) instead of being passed alongside it, so any of these mizer 3.3
+  arguments can be overridden as documented.
 
 ## Breaking changes
 

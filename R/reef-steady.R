@@ -149,25 +149,31 @@ reefSteady <- function(params, d_func = NULL,
     # for the old rule explicitly, exactly as mizer's own steady() and
     # projectToSteady() wrappers do. t_save = t_per keeps the trajectory
     # spacing these functions have always returned.
-    if (return_sim) {
-        object <- mizer::projectUntilSettled(
-            params,
+    #
+    # These defaults are merged with `...` via modifyList() (user values
+    # win) rather than passed alongside `...`, so a caller can override any
+    # of them -- e.g. reefSteady(params, distance_tol = 0.05) -- instead of
+    # hitting "formal argument matched by multiple actual arguments" from
+    # naming the same argument twice.
+    steady_args <- utils::modifyList(
+        list(
             distance_func = d_func,
             t_check = t_per, t_max = t_max,
             dt = dt, t_save = t_per, distance_tol = tol,
             require_steady = FALSE,
-            progress_bar = progress_bar, ...
-        )
+            progress_bar = progress_bar
+        ),
+        list(...)
+    )
+    if (return_sim) {
+        object <- do.call(mizer::projectUntilSettled,
+                           c(list(params), steady_args))
         params <- object@params
     } else {
-        object <- mizer::findSteadyState(
-            params,
-            solver = "project",
-            distance_func = d_func,
-            t_check = t_per, t_max = t_max,
-            dt = dt, t_save = t_per, distance_tol = tol,
-            require_steady = FALSE,
-            progress_bar = progress_bar, ...
+        object <- do.call(
+            mizer::findSteadyState,
+            utils::modifyList(list(params = params, solver = "project"),
+                               steady_args)
         )
         params <- object
     }
