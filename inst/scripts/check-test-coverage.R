@@ -3,9 +3,9 @@
 # Runs the package's test suite under covr and reports coverage, both
 # package-wide and per file. Intended for reviewers/readers checking the
 # "code testing" claims in the paper's code-availability/checklist section,
-# and for periodic maintainer use -- it's the same tool the
-# .github/workflows/test-coverage.yaml CI job uses, run locally with a
-# more readable summary.
+# and for periodic maintainer use -- there is no CI job that runs this
+# automatically (the optional Codecov workflow that once did was removed),
+# so this is the way to check coverage.
 #
 # Usage: from the package root, `Rscript inst/scripts/check-test-coverage.R`
 # (or source it interactively). Writes:

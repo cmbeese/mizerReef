@@ -265,9 +265,10 @@ scaleReefModel <- function(params, factor) {
     params@other_params$algae$rho <- params@other_params$algae$rho / factor
     sp$rho_algae <- sp$rho_algae / factor
 
-    # Deprecated in mizerReef 2.0.0, but still here for backward compatibility
-    # algae growth is now a fixed parameter and not scaled with the model
-    # params@other_params$algae$growth <- params@other_params$algae$growth * factor
+    # algae$growth is a fixed, literature-informed production rate (see
+    # setAlgaeParams()), deliberately NOT rescaled here -- unlike everything
+    # else in this function, it doesn't track fish abundance. See NEWS.md
+    # (2.0.1) for why this used to be scaled and what that broke.
 
     # Detritus
     params@other_params$detritus$rho <- params@other_params$detritus$rho / factor
