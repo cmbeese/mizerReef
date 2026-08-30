@@ -750,8 +750,15 @@ setRefuge <- function(params, method, method_params = NULL,
     if (any(missing_a) || any(missing_b)) {
         sp[["a"]][missing_a] <- a_bar
         sp[["b"]][missing_b] <- b_bar
+        # var identifies which column was actually defaulted, so a caller
+        # using with_info_level()'s `except` to suppress this specific
+        # report by name (e.g. except = "b") targets the right one -- the
+        # message always names both since a_bar/b_bar are reported together,
+        # but the var tag shouldn't claim "a" was defaulted when only "b"
+        # was.
+        var <- if (any(missing_a)) "a" else "b"
         mizer::signal_info(
-            "a", paste0(
+            var, paste0(
                 "Missing values in species_params columns 'a' and/or 'b' have been set to average values (a_bar = ",
                 a_bar, ", b_bar = ", b_bar, "). Consider providing species-specific length-weight parameters."),
             level = 1, severity = "warning", unhandled = "show")
@@ -1443,11 +1450,18 @@ newRefuge <- function(params, new_refuge = FALSE,
     }
 
     # Update parameters
-    # Store new parameters
+    # Store new parameters. info_level is forwarded explicitly: nested
+    # with_info_level() calls only "just work" without forwarding when the
+    # inner call's own resolved info_level happens to agree with the outer
+    # one, and silently diverge otherwise (e.g. under a global
+    # options(mizer_info_level = 0) that differs from what this call was
+    # explicitly given). No ... is spliced into this call, so there is no
+    # argument-collision risk in forwarding it.
     params <- setRefuge(
         params = params,
         method = new_method,
-        method_params = new_mp
+        method_params = new_mp,
+        info_level = info_level
     )
 
     # Find new refuge profile

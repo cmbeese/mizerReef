@@ -117,10 +117,18 @@ newReefParams <- function( # Original mizer parameters
                           info_level = mizer::default_info_level(), ...) {
     # One handler for the whole construction: the reports raised by
     # setRefuge(), setAlgaeParams(), setDetritusParams() and the rest are
-    # collected here and given together. `info_level` is deliberately *not*
-    # forwarded to them -- handlers nest by themselves, and passing it down
-    # while it can also arrive through `...` gives "formal argument
-    # 'info_level' matched by multiple actual arguments".
+    # collected here and given together. `info_level` is also forwarded to
+    # each of them explicitly below: nested with_info_level() calls only
+    # "just work" without forwarding when an inner call's own resolved
+    # info_level happens to agree with the outer one, and silently diverge
+    # otherwise -- e.g. under a global `options(mizer_info_level = 0)` that
+    # differs from what this call was explicitly given, an unforwarded inner
+    # call takes with_info_level()'s documented "silence is the exception"
+    # path and unconditionally muffles its own reports regardless of what
+    # info_level was passed here. There is no argument-collision risk in
+    # forwarding it: `info_level` is one of this function's own named
+    # formals, so it can never also be present in `...` for R to match
+    # twice, no matter what the caller passes.
     mizer::with_info_level(info_level = info_level, {
     ## Initialize model with newMultispeciesParams ----
     params <- newMultispeciesParams(
@@ -161,10 +169,12 @@ newReefParams <- function( # Original mizer parameters
         a_bar = a_bar, b_bar = b_bar,
         w_settle = w_settle,
         max_protect = max_protect, tau = tau,
-        use_dummy_fish_bins = use_dummy_fish_bins, ...
+        use_dummy_fish_bins = use_dummy_fish_bins,
+        info_level = info_level, ...
     )
 
-    # Find initial refuge profiles
+    # Find initial refuge profiles. getRefuge() raises no reports of its own
+    # (it has no info_level formal), so there's nothing to forward here.
     params <- getRefuge(params, ...)
 
     ### Unstructured resources ----
@@ -175,7 +185,8 @@ newReefParams <- function( # Original mizer parameters
         algae_capacity = algae_capacity,
         UR_interaction = UR_interaction,
         use_UR_cc = use_UR_cc,
-        algae_colour = algae_colour
+        algae_colour = algae_colour,
+        info_level = info_level
     )
 
     #### Detritus ----
@@ -187,7 +198,8 @@ newReefParams <- function( # Original mizer parameters
         external = external,
         UR_interaction = UR_interaction,
         use_UR_cc = use_UR_cc,
-        detritus_colour = detritus_colour
+        detritus_colour = detritus_colour,
+        info_level = info_level
     )
 
     ### External mortality ----

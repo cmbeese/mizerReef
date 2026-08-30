@@ -198,11 +198,25 @@ reefSteady <- function(params, d_func = NULL,
         # have been called with use_UR_cc = TRUE; it is unset (NULL) on
         # models that have never opted into the carrying-capacity-scaled
         # formulation, so treat that as FALSE rather than erroring.
+        #
+        # info_level is forwarded explicitly here, unlike some other inner
+        # calls in this package -- with_info_level()'s own docs note that
+        # nesting only silently "just works" as long as an inner call's own
+        # resolved info_level agrees with the outer one; if it doesn't (e.g.
+        # a global `options(mizer_info_level = 0)` differs from what this
+        # call was explicitly given), the inner with_info_level() takes the
+        # documented "silence is the exception" path and unconditionally
+        # muffles its own reports regardless of what the outer call asked
+        # for. Confirmed directly: without forwarding, reefSteady(params,
+        # info_level = 3) under a global info_level = 0 option silently lost
+        # tuneUR()'s reports even though the caller explicitly asked for
+        # them. No ... is spliced into either call below, so there is no
+        # argument-collision risk in forwarding it.
         cc <- isTRUE(params@other_params$use_UR_cc)
         if (cc) {
-            params <- tuneUR_cc(params = params)
+            params <- tuneUR_cc(params = params, info_level = info_level)
         } else {
-            params <- tuneUR(params = params)
+            params <- tuneUR(params = params, info_level = info_level)
         }
     }
 

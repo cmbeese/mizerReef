@@ -62,10 +62,11 @@ test_that("reefSteady carries info_level down to the algae/detritus tuning", {
 })
 
 test_that("newReefParams collects the reports of the setters it calls", {
-    # newReefParams() installs one handler for the whole construction and does
-    # not forward info_level to the setters: handlers nest by themselves, and
-    # forwarding it while it can also arrive through `...` would give
-    # "formal argument 'info_level' matched by multiple actual arguments".
+    # newReefParams() installs one handler for the whole construction and
+    # also forwards info_level explicitly to setRefuge()/setAlgaeParams()/
+    # setDetritusParams() -- see the regression test below for why forwarding
+    # matters even though nested with_info_level() calls "just work" in the
+    # common case.
     data(caribbean_3_species)
     data(caribbean_3_interaction)
     data(tuning_profile)
@@ -77,6 +78,35 @@ test_that("newReefParams collects the reports of the setters it calls", {
     expect_length(warnings_from(build(info_level = 0)), 0)
     expect_s4_class(suppressMessages(suppressWarnings(build(info_level = 0))),
                     "mizerReef")
+})
+
+test_that("an explicit info_level overrides a differing global mizer_info_level option", {
+    # mizer::with_info_level()'s nesting only "just works" without forwarding
+    # when an inner call's own resolved info_level happens to agree with the
+    # outer one -- e.g. both left at the default, which reads the same
+    # global option either way. If a global `options(mizer_info_level = 0)`
+    # differs from what the outer call was explicitly given, an unforwarded
+    # inner call resolves its *own* default independently, gets 0, and takes
+    # with_info_level()'s documented "silence is the exception" path:
+    # unconditionally muffling its reports regardless of what the outer,
+    # explicit info_level asked for. reefSteady()/newReefParams()/newRefuge()
+    # forward info_level to their inner setters/tuners specifically to avoid
+    # this.
+    data(caribbean_3_model)
+    withr::local_options(mizer_info_level = 0)
+
+    expect_match(
+        warnings_from(reefSteady(caribbean_3_model, progress_bar = FALSE,
+                                 info_level = 3)),
+        "flux of external detritus is negative", all = FALSE
+    )
+
+    params <- caribbean_3_model
+    params@species_params$interaction_algae <- NULL
+    expect_match(
+        warnings_from(setAlgaeParams(params, info_level = 3)),
+        "interaction_algae", all = FALSE
+    )
 })
 
 test_that("the reports keep the wording they had as bare warnings", {
