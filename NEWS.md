@@ -1,3 +1,77 @@
+# MizerReef 2.0.3
+
+## New features
+
+- The reports mizerReef makes while building or changing a model go through
+  mizer 3.3's `signal_info()`/`with_info_level()` mechanism instead of bare
+  `message()`/`warning()` calls, so they can be turned down. `newReefParams()`,
+  `reefSteady()`, `setAlgaeParams()`, `setDetritusParams()`, `setRefuge()`,
+  `newRefuge()`, `tuneUR()` and `tuneUR_cc()` gain an `info_level` argument,
+  defaulting to `mizer::default_info_level()`:
+
+  ```r
+  params <- newReefParams(..., info_level = 1)   # only what went differently
+  params <- reefSteady(params, info_level = 0)   # silence
+  ```
+
+  The wording is unchanged, and every report is still a warning at the default
+  level, so scripts matching on these messages keep working -- except
+  `newRefuge()`'s "no new method given" report: it was a single multi-line
+  `warning()` string literal, so its text included a literal newline plus the
+  source file's own indentation; the `paste()`-built replacement collapses
+  that to a single space. No test matched the old text exactly, so nothing in
+  this package's own suite broke, but a caller doing an exact-string match
+  against it would need updating.
+
+  `newReefParams()` and `reefSteady()` install one handler for the whole call,
+  so the reports raised by the setters and by `tuneUR()`/`tuneUR_cc()` are
+  collected and given together. `info_level` is also forwarded to those inner
+  calls explicitly. Nested `with_info_level()` calls do work without
+  forwarding it in the common case -- but only because an inner call's own
+  resolved `info_level` (read from `mizer::default_info_level()`) happens to
+  agree with the outer one, which is true whenever both are left at the
+  default. If a global `options(mizer_info_level = 0)` differs from what the
+  outer call was explicitly given, an unforwarded inner call resolves its own
+  default independently, gets `0`, and `with_info_level()`'s documented
+  "silence is the exception" rule takes over: it unconditionally muffles that
+  call's reports regardless of what the outer, explicit `info_level` asked
+  for. Confirmed directly: under a global `mizer_info_level = 0`,
+  `reefSteady(params, info_level = 3)` silently lost `tuneUR()`'s reports
+  even though the caller explicitly asked for them; explicit forwarding fixes
+  it. There is no argument-collision risk in forwarding it -- `info_level` is
+  one of these functions' own named formals, so it can never also be present
+  in `...` for R to match twice, contrary to what was assumed here
+  previously.
+
+- `scaleReefModel()` reports the `r_max` -> `R_max` rename with
+  `signal_info()`, matching mizer's own `scaleModel()`, which this part of the
+  function reproduces. Note that, also matching upstream, this branch is
+  unreachable in practice: `validParams()`, called earlier in the same
+  function, already silently renames `r_max` to `R_max` on its own before this
+  check runs.
+
+- `setRefuge()`'s report for missing `a`/`b` length-weight parameters now
+  identifies which column was actually defaulted (`var = "a"` or `"b"`)
+  instead of always reporting `"a"`, so a caller suppressing this specific
+  report by name via `with_info_level()`'s `except` argument targets the
+  right one.
+
+## Not converted, deliberately
+
+Ten reports stay as plain `message()`/`warning()` calls:
+
+- The `is.nan(consumption)` guards in `algae_dynamics()`,
+  `algae_dynamics_cc()`, `detritus_dynamics()` and `detritus_dynamics_cc()`,
+  and the refuge-misconfiguration warning in `reefVulnerable()`. These run
+  inside `project()`'s per-timestep loop, where there is no wrapped entry point
+  to collect them and end-of-call delivery would be the wrong semantics. They
+  are also genuine fault alarms rather than a choice mizer made, which is what
+  `signal_info()` is documented for.
+- The four migration reports in `upgradeReefParams()`, which fire once during a
+  deliberate one-off migration.
+- The warning in `plotRefugeProfile()`: a plotting function has no `info_level`
+  convention.
+
 # MizerReef 2.0.2
 
 Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and

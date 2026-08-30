@@ -45,6 +45,7 @@ newReefParams(
   include_ext_mort = TRUE,
   include_sen_mort = TRUE,
   z0pre = 0.2,
+  info_level = mizer::default_info_level(),
   ...
 )
 }
@@ -234,6 +235,11 @@ to use default senescence mortality. Defaults to TRUE.}
 each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
 to 1-n where n is the given allometric scaling exponent and
 z0pre defaults to 0.2.}
+
+\item{info_level}{How much mizer should say about the choices it makes
+here. Level 1 keeps only the reports that tell you something went
+differently from how you asked; 0 is silence. See
+\code{\link[mizer:default_info_level]{mizer::default_info_level()}}.}
 
 \item{...}{Extra parameters to be passed to \code{\link[mizer:newMultispeciesParams]{newMultispeciesParams()}}}
 }

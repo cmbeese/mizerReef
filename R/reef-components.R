@@ -96,11 +96,17 @@ rescaleComponents <- function(params, algae_factor = 1, detritus_factor = 1) {
 #'
 #' @param params A MizerParams object
 #' @param ... unused
+#' @param info_level How much mizer should say about the choices it makes
+#'   here. Level 1 keeps only the reports that tell you something went
+#'   differently from how you asked; 0 is silence. See
+#'   [mizer::default_info_level()].
 #' @return An updated MizerParams object
 #' @concept Uresources
 #' @seealso [reefSteady()], [algae_dynamics_cc()], [detritus_dynamics_cc()]
 #' @export
-tuneUR_cc <- function(params, ...) {
+tuneUR_cc <- function(params, info_level = mizer::default_info_level(),
+                      ...) {
+    mizer::with_info_level(info_level = info_level, {
     # algae
     # algae_growth (P_A) is a fixed, literature-informed production rate
     # (see getAlgaeProduction()) and is deliberately NOT retuned here -- real
@@ -125,11 +131,15 @@ tuneUR_cc <- function(params, ...) {
         # Not an error: a negative external flux is a valid steady state,
         # interpreted as detritus flowing off the reef (e.g. to deeper
         # water) rather than flowing in from external sources.
-        warning("The flux of external detritus is negative.")
+        mizer::signal_info(
+            "detritus_external",
+            "The flux of external detritus is negative.",
+            level = 1, severity = "warning", unhandled = "show")
     }
     params@other_params$detritus$external <- (dout / (1 - bd / kd)) - din
 
     params
+    })
 }
 
 #' Tune unstructured resources (algae and detritus) to steady state
@@ -155,6 +165,10 @@ tuneUR_cc <- function(params, ...) {
 #'
 #' @param params A MizerParams object
 #' @param ... unused
+#' @param info_level How much mizer should say about the choices it makes
+#'   here. Level 1 keeps only the reports that tell you something went
+#'   differently from how you asked; 0 is silence. See
+#'   [mizer::default_info_level()].
 #' @return An updated MizerParams object
 #' @concept Uresources
 #' @seealso [reefSteady()], [algae_dynamics()], [detritus_dynamics()]
@@ -162,7 +176,9 @@ tuneUR_cc <- function(params, ...) {
 #' data(caribbean_3_model)
 #' params <- tuneUR(caribbean_3_model)
 #' @export
-tuneUR <- function(params, ...) {
+tuneUR <- function(params, info_level = mizer::default_info_level(),
+                   ...) {
+    mizer::with_info_level(info_level = info_level, {
     # algae
     # algae_growth (P_A) is a fixed, literature-informed production rate
     # (see getAlgaeProduction()) and is deliberately NOT retuned here -- real
@@ -175,9 +191,12 @@ tuneUR <- function(params, ...) {
     if (ca > 0) {
         params@initial_n_other$algae <- pa / ca
     } else {
-        warning("Algae consumption is zero, so algae has no finite ",
-                "steady-state biomass at the current algae growth rate. ",
-                "Leaving algae biomass unchanged.")
+        mizer::signal_info(
+            "algae_biomass",
+            paste("Algae consumption is zero, so algae has no finite",
+                  "steady-state biomass at the current algae growth rate.",
+                  "Leaving algae biomass unchanged."),
+            level = 1, severity = "warning", unhandled = "show")
     }
 
     # detritus
@@ -188,11 +207,15 @@ tuneUR <- function(params, ...) {
         # Not an error: a negative external flux is a valid steady state,
         # interpreted as detritus flowing off the reef (e.g. to deeper
         # water) rather than flowing in from external sources.
-        warning("The flux of external detritus is negative.")
+        mizer::signal_info(
+            "detritus_external",
+            "The flux of external detritus is negative.",
+            level = 1, severity = "warning", unhandled = "show")
     }
     params@other_params$detritus$external <- dout - din
 
     params
+    })
 }
 
 #' Scale reef abundances
@@ -304,7 +327,9 @@ scaleReefModel <- function(params, factor) {
     if ("r_max" %in% names(params@species_params)) {
         params@species_params$R_max <- params@species_params$r_max
         params@species_params$r_max <- NULL
-        message("The 'r_max' column has been renamed to 'R_max'.")
+        mizer::signal_info("R_max",
+                           "The 'r_max' column has been renamed to 'R_max'.",
+                           level = 1, unhandled = "show")
     }
     sp <- mizer::species_params(params)
     if ("R_max" %in% names(sp)) {
