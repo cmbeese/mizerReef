@@ -67,7 +67,7 @@ print(params)
 #> list()
 #> 
 #> Slot "mizer_version":
-#> [1] '3.3.0'
+#> [1] '3.3.1'
 #> 
 #> Slot "extensions":
 #> $mizerReef
@@ -76,10 +76,10 @@ print(params)
 #> 
 #> 
 #> Slot "time_created":
-#> [1] "2026-08-29 07:50:49 UTC"
+#> [1] "2026-08-30 00:03:41 UTC"
 #> 
 #> Slot "time_modified":
-#> [1] "2026-08-29 07:50:49 UTC"
+#> [1] "2026-08-30 00:03:41 UTC"
 #> 
 #> Slot "w":
 #>   [1] 1.000000e-03 1.167237e-03 1.362441e-03 1.590291e-03 1.856246e-03
@@ -8414,27 +8414,27 @@ params <- params |>
     reefSteady() |> reefSteady() |> reefSteady() |> 
     reefSteady() |> reefSteady() |> reefSteady()
 #> Reached the convergence tolerance after 31.5 years. The biomasses change at up
-#> to 1.3e-07 per year.
+#> to 1.6e-09 per year.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_grab, pred_plank, farm_damsel
 #> Reached the convergence tolerance after 1.5 years. The biomasses change at up
-#> to 5.4e-08 per year.
+#> to 6.4e-10 per year.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_grab, pred_plank, farm_damsel
 #> Reached the convergence tolerance after 1.5 years. The biomasses change at up
-#> to 2.2e-08 per year.
+#> to 2.6e-10 per year.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_grab, pred_plank, farm_damsel
 #> Reached the convergence tolerance after 1.5 years. The biomasses change at up
-#> to 9.2e-09 per year.
+#> to 1e-10 per year.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_grab, pred_plank, farm_damsel
 #> Reached the convergence tolerance after 1.5 years. The biomasses change at up
-#> to 3.8e-09 per year.
+#> to 4.2e-11 per year.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_grab, pred_plank, farm_damsel
 #> Reached the convergence tolerance after 1.5 years. The biomasses change at up
-#> to 1.5e-09 per year.
+#> to 1.7e-11 per year.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_grab, pred_plank, farm_damsel
 
@@ -8761,19 +8761,19 @@ params <- params |>
 #> Warning: For the following species `erepro` has been increased to the smallest
 #> possible value: erepro[eels] = 0.00929
 #> Reached the convergence tolerance after 13.5 years. The biomasses change at up
-#> to 0.007 per year.
+#> to 4e-05 per year.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_plank, farm_damsel
 #> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
-#> Reached the convergence tolerance after 10.5 years. The biomasses change at up to 0.11 per year. Reduce the tolerance on the distance function to converge further.
+#> Reached the convergence tolerance after 10.5 years. The biomasses change at up to 0.0011 per year. The component `algae` (up to 0.11 per year) is also changing. Components are not included in the biomass drift above, although this run does advance them; see `attr(getSteadyResidual(params), "other")` for the rates themselves.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_plank, farm_damsel
 #> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
-#> Reached the convergence tolerance after 9 years. The biomasses change at up to 0.11 per year. Reduce the tolerance on the distance function to converge further.
+#> Reached the convergence tolerance after 9 years. The biomasses change at up to 0.0012 per year. The component `algae` (up to 0.11 per year) is also changing. Components are not included in the biomass drift above, although this run does advance them; see `attr(getSteadyResidual(params), "other")` for the rates themselves.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_plank, farm_damsel
 #> `matchBiomasses()` has rescaled the model and so moved it off its steady state. Run `tuneSteadyState()` to settle it again. You can check with `getSteadyResidual()`.
-#> Reached the convergence tolerance after 9 years. The biomasses change at up to 0.025 per year.
+#> Reached the convergence tolerance after 9 years. The biomasses change at up to 0.00037 per year.
 #> Warning: The following species require an unrealistic value greater than 1 for
 #> `erepro`: pred_plank, farm_damsel
 
@@ -8973,7 +8973,7 @@ caribbean_10_model <- reefSteady(params)
     #> 
     #> other attached packages:
     #> [1] knitr_1.51              dplyr_1.2.1             ggplot2_4.0.3          
-    #> [4] mizerExperimental_3.3.0 mizerReef_2.0.2         mizer_3.3.0            
+    #> [4] mizerExperimental_3.3.1 mizerReef_2.0.2         mizer_3.3.1            
     #> 
     #> loaded via a namespace (and not attached):
     #>  [1] plotly_4.12.1       sass_0.4.10         generics_0.1.4     

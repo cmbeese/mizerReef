@@ -141,6 +141,6 @@ the session.
 ``` r
 data(caribbean_3_model)
 params <- reefSteady(caribbean_3_model)
-#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 9e-10 per year.
+#> Reached the convergence tolerance after 1.5 years. The biomasses change at up to 1.5e-10 per year.
 #> Warning: The flux of external detritus is negative.
 ```
