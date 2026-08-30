@@ -45,7 +45,8 @@ Suggests:
     mizerMR (>= 0.3.1.2),
     patchwork,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    withr
 Remotes:
     sizespectrum/mizer,
     sizespectrum/mizerExperimental,
