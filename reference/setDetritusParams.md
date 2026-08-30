@@ -13,7 +13,8 @@ setDetritusParams(
   external = NULL,
   UR_interaction = NULL,
   use_UR_cc = FALSE,
-  detritus_colour = "plum4"
+  detritus_colour = "plum4",
+  info_level = mizer::default_info_level()
 )
 ```
 
@@ -59,6 +60,13 @@ setDetritusParams(
 - detritus_colour:
 
   Character. Colour to use for detritus in plots. Default is "plum4".
+
+- info_level:
+
+  How much mizer should say about the choices it makes here. Level 1
+  keeps only the reports that tell you something went differently from
+  how you asked; 0 is silence. See
+  [`mizer::default_info_level()`](https://sizespectrum.org/mizer/reference/default_info_level.html).
 
 ## Value
 

@@ -15,7 +15,7 @@ length-weight parameters."><meta property="og:image" content="https://cmbeese.gi
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,6 +72,7 @@ length-weight parameters.</p>
 <span>  max_protect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tau <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  use_dummy_fish_bins <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  info_level <span class="op">=</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/default_info_level.html" class="external-link">default_info_level</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -173,6 +174,13 @@ thresholds are calculated for sigmoidal, binned, and competitive methods:</p><ul
 Set according to your data collection method. The setting is stored in
 <code>params@other_params$refuge_params$use_dummy_fish_bins</code> and used by <code><a href="getRefuge.html">getRefuge()</a></code>.</p></li>
 </ul></dd>
+
+
+<dt id="arg-info-level">info_level<a class="anchor" aria-label="anchor" href="#arg-info-level"></a></dt>
+<dd><p>How much mizer should say about the choices it makes
+here. Level 1 keeps only the reports that tell you something went
+differently from how you asked; 0 is silence. See
+<code><a href="https://sizespectrum.org/mizer/reference/default_info_level.html" class="external-link">mizer::default_info_level()</a></code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

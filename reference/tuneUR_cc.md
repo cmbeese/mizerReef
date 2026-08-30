@@ -7,7 +7,7 @@ so that each is at steady state.
 ## Usage
 
 ``` r
-tuneUR_cc(params, ...)
+tuneUR_cc(params, info_level = mizer::default_info_level(), ...)
 ```
 
 ## Arguments
@@ -15,6 +15,13 @@ tuneUR_cc(params, ...)
 - params:
 
   A MizerParams object
+
+- info_level:
+
+  How much mizer should say about the choices it makes here. Level 1
+  keeps only the reports that tell you something went differently from
+  how you asked; 0 is silence. See
+  [`mizer::default_info_level()`](https://sizespectrum.org/mizer/reference/default_info_level.html).
 
 - ...:
 

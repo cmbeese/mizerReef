@@ -17,6 +17,7 @@ reefSteady(
   return_sim = FALSE,
   preserve = c("reproduction_level", "erepro", "R_max"),
   progress_bar = TRUE,
+  info_level = mizer::default_info_level(),
   ...
 )
 ```
@@ -75,6 +76,13 @@ reefSteady(
 
   A shiny progress object to implement a progress bar in a shiny app.
   Default FALSE.
+
+- info_level:
+
+  How much mizer should say about the choices it makes here. Level 1
+  keeps only the reports that tell you something went differently from
+  how you asked; 0 is silence. See
+  [`mizer::default_info_level()`](https://sizespectrum.org/mizer/reference/default_info_level.html).
 
 - ...:
 

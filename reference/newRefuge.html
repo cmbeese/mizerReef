@@ -13,7 +13,7 @@ should run reefSteady() after this function to return to steady state."><meta pr
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,7 @@ should run <code><a href="reefSteady.html">reefSteady()</a></code> after this fu
 <span>  new_L_refuge <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  new_prop_protect <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_bin <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  info_level <span class="op">=</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/default_info_level.html" class="external-link">default_info_level</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -130,6 +131,13 @@ or vector (length = number of bins) to multiply the <code>prop_protect</code>
 (binned) or <code>refuge_density</code> (competitive) values for each size bin.
 Changes the proportion of fish protected. If a single value is given,
 it is applied to all bins.</p></dd>
+
+
+<dt id="arg-info-level">info_level<a class="anchor" aria-label="anchor" href="#arg-info-level"></a></dt>
+<dd><p>How much mizer should say about the choices it makes
+here. Level 1 keeps only the reports that tell you something went
+differently from how you asked; 0 is silence. See
+<code><a href="https://sizespectrum.org/mizer/reference/default_info_level.html" class="external-link">mizer::default_info_level()</a></code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

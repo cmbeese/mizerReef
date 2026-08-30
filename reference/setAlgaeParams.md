@@ -11,7 +11,8 @@ setAlgaeParams(
   algae_capacity = NULL,
   UR_interaction = NULL,
   use_UR_cc = FALSE,
-  algae_colour = "darkseagreen3"
+  algae_colour = "darkseagreen3",
+  info_level = mizer::default_info_level()
 )
 ```
 
@@ -59,6 +60,13 @@ setAlgaeParams(
 
   Character. Colour to use for algae in plots. Default is
   "darkseagreen3".
+
+- info_level:
+
+  How much mizer should say about the choices it makes here. Level 1
+  keeps only the reports that tell you something went differently from
+  how you asked; 0 is silence. See
+  [`mizer::default_info_level()`](https://sizespectrum.org/mizer/reference/default_info_level.html).
 
 ## Value
 
