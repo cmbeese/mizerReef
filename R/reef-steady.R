@@ -332,3 +332,18 @@ tuneSteadyState.mizerReef <- function(params,
         preserve = preserve, effort = effort, info_level = info_level, ...
     )
 }
+
+#' @rdname reef-steady-methods
+#' @method findSteadyState mizerReef
+#' @export
+findSteadyState.mizerReef <- function(params,
+                                      solver = c("project", "newton"),
+                                      ...) {
+    solver <- match.arg(solver)
+    if (solver == "newton") {
+        stop("`findSteadyState()` on a mizerReef model supports only ",
+             "`solver = \"project\"`: algae and detritus dynamics require ",
+             "the project solver. See `?reefSteady`.")
+    }
+    NextMethod()
+}

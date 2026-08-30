@@ -76,7 +76,7 @@ test_that("newReefParams collects the reports of the setters it calls", {
                       method = "binned", method_params = tuning_profile, ...)
     }
     expect_length(warnings_from(build(info_level = 0)), 0)
-    expect_s4_class(suppressMessages(suppressWarnings(build(info_level = 0))),
+    expect_s3_class(suppressMessages(suppressWarnings(build(info_level = 0))),
                     "mizerReef")
 })
 

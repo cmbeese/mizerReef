@@ -4,6 +4,7 @@
 \alias{reef-steady-methods}
 \alias{steady.mizerReef}
 \alias{tuneSteadyState.mizerReef}
+\alias{findSteadyState.mizerReef}
 \title{Steady state methods for mizerReef models}
 \usage{
 \method{steady}{mizerReef}(
@@ -31,6 +32,8 @@
   info_level = mizer::default_info_level(),
   ...
 )
+
+\method{findSteadyState}{mizerReef}(params, solver = c("project", "newton"), ...)
 }
 \arguments{
 \item{params}{A \code{mizerReef} object}

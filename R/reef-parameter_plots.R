@@ -50,7 +50,7 @@ plotVulnerable <- function(object,
         is.flag(return_data)
     )
 
-    if (is(object, "MizerSim")) {
+    if (inherits(object, "MizerSim")) {
         ## sim values ----
         params <- object@params
         # Get time for end of simulation
@@ -60,7 +60,7 @@ plotVulnerable <- function(object,
             t <- time_step
         }
         vul <- getVulnerable(object, time_range = t)
-    } else if (is(object, "MizerParams")) {
+    } else if (inherits(object, "MizerParams")) {
         ## params values ----
         params <- object
 
@@ -210,11 +210,11 @@ plotRefugeProfile <- function(object,
         is.flag(return_data)
     )
 
-    if (is(object, "MizerSim")) {
+    if (inherits(object, "MizerSim")) {
         ## sim values ----
         params <- object@params
         warning("You are plotting the refuge profile from the steady state. To view refuge density through time, use plotRefugeDensity.")
-    } else if (is(object, "MizerParams")) {
+    } else if (inherits(object, "MizerParams")) {
         ## params ----
         params <- object
     }

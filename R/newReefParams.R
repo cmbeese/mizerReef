@@ -371,7 +371,9 @@ newReefParams <- function( # Original mizer parameters
     # the chain still builds correctly when extensions really are combined.
     params <- mizer::recordExtension(
         params, "mizerReef",
-        version = as.character(utils::packageVersion("mizerReef")))
+        version = as.character(utils::packageVersion("mizerReef")),
+        requirement = "sizespectrum/mizerReef"
+    )
     params <- mizer::coerceToExtensionClass(params)
 
     # Return object ----

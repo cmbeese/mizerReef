@@ -227,7 +227,7 @@ plotSpectraChange <- function(object1, object2, species = NULL,
         paste("Relative Change in", quantity)
     }
 
-    if (is(object1, "MizerSim")) {
+    if (inherits(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
@@ -361,12 +361,12 @@ plotProductivity <- function(object,
                              min_fishing_l = NULL, max_fishing_l = NULL,
                              include_repro = FALSE, include_inverts = FALSE,
                              return_data = FALSE, ...) {
-    if (is(object, "MizerSim")) {
+    if (inherits(object, "MizerSim")) {
         # sim values
         sim <- object
         params <- sim@params
         assert_that(
-            is(sim, "MizerSim"),
+            inherits(sim, "MizerSim"),
             is.flag(return_data)
         )
 
@@ -444,11 +444,11 @@ plotProductivity <- function(object,
                 linetype = "Species Group",
                 x = "Year"
             )
-    } else if (is(object, "MizerParams")) {
+    } else if (inherits(object, "MizerParams")) {
         # params
         params <- object
         assert_that(
-            is(params, "MizerParams"),
+            inherits(params, "MizerParams"),
             is.flag(return_data)
         )
 
@@ -622,7 +622,7 @@ plot2Productivity <- function(object1, object2, species = NULL,
     sf$Model <- factor(sf$Model, levels = c(name1, name2))
 
     # if sim, get params -
-    if (is(object1, "MizerSim")) {
+    if (inherits(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
@@ -804,7 +804,7 @@ plotProductivityRelative <- function(object1, object2, diff_method,
     }
 
     # save 1 set for species names -
-    if (is(object1, "MizerSim")) {
+    if (inherits(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
@@ -902,7 +902,7 @@ plotTotalAbundance <- function(object, stack = FALSE,
                                max_fishing_l = NULL,
                                return_data = FALSE, ...) {
     # object checks -
-    if (is(object, "MizerSim")) {
+    if (inherits(object, "MizerSim")) {
         ## sim values -
         # get total abundance at last timestep
         params <- object@params
@@ -923,7 +923,7 @@ plotTotalAbundance <- function(object, stack = FALSE,
         # params -
         params <- object
         assert_that(
-            is(params, "MizerParams"),
+            inherits(params, "MizerParams"),
             is.flag(return_data)
         )
 
@@ -1040,7 +1040,7 @@ plotTotalBiomass <- function(object,
                              max_fishing_l = NULL,
                              return_data = FALSE, ...) {
     # object checks -
-    if (is(object, "MizerSim")) {
+    if (inherits(object, "MizerSim")) {
         ## sim values -
         # get total biomass at last timestep
         params <- object@params
@@ -1058,7 +1058,7 @@ plotTotalBiomass <- function(object,
         # params -
         params <- object
         assert_that(
-            is(params, "MizerParams"),
+            inherits(params, "MizerParams"),
             is.flag(return_data)
         )
 
@@ -1192,7 +1192,7 @@ plot2TotalBiomass <- function(object1, object2,
     sf$Model <- factor(sf$Model, levels = c(name1, name2))
 
     # if sim, get params -
-    if (is(object1, "MizerSim")) {
+    if (inherits(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
@@ -1344,7 +1344,7 @@ plotTotalBiomassRelative <- function(object1, object2,
     }
 
     # if sim, get params -
-    if (is(object1, "MizerSim")) {
+    if (inherits(object1, "MizerSim")) {
         params <- object1@params
     } else {
         params <- object1
@@ -1453,11 +1453,11 @@ plotRelativeContribution <- function(object,
     )
     prod$Metric <- "Productivity"
 
-    if (is(object, "MizerSim")) {
+    if (inherits(object, "MizerSim")) {
         params <- object@params
     } else {
         params <- object
-        assert_that(is(params, "MizerParams"))
+        assert_that(inherits(params, "MizerParams"))
     }
 
     # group names -

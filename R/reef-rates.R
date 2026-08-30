@@ -31,7 +31,7 @@
 #' @family rate functions
 getDegrade <- function(object, n, n_pp, n_other,
                        time_range, drop = TRUE, ...) {
-    if (is(object, "MizerParams")) {
+    if (inherits(object, "MizerParams")) {
         # params -----
         params <- mizer::validParams(object)
         if (missing(time_range)) time_range <- 0
@@ -114,7 +114,7 @@ getDegrade <- function(object, n, n_pp, n_other,
 #' @family rate functions
 getVulnerable <- function(object, n, n_pp, n_other,
                           time_range, drop = TRUE, ...) {
-    if (is(object, "MizerParams")) {
+    if (inherits(object, "MizerParams")) {
         # params -----
         params <- mizer::validParams(object)
         if (missing(time_range)) time_range <- 0
@@ -237,7 +237,7 @@ getSenMort <- function(params, n = initialN(params),
 getEGrowthTime <- function(object, n, n_pp, n_other,
                            time_range,
                            drop = FALSE, ...) {
-    if (is(object, "MizerParams")) {
+    if (inherits(object, "MizerParams")) {
         params <- object
         params <- validParams(params)
         f <- get(params@rates_funcs$EGrowth)
