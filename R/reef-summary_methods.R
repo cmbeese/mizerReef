@@ -67,10 +67,10 @@ getProductivity <- function(object,
                             min_fishing_l = NULL, 
                             max_fishing_l = NULL,...) {
     
-    if (is(object, "MizerParams")) {
+    if (inherits(object, "MizerParams")) {
         
         params <- object
-        assert_that(is(params, "MizerParams"))
+        assert_that(inherits(params, "MizerParams"))
         
         # Set default fishing sizes if not provided
         if(is.null(min_fishing_l)){ min_fishing_l <- 7 }
@@ -93,7 +93,7 @@ getProductivity <- function(object,
         
         return(prod)
     
-    } else if (is(object, "MizerSim")) {
+    } else if (inherits(object, "MizerSim")) {
         
         # If no time range is given, default to the final time step
         sim <- object

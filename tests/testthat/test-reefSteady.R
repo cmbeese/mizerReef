@@ -3,7 +3,7 @@ test_that("reefSteady returns a valid mizerReef object with finite, non-negative
     # all(... >= 0)) applied to the mizerReef-extended object.
     data(caribbean_3_model)
     result <- reefSteady(caribbean_3_model, progress_bar = FALSE)
-    expect_s4_class(result, "mizerReef")
+    expect_s3_class(result, "mizerReef")
     expect_true(all(is.finite(result@initial_n)))
     expect_true(all(result@initial_n >= 0))
 })
@@ -106,7 +106,7 @@ test_that("reefSteady with return_sim = TRUE returns a MizerSim-like object wrap
     data(caribbean_3_model)
     old_growth <- caribbean_3_model@other_params$algae$growth
     sim <- reefSteady(caribbean_3_model, return_sim = TRUE, progress_bar = FALSE)
-    expect_s4_class(sim@params, "mizerReef")
+    expect_s3_class(sim@params, "mizerReef")
 
     # algae_growth is a fixed input, left unchanged by tuning -- only the
     # algae biomass is retuned to the resulting steady state.
@@ -129,8 +129,8 @@ test_that("loading mizerReef leaves mizer::steady() working for non-reef models"
     reef_free <- suppressWarnings(suppressMessages(
         mizer::steady(mizer::NS_params, t_max = 3, progress_bar = FALSE)
     ))
-    expect_s4_class(reef_free, "MizerParams")
-    expect_false(is(reef_free, "mizerReef"))
+    expect_s3_class(reef_free, "MizerParams")
+    expect_false(inherits(reef_free, "mizerReef"))
 })
 
 test_that("steady() and tuneSteadyState() dispatch to reefSteady() for reef models", {
@@ -140,8 +140,8 @@ test_that("steady() and tuneSteadyState() dispatch to reefSteady() for reef mode
     via_steady <- mizer::steady(caribbean_3_model, progress_bar = FALSE)
     via_tune <- mizer::tuneSteadyState(caribbean_3_model, progress_bar = FALSE)
 
-    expect_s4_class(via_steady, "mizerReef")
-    expect_s4_class(via_tune, "mizerReef")
+    expect_s3_class(via_steady, "mizerReef")
+    expect_s3_class(via_tune, "mizerReef")
     expect_equal(via_steady@initial_n, expected@initial_n)
     expect_equal(via_tune@initial_n, expected@initial_n)
     expect_equal(via_steady@initial_n_other, expected@initial_n_other)

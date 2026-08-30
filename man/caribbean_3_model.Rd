@@ -5,7 +5,11 @@
 \alias{caribbean_3_model}
 \title{mizerParams object for a simple, generic Caribbean reef with 3 species groups}
 \format{
-mizerParams object
+A \link[=mizerReef-class]{mizerReef} object.
+
+The object was created with \code{\link[=newReefParams]{newReefParams()}} and is stored in the package's
+\verb{data/} directory. R's standard lazy-loading preserves its S3 class vector
+and extension metadata.
 }
 \source{
 PhD Thesis, FORCE dataset
@@ -53,10 +57,5 @@ Victoria University of Wellington.
 FORCE dataset. From: Dryden, C. (2017). Habitat structural
 complexity of Caribbean coral reefs and its relationships with fish community
 structure. PhD Thesis, Newcastle University.
-
-Beese, C. (2025). PhD Thesis. "Modelling Coral Reef Futures:
-Exploring the role of structural complexity in sustaining ecosystem services."
-Victoria University of Wellington.
-https://doi.org/10.26686/wgtn.26421523
 }
 \keyword{datasets}

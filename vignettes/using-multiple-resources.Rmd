@@ -125,26 +125,21 @@ Install mizerMR alongside mizerReef if you do not have it yet:
 remotes::install_github("sizespectrum/mizerMR")
 ```
 
-Then load both packages. Each mizer extension announces itself to mizer when it
-is loaded, building up an *extension chain*. The package you load **last** sits
-at the front of the chain.
+Then load both packages:
 
 ```{r}
 library(mizerReef)
 library(mizerMR)
 ```
 
-```{r}
-getRegisteredExtensions()
-```
-
-Both extensions are now active. mizerReef ships an example model for a generic
+mizerReef ships an example model for a generic
 three-group Caribbean reef, `caribbean_3_model`, with functional groups for
 predators, herbivores and invertebrates:
 
 ```{r}
 params <- caribbean_3_model
 class(params)
+getMetadata(params)$extensions
 ```
 
 The object carries the `mizerReef` class, so all of mizer's generics
@@ -205,16 +200,14 @@ leaving mizerReef's algae, detritus and refuge machinery untouched:
 params <- setMultipleResources(params, resource_params = resource_params)
 ```
 
-The returned object now belongs to a class that chains **both** extensions:
-
 ```{r}
 class(params)
-is(params, "mizerReef")
-is(params, "mizerMR")
+inherits(params, "mizerReef")
+inherits(params, "mizerMR")
 ```
 
-`class()` reports the most-derived class, `mizerMR`, but the object still
-inherits from `mizerReef`, so reef generics and multiple-resource generics both
+`class()` reports the full S3 class vector `c("mizerMR", "mizerReef", "MizerParams")`.
+The object inherits from both `mizerMR` and `mizerReef`, so reef generics and multiple-resource generics both
 dispatch correctly. The multiple resources live in a new `"MR"` component:
 
 ```{r}
@@ -306,16 +299,15 @@ plotBiomass(sim)
 
 ## How the chaining works
 
-Under the hood, both packages register themselves as *dispatching extensions*.
-mizer builds an S4 class hierarchy in which the combined object extends
-`mizerMR`, which extends `mizerReef`, which extends `MizerParams`:
+Under the hood, both packages record themselves on the object and extend its
+S3 class vector:
 
 ```{r}
-extends("mizerMR")
+class(params)
 ```
 
 When you call a generic such as `getEncounter()` or `getBiomass()`, R walks this
-hierarchy from the outermost class inward. Each extension's method does its own
+class vector from left to right. Each extension's method does its own
 work and then calls `NextMethod()` to let the next extension in the chain
 contribute. That is why the reef's refuge-modified encounter and the multiple
 resources' encounter both end up in the final rate, and why a single
@@ -327,8 +319,8 @@ polite about calling `NextMethod()`.
 
 The composability shown above is *not* automatic just because two packages
 both touch mizer models — it works here because **both** mizerReef and
-mizerMR are *dispatching extensions*: each registers itself with
-`registerExtension()`, defines an S4 marker class, and calls `NextMethod()`
+mizerMR are *dispatching extensions*: each records itself on the object,
+adds its S3 extension class, and calls `NextMethod()`
 inside every method that overrides a shared generic. mizer still supports an
 older, simpler mechanism for changing a single rate calculation:
 `mizer::setRateFunction(params, "Encounter", "my_fun")` swaps in one named
@@ -361,25 +353,6 @@ extensions to be written as dispatching extensions that call `NextMethod()`
 composable behaviour across *any* pair of mizer extensions, regardless of
 which mechanism each uses, is still an evolving part of the mizer ecosystem.
 
-```{r, include = FALSE}
-# Loading mizerMR registers it in this R session's extension chain for as
-# long as the session lasts (mizer::registerExtension() has no matching
-# "unregister" in its public API). Package vignettes are all built in one
-# shared R session, so without resetting the chain here, every mizerReef
-# example object in any vignette built *after* this one in the same session
-# -- regardless of file order -- would silently pick up the mizerMR class
-# too, mis-dispatching to methods (like mizerMR's plotSpectra()) that
-# assume a multiple-resource structure the object doesn't actually have.
-# mizer:::clearExtensionChain() is unexported but is mizer's own documented
-# mechanism for this (see guide-create-extension-package's discussion of
-# tests that manipulate the extension chain), so this resets the session
-# back to a clean, mizerReef-only chain once this vignette is done.
-if (requireNamespace("mizerMR", quietly = TRUE)) {
-    mizer:::clearExtensionChain()
-    mizer::registerExtension("mizerReef", requirement = "sizespectrum/mizerReef")
-}
-```
-
-For more on the extension chain — including how the load order is recorded in
+For more on the extension mechanism — including how the extensions are recorded in
 the object and restored when you save and reload it — see
 `vignette("guide-use-extension-packages", package = "mizer")`.

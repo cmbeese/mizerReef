@@ -11,5 +11,5 @@ test_that("MizerReefParams issues deprecation warning", {
         ),
         "deprecated"
     )
-    expect_s4_class(params, "mizerReef")
+    expect_s3_class(params, "mizerReef")
 })
