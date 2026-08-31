@@ -55,7 +55,13 @@
 #'
 #' @param min_w_pp Minimum size of plankton in grams
 #'
-#' @param w_pp_cutoff Maximum size of plankton in grams, default to 1 g
+#' @param w_pp_cutoff Maximum size of plankton in grams, default to 1 g.
+#'                    Deliberately narrower than mizer's own default
+#'                    (10 g): mizerReef's plankton resource represents
+#'                    plankton only, since a reef model gives invertebrates
+#'                    their own explicit species/spectrum rather than
+#'                    folding them into the single background resource the
+#'                    way a typical mizer model often does.
 #'
 #' @param n Allometric growth exponent (also used as metabolic exponent p)
 #'

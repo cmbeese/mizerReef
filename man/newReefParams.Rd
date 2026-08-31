@@ -60,7 +60,13 @@ observed abundances, and their maximum size.}
 
 \item{min_w_pp}{Minimum size of plankton in grams}
 
-\item{w_pp_cutoff}{Maximum size of plankton in grams, default to 1 g}
+\item{w_pp_cutoff}{Maximum size of plankton in grams, default to 1 g.
+Deliberately narrower than mizer's own default
+(10 g): mizerReef's plankton resource represents
+plankton only, since a reef model gives invertebrates
+their own explicit species/spectrum rather than
+folding them into the single background resource the
+way a typical mizer model often does.}
 
 \item{n}{Allometric growth exponent (also used as metabolic exponent p)}
 
