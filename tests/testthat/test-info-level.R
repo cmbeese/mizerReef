@@ -16,6 +16,20 @@ warnings_from <- function(expr) {
     w
 }
 
+# caribbean_3_model is now well-balanced at steady state (its detritus
+# scale/lifetime having just been tuned to a literature target), so it no
+# longer incidentally triggers tuneUR()/tuneUR_cc()'s negative-external-flux
+# case on its own the way it used to. Force a detritus consumption deficit
+# deliberately -- `rho` is cached on `other_params$detritus$rho` (an outer
+# product with w^n, not recomputed from `species_params$rho_detritus` on
+# the fly), so both need scaling down together for `getDetritusConsumption()`
+# to see it.
+force_detritus_deficit <- function(params) {
+    params@other_params$detritus$rho <- params@other_params$detritus$rho * 0.01
+    params@species_params$rho_detritus <- params@species_params$rho_detritus * 0.01
+    params
+}
+
 test_that("setAlgaeParams reports the interaction_algae default through info_level", {
     data(caribbean_3_model)
     params <- caribbean_3_model
@@ -38,7 +52,7 @@ test_that("setDetritusParams reports the interaction_detritus default through in
 
 test_that("tuneUR and tuneUR_cc report the negative external detritus flux through info_level", {
     data(caribbean_3_model)
-    params <- caribbean_3_model
+    params <- force_detritus_deficit(caribbean_3_model)
 
     expect_match(warnings_from(tuneUR(params)),
                  "flux of external detritus is negative", all = FALSE)
@@ -52,10 +66,11 @@ test_that("reefSteady carries info_level down to the algae/detritus tuning", {
     # The reports raised by tuneUR()/tuneUR_cc() are collected by the handler
     # reefSteady() installs, so a caller can quiet the whole call.
     data(caribbean_3_model)
-    expect_match(warnings_from(reefSteady(caribbean_3_model, progress_bar = FALSE)),
+    params <- force_detritus_deficit(caribbean_3_model)
+    expect_match(warnings_from(reefSteady(params, progress_bar = FALSE)),
                  "flux of external detritus is negative", all = FALSE)
     expect_length(
-        warnings_from(reefSteady(caribbean_3_model, progress_bar = FALSE,
+        warnings_from(reefSteady(params, progress_bar = FALSE,
                                  info_level = 0)),
         0
     )
@@ -96,8 +111,8 @@ test_that("an explicit info_level overrides a differing global mizer_info_level 
     withr::local_options(mizer_info_level = 0)
 
     expect_match(
-        warnings_from(reefSteady(caribbean_3_model, progress_bar = FALSE,
-                                 info_level = 3)),
+        warnings_from(reefSteady(force_detritus_deficit(caribbean_3_model),
+                                 progress_bar = FALSE, info_level = 3)),
         "flux of external detritus is negative", all = FALSE
     )
 
