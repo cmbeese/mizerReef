@@ -10,6 +10,7 @@ newReefParams(
   crit_feed = NULL,
   min_w_pp = NA,
   w_pp_cutoff = 1,
+  kappa = NULL,
   n = 0.75,
   new_refuge = FALSE,
   method,
@@ -61,6 +62,23 @@ observed abundances, and their maximum size.}
 \item{min_w_pp}{Minimum size of plankton in grams}
 
 \item{w_pp_cutoff}{Maximum size of plankton in grams, default to 1 g}
+
+\item{kappa}{Coefficient of the resource power-law abundance
+(\code{resource_params$kappa}). Defaults to \link{reef_kappa_default}, not
+mizer's own \code{newMultispeciesParams()} default of \code{1e11} -- that value
+is a placeholder unrelated to any particular model's scale, and reef
+models' typical biomass totals (order-of-magnitude 10-1000 g/m^2, not
+the much larger scales other mizer applications are often calibrated
+to) sit many orders of magnitude closer to \code{reef_kappa_default} than
+to \code{1e11}. This matters beyond convenience: the very first
+\code{calibrateReefBiomass()} call rescales \code{kappa} (and \code{gamma}, for
+every species) by a single factor sized to close the \emph{entire} gap
+between the starting \code{kappa} and a
+realistic one -- starting closer reduces the size of that first jump,
+which is where this kind of model has been observed to become
+numerically fragile. Still an uncalibrated placeholder like \code{1e11}
+was, just a less extreme one -- run \code{calibrateReefBiomass()} before
+relying on it for anything.}
 
 \item{n}{Allometric growth exponent (also used as metabolic exponent p)}
 
