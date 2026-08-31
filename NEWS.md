@@ -70,7 +70,38 @@
   skipped `calibrateReefBiomass()`. Run `calibrateReefBiomass()` before
   `matchReefGrowth()`/`matchBiomasses()` to resolve it.
 
+- `newReefParams()` gains a `kappa` argument, defaulting to the new exported
+  constant `reef_kappa_default` (`100`) instead of silently inheriting
+  `newMultispeciesParams()`'s own default (`1e11`, a placeholder unrelated to
+  any particular model's scale). Reef models' typical biomass totals
+  (order-of-magnitude 10-1000 g/m^2) sit many orders of magnitude closer to
+  `100` than to `1e11`; starting closer reduces the size of the rescale
+  `calibrateReefBiomass()`'s first call has to make to reach a realistic
+  scale, which is where this kind of model has been observed to become
+  numerically fragile. Still an uncalibrated placeholder, just a
+  substantially less extreme one -- the guard-rail warning above now checks
+  against both `1e11` and `reef_kappa_default`.
+
 ## Bug fixes
+
+- The bundled `caribbean_3_model`/`caribbean_3_species`/
+  `caribbean_3_interaction` have been regenerated from a fresh,
+  from-scratch rebuild (`inst/scripts/Caribbean_3_model-calibration.R`),
+  rather than patched from the previous bundled model as the 02/08/2026
+  recalibration did. Biomass and age at maturity both match the
+  `biomass_observed`/`age_mat` targets closely (predators 107.09/107,
+  herbivores 34.00/34, inverts 40.00/40 g/m^2; age_mat 4.00/4.0,
+  1.60/1.6 years). **Known limitation, not resolved by this rebuild**:
+  predators' realized diet is dominated by background "Resource" at
+  essentially every size, rather than the herbivore/invert/cannibalism mix
+  Rogers et al. 2018's own model shows. Pinning predators' `gamma` to
+  Rogers' own literature value (Appendix S1 Table S2, 6.4 m^2/yr) and
+  separately retuning the resource abundance scale/slope were both tried
+  and abandoned after extensive investigation -- both destabilize the
+  model rather than improving diet realism, once actually taking effect
+  (an earlier attempt at the `gamma` pin looked like it worked but was
+  silently a no-op). See the `caribbean-3-fresh-rebuild-diet-bug` project
+  history for the full derivation.
 
 - `newReefParams()`'s residual (non-senescence) natural mortality,
   $\mu_{nat.i}(w) = \mu_{nat}\, w^{z0exp}$, computed `z0exp <- 1 - n` instead
