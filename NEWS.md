@@ -48,13 +48,18 @@
   `p`, vs. mizer's `2/3`; `crit_feed = 0.7`), and the algae/detritus/
   external-mortality model-level defaults (`algae_growth_initial`,
   capacities, `sen_decomp`/`ext_decomp`, `nat_mort`/`sen_prop`/`sen_curve`,
-  `use_UR_cc`). Flagged which of these are actually reef-specific biology
-  (e.g. `a_bar`/`b_bar`, `algae_growth_initial` -- worth reconsidering for a
-  non-reef system or a different dominant primary producer) versus which
-  have no documented rationale at all (`w_pp_cutoff`, `n`/`p`, `crit_feed`;
-  `n = 0.75` in particular traces to Rogers (2018)'s own parameterisation,
-  not a reef-specific finding, so it's a candidate for sensitivity-testing
-  rather than a value to trust as-is).
+  `use_UR_cc`). Distinguished three different kinds of default: reef-specific
+  biology worth reconsidering for a non-reef system (`a_bar`/`b_bar`,
+  `algae_growth_initial`); `w_pp_cutoff = 1` (vs. mizer's `10`), a
+  deliberate architectural choice -- mizerReef's plankton spectrum
+  represents plankton only, since invertebrates get their own explicit
+  species/spectrum instead of sharing the single background resource the
+  way a typical mizer model's often does; and `n`/`p` and `crit_feed`,
+  which have no documented rationale for differing from mizer's own
+  defaults (`n = 0.75` traces to Rogers (2018)'s own parameterisation, not
+  a reef-specific finding; `crit_feed = 0.7` differs from mizer's own `f0`
+  default of `0.6` with no stated reason) -- candidates for
+  sensitivity-testing, not values to trust as-is.
 
 ## New features
 

@@ -387,19 +387,20 @@ caribbean_10_model <- newReefParams(species_params = caribbean_10_species,
 ```
 
 Besides the species-level and refuge-level defaults already covered above,
-`newReefParams()` makes a few default choices of its own about the
-underlying mizer model:
+`newReefParams()` (all three of these are set directly in its own function
+signature/body, not inherited from a setter) makes a few default choices of
+its own about the underlying mizer model:
 
 ```{r construction-defaults-table, echo=FALSE, eval=TRUE}
 kable(
   data.frame(
     Argument = c("w_pp_cutoff", "n (and p)", "crit_feed"),
     `mizerReef default` = c("1 g", "0.75", "0.7"),
-    `mizer's own default` = c("10 g", "2/3 (≈0.667); p defaults independently to 0.7", "(no equivalent)"),
+    `mizer's own default` = c("10 g", "2/3 (≈0.667); p defaults independently to 0.7", "0.6, for the f0 species parameter"),
     Description = c(
       "Maximum size of the plankton resource spectrum.",
       "Allometric growth exponent; mizerReef also uses it for the metabolic exponent p, rather than defaulting p independently.",
-      "Target feeding level f0 used to calibrate each species' algae/detritus encounter rate (rho) at maximum size, for any species without its own f0."
+      "Target feeding level; fills in f0 for any species that doesn't have its own, which in turn calibrates that species' algae/detritus encounter rate (rho) at maximum size."
     ),
     check.names = FALSE
   ),
@@ -408,15 +409,21 @@ kable(
 ```
 
 These are ordinary arguments, so pass your own value the same way as any
-other (e.g. `newReefParams(..., w_pp_cutoff = 10)`). Unlike the
-literature-grounded defaults elsewhere on this page, none of these three
-has a documented rationale in the source for why it differs from mizer's
-own default -- `n = 0.75` in particular traces to the trait-based model in
-Rogers (2018) (see `vignette("caribbean_3_model-description")`) rather than
-a reef-specific finding, so it's a starting point to sensitivity-test for
-your own system, not a value to trust because it's reef-flavoured. Treat
-all three the same way: worth knowing they exist and differ from mizer,
-not worth assuming they're right for you.
+other (e.g. `newReefParams(..., w_pp_cutoff = 10)`). They don't all have the
+same kind of justification, though:
+
+- **`w_pp_cutoff` is a deliberate, architectural choice**, not an oversight.
+  mizerReef's narrower plankton spectrum represents plankton *only* --
+  unlike a typical mizer model, where the single background resource often
+  also stands in for small invertebrates, a reef model gives invertebrates
+  their own explicit species/spectrum instead, so the plankton resource
+  doesn't need to reach as high in size.
+- **`n`/`p` and `crit_feed` have no documented rationale for differing
+  from mizer's own defaults.** `n = 0.75` traces to the trait-based model
+  in Rogers (2018) (see `vignette("caribbean_3_model-description")`) rather
+  than a reef-specific finding. Treat both as starting points worth
+  sensitivity-testing for your own system, not values to trust just
+  because they're what mizerReef happens to ship.
 
 For every other construction argument (`species_params`, `interaction`,
 `kappa`, `resource_rate`, and so on), `newReefParams()` simply passes your
