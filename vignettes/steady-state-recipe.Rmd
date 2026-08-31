@@ -76,10 +76,21 @@ params <- newReefParams(species_params = caribbean_10_species,
                         method_params = tuning_profile)
 ```
 
-These messages let us know when the package set default values for some
-parameters such as the search volume, natural mortality, and maximum
-consumption rates. You can change these defaults later if you have better
-estimates using `species_params()` or one of the `set*()` functions.
+These messages let us know when a default value was used for some parameter
+you didn't provide, and they come from two different places:
+
+- **mizer's own defaults** -- search volume (`gamma`), maximum consumption
+  rate (`h`), and the like. These are exactly what you'd see calling
+  `mizer::newMultispeciesParams()` directly; see mizer's [Setting
+  Parameters](https://sizespectrum.org/mizer/reference/setParams.html)
+  reference page for what each one is and how it's calculated.
+- **mizerReef's own defaults** -- `refuge_user`, `satiation`,
+  `algae_growth_initial` and the rest of the reef-specific mechanism, listed
+  in `vignette("mizerReef")`'s [Setting species parameters] and [Creating
+  your first model] sections and in `vignette("tuning-diet-composition")`.
+
+Either way, you can change the value later if you have a better estimate,
+using `species_params()` or one of the `set*()` functions.
 
 With a full species table, this wall of messages gets long. `newReefParams()`
 (and every other model-building function in mizerReef) takes an `info_level`

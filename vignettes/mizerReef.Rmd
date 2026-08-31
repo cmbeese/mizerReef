@@ -184,7 +184,7 @@ kable(
     Description = c(
       "TRUE if the group uses predation refuge (i.e., individuals hide inside habitat structure to avoid predators; typical for small-bodied or cryptic reef fish). FALSE for species that do not use refuge. FALSE by default",
       "TRUE if the group is blocked from accessing prey in refuge (i.e., predators that cannot reach prey hiding in refuge). FALSE for species with behavioural or morphological adaptations (e.g., eels) that allow them to access prey in refuge. FALSE by default.",
-      "TRUE if group is subject to satiation on unstructured resources (algae or detritus; default is TRUE for herbivores, FALSE for carnivores).",
+      "TRUE if group is subject to satiation on unstructured resources (algae or detritus). By default TRUE only for detritivores -- species that eat detritus but do not also graze algae or eat other species -- and FALSE for every other group, including herbivores.",
       "Proportion of diet from algae (0–1). 0 by default.",
       "Proportion of diet from detritus (0–1). 0 by default"
     )
@@ -193,10 +193,19 @@ kable(
 )
 ```
 
-By default, MizerReef will assign values to any missing parameters
-so that the corresponding feature is disabled, and issue a warning. See
-[setRefuge()], [setAlgaeParams()] and [setDetritusParams()] for additional
-details.
+Every one of these is a **mizerReef default**, not a mizer one: if you leave
+a column out (or leave a cell blank/`NA`), mizerReef fills it in with the
+value above so the corresponding feature is simply switched off for that
+species, and reports that it did so (see `info_level` below). You can
+override any of these -- either by including the column in your species
+table, or afterwards with `species_params(params)$refuge_user <- ...`
+(and similarly for the others) or the relevant `set*()` function
+(`setRefuge()` for `refuge_user`/`blocked_pred`/`satiation`,
+`setAlgaeParams()`/`setDetritusParams()` for the two interaction columns).
+[Setting the refuge profile] and `vignette("tuning-diet-composition")`
+cover the model-level defaults (not tied to one species) that these two
+setters also fill in -- things like how much of a refuge is ever protected,
+or algae's production rate.
 
 > <details> <summary>💡 <strong>Tip:</strong> When importing your species parameter table from a CSV, make sure that missing values are represented as NA or blank cells, not zeros.</summary> You can load your species parameter data frame into R using standard functions like <code>read.csv()</code> or <code>readxl::read_excel()</code>, depending on your file format. Ensure that the column names in your data frame match those expected by MizerReef. Use <code>na.strings = c(""," ")</code> in <code>read.csv()</code> to ensure blanks are read as <code>NA</code> rather than <code>0</code>. </details>
 
@@ -292,6 +301,28 @@ varies with prey size:
   ```
   </details>
 
+A few more refuge settings apply across all three methods rather than being
+part of `method_params`, and mizerReef fills them in with a default if you
+don't set them explicitly with `setRefuge()`/`newReefParams()`:
+
+```{r refuge-scalar-defaults-table, echo=FALSE, eval=TRUE}
+kable(
+  data.frame(
+    Argument = c("max_protect", "tau", "w_settle", "a_bar / b_bar",
+                 "use_dummy_fish_bins"),
+    Default = c("0.98", "1", "0.1 g", "0.025 / 3", "TRUE"),
+    Description = c(
+      "Cap on the proportion of any size class that refuge can ever protect, so some food always remains accessible to predators.",
+      "Proportion of refuge-eligible individuals that actually use a refuge when one is available.",
+      "Weight below which fish are assumed to be unsettled larvae, exempt from the refuge calculation.",
+      "Length-weight parameters for a 'dummy fish', used to convert refuge bin boundaries between length and weight, and to fill in a real species' own a/b if it's missing one.",
+      "Whether refuge bin boundaries are set by weight, using the dummy-fish a_bar/b_bar (TRUE), or by length, using each species' own a/b (FALSE)."
+    )
+  ),
+  caption = "mizerReef's default refuge settings, shared across all three methods."
+)
+```
+
 ### Refuge profiles and body shape {.section-refuge-example}
 
 This plot shows example refuge profiles created using each method and how they differ based on species body shape characteristics. The same set of species groups can receive
@@ -351,8 +382,45 @@ caribbean_10_model <- newReefParams(species_params = caribbean_10_species,
                                     method_params = tuning_profile)
 ```
 
+Besides the species-level and refuge-level defaults already covered above,
+`newReefParams()` makes a few default choices of its own about the
+underlying mizer model, some of which deliberately differ from what
+`mizer::newMultispeciesParams()` would otherwise choose:
+
+```{r construction-defaults-table, echo=FALSE, eval=TRUE}
+kable(
+  data.frame(
+    Argument = c("w_pp_cutoff", "n (and p)", "crit_feed"),
+    `mizerReef default` = c("1 g", "0.75", "0.7"),
+    `mizer's own default` = c("10 g", "2/3 (≈0.667); p defaults independently to 0.7", "(no equivalent)"),
+    Description = c(
+      "Maximum size of the plankton resource spectrum.",
+      "Allometric growth exponent; mizerReef also uses it for the metabolic exponent p, rather than defaulting p independently.",
+      "Target feeding level f0 used to calibrate each species' algae/detritus encounter rate (rho) at maximum size, for any species without its own f0."
+    ),
+    check.names = FALSE
+  ),
+  caption = "mizerReef's own defaults for underlying mizer construction arguments."
+)
+```
+
+These are ordinary `newReefParams()` arguments, so pass your own value the
+same way as any other (e.g. `newReefParams(..., w_pp_cutoff = 10)`). The
+`w_pp_cutoff` default in particular is worth knowing about if you're
+comparing against a plain mizer model or a worked example from elsewhere: a
+narrower plankton spectrum is a real, deliberate mizerReef choice, not an
+oversight, but it does mean plankton-mediated results can differ noticeably
+from the same species table run through base mizer's own default.
+
+For every other construction argument (`species_params`, `interaction`,
+`kappa`, `resource_rate`, and so on), `newReefParams()` simply passes your
+value straight through to `newMultispeciesParams()`, so mizer's own
+defaults and the messages it reports when using them apply unchanged --
+see mizer's [Setting Parameters](https://sizespectrum.org/mizer/reference/setParams.html)
+reference page for those.
+
 After creating your initial `params` object, you will typically run through a tuning
-sequence to calibrate biomasses and adjust reproduction, growth, and unstructured 
+sequence to calibrate biomasses and adjust reproduction, growth, and unstructured
 resource parameters to match observed data.
 
 
