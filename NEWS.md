@@ -1,5 +1,40 @@
 # MizerReef 2.0.3
 
+## Documentation
+
+- Vignettes reviewed and updated for accuracy against mizer 3.3 and the
+  `info_level` reporting mechanism (see New features below): `mizerReef`
+  and `steady-state-recipe` now mention `info_level` where model
+  construction is at its noisiest, and `setAlgaeParams()`/
+  `setDetritusParams()`'s roxygen docs no longer refer to a nonexistent
+  `resource_interaction` column (the actual column is
+  `interaction_resource`).
+- `steady-state-recipe.Rmd`'s "Understanding Reproduction Level and
+  Convergence" section is substantially condensed (it repeated the same
+  point about four times), and gains a new final step for rescaling algae
+  and detritus to a realistic absolute standing-biomass/turnover-time scale
+  with `rescale_algae()`/`detritus_lifetime()<-`, run only after diet,
+  biomass and growth tuning since it doesn't disturb consumption.
+- The "Getting started with MizerReef" vignette is split in two:
+  `mizerReef` now covers building and tuning a first model, and a new
+  `running-simulations` vignette covers changing the refuge profile and
+  projecting a tuned model forward (fishing pressure, habitat-degradation
+  trajectories).
+- `karpata_model-description.Rmd` and `caribbean_3_model-description.Rmd`
+  no longer restate the general model theory already covered in
+  `model-description.Rmd` (growth, mortality, reproduction, resource
+  dynamics); each now links out to it and keeps only what's specific to
+  its own example model. Their introductions are also sharpened:
+  `caribbean_3_model` reproduces the 3-group trait-based model from
+  Rogers (2018), while `caribbean_10_model`/Karpata is the field-calibrated,
+  finer-resolution extension of it.
+- New vignette `tuning-diet-composition.Rmd`, covering where diet
+  composition lives (`interaction_resource` vs. mizerReef's own
+  `interaction_algae`/`interaction_detritus`), how `tuneUR()`/`tuneUR_cc()`
+  keep algae and detritus in relative-scale balance as diet changes
+  (algae: fixed production, solved biomass; detritus: fixed biomass, solved
+  production -- the two are not symmetric), and how to read `plotDiet()`.
+
 ## New features
 
 - The reports mizerReef makes while building or changing a model go through

@@ -1,0 +1,206 @@
+---
+title: "Tuning Diet Composition"
+output:
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tuning Diet Composition}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+library(mizer)
+library(mizerExperimental)
+library(mizerReef)
+library(dplyr)
+```
+
+# Overview
+
+A mizerReef model's diet composition -- how much of each consumer's intake
+comes from other fish, from plankton, from algae, or from detritus -- is set
+by several parameters working together, and it interacts with the biomass
+and growth calibration covered in `vignette("steady-state-recipe")`. This
+vignette focuses on that interaction specifically: where diet composition
+actually lives in a mizerReef model, how it's kept in balance as you change
+it, and how to read `plotDiet()` to tell whether a diet is realistic.
+
+It assumes you already have a model near steady state (see
+`vignette("mizerReef")` and `vignette("steady-state-recipe")`); the worked
+example below uses the bundled `caribbean_3_model`.
+
+```{r load-model}
+data("caribbean_3_model")
+params <- caribbean_3_model
+```
+
+# Where diet composition lives
+
+A consumer's diet in mizerReef is split across up to four food sources: other
+fish (governed by the interaction matrix $\theta_{ij}$), plankton, algae, and
+detritus. The first three of these follow the same mizer/mizerReef pattern --
+a preference column between 0 and 1 -- but they're set through two different
+mechanisms, because algae and detritus are mizerReef's own invention and
+plankton is not:
+
+- **`interaction_resource`** (plankton) is a plain **mizer** species
+  parameter, part of the same machinery mizer uses for any background
+  resource. Set it the ordinary mizer way -- as a column in your species
+  table, or with `species_params(params)$interaction_resource <- value` --
+  there's no mizerReef-specific setter for it, because none is needed.
+- **`interaction_algae`** and **`interaction_detritus`** are mizerReef's own
+  columns, since mizer has no built-in notion of either resource. Set them
+  through `setAlgaeParams()`/`setDetritusParams()`'s `UR_interaction`
+  argument (which validates the values and can set several resources'
+  interaction columns at once), or as species parameter columns directly, the
+  same as `interaction_resource`.
+
+That's the asymmetry in full: `setAlgaeParams()`/`setDetritusParams()` (and
+`setURcapacity()` for the optional carrying-capacity variant) exist to
+configure resources mizer doesn't know about. They aren't a gap relative to
+`interaction_resource` -- mizer's own species-parameter machinery already
+covers that one.
+
+Two more parameters set the *power* of algae/detritus consumption, as
+opposed to the *preference* for it: `rho_algae` and `rho_detritus`
+(mass-specific consumption-rate coefficients). A species with
+`interaction_algae > 0` but `rho_algae = 0` still encounters no algae in
+practice -- `rho` and `interaction` multiply together in the encounter rate
+(see `vignette("model-description")`'s Encounter rate section).
+
+```{r diet-params-table}
+params@species_params %>%
+    select(species, interaction_algae, rho_algae,
+           interaction_detritus, rho_detritus) %>%
+    knitr::kable()
+```
+
+# Keeping algae and detritus in balance: `tuneUR()`
+
+Changing a diet-composition parameter changes how much algae or detritus is
+consumed, which knocks those two pools off their own steady state -- so a
+diet change needs to be followed by re-tuning them, not just the fish.
+`reefSteady()` does this automatically (it calls `tuneUR()`, or `tuneUR_cc()`
+for carrying-capacity models, once the fish sub-model has converged), but
+it's worth understanding exactly what each pool holds fixed, because the two
+are **not** symmetric:
+
+- **Algae's *production*** (`algae_growth_initial` in `setAlgaeParams()`,
+  called "growth" in the API but genuinely a production rate, in
+  g/m²/year) **is a fixed, literature-informed constant that is never
+  retuned to match consumption.** `tuneUR()` instead solves for algae's
+  *biomass*: at steady state, production $P_A$ and consumption $c_A B_A$
+  balance, so $B_A = P_A / c_A$. Turn up grazing pressure (more consumers,
+  or a higher `interaction_algae`/`rho_algae`) and the modelled algae
+  biomass goes *down* to match -- production itself never moves.
+- **Detritus is tuned the opposite way.** `tuneUR()` leaves detritus's
+  *current* biomass alone and instead solves for the *external-input* term
+  of its production -- the flux needed, on top of faeces and decomposing
+  carcasses, to keep the current biomass a steady state under current
+  consumption. So it's detritus's *production*, not its biomass, that
+  chases whatever consumption you set up -- the reverse of algae.
+
+Both of these are a **relative-scale** balance, done automatically as part
+of ordinary steady-state tuning. They say nothing about whether the
+resulting *absolute* biomass is realistic -- that's a separate, optional
+final step (`rescale_algae()`, `detritus_lifetime()<-`) covered in
+`vignette("steady-state-recipe")`'s last step, deliberately not duplicated
+here since it's independent of diet composition: it holds total consumption
+fixed while it corrects the scale.
+
+# Diet composition and growth: iterate, don't set once
+
+Changing a diet parameter changes realised encounter rates, which changes
+growth -- so a diet change usually needs another pass of
+`matchReefGrowth()`/`calibrateReefBiomass()` afterwards, exactly as in the
+main calibration recipe. Treat diet tuning as one more lever inside that
+same iterative loop, not a step you do once at the end:
+
+```{r diet-tuning-loop, eval=FALSE}
+# After adjusting interaction_algae/interaction_detritus/rho_algae/rho_detritus:
+params <- params |>
+    reefSteady() |>                 # re-balances algae/detritus (tuneUR())
+    calibrateReefBiomass() |> matchBiomasses() |> matchReefGrowth() |>
+    reefSteady()
+```
+
+# Reading `plotDiet()`
+
+`plotDiet()` shows, for each predator and size, the proportion of intake
+coming from each prey/resource category. A few things to look for:
+
+```{r plot-diet, fig.cap="Diet composition by predator and size for caribbean_3_model."}
+plotDiet(params)
+```
+
+- **A category near 0% or 100% across the whole size range** for a species
+  that should have a mixed diet usually means its `interaction_*`/`rho_*`
+  values for that resource are at their defaults (typically 0) rather than
+  set deliberately -- check the table above rather than assuming the model
+  has "decided" something ecologically.
+- **An ontogenetic shift that doesn't match expectations** (e.g. a species
+  that should transition from plankton to algae/detritus with size but
+  doesn't) usually means the allometric exponents on encounter
+  ($m_{alg}$/$m_{det}$, or the predation kernel for fish prey) need
+  adjusting, not just the preference values.
+- **Compare against `plotFeedingLevel()`** alongside diet: a species pinned
+  near a feeding level of 1 (fully satiated) can have a diet share that
+  looks reasonable in proportion while still indicating the *absolute* food
+  availability is off -- diet composition and feeding level are different
+  questions, and a model can get one right while the other is still wrong.
+
+```{r plot-feeding-level, fig.cap="Feeding level by species and size for caribbean_3_model."}
+plotFeedingLevel(params)
+```
+
+# Worked example: shifting a herbivore's diet
+
+Suppose `herbivores` in `caribbean_3_model` should draw relatively more of
+their diet from detritus and less from algae than the current calibration
+gives them. Adjust `interaction_algae`/`interaction_detritus`, then re-tune:
+
+```{r diet-shift-example}
+sp <- species_params(params)
+sp["herbivores", "interaction_algae"]
+sp["herbivores", "interaction_detritus"]
+
+params_shifted <- params
+species_params(params_shifted)["herbivores", "interaction_algae"] <- 0.5
+species_params(params_shifted)["herbivores", "interaction_detritus"] <- 0.5
+params_shifted <- reefSteady(params_shifted)
+```
+
+```{r plot-diet-comparison, fig.cap="Herbivore diet before (top) and after (bottom) shifting interaction_algae/interaction_detritus.", fig.height=8}
+patchwork::wrap_plots(
+    plotDiet(params, species = "herbivores") + ggplot2::ggtitle("Original"),
+    plotDiet(params_shifted, species = "herbivores") + ggplot2::ggtitle("Shifted"),
+    ncol = 1
+)
+```
+
+Note that `reefSteady()` alone only re-balances algae and detritus around
+the *same* fish abundances -- it doesn't re-match biomass or growth to
+observations. A real diet retuning would follow this with the
+`calibrateReefBiomass()`/`matchBiomasses()`/`matchReefGrowth()` loop shown
+above before treating the result as a finished, calibrated model.
+
+# See also
+
+- `vignette("steady-state-recipe")` for the full calibration recipe this
+  fits into, including the final absolute-scale rescaling step.
+- `vignette("model-description")`'s [Encounter
+  rate](model-description.html#encounter-rate) and [unstructured resource
+  dynamics](model-description.html#unstructured-resource-dynamics) sections
+  for the underlying formulas.
+- `?setAlgaeParams`, `?setDetritusParams`, `?tuneUR`, `?matchReefGrowth`,
+  `?plotDiet`
+
+```{r session-info, echo = FALSE}
+sessionInfo()
+```
