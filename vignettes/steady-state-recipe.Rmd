@@ -76,7 +76,24 @@ params <- newReefParams(species_params = caribbean_10_species,
                         method_params = tuning_profile)
 ```
 
-These warnings let us know when the packages set default values for some parameters such as the search volume, natural mortality, and maximum consumption rates. You can change these defaults later if you have better estimates using `species_params()` or one of the `set*()` functions. 
+These messages let us know when the package set default values for some
+parameters such as the search volume, natural mortality, and maximum
+consumption rates. You can change these defaults later if you have better
+estimates using `species_params()` or one of the `set*()` functions.
+
+With a full species table, this wall of messages gets long. `newReefParams()`
+(and every other model-building function in mizerReef) takes an `info_level`
+argument to control it: `info_level = 1` keeps only the reports that say
+something went differently from what you actually asked for (dropping the
+routine default-value fills), and `info_level = 0` is silent. For example:
+
+```{r create-initial-params-quiet, eval=FALSE}
+params <- newReefParams(species_params = caribbean_10_species,
+                        interaction = caribbean_10_interaction,
+                        method = "binned",
+                        method_params = tuning_profile,
+                        info_level = 1)
+```
 
 Let's examine the species groups and their key parameters:
 
@@ -130,131 +147,35 @@ oscillations.
 
 ## Understanding Reproduction Level and Convergence
 
-### What does reproduction_level control?
+`reproduction_level` controls the functional form of the Beverton-Holt
+stock-recruitment relationship, from 0 (maximum compensation: recruitment
+saturates quickly against spawning biomass) to 1 (mizer's default, no
+compensation: recruitment is directly proportional to spawning biomass).
 
-The `reproduction_level` parameter controls the **functional form** of the 
-Beverton-Holt stock-recruitment relationship. It ranges from 0 (maximum 
-compensation) to 1 (no compensation):
+Reef models add several sources of non-linearity beyond a standard mizer
+model -- coupled algae/detritus/plankton dynamics, refuge mechanisms whose
+effect on predation mortality is itself density-dependent, and the iterative
+`calibrateReefBiomass()`/`matchReefGrowth()` loops used to reach them. With
+no reproductive compensation (`reproduction_level = 1`), there's nothing to
+damp these interacting non-linearities, and `reefSteady()`'s search for an
+equilibrium (where it repeatedly adjusts `erepro` to drive births toward
+deaths) can fail to converge or oscillate. Moderate compensation
+(`reproduction_level = 0.5`) provides just enough stabilizing feedback to
+damp this without itself being steep enough to cause the solver to
+overshoot, which is what happens as compensation gets stronger still
+(`reproduction_level` near 0). This isn't purely a numerical convenience,
+either: many reef fish have an open recruitment system, with larvae
+dispersing widely and local recruitment only weakly tied to local spawning
+stock, which is itself closer to moderate than to zero or maximum
+compensation.
 
-- **reproduction_level = 1** (mizer default): Purely density-**independent**. 
-  Recruitment is directly proportional to spawning biomass with no compensatory 
-  feedback. Linear response.
-  
-- **reproduction_level = 0.5** (intermediate): Moderate density-**dependence**. 
-  Recruitment saturates somewhat as spawning biomass increases, providing 
-  compensatory feedback but not extreme non-linearity.
-  
-- **reproduction_level = 0** (maximum): Strongly density-**dependent**. 
-  Recruitment saturates quickly, creating steep non-linear response curves. 
-  Maximum compensation.
-
-### Why does pure density-independence (default) fail in reef models?
-
-During `reefSteady()` (which is also what mizer's `tuneSteadyState()`, and its
-superseded alias `steady()`, run on a reef model), the algorithm iteratively
-adjusts `erepro` (egg production efficiency) to drive each species toward
-equilibrium where births equal deaths. 
-
-**With pure density-independence (reproduction_level = 1, the mizer default):**
-
-1. **No stabilizing feedback**: Biomass fluctuations have no compensatory 
-   response in recruitment.
-   
-2. **Compounded instability**: Reef models add multiple non-linearities (refuge 
-   dynamics, multiple resources). Without reproductive compensation to dampen 
-   fluctuations, these non-linearities interact chaotically.
-   
-3. **Failed convergence**: The solver can't find a stable equilibrium because 
-   small perturbations propagate without feedback.
-
-**With moderate density-dependence (reproduction_level = 0.5):**
-
-- **Stabilizing feedback**: If biomass drops, recruitment compensates somewhat, 
-  preventing runaway collapses.
-  
-- **Smooth response**: The compensation is gradual, not steep, so the solver 
-  can iterate without overshooting.
-  
-- **Convergence**: The system finds a stable equilibrium where reproductive 
-  feedback balances the reef non-linearities.
-
-**With strong density-dependence (reproduction_level near 0):**
-
-- **Too steep**: The compensation curve becomes so non-linear that the solver 
-  overshoots targets, creating oscillations again.
-
-### Why are reef models especially sensitive?
-
-MizerReef models add multiple sources of non-linearity:
-
-- **Multiple resources** (algae, detritus, plankton) with their own coupled 
-  dynamics
-- **Refuge mechanisms** that non-linearly affect predation mortality based on 
-  density
-- **Iterative calibration loops** (`calibrateReefBiomass`, `matchReefGrowth`) 
-  that compound small instabilities
-
-With **no density-dependence** (mizer default), there's no compensatory 
-feedback to stabilize these interacting non-linearities. The system has too 
-many sources of instability and no damping mechanism.
-
-With **moderate density-dependence** (0.5), reproductive compensation provides 
-just enough stabilizing feedback without adding another steep non-linearity. 
-This balances the non-linearity budget and allows convergence.
-
-With **strong density-dependence** (near 0), the steep compensation curve 
-itself becomes a destabilizing non-linearity, causing overshooting.
-
-### What does reproduction_level do outside of steady state?
-
-During forward projections (`project()`), `reproduction_level` controls how 
-recruitment responds to biomass perturbations:
-
-- **Low (high density-dependence)**: Strong compensatory dynamics. Overfished 
-  stocks recover faster because recruitment is maintained even at low spawning 
-  biomass. Boom-bust cycles are naturally damped.
-  
-- **High (low density-dependence)**: Recruitment tracks spawning biomass more 
-  directly with less compensation. Populations are more vulnerable to collapse 
-  but also track environmental drivers more closely.
-
-### Is this biologically realistic for reefs?
-
-For many reef fish species, **moderate density-dependence is often more 
-realistic** than either pure density-independence or strong compensation:
-
-- **Larval dispersal**: Reef fish larvae disperse widely in ocean currents. 
-  Local recruitment is weakly (but not completely) tied to local spawning stock 
-  because recruits come from both local and distant populations (open 
-  recruitment system). This creates weak to moderate density-dependence.
-  
-- **Connectivity**: Reef ecosystems are highly interconnected through larval 
-  exchange. Local density-dependent feedbacks exist but are dampened by 
-  connectivity, resulting in moderate (not strong) compensation.
-  
-- **Environmental variability**: Recruitment is driven by both spawning stock 
-  and oceanographic conditions. Pure density-independence (default mizer) would 
-  ignore biological reality that spawning stock matters *somewhat*.
-
-Therefore, setting `reproduction_level` to 0.5 is not just numerically 
-convenient—it often better reflects reef fish biology than either extreme 
-(pure density-independence or maximum compensation).
-
-### Recommended workflow
-
-1. **During calibration**: Set `reproduction_level` to 0.5 (moderate 
-   density-dependence) to ensure convergence while matching biomasses and 
-   growth rates. This provides stabilizing feedback without extreme 
-   non-linearity.
-   
-2. **After calibration**: You can optionally increase `reproduction_level` 
-   toward 1 (less compensation) if you believe recruitment is very weakly 
-   density-dependent, or decrease it toward 0 (stronger compensation) if you 
-   need to test recovery dynamics from overfishing.
-   
-3. **For reef models**: Keeping `reproduction_level` at moderate values 
-   (around 0.5) throughout is usually both numerically stable and biologically 
-   defensible for most reef fish with moderate connectivity.
+**Recommended workflow**: use `reproduction_level = 0.5` throughout
+calibration for stable convergence while matching biomasses and growth
+rates. Afterwards, you can move it toward 1 if you believe recruitment is
+very weakly density-dependent for your system, or toward 0 to test recovery
+dynamics from overfishing -- but moderate values are usually both the most
+numerically stable and the most biologically defensible default for reef
+fish with typical connectivity.
 
 </details>
 
@@ -403,6 +324,58 @@ kable(data.frame(Species = names(rdi_rdd_ratio),
       digits = 2)
 ```
 
+# Step 7: Rescale Algae and Detritus to a Realistic Absolute Scale
+
+Steps 3-6 above tune algae and detritus *relative* to the fish sub-model --
+`reefSteady()` calls `tuneUR()`/`tuneUR_cc()` internally, which balances
+each pool's production against consumption (see
+`vignette("model-description")`'s Algae and Detritus sections for exactly
+what's held fixed for each). That balance says nothing about the pools'
+*absolute* scale, though, and reaching it usually leaves algae and detritus
+biomass far from a realistic standing stock: every biomass-correction step
+above (`calibrateReefBiomass()` in particular) necessarily rescales the
+species' interaction strength with algae/detritus (`rho_algae`/
+`rho_detritus`) to preserve feeding level as fish abundances are corrected --
+the same principle mizer itself uses for `gamma`/search volume -- and that
+repeated rescaling drives the *absolute* biomass scale down over the course
+of calibration, even though nothing about it is wrong.
+
+The fix is a final, deliberately non-disruptive correction:
+`rescale_algae()`/`rescale_detritus()` multiply a pool's biomass by a factor
+and divide the consuming species' interaction strength by the same factor,
+so **total consumption -- and therefore the already-tuned fish
+sub-model -- is completely unaffected**. `detritus_lifetime() <-` is a
+convenience wrapper around `rescale_detritus()` that targets a turnover time
+(biomass / consumption rate) instead of a raw factor; there is no equivalent
+setter for algae, so target its standing biomass directly with
+`rescale_algae()`.
+
+This is why the step belongs at the *end* of the recipe, not earlier:
+because it doesn't touch consumption, it doesn't need to be redone after a
+biomass or growth match, and running it before one would just be undone by
+the next `calibrateReefBiomass()` call.
+
+```{r rescale-algae-detritus, eval=FALSE}
+# Detritus: target a literature turnover time directly.
+# e.g. Max, Hamilton, Gaines & Warner (2013, Mar. Ecol. Prog. Ser. 482:181-195)
+# measured a 2.8-4.9 hour benthic detritus residence time at Palmyra Atoll;
+# here we target the midpoint, expressed in years.
+detritus_lifetime(params) <- 3.85 / (24 * 365)
+
+# Algae: target a literature standing biomass directly with rescale_algae().
+# Grazed Caribbean algal turf standing stock is commonly cited on the order
+# of 10-100 g dry weight/m^2 -- convert to whatever mass units your own
+# biomass_observed data uses (usually wet weight, via a site-specific
+# dry:wet ratio) before using it as `target_algae_biomass` below, rather
+# than reusing a number tuned for a different dataset.
+params <- rescale_algae(params, target_algae_biomass / algae_biomass(params))
+
+# Neither call requires re-running reefSteady() -- they don't change
+# consumption, only the reported biomass and rho -- but it's good practice
+# to confirm the biomass match is still exact:
+plotBiomassObservedVsModel(params)
+```
+
 ## Final Model Validation
 
 Let's examine the final model performance across multiple metrics:
@@ -431,6 +404,7 @@ This recipe provides a systematic approach to tuning `MizerReef` models:
 3. **Iterative matching**: Repeatedly match biomasses and growth rates
 4. **Add complexity**: Switch to competitive refuge method when stable
 5. **Final tuning**: Adjust reproduction parameters for realistic dynamics
+6. **Rescale resources**: Correct algae/detritus to a realistic absolute scale, last, since it doesn't disturb anything tuned before it
 
 ## Key Functions Used
 
@@ -438,8 +412,9 @@ This recipe provides a systematic approach to tuning `MizerReef` models:
 - `setBevertonHolt()`: Set reproduction parameters
 - `reefSteady()`: Project to steady state
 - `calibrateReefBiomass()`: Match observed biomasses
-- `matchReefGrowth()`: Match growth rates  
+- `matchReefGrowth()`: Match growth rates
 - `newRefuge()`: Switch refuge methods
+- `rescale_algae()`, `detritus_lifetime()<-`: Correct absolute resource scale without disturbing consumption
 - Various plotting functions for validation
 
 ## Complete Tuning Script
@@ -505,6 +480,11 @@ params <- setBevertonHolt(params, erepro = 0.35)
 params <- setBevertonHolt(params, reproduction_level = rdi)
 params <- params |>
     reefSteady() |> reefSteady() |> reefSteady()
+
+# 7. Rescale algae/detritus to a realistic absolute scale. Does not disturb
+# consumption, so no further reefSteady() calls are needed for this step.
+detritus_lifetime(params) <- 3.85 / (24 * 365)
+params <- rescale_algae(params, target_algae_biomass / algae_biomass(params))
 
 # Save final model
 caribbean_10_model <- reefSteady(params)
