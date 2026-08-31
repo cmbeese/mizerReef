@@ -107,7 +107,7 @@ interaction via the UR_interaction argument.
  algae biomass will be limited by the specified capacity.
 
  Note: Interaction with size-structured resources, such as plankton,
- is set with the resource_interaction column of the species parameters
+ is set with the interaction_resource column of the species parameters
  dataframe.
 }\if{html}{\out{</div>}}
 }
