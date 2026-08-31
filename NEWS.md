@@ -34,6 +34,21 @@
   keep algae and detritus in relative-scale balance as diet changes
   (algae: fixed production, solved biomass; detritus: fixed biomass, solved
   production -- the two are not symmetric), and how to read `plotDiet()`.
+- Every value mizerReef itself chooses as a default (as opposed to mizer's
+  own defaults, which are only pointed at mizer's reference page rather
+  than restated) is now named across the vignettes, with its actual value
+  and how to override it: the species-level flags in `mizerReef.Rmd`
+  (including a fix -- `satiation` was documented as defaulting to TRUE for
+  herbivores, when it actually defaults to TRUE only for pure
+  detritivores, matching `model-description.Rmd`'s always-correct
+  description and the source), the refuge-profile scalars
+  (`max_protect`, `tau`, `w_settle`, `a_bar`/`b_bar`,
+  `use_dummy_fish_bins`), `newReefParams()`'s own construction-level
+  choices (`w_pp_cutoff = 1` vs. mizer's `10`; `n = 0.75`, also reused as
+  `p`, vs. mizer's `2/3`; `crit_feed = 0.7`), and the algae/detritus/
+  external-mortality model-level defaults (`algae_growth_initial`,
+  capacities, `sen_decomp`/`ext_decomp`, `nat_mort`/`sen_prop`/`sen_curve`,
+  `use_UR_cc`).
 
 ## New features
 
