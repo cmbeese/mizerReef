@@ -273,7 +273,7 @@ independent of the functional groups and group abundances. It is assumed
 to decrease allometrically with body size:
 
 $$
-\mu_{nat.i}(w) = \mu_{nat} w^{1 - n}
+\mu_{nat.i}(w) = \mu_{nat} w^{n - 1}
 $$ {#eq-z0} where $\mu_{nat}$ is the residual natural mortality rate and
 $n$ is the allometric scaling exponent. We use a residual mortality rate of
 $\mu_{nat} =$ `r ext_mort$nat_mort` per year at size 1 gram.

@@ -29,7 +29,7 @@
 #'
 #' @param z0pre If `include_ext_mort`is FALSE, the external mortality rate for
 #'              each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
-#'              to 1-n where n is the given allometric scaling exponent and
+#'              to n-1 where n is the given allometric scaling exponent and
 #'              z0pre defaults to 0.2.
 #'
 #' @param new_refuge Logical. If TRUE, indicates this refuge profile is being
@@ -373,7 +373,7 @@ newReefParams <- function( # Original mizer parameters
         ext_mort_params <- params@other_params[["ext_mort_params"]]
 
         # Change to allometric external mortality
-        z0exp <- 1 - n
+        z0exp <- n - 1
         nat_mort <- ext_mort_params$nat_mort
         nat_mort <- rep(nat_mort, nrow(species_params(params)))
         allo_mort <- outer(nat_mort, params@w^(z0exp))
@@ -383,7 +383,7 @@ newReefParams <- function( # Original mizer parameters
     } else {
         # Set coefficient for each species. Here we choose 0.1 for each species
         z0pre <- rep(z0pre, nrow(species_params(params)))
-        z0exp <- 1 - n
+        z0exp <- n - 1
         # Multiply by power of size with exponent, here chosen to be -1/4
         # The outer() function makes it an array species x size
         allo_mort <- outer(z0pre, w(params)^z0exp)

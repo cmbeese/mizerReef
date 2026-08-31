@@ -296,7 +296,7 @@ into refuge apply the full mortality. This is computed by `reefPredMort()`.
 Mortality from sources not modelled explicitly (predators outside the model,
 disease, and so on) is taken to be allometric in size,
 $$
-\mu_{nat.i}(w) = \mu_{nat}\, w^{\,1-n},
+\mu_{nat.i}(w) = \mu_{nat}\, w^{\,n-1},
 $$
 with $\mu_{nat}$ the rate at $1$ g (`nat_mort`, default $0.2$) and $n$ the
 growth exponent. This is mizerReef's external mortality $\mu_{ext.i}(w)$ and
@@ -444,7 +444,7 @@ and reduces to the linear case as $K \to \infty$.
 | Prey availability | full abundance $N_j(w)$ | discounted by vulnerability $V_{ij}(w)\,N_j(w)$ |
 | Encounter | plankton + fish | plankton + fish + algae + detritus |
 | Satiation | all groups | optional; off for carnivores |
-| External mortality | constant $z0_i$ | $\mu_{nat}\,w^{1-n}$ plus senescence $\mu_{sen.i}(w)$ |
+| External mortality | constant $z0_i$ | $\mu_{nat}\,w^{n-1}$ plus senescence $\mu_{sen.i}(w)$ |
 | Extra resources | resource spectrum only | plus unstructured pools $B_A$, $B_D$ |
 
 For how these equations are realised through mizer's extension mechanism (S3

@@ -107,7 +107,7 @@ test_that("newReefParams computes external mortality using the allometric z0pre 
         z0pre = 0.15,
         n = 0.75
     ))
-    expected_mort <- outer(rep(0.15, 3), result@w^0.25)
+    expected_mort <- outer(rep(0.15, 3), result@w^(-0.25))
     expect_equal(mizer::ext_mort(result), expected_mort, ignore_attr = TRUE)
 })
 
@@ -123,7 +123,7 @@ test_that("newReefParams computes external mortality using nat_mort = 0.2 defaul
         include_ext_mort = TRUE,
         n = 0.75
     ))
-    expected_mort <- outer(rep(0.2, 3), result@w^0.25)
+    expected_mort <- outer(rep(0.2, 3), result@w^(-0.25))
     expect_equal(mizer::ext_mort(result), expected_mort, ignore_attr = TRUE)
 })
 

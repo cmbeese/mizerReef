@@ -70,6 +70,24 @@
   skipped `calibrateReefBiomass()`. Run `calibrateReefBiomass()` before
   `matchReefGrowth()`/`matchBiomasses()` to resolve it.
 
+## Bug fixes
+
+- `newReefParams()`'s residual (non-senescence) natural mortality,
+  $\mu_{nat.i}(w) = \mu_{nat}\, w^{z0exp}$, computed `z0exp <- 1 - n` instead
+  of `z0exp <- n - 1`, so with the default `n = 0.75` mortality *increased*
+  with body size (`w^0.25`) instead of decreasing (`w^-0.25`) -- the opposite
+  of the allometric decline the function's own documentation described, of
+  mizer's own `setExtMort()` default (`z0exp = resource_params$n - 1`), and
+  of the literature this formula is drawn from (Rogers et al. 2018 Appendix
+  S1, Table S2: $D_{iO}(m) = \mu\, m^{-0.25} + \dots$). Affected both the
+  `include_ext_mort = TRUE` and `= FALSE` branches, and has been present
+  since the function's first commit. Confirmed via a controlled comparison
+  that the sign was not the source of the `caribbean_3` fresh-rebuild
+  growth-matching instability (see the guard-rail warning above) -- both
+  signs diverge at the same iteration once predators' `gamma` is held at its
+  literature value -- so this is a standalone correctness fix, not a
+  resolution of that instability.
+
 ## Not converted, deliberately
 
 Ten reports stay as plain `message()`/`warning()` calls:
