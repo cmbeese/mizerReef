@@ -70,18 +70,6 @@
   skipped `calibrateReefBiomass()`. Run `calibrateReefBiomass()` before
   `matchReefGrowth()`/`matchBiomasses()` to resolve it.
 
-- `newReefParams()` gains a `kappa` argument, defaulting to the new exported
-  constant `reef_kappa_default` (`100`) instead of silently inheriting
-  `newMultispeciesParams()`'s own default (`1e11`, a placeholder unrelated to
-  any particular model's scale). Reef models' typical biomass totals
-  (order-of-magnitude 10-1000 g/m^2) sit many orders of magnitude closer to
-  `100` than to `1e11`; starting closer reduces the size of the rescale
-  `calibrateReefBiomass()`'s first call has to make to reach a realistic
-  scale, which is where this kind of model has been observed to become
-  numerically fragile. Still an uncalibrated placeholder, just a
-  substantially less extreme one -- the guard-rail warning above now checks
-  against both `1e11` and `reef_kappa_default`.
-
 ## Bug fixes
 
 - The bundled `caribbean_3_model`/`caribbean_3_species`/
@@ -91,17 +79,26 @@
   recalibration did. Biomass and age at maturity both match the
   `biomass_observed`/`age_mat` targets closely (predators 107.09/107,
   herbivores 34.00/34, inverts 40.00/40 g/m^2; age_mat 4.00/4.0,
-  1.60/1.6 years). **Known limitation, not resolved by this rebuild**:
-  predators' realized diet is dominated by background "Resource" at
-  essentially every size, rather than the herbivore/invert/cannibalism mix
-  Rogers et al. 2018's own model shows. Pinning predators' `gamma` to
-  Rogers' own literature value (Appendix S1 Table S2, 6.4 m^2/yr) and
-  separately retuning the resource abundance scale/slope were both tried
-  and abandoned after extensive investigation -- both destabilize the
-  model rather than improving diet realism, once actually taking effect
-  (an earlier attempt at the `gamma` pin looked like it worked but was
-  silently a no-op). See the `caribbean-3-fresh-rebuild-diet-bug` project
-  history for the full derivation.
+  1.60/1.6 years). Predators' realized diet, previously dominated by
+  background "Resource" at essentially every size (a pre-existing issue,
+  not introduced here), now shows real, substantial piscivory across the
+  size range (real-prey fraction 0.3% -> 4% -> 62% -> 92% -> 99.7% at
+  w=4.7/53/510/933/1986g) via a new final calibration step using
+  `mizerExperimental::scaleDownBackground()`, which shifts the
+  fish-vs-resource abundance balance in a dimensionally-safe way. Two
+  other approaches to the same problem were tried and abandoned first:
+  pinning predators' `gamma` to Rogers et al. 2018's literature value
+  (Appendix S1 Table S2, 6.4 m^2/yr, which destabilizes the model once an
+  earlier no-op bug in the pinning helper is fixed) and retuning the
+  resource abundance scale/slope directly after biomass calibration
+  (unstable across its entire tested range). As a side effect,
+  `scaleDownBackground()` also resolved a previously undiagnosed growth
+  wall: predators' growth energy hit exactly zero around w=900-1000g
+  (well short of `w_inf=3125g`) because background Resource, capped at
+  `w_pp_cutoff=1g`, becomes inaccessible to predators once their
+  preferred prey size exceeds that cutoff, and there wasn't enough real
+  prey to fill the gap. See the `caribbean-3-fresh-rebuild-diet-bug`
+  project history for the full derivation.
 
 - `newReefParams()`'s residual (non-senescence) natural mortality,
   $\mu_{nat.i}(w) = \mu_{nat}\, w^{z0exp}$, computed `z0exp <- 1 - n` instead

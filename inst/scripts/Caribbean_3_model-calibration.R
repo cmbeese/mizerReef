@@ -29,54 +29,59 @@
 # See the caribbean-3-fresh-rebuild-diet-bug memory (or ask about that
 # investigation) for the complete derivation.
 #
-## KNOWN OPEN ISSUE, not resolved -- predator diet is background-Resource-
-## dominated, not fixed here ------------------------------------------------
+## Diet realism: RESOLVED via mizerExperimental::scaleDownBackground() -------
 #
-# With this recipe, predators' realized diet is ~100% background "Resource"
-# at essentially every size, not the mix of cannibalism/herbivore/invert
-# predation Rogers 2018's own model shows. Two things were tried and
-# abandoned after extensive investigation, both documented in detail in the
-# caribbean-3-fresh-rebuild-diet-bug memory:
+# Earlier versions of this script left predator diet background-Resource-
+# dominated at every size. That's fixed now (Step 6, below) using
+# `scaleDownBackground()`, which also turned out to fix a second, related
+# problem never previously diagnosed: predators' growth energy hit exactly
+# zero around w=900-1000g and abundance was exactly zero above that --
+# well short of `w_inf=3125g` -- because background Resource (capped at
+# `w_pp_cutoff=1g`) becomes inaccessible to predators once their preferred
+# prey size (`w/beta`) exceeds 1g (at `w = beta * w_pp_cutoff = 100g`), and
+# there wasn't enough real prey to fill the gap. With Step 6, predators now
+# grow smoothly all the way to `w_inf` and real-prey fraction (herbivore +
+# invertebrate + cannibalism) reaches ~93% at w=933g (up from <1% before).
+# Three things were tried before finding this, documented in full detail in
+# the caribbean-3-fresh-rebuild-diet-bug memory:
 #
 #   1. Pinning predators' `gamma` (search volume) to Rogers 2018's own
-#      literature value (Appendix S1 Table S2, A_P = 6.4 m^2/yr) so that
-#      predators search for prey at a realistic rate. This is NOT simply a
-#      matter of setting `gamma = 6.4` in the CSV: a helper that pins
-#      `species_params$gamma` directly without going through
-#      `species_params<-()` looks like it works (search_vol stays
-#      unaffected, `isSteady()` stays TRUE, diagnostics look fine) but is a
-#      no-op -- it never touches `@search_vol`, the slot mizer's dynamics
-#      actually read, so `gamma` in species_params silently disagrees with
-#      the model's real behaviour. Once fixed to genuinely take effect
-#      (via `species_params(params) <- ...`, which properly rescales
-#      `search_vol` too), pinning gamma=6.4 destabilizes the model outright
-#      -- predators' realized age at maturity collapses to ~0.002 years,
-#      nowhere near sane. This is NOT simply a bug to fix: seeding `kappa`
-#      directly from Rogers' own recruit-intercept recipe (~32, independent
-#      of the biomass-matching loop) still only gets predators' naturally-
-#      derived gamma to ~0.17, and once the biomass-matching loop actually
-#      runs to hit `biomass_observed`, `kappa` gets pulled back to ~305-311
-#      regardless of where it started -- i.e. `biomass_observed=107` (the
-#      FORCE field survey) and Rogers' own internally-consistent literature
-#      parameterization may simply not be simultaneously satisfiable in
-#      this model. This is consistent with Part 2/3 of the memory's
-#      `getStability()` finding that gamma=6.4 alone sits on a near-Hopf
-#      bifurcation with a 284-year relaxation timescale.
-#   2. Separately retuning `kappa`/`lambda` (the resource abundance scale
-#      and slope) toward Rogers' own resource description, without forcing
-#      gamma at all, to shift the balance away from background Resource.
-#      This is ALSO unstable: even a fully gradual, biomass-matching-
-#      interleaved transition from the naturally-calibrated kappa (~311)
-#      toward a lower value diverges (`erepro` exploding from ~1e-5 to
-#      ~4e4 across a few gentle steps) -- this is a genuine dynamical
-#      instability in this region of parameter space, not a step-size or
-#      sequencing bug.
+#      literature value (Appendix S1 Table S2, A_P = 6.4 m^2/yr). Abandoned:
+#      a helper that pins `species_params$gamma` directly without going
+#      through `species_params<-()` looks like it works but is a no-op --
+#      it never touches `@search_vol`, the slot mizer's dynamics actually
+#      read. Once fixed to genuinely take effect, pinning gamma=6.4
+#      destabilizes the model outright (age at maturity collapses to
+#      ~0.002 years). Consistent with the memory's `getStability()` finding
+#      that gamma=6.4 alone sits on a near-Hopf bifurcation with a
+#      284-year relaxation timescale.
+#   2. Retuning `kappa`/`lambda` (the resource abundance scale and slope)
+#      *after* biomass calibration has already converged, without forcing
+#      gamma. Abandoned: unstable across the entire range tested (targets
+#      from kappa=80 down to kappa=4, 8-15 gradual steps, with or without
+#      matchReefGrowth() in the polish phase) -- `erepro` explodes rather
+#      than settling, a genuine dynamical instability in this region of
+#      parameter space, not a step-size or sequencing bug.
+#   3. `kappa` matters a great deal at *construction* time, before any
+#      calibration runs, and not at all as something to retune afterward:
+#      `calibrateReefBiomass()` called once from mizer's own uncalibrated
+#      default (kappa=1e11, no package override) lands calibration in a
+#      meaningfully better basin (real-prey fraction ~20% at w=933g) than
+#      a lower seed does (a kappa=100 seed lands at real-prey fraction
+#      ~8%) -- a real, stable improvement, but not enough on its own.
+#   4. **This is what Step 6 below actually uses**: `scaleDownBackground()`
+#      (see its own comment at Step 6 for the mechanism) shifts the
+#      fish-vs-resource abundance balance in a dimensionally-safe way,
+#      without touching gamma or kappa/lambda directly. Combined with the
+#      kappa=1e11 basin from (3), this reaches real-prey fraction ~93% at
+#      w=933g and, as a side effect, resolves the growth-wall problem too
+#      (see above) -- genuinely resolving what (1) and (2) could not.
 #
-# Both were abandoned as not simultaneously achievable with the current
-# `biomass_observed` targets and interaction/mortality parameters. The
-# honest deliverable is: biomass and age-at-maturity match survey targets
-# well; predator diet realism is a real, open limitation, flagged here for
-# a future session rather than papered over.
+# The honest deliverable is: biomass and age-at-maturity match survey
+# targets well, and predator diet now shows real, substantial piscivory
+# (still more cannibalism-heavy than Rogers 2018's own herb/invert-
+# dominant weights -- a remaining, smaller gap, not the near-total absence
+# of piscivory this recipe started with).
 
 ## Design note: satiation = TRUE and age_mat = 1.6 for herbivores ---------------
 #
@@ -190,12 +195,28 @@ params <- params |>
 stopifnot(mizer::isSteady(params))
 log_msg("initial settle complete, isSteady=TRUE")
 
-## Step 3: official undamped calibration loop ------------------------------------
-params <- calibrateReefBiomass(params) |> matchBiomasses() |> reefSteady() |>
-    matchReefGrowth() |> reefSteady()
-for (i in 1:8) {
+## Step 3: calibrate biomass ONCE, then iteratively fine-tune -------------------
+## `calibrateReefBiomass()` does a one-shot rescale of kappa/gamma/abundance
+## to bring the model onto the right absolute scale -- it is meant to run
+## once, not be looped. Looping it (as an earlier version of this script
+## did, 9 times total) does not diverge, but does land the model in a
+## meaningfully worse final kappa/diet basin: calling it once from mizer's
+## own default kappa (1e11, no override -- see note above) settles at
+## kappa~107 with real-prey fraction ~20% at 933g; looping it 9 times from
+## the SAME starting kappa settles at kappa~103 (materially the same,
+## confirming looping isn't itself the problem there) -- but looping it 9
+## times from a *seeded* kappa=100 (this package's former, since-removed
+## reef_kappa_default) settles at kappa~305-311 with real-prey fraction
+## ~8%, a clearly worse basin. The single-call structure below matches
+## vignettes/steady-state-recipe.Rmd's own Step 4a/4b, is simpler, and
+## reliably lands in the better basin regardless of iteration count.
+params <- calibrateReefBiomass(params)
+params <- reefSteady(params)
+log_msg(sprintf("Step 3: single calibrateReefBiomass(), dist=%.4g kappa=%.4g",
+                 dist_to_target(params), params@resource_params$kappa))
+for (i in 1:6) {
     params <- params |>
-        calibrateReefBiomass() |> matchBiomasses() |> matchReefGrowth() |>
+        matchBiomasses() |> matchReefGrowth() |>
         reefSteady()
     log_msg(sprintf("Step 3 iter %d: dist=%.4g", i, dist_to_target(params)))
 }
@@ -245,7 +266,7 @@ params <- setBevertonHolt(params, reproduction_level = rep_level)
 log_msg("setBevertonHolt reproduction_level", paste(names(rep_level), rep_level, sep = "=", collapse = ";"))
 
 for (i in 1:3) {
-    params <- calibrateReefBiomass(params) |> matchBiomasses() |>
+    params <- matchBiomasses(params) |>
         matchReefGrowth() |> reefSteady()
 }
 log_msg("post-reproduction refinement x3")
@@ -303,11 +324,59 @@ cat("After Step 5 (algae/detritus rescale), dist:", dist_to_target(params), "\n"
 cat("algae biomass:", params@initial_n_other$algae, " detritus_lifetime (h):",
     detritus_lifetime(params) * 8760, "\n")
 
-# Diet real-prey-fraction check (see KNOWN OPEN ISSUE note above -- this is
-# expected to be small/background-Resource-dominated; not yet resolved).
+## Step 6: scaleDownBackground() -- shift the fish-vs-resource balance -----------
+## Diet realism (see KNOWN OPEN ISSUE note above) is fixed here, not by
+## touching gamma or kappa/lambda directly (both dead ends -- see above),
+## but by mizerExperimental's `scaleDownBackground(params, factor)`:
+##   scaleAbundance(params, factor) |> scaleModel(factor = 1/factor)
+## `scaleAbundance()` first rescales ONLY foreground (fish) abundance by
+## `factor`; `scaleModel()` (mizer's own, the same dimensionally-safe
+## rescale `scaleReefModel()`/`calibrateReefBiomass()` already use) then
+## rescales EVERYTHING -- kappa, gamma/search_vol, and all abundances,
+## fish included -- by `1/factor`. Net effect: fish abundance is
+## unchanged (factor * 1/factor), but kappa shrinks by 1/factor while
+## gamma/search_vol grow by factor to compensate, in a self-consistent,
+## unit-safe way -- unlike the ad-hoc kappa/lambda retune this replaces,
+## which was unstable across its entire tested range (see above).
+##
+## `factor=32` is empirically tuned with a safety margin below where this
+## goes unstable. The exact boundary is fragile and NOT perfectly
+## reproducible run-to-run: the refuge-switch phase above (Step 4) is
+## itself somewhat chaotic (Part 5's own note: early rounds oscillate
+## substantially before converging), so tiny floating-point differences
+## from one run to the next land Step 5's kappa at a slightly different
+## value, which shifts exactly how far scaleDownBackground() can safely
+## push before diverging. Confirmed directly: a boundary found against one
+## build (kappa=311, factor=53 safe/54 unsafe) did NOT transfer to another
+## build of the nominally same recipe (kappa=187, factor=34 safe/35
+## unsafe) -- pick a factor with real margin below wherever the boundary
+## lands for a given build, don't sit right on the edge.
+scale_down_factor <- 32
+params <- scaleDownBackground(params, scale_down_factor)
+params <- reefSteady(params)
+for (i in 1:15) {
+    params <- matchBiomasses(params) |> matchReefGrowth() |> reefSteady()
+    log_msg(sprintf("Step 6 iter %d: dist=%.4g", i, dist_to_target(params)))
+}
+stopifnot(mizer::isSteady(params))
+cat("After Step 6 (scaleDownBackground, factor=", scale_down_factor, "), dist:",
+    dist_to_target(params), "\n")
+
+## Step 6 touches rho_algae/rho_detritus (via matchReefGrowth()'s growth
+## rescale), drifting algae/detritus off Step 5's literature targets
+## (confirmed: detritus_lifetime drifted from 3.85h to 0.77h in testing) --
+## re-apply the same rescale one more time now that Step 6 is done.
+params <- rescale_algae(params, algae_biomass_target / params@initial_n_other$algae)
+detritus_lifetime(params) <- detritus_lifetime_target
+params <- reefSteady(params)
+stopifnot(mizer::isSteady(params))
+log_msg(sprintf("Step 6 algae/detritus re-rescale: algae -> %.1f g/m^2, detritus_lifetime -> %.2fh",
+                 params@initial_n_other$algae, detritus_lifetime(params) * 8760))
+
+# Diet real-prey-fraction check (see KNOWN OPEN ISSUE note above).
 diet <- getDiet(params)
 w <- params@w
-for (target_w in c(5, 50, 500, 2000)) {
+for (target_w in c(5, 50, 500, 933, 2000)) {
     wi <- which.min(abs(w - target_w))
     d <- diet["predators", wi, ]
     real_prey <- sum(d[intersect(names(d), c("predators", "herbivores", "inverts"))], na.rm = TRUE)
