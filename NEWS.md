@@ -48,7 +48,13 @@
   `p`, vs. mizer's `2/3`; `crit_feed = 0.7`), and the algae/detritus/
   external-mortality model-level defaults (`algae_growth_initial`,
   capacities, `sen_decomp`/`ext_decomp`, `nat_mort`/`sen_prop`/`sen_curve`,
-  `use_UR_cc`).
+  `use_UR_cc`). Flagged which of these are actually reef-specific biology
+  (e.g. `a_bar`/`b_bar`, `algae_growth_initial` -- worth reconsidering for a
+  non-reef system or a different dominant primary producer) versus which
+  have no documented rationale at all (`w_pp_cutoff`, `n`/`p`, `crit_feed`;
+  `n = 0.75` in particular traces to Rogers (2018)'s own parameterisation,
+  not a reef-specific finding, so it's a candidate for sensitivity-testing
+  rather than a value to trust as-is).
 
 ## New features
 

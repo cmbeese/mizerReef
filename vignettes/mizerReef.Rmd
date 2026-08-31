@@ -193,19 +193,17 @@ kable(
 )
 ```
 
-Every one of these is a **mizerReef default**, not a mizer one: if you leave
-a column out (or leave a cell blank/`NA`), mizerReef fills it in with the
-value above so the corresponding feature is simply switched off for that
-species, and reports that it did so (see `info_level` below). You can
-override any of these -- either by including the column in your species
-table, or afterwards with `species_params(params)$refuge_user <- ...`
-(and similarly for the others) or the relevant `set*()` function
-(`setRefuge()` for `refuge_user`/`blocked_pred`/`satiation`,
-`setAlgaeParams()`/`setDetritusParams()` for the two interaction columns).
-[Setting the refuge profile] and `vignette("tuning-diet-composition")`
-cover the model-level defaults (not tied to one species) that these two
-setters also fill in -- things like how much of a refuge is ever protected,
-or algae's production rate.
+Every one of these is a **mizerReef default**, not a mizer one: leave a
+column out (or leave a cell blank/`NA`) and mizerReef fills it in with the
+value above, switching that feature off for the species and reporting that
+it did so. Override any of them by including the column in your own species
+table, or afterwards with `species_params(params)$refuge_user <- ...` (and
+similarly for the others) or the relevant setter (`setRefuge()` for the
+first three, `setAlgaeParams()`/`setDetritusParams()` for the interaction
+columns). Those two setters also fill in several *model-level* defaults --
+not tied to one species, e.g. how much of a refuge is ever protected, or
+algae's production rate -- covered next in [Setting the refuge profile] and
+in `vignette("tuning-diet-composition")`.
 
 > <details> <summary>💡 <strong>Tip:</strong> When importing your species parameter table from a CSV, make sure that missing values are represented as NA or blank cells, not zeros.</summary> You can load your species parameter data frame into R using standard functions like <code>read.csv()</code> or <code>readxl::read_excel()</code>, depending on your file format. Ensure that the column names in your data frame match those expected by MizerReef. Use <code>na.strings = c(""," ")</code> in <code>read.csv()</code> to ensure blanks are read as <code>NA</code> rather than <code>0</code>. </details>
 
@@ -301,9 +299,9 @@ varies with prey size:
   ```
   </details>
 
-A few more refuge settings apply across all three methods rather than being
-part of `method_params`, and mizerReef fills them in with a default if you
-don't set them explicitly with `setRefuge()`/`newReefParams()`:
+A few more refuge settings apply across all three methods, and mizerReef
+fills them in with a default if you don't set them via
+`setRefuge()`/`newReefParams()`:
 
 ```{r refuge-scalar-defaults-table, echo=FALSE, eval=TRUE}
 kable(
@@ -314,14 +312,20 @@ kable(
     Description = c(
       "Cap on the proportion of any size class that refuge can ever protect, so some food always remains accessible to predators.",
       "Proportion of refuge-eligible individuals that actually use a refuge when one is available.",
-      "Weight below which fish are assumed to be unsettled larvae, exempt from the refuge calculation.",
+      "Weight below which fish are assumed unsettled larvae, exempt from the refuge calculation.",
       "Length-weight parameters for a 'dummy fish', used to convert refuge bin boundaries between length and weight, and to fill in a real species' own a/b if it's missing one.",
-      "Whether refuge bin boundaries are set by weight, using the dummy-fish a_bar/b_bar (TRUE), or by length, using each species' own a/b (FALSE)."
+      "Whether refuge bins are set by weight, using a_bar/b_bar (TRUE), or by length, using each species' own a/b (FALSE)."
     )
   ),
   caption = "mizerReef's default refuge settings, shared across all three methods."
 )
 ```
+
+`a_bar`/`b_bar` and `w_settle` were chosen for small-bodied coral-reef fish,
+not for fish in general -- a pelagic species' length-weight relationship, for
+instance, can be very different from `a_bar = 0.025`, `b_bar = 3`. If your
+system isn't a coral reef, treat every default on this page as a starting
+point to check against your own species' traits, not a universal constant.
 
 ### Refuge profiles and body shape {.section-refuge-example}
 
@@ -384,8 +388,7 @@ caribbean_10_model <- newReefParams(species_params = caribbean_10_species,
 
 Besides the species-level and refuge-level defaults already covered above,
 `newReefParams()` makes a few default choices of its own about the
-underlying mizer model, some of which deliberately differ from what
-`mizer::newMultispeciesParams()` would otherwise choose:
+underlying mizer model:
 
 ```{r construction-defaults-table, echo=FALSE, eval=TRUE}
 kable(
@@ -404,13 +407,16 @@ kable(
 )
 ```
 
-These are ordinary `newReefParams()` arguments, so pass your own value the
-same way as any other (e.g. `newReefParams(..., w_pp_cutoff = 10)`). The
-`w_pp_cutoff` default in particular is worth knowing about if you're
-comparing against a plain mizer model or a worked example from elsewhere: a
-narrower plankton spectrum is a real, deliberate mizerReef choice, not an
-oversight, but it does mean plankton-mediated results can differ noticeably
-from the same species table run through base mizer's own default.
+These are ordinary arguments, so pass your own value the same way as any
+other (e.g. `newReefParams(..., w_pp_cutoff = 10)`). Unlike the
+literature-grounded defaults elsewhere on this page, none of these three
+has a documented rationale in the source for why it differs from mizer's
+own default -- `n = 0.75` in particular traces to the trait-based model in
+Rogers (2018) (see `vignette("caribbean_3_model-description")`) rather than
+a reef-specific finding, so it's a starting point to sensitivity-test for
+your own system, not a value to trust because it's reef-flavoured. Treat
+all three the same way: worth knowing they exist and differ from mizer,
+not worth assuming they're right for you.
 
 For every other construction argument (`species_params`, `interaction`,
 `kappa`, `resource_rate`, and so on), `newReefParams()` simply passes your

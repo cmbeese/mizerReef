@@ -57,6 +57,16 @@ Throughout, the index $i$ (or $j$) runs over the modelled functional groups
 rather than taxonomic species; in mizerReef the entries of $N_i(w)$ are usually
 size spectra of feeding guilds.
 
+Every quantity below labelled a "mizerReef default" is a value the package
+fills in for you if you don't supply your own -- distinct from mizer's own
+defaults, which this page doesn't restate (see mizer's [Setting
+Parameters](https://sizespectrum.org/mizer/reference/setParams.html)
+reference page). Several were chosen for coral reefs and small-bodied reef
+fish specifically (e.g. `a_bar`/`b_bar`, algae's production rate), so check
+them against your own system rather than assuming they transfer to a
+different kind of ecosystem; see `vignette("mizerReef")` for the full
+listing and how to override each one.
+
 # State variables
 
 A mizerReef model carries the same consumer spectra $N_i(w)$ and resource
@@ -121,8 +131,8 @@ L^{b}$), using either group-specific values or a set of "dummy fish" values
 $\bar a, \bar b$ (mizerReef defaults $0.025$/$3$, `a_bar`/`b_bar` --
 also used to fill in a real species' own $a$/$b$ if it's missing one),
 depending on how the field data were collected. Fish below a settlement
-weight $w_{\text{settle}}$ (default $0.1$ g, `w_settle`) are excluded from
-the refuge calculation altogether, as unsettled larvae.
+weight $w_{\text{settle}}$ (`w_settle`, mizerReef default $0.1$ g) are
+excluded from the refuge calculation altogether, as unsettled larvae.
 
 **Sigmoidal.** A smooth decline in protection around a threshold length
 $L_{\text{refuge}}$, appropriate when the refuge-size distribution is unknown.
@@ -313,11 +323,11 @@ $$
 $$
 with $\mu_{nat}$ the rate at $1$ g (`nat_mort`, mizerReef default $0.2$) and
 $n$ the growth exponent. This is mizerReef's external mortality
-$\mu_{ext.i}(w)$ and plays the same role as $z0_i$ in mizer -- note that
-mizer's own default for the analogous quantity is $0.6$ (`z0pre`, only
-relevant if you set `include_ext_mort = FALSE` to opt out of mizerReef's
-own mechanism above and use mizer's instead; mizerReef's default there is
-$0.2$ too).
+$\mu_{ext.i}(w)$ and plays the same role as $z0_i$ in mizer, which defaults
+to $0.6$ (`z0pre`) for the analogous rate under mizer's own, simpler
+allometric formula -- used only if you set `include_ext_mort = FALSE` to
+opt out of the mechanism above (mizerReef defaults `z0pre` to $0.2$ too, in
+that case).
 
 ## Senescence mortality
 

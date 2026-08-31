@@ -84,10 +84,9 @@ params@species_params %>%
 ## Defaults `setAlgaeParams()`/`setDetritusParams()` choose for you
 
 Besides `interaction_algae`/`interaction_detritus` defaulting to 0 (shown
-above), `setAlgaeParams()` and `setDetritusParams()` fill in several
-model-level defaults -- not tied to any one species -- whenever you leave
-them unset. All of these are mizerReef's own choices, not mizer's, and all
-are ordinary arguments you can override:
+above), `setAlgaeParams()`/`setDetritusParams()` fill in several
+model-level defaults -- not tied to any one species -- whenever left unset.
+All are mizerReef's own, and all are ordinary arguments you can override:
 
 ```{r ur-defaults-table, echo=FALSE}
 knitr::kable(
@@ -112,9 +111,11 @@ knitr::kable(
 `algae_growth_initial` is the one most worth checking rather than accepting
 by default: it's held fixed throughout tuning (see below), so it acts as an
 absolute anchor for the whole algae pool's scale, not just a starting guess
-like most of the others here. The literature range behind the 2000 g/m²/year
-default is given in `?setAlgaeParams`; if your system's algal turf
-production is better documented elsewhere, use that value instead.
+like most of the others here. It (like `sen_decomp`/`ext_decomp`) comes from
+literature on *coral-reef algal turf and detritus* specifically (see
+`?setAlgaeParams`) -- for a non-reef system, or even a reef with a different
+dominant primary producer, look up your own system's value rather than
+keeping this one.
 
 Both bundled example models (`caribbean_3_model`, `caribbean_10_model`) use
 these defaults as-is for everything except `ext_decomp` (set to 0.8, not the
