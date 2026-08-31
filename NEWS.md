@@ -100,6 +100,33 @@
   prey to fill the gap. See the `caribbean-3-fresh-rebuild-diet-bug`
   project history for the full derivation.
 
+- The bundled `caribbean_3_model`/`caribbean_3_species` have been
+  regenerated again with corrected maturity targets, using the same
+  from-scratch script as above. Both predators (`Cephalopholis cruentata`,
+  graysby grouper) and herbivores (`Sparisoma viride`, stoplight parrotfish)
+  are protogynous hermaphrodites, and both species' previous `age_mat`
+  values (4 and 1.6 years respectively) turned out to reflect the wrong
+  life-history milestone or a superseded estimate rather than age at first
+  maturity -- see the calibration script's own design note for full
+  citations. New targets: `age_mat = 2` years and `l_mat = 16` cm TL (->
+  `w_mat = 102.4` g via each species' length-weight relationship) for both
+  species. Biomass and age at maturity still match targets closely
+  (predators 107.04/107, herbivores 34.00/34, inverts 40.67/40 g/m^2;
+  age_mat 2.00/2.0 for both). The new `age_mat` targets shifted the stable
+  range for the `scaleDownBackground()` factor (see above) sharply lower --
+  the previous `factor=32` no longer converges at all; re-tuned to `17`
+  (stable boundary confirmed at 19/20 for this build). Predators' realized
+  diet is a little weaker as a result (real-prey fraction ~76% at w=933g,
+  down from ~92%, though still meaningfully non-zero piscivory) -- herbivore
+  share of predator diet specifically remains low (~1-6% across the size
+  range) regardless of this change. Three candidate levers for improving
+  that specifically (raising predators' interaction weight on herbivores,
+  lowering predators' `beta`, lowering predators' `interaction_resource`)
+  were tested directly: only the first is numerically stable, and even at
+  its maximum (1.0, from 0.17) only raises herbivore diet share to ~6.5%;
+  the latter two both break biomass matching outright. None adopted in this
+  build -- diet composition (see above) remains a known, open issue.
+
 - `newReefParams()`'s residual (non-senescence) natural mortality,
   $\mu_{nat.i}(w) = \mu_{nat}\, w^{z0exp}$, computed `z0exp <- 1 - n` instead
   of `z0exp <- n - 1`, so with the default `n = 0.75` mortality *increased*

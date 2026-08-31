@@ -5,6 +5,11 @@
 # RECALIBRATED 02/08/2026 -- satiation=TRUE / age_mat=1.6 for herbivores
 # REBUILT FROM SCRATCH 31/08/2026 -- see note below; supersedes the 02/08/2026
 # "start from the bundled model" workaround.
+# RECALIBRATED 01/09/2026 -- age_mat=2 (both species), l_mat=16cm / w_mat=102.4g
+# (both species), scale_down_factor 32->17; see design note below for
+# citations. Diet realism (herbivore share of predator diet, still ~1-6%
+# even after checking interaction/beta/interaction_resource levers) remains
+# a known, separately-tracked open issue -- not addressed by this revision.
 
 ## IMPORTANT: this script rebuilds from newReefParams() again -----------
 #
@@ -112,18 +117,42 @@
 #   matchReefGrowth() alone drove herbivore biomass to >800 g/m^2 (vs. the
 #   ~34 g/m^2 FORCE-survey target) with no sign of settling.
 #
-# - age_mat: the thesis's age_mat = 4 for herbivores almost certainly
-#   conflated "age at sexual transition" (when female stoplight parrotfish,
-#   Sparisoma viride, become male -- a protogynous-hermaphrodite-specific
-#   milestone) with "age at first sexual maturity". Rivera Hernandez &
-#   Shervette (2025, Environ Biol Fish 108:179-198; a comprehensive 2013-2023
-#   otolith/gonad-histology study of 1801 U.S. Caribbean stoplight
-#   parrotfish) report age at median sexual transition (AT50) = 4.5 years --
-#   very close to the old 4 -- but age at median sexual MATURITY (AM50), the
-#   quantity age_mat is actually meant to represent, = 1.6 years. The package
-#   maintainer confirmed they trust the FORCE biomass_observed values far
-#   more strongly than the original age_mat = 4 guess, and was comfortable
-#   retargeting age_mat using this literature value instead.
+# - age_mat / w_mat (UPDATED 2026-09-01): both species' targets are now set
+#   from species-specific maturity literature rather than a shared guess:
+#
+#   Predators (Cephalopholis cruentata, graysby grouper): age_mat = 2 years,
+#   from FishBase-cited Caribbean grouper life-history data for female
+#   (initial-phase) maturity. Heemstra & Randall (1993, Groupers of the
+#   World, FAO Species Catalogue Vol. 125) separately give 4-5 years / 20-23
+#   cm TL for the *sex-change* (female-to-male) threshold -- a different
+#   milestone from first maturity, and NOT the quantity age_mat represents.
+#   This repeats, for a different species, the exact protogyny-conflation
+#   risk documented below for herbivores -- confirmed here to have actually
+#   affected this dataset too, since the previous age_mat = 4 for predators
+#   was in fact the sex-change age, not the maturity age.
+#
+#   Herbivores (Sparisoma viride, stoplight parrotfish): age_mat = 2 years.
+#   Choat, Robertson, Ackerman & Posada (2003, Mar. Ecol. Prog. Ser.
+#   246:265-277) give ~4 years, but FishBase's length-at-maturity data for
+#   this species (the same source used for l_mat, below) ties initial-phase
+#   (female) maturity to an age of ~2-3 years in faster-growing Caribbean
+#   populations -- the more recent estimate, and the one confirmed for this
+#   build. This *reverts* the 02/08/2026 recalibration's age_mat = 1.6
+#   (from Rivera Hernandez & Shervette 2025's AM50 estimate) a second time,
+#   to a value distinct from both that and the thesis's original 4.
+#   `satiation = TRUE` (above) is kept regardless of which age_mat value is
+#   used -- it's the density-dependent brake that lets herbivore biomass
+#   settle at any realistic age_mat, not a fix tied to the 1.6-specific
+#   value. NOTE: with age_mat = 4, Step 6's scaleDownBackground(factor=32)
+#   diverged ("search_vol must not contain non-finite values") -- confirmed
+#   this recipe's stability is sensitive to the exact age_mat targets, not
+#   just biomass/gamma as previously documented; see the
+#   caribbean-3-fresh-rebuild-diet-bug memory for the full record.
+#
+#   l_mat (both species): 16 cm TL, from FishBase length-at-50%-maturity
+#   for each species (predators: ~16 cm; herbivores: 16.3 cm). Converted to
+#   `w_mat` via each species' own length-weight relationship (w = a * L^b,
+#   a = 0.025, b = 3): 0.025 * 16^3 = 102.4 g.
 
 ## Setup - load packages -------------------------------------------------------
 library(mizer)
@@ -339,19 +368,28 @@ cat("algae biomass:", params@initial_n_other$algae, " detritus_lifetime (h):",
 ## unit-safe way -- unlike the ad-hoc kappa/lambda retune this replaces,
 ## which was unstable across its entire tested range (see above).
 ##
-## `factor=32` is empirically tuned with a safety margin below where this
-## goes unstable. The exact boundary is fragile and NOT perfectly
-## reproducible run-to-run: the refuge-switch phase above (Step 4) is
-## itself somewhat chaotic (Part 5's own note: early rounds oscillate
-## substantially before converging), so tiny floating-point differences
-## from one run to the next land Step 5's kappa at a slightly different
-## value, which shifts exactly how far scaleDownBackground() can safely
-## push before diverging. Confirmed directly: a boundary found against one
-## build (kappa=311, factor=53 safe/54 unsafe) did NOT transfer to another
-## build of the nominally same recipe (kappa=187, factor=34 safe/35
-## unsafe) -- pick a factor with real margin below wherever the boundary
-## lands for a given build, don't sit right on the edge.
-scale_down_factor <- 32
+## The right factor is empirically tuned with a safety margin below where
+## this goes unstable. The exact boundary is fragile and NOT perfectly
+## reproducible run-to-run or across species_params changes: the
+## refuge-switch phase above (Step 4) is itself somewhat chaotic (Part 5's
+## own note: early rounds oscillate substantially before converging), so
+## tiny floating-point differences from one run to the next land Step 5's
+## kappa at a slightly different value, which shifts exactly how far
+## scaleDownBackground() can safely push before diverging. Confirmed
+## directly: a boundary found against one build (kappa=311, factor=53
+## safe/54 unsafe) did NOT transfer to another build of the nominally same
+## recipe (kappa=187, factor=34 safe/35 unsafe) -- pick a factor with real
+## margin below wherever the boundary lands for a given build, don't sit
+## right on the edge.
+##
+## UPDATED 2026-09-01: changing predators'/herbivores' age_mat (see the
+## design note above, age_mat = 2 for both, down from 4/1.6) shifted this
+## boundary sharply lower -- confirmed by direct sweep against this build:
+## factor=19 stable, factor=20 fails ("search_vol must not contain
+## non-finite values"). The previous factor=32 no longer converges at all.
+## Re-picked at 17 for margin below the new boundary, same convention as
+## before.
+scale_down_factor <- 17
 params <- scaleDownBackground(params, scale_down_factor)
 params <- reefSteady(params)
 for (i in 1:15) {
