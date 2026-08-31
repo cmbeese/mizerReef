@@ -383,6 +383,11 @@ B_A(t + dt) = B_A(t)\, e^{-c_A\, dt}
   + \frac{P_A}{c_A}\left(1 - e^{-c_A\, dt}\right).
 $$
 
+`tuneUR()`/`tuneUR_cc()` (via `reefSteady()`) keep $B_A$ at this
+*relative*-scale balance as the fish sub-model changes. Getting the
+resulting *absolute* biomass onto a realistic scale is a separate, optional
+step, `rescale_algae()`, covered in `vignette("steady-state-recipe")`.
+
 ## Detritus
 
 Detritus obeys the same form,
@@ -421,6 +426,12 @@ $$
 - **External input** $p_{D,\text{ext}}$ — a constant rate at which detritus
   enters from unmodelled sources such as sponges, coral mucus and pelagic
   sinking (`external`), set to close the steady-state budget.
+
+Unlike algae, it's $p_{D,\text{ext}}$ that `tuneUR()`/`tuneUR_cc()` solve for
+at each *relative*-scale balance -- detritus's current biomass $B_D$ is left
+alone. As with algae, correcting the resulting *absolute* scale is a
+separate, optional step, `rescale_detritus()`/`detritus_lifetime()<-`,
+covered in `vignette("steady-state-recipe")`.
 
 ## Carrying-capacity variant
 
