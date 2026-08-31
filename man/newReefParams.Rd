@@ -60,7 +60,13 @@ observed abundances, and their maximum size.}
 
 \item{min_w_pp}{Minimum size of plankton in grams}
 
-\item{w_pp_cutoff}{Maximum size of plankton in grams, default to 1 g}
+\item{w_pp_cutoff}{Maximum size of plankton in grams, default to 1 g.
+Deliberately narrower than mizer's own default
+(10 g): mizerReef's plankton resource represents
+plankton only, since a reef model gives invertebrates
+their own explicit species/spectrum rather than
+folding them into the single background resource the
+way a typical mizer model often does.}
 
 \item{n}{Allometric growth exponent (also used as metabolic exponent p)}
 
@@ -283,7 +289,7 @@ resource components, senescence mortality, and predation refuge.
  algae biomass will be limited by the specified capacity.
 
  Note: Interaction with size-structured resources, such as plankton,
- is set with the resource_interaction column of the species parameters
+ is set with the interaction_resource column of the species parameters
  dataframe.
 }\if{html}{\out{</div>}}
 }
@@ -318,7 +324,7 @@ resource components, senescence mortality, and predation refuge.
  biomass will be limited by the specified capacity.
 
  Note: Interaction with size-structured resources, such as plankton, is
- set with the resource_interaction column of the species parameters dataframe.
+ set with the interaction_resource column of the species parameters dataframe.
 }\if{html}{\out{</div>}}
 }
 

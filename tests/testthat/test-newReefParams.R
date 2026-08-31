@@ -76,7 +76,7 @@ test_that("newReefParams computes rho_algae/rho_detritus using the documented fo
         species_params = sp, interaction = caribbean_3_interaction,
         min_w_pp = NA, w_pp_cutoff = 1, n = 0.75, p = 0.75
     ))
-    f0 <- mizer::set_species_param_default(base@species_params, "f0", 0.7)$f0
+    f0 <- mizer::set_species_param_default(base@species_params, "f0", 0.6)$f0
     E <- mizer::getEncounter(base)[, length(base@w)] / (base@w[length(base@w)]^0.75)
     expected_rho_algae <- pmax(0, f0 * base@species_params$h / (1 - f0) - E) *
         sp$interaction_algae
