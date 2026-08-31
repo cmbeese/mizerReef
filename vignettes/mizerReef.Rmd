@@ -395,7 +395,7 @@ its own about the underlying mizer model:
 kable(
   data.frame(
     Argument = c("w_pp_cutoff", "n (and p)", "crit_feed"),
-    `mizerReef default` = c("1 g", "0.75", "0.7"),
+    `mizerReef default` = c("1 g", "0.75", "0.6"),
     `mizer's own default` = c("10 g", "2/3 (≈0.667); p defaults independently to 0.7", "0.6, for the f0 species parameter"),
     Description = c(
       "Maximum size of the plankton resource spectrum.",
@@ -418,12 +418,13 @@ same kind of justification, though:
   also stands in for small invertebrates, a reef model gives invertebrates
   their own explicit species/spectrum instead, so the plankton resource
   doesn't need to reach as high in size.
-- **`n`/`p` and `crit_feed` have no documented rationale for differing
-  from mizer's own defaults.** `n = 0.75` traces to the trait-based model
-  in Rogers (2018) (see `vignette("caribbean_3_model-description")`) rather
-  than a reef-specific finding. Treat both as starting points worth
-  sensitivity-testing for your own system, not values to trust just
-  because they're what mizerReef happens to ship.
+- **`crit_feed` matches mizer's own `f0` default** (it used to be `0.7`,
+  with no documented reason for the divergence -- fixed in 2.0.3).
+- **`n`/`p` has no documented rationale for differing from mizer's own
+  default.** It traces to the trait-based model in Rogers (2018) (see
+  `vignette("caribbean_3_model-description")`) rather than a reef-specific
+  finding, so it's a starting point worth sensitivity-testing for your own
+  system, not a value to trust just because it's what mizerReef ships.
 
 For every other construction argument (`species_params`, `interaction`,
 `kappa`, `resource_rate`, and so on), `newReefParams()` simply passes your

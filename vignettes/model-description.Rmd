@@ -234,8 +234,9 @@ size. This contribution is added through mizer's standard component mechanism
 (`encounter_contribution()`). `newReefParams()` calculates $\rho_{i,A}$ and
 $\rho_{i,D}$ automatically for you, from `interaction_algae`/
 `interaction_detritus` and a target feeding level at maximum size
-(`crit_feed`, mizerReef default $0.7$) -- see `vignette("mizerReef")`'s
-[Creating your first model] section.
+(`crit_feed`, mizerReef default $0.6$, matching mizer's own default for the
+same quantity) -- see `vignette("mizerReef")`'s [Creating your first model]
+section.
 
 # Consumption and satiation
 

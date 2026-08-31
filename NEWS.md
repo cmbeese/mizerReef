@@ -1,5 +1,23 @@
 # MizerReef 2.0.3
 
+## Bug fixes
+
+- `newReefParams()`'s `crit_feed` (the target feeding level used to
+  calibrate each species' algae/detritus encounter rate, `rho`, when a
+  species doesn't have its own `f0`) defaulted to `0.7`, diverging from
+  mizer's own default for the same quantity (`f0`'s documented fallback,
+  `0.6`, see `get_f0_default()`) with no stated reason anywhere in the
+  source. Found while auditing mizerReef's defaults for the vignette
+  documentation work below; changed to `0.6` to match mizer's convention.
+  This changes the `rho_algae`/`rho_detritus` mizerReef calculates for any
+  species without its own `f0`, for any model built from scratch with
+  `crit_feed` left at its default -- **the bundled `caribbean_3_model`/
+  `caribbean_10_model` objects are themselves unaffected** (they're
+  pre-built data, not reconstructed on load), but rebuilding either from
+  its documented calibration script will now produce a slightly different
+  model than the currently-bundled one, since that script doesn't pass
+  `crit_feed` explicitly.
+
 ## Documentation
 
 - Vignettes reviewed and updated for accuracy against mizer 3.3 and the
@@ -48,18 +66,18 @@
   `p`, vs. mizer's `2/3`; `crit_feed = 0.7`), and the algae/detritus/
   external-mortality model-level defaults (`algae_growth_initial`,
   capacities, `sen_decomp`/`ext_decomp`, `nat_mort`/`sen_prop`/`sen_curve`,
-  `use_UR_cc`). Distinguished three different kinds of default: reef-specific
-  biology worth reconsidering for a non-reef system (`a_bar`/`b_bar`,
-  `algae_growth_initial`); `w_pp_cutoff = 1` (vs. mizer's `10`), a
-  deliberate architectural choice -- mizerReef's plankton spectrum
-  represents plankton only, since invertebrates get their own explicit
-  species/spectrum instead of sharing the single background resource the
-  way a typical mizer model's often does; and `n`/`p` and `crit_feed`,
-  which have no documented rationale for differing from mizer's own
-  defaults (`n = 0.75` traces to Rogers (2018)'s own parameterisation, not
-  a reef-specific finding; `crit_feed = 0.7` differs from mizer's own `f0`
-  default of `0.6` with no stated reason) -- candidates for
-  sensitivity-testing, not values to trust as-is.
+  `use_UR_cc`). Distinguished three different kinds of default:
+  reef-specific biology worth reconsidering for a non-reef system
+  (`a_bar`/`b_bar`, `algae_growth_initial`); `w_pp_cutoff = 1` (vs.
+  mizer's `10`), a deliberate architectural choice -- mizerReef's
+  plankton spectrum represents plankton only, since invertebrates get
+  their own explicit species/spectrum instead of sharing the single
+  background resource the way a typical mizer model's often does; and
+  `n`/`p` (`0.75`, vs. mizer's `2/3`), which has no documented rationale
+  for differing from mizer's own default -- it traces to Rogers (2018)'s
+  own parameterisation, not a reef-specific finding, so it's a candidate
+  for sensitivity-testing rather than a value to trust as-is. (`crit_feed`
+  was in this last category too -- see Bug fixes above.)
 
 ## New features
 
