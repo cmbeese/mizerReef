@@ -57,23 +57,6 @@
 #'
 #' @param w_pp_cutoff Maximum size of plankton in grams, default to 1 g
 #'
-#' @param kappa Coefficient of the resource power-law abundance
-#'   (`resource_params$kappa`). Defaults to [reef_kappa_default], not
-#'   mizer's own `newMultispeciesParams()` default of `1e11` -- that value
-#'   is a placeholder unrelated to any particular model's scale, and reef
-#'   models' typical biomass totals (order-of-magnitude 10-1000 g/m^2, not
-#'   the much larger scales other mizer applications are often calibrated
-#'   to) sit many orders of magnitude closer to `reef_kappa_default` than
-#'   to `1e11`. This matters beyond convenience: the very first
-#'   `calibrateReefBiomass()` call rescales `kappa` (and `gamma`, for
-#'   every species) by a single factor sized to close the *entire* gap
-#'   between the starting `kappa` and a
-#'   realistic one -- starting closer reduces the size of that first jump,
-#'   which is where this kind of model has been observed to become
-#'   numerically fragile. Still an uncalibrated placeholder like `1e11`
-#'   was, just a less extreme one -- run `calibrateReefBiomass()` before
-#'   relying on it for anything.
-#'
 #' @param n Allometric growth exponent (also used as metabolic exponent p)
 #'
 #' @param crit_feed Critical feeding level
@@ -98,7 +81,6 @@ newReefParams <- function( # Original mizer parameters
                           species_params, interaction = NULL,
                           crit_feed = NULL,
                           min_w_pp = NA, w_pp_cutoff = 1,
-                          kappa = NULL,
                           n = 0.75,
                           # Parameters for setting up refuge
                           new_refuge = FALSE,
@@ -148,46 +130,40 @@ newReefParams <- function( # Original mizer parameters
     # formals, so it can never also be present in `...` for R to match
     # twice, no matter what the caller passes.
     mizer::with_info_level(info_level = info_level, {
-    if (is.null(kappa)) kappa <- reef_kappa_default
-
     ## Initialize model with newMultispeciesParams ----
     params <- newMultispeciesParams(
         species_params = species_params,
         interaction = interaction,
         min_w_pp = min_w_pp,
         w_pp_cutoff = w_pp_cutoff,
-        kappa = kappa,
         n = n, p = n, ...
     )
 
     # Warn if gamma was derived against an uncalibrated resource scale ----
-    # Whenever the caller doesn't supply their own `kappa`, it defaults to
-    # `reef_kappa_default` above (not mizer's own `newMultispeciesParams()`
-    # default of `1e11`, a placeholder unrelated to any particular model's
-    # scale -- still checked for too, in case `kappa` reaches this some
-    # other way). `get_gamma_default()` derives `gamma` to be self-consistent
-    # with whatever `kappa` exists at construction time (see
-    # https://github.com/sizespectrum/mizer/pull/603 for this staleness trap
-    # in general). If `biomass_observed` is present, the caller clearly
-    # intends to calibrate the model's scale to real data via
+    # `newMultispeciesParams()` defaults `kappa` to a fixed placeholder
+    # (1e11, mizer's own default, unrelated to any particular model's
+    # scale) whenever the caller doesn't supply one, and its own
+    # `get_gamma_default()` derives `gamma` to be self-consistent with
+    # whatever `kappa` exists at construction time (see
+    # https://github.com/sizespectrum/mizer/pull/603 for this staleness
+    # trap in general). If `biomass_observed` is present, the caller
+    # clearly intends to calibrate the model's scale to real data via
     # `calibrateReefBiomass()` -- but until that call actually happens,
-    # `gamma` stays sized for a Resource pool potentially many times larger
-    # than any real fish abundance, making encounter with real fish/invert
-    # prey numerically negligible even though total biomass can still
-    # converge to the right target (`matchReefGrowth()`/`matchBiomasses()`
-    # rescale abundance and growth curves, not gamma's absolute scale) --
-    # silently producing a model whose predators never eat other fish,
-    # confirmed directly for `caribbean_3_model` in a from-scratch rebuild
-    # that skipped this step.
+    # `gamma` stays sized for a Resource pool ~1e11 times larger than any
+    # real fish abundance, making encounter with real fish/invert prey
+    # numerically negligible even though total biomass can still converge
+    # to the right target (`matchReefGrowth()`/`matchBiomasses()` rescale
+    # abundance and growth curves, not gamma's absolute scale) -- silently
+    # producing a model whose predators never eat other fish, confirmed
+    # directly for `caribbean_3_model` in a from-scratch rebuild that
+    # skipped this step.
     if (("biomass_observed" %in% names(params@species_params)) &&
         any(!is.na(params@species_params$biomass_observed)) &&
-        (isTRUE(all.equal(params@resource_params$kappa, 1e11)) ||
-         isTRUE(all.equal(params@resource_params$kappa, reef_kappa_default)))) {
+        isTRUE(all.equal(params@resource_params$kappa, 1e11))) {
         mizer::signal_info(
             "kappa",
             paste(
-                "`kappa` is still at its uncalibrated default",
-                paste0("(", signif(params@resource_params$kappa, 3), ")"),
+                "`kappa` is still at mizer's uncalibrated default (1e11)",
                 "while `biomass_observed` is set. `gamma` has been derived",
                 "to match this placeholder resource scale, so encounter",
                 "with real fish/invert prey will be numerically negligible",
@@ -439,17 +415,3 @@ newReefParams <- function( # Original mizer parameters
     params
     })
 }
-
-#' Default `kappa` for [newReefParams()]
-#'
-#' Unlike mizer's own `newMultispeciesParams()` default (`1e11`, a
-#' placeholder unrelated to any particular model's scale), this is chosen
-#' to be within a few orders of magnitude of realistic reef-fish/resource
-#' abundance scales -- this package's own validated models land `kappa`
-#' roughly in the 3-100 range after calibration. Still an uncalibrated
-#' placeholder, just a much less extreme one; see the `kappa` argument of
-#' [newReefParams()] for why the size of this starting point matters
-#' beyond convenience.
-#' @concept setup
-#' @export
-reef_kappa_default <- 100
