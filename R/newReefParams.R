@@ -139,6 +139,43 @@ newReefParams <- function( # Original mizer parameters
         n = n, p = n, ...
     )
 
+    # Warn if gamma was derived against an uncalibrated resource scale ----
+    # `newMultispeciesParams()` defaults `kappa` to a fixed placeholder
+    # (1e11, mizer's own default, unrelated to any particular model's
+    # scale) whenever the caller doesn't supply one, and its own
+    # `get_gamma_default()` derives `gamma` to be self-consistent with
+    # whatever `kappa` exists at construction time (see
+    # https://github.com/sizespectrum/mizer/pull/603 for this staleness
+    # trap in general). If `biomass_observed` is present, the caller
+    # clearly intends to calibrate the model's scale to real data via
+    # `calibrateReefBiomass()` -- but until that call actually happens,
+    # `gamma` stays sized for a Resource pool ~1e11 times larger than any
+    # real fish abundance, making encounter with real fish/invert prey
+    # numerically negligible even though total biomass can still converge
+    # to the right target (`matchReefGrowth()`/`matchBiomasses()` rescale
+    # abundance and growth curves, not gamma's absolute scale) -- silently
+    # producing a model whose predators never eat other fish, confirmed
+    # directly for `caribbean_3_model` in a from-scratch rebuild that
+    # skipped this step.
+    if (("biomass_observed" %in% names(params@species_params)) &&
+        any(!is.na(params@species_params$biomass_observed)) &&
+        isTRUE(all.equal(params@resource_params$kappa, 1e11))) {
+        mizer::signal_info(
+            "kappa",
+            paste(
+                "`kappa` is still at mizer's uncalibrated default (1e11)",
+                "while `biomass_observed` is set. `gamma` has been derived",
+                "to match this placeholder resource scale, so encounter",
+                "with real fish/invert prey will be numerically negligible",
+                "until the model's scale is calibrated -- run",
+                "`calibrateReefBiomass()` before `matchReefGrowth()`/",
+                "`matchBiomasses()`, or predators may converge on the",
+                "right total biomass while eating ~0% fish prey."
+            ),
+            level = 1, severity = "warning", unhandled = "show"
+        )
+    }
+
     # Initialise other_params sub-lists for reef-specific state
     # (these replace the old custom S4 slots)
     if (is.null(params@other_params$refuge_params)) params@other_params$refuge_params <- list()

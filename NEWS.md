@@ -56,6 +56,20 @@
   report by name via `with_info_level()`'s `except` argument targets the
   right one.
 
+- `newReefParams()` now warns when `resource_params$kappa` is still at
+  mizer's uncalibrated default (`1e11`) while `biomass_observed` is set.
+  `gamma` is derived by mizer's `get_gamma_default()` to be self-consistent
+  with whatever `kappa` exists at construction time (see mizer PR #603 for
+  this staleness trap in general); left uncalibrated, `gamma` ends up sized
+  for a Resource pool ~11 orders of magnitude larger than any real fish
+  abundance, making encounter with real fish/invert prey numerically
+  negligible even though `matchReefGrowth()`/`matchBiomasses()` can still
+  bring total biomass to the right target -- silently producing a model
+  whose predators converge on realistic biomass while eating ~0% fish prey.
+  Confirmed directly for a from-scratch rebuild of `caribbean_3_model` that
+  skipped `calibrateReefBiomass()`. Run `calibrateReefBiomass()` before
+  `matchReefGrowth()`/`matchBiomasses()` to resolve it.
+
 ## Not converted, deliberately
 
 Ten reports stay as plain `message()`/`warning()` calls:
