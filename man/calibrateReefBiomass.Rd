@@ -28,7 +28,7 @@ After using this function the total biomass in the model will match the
 total biomass, summed over all species. However the biomasses of the
 individual species will not match observations yet, with some species
 having biomasses that are too high and others too low. So after this
-function use the mizer function matchReefBiomasses() to match the
+function use the mizer function \code{\link[mizer:matchBiomasses]{mizer::matchBiomasses()}} to match the
 biomasses for each group.
 }
 \examples{

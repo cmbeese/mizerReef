@@ -382,7 +382,7 @@ scaleReefBackground <- function(params, factor) {
 #' total biomass, summed over all species. However the biomasses of the
 #' individual species will not match observations yet, with some species
 #' having biomasses that are too high and others too low. So after this
-#' function use the mizer function matchReefBiomasses() to match the
+#' function use the mizer function [mizer::matchBiomasses()] to match the
 #' biomasses for each group.
 #'
 #' @param params A MizerParams object
