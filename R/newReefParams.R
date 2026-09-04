@@ -29,7 +29,7 @@
 #'
 #' @param z0pre If `include_ext_mort`is FALSE, the external mortality rate for
 #'              each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
-#'              to 1-n where n is the given allometric scaling exponent and
+#'              to n-1 where n is the given allometric scaling exponent and
 #'              z0pre defaults to 0.2.
 #'
 #' @param new_refuge Logical. If TRUE, indicates this refuge profile is being
@@ -144,6 +144,43 @@ newReefParams <- function( # Original mizer parameters
         w_pp_cutoff = w_pp_cutoff,
         n = n, p = n, ...
     )
+
+    # Warn if gamma was derived against an uncalibrated resource scale ----
+    # `newMultispeciesParams()` defaults `kappa` to a fixed placeholder
+    # (1e11, mizer's own default, unrelated to any particular model's
+    # scale) whenever the caller doesn't supply one, and its own
+    # `get_gamma_default()` derives `gamma` to be self-consistent with
+    # whatever `kappa` exists at construction time (see
+    # https://github.com/sizespectrum/mizer/pull/603 for this staleness
+    # trap in general). If `biomass_observed` is present, the caller
+    # clearly intends to calibrate the model's scale to real data via
+    # `calibrateReefBiomass()` -- but until that call actually happens,
+    # `gamma` stays sized for a Resource pool ~1e11 times larger than any
+    # real fish abundance, making encounter with real fish/invert prey
+    # numerically negligible even though total biomass can still converge
+    # to the right target (`matchReefGrowth()`/`matchBiomasses()` rescale
+    # abundance and growth curves, not gamma's absolute scale) -- silently
+    # producing a model whose predators never eat other fish, confirmed
+    # directly for `caribbean_3_model` in a from-scratch rebuild that
+    # skipped this step.
+    if (("biomass_observed" %in% names(params@species_params)) &&
+        any(!is.na(params@species_params$biomass_observed)) &&
+        isTRUE(all.equal(params@resource_params$kappa, 1e11))) {
+        mizer::signal_info(
+            "kappa",
+            paste(
+                "`kappa` is still at mizer's uncalibrated default (1e11)",
+                "while `biomass_observed` is set. `gamma` has been derived",
+                "to match this placeholder resource scale, so encounter",
+                "with real fish/invert prey will be numerically negligible",
+                "until the model's scale is calibrated -- run",
+                "`calibrateReefBiomass()` before `matchReefGrowth()`/",
+                "`matchBiomasses()`, or predators may converge on the",
+                "right total biomass while eating ~0% fish prey."
+            ),
+            level = 1, severity = "warning", unhandled = "show"
+        )
+    }
 
     # Initialise other_params sub-lists for reef-specific state
     # (these replace the old custom S4 slots)
@@ -344,7 +381,7 @@ newReefParams <- function( # Original mizer parameters
         ext_mort_params <- params@other_params[["ext_mort_params"]]
 
         # Change to allometric external mortality
-        z0exp <- 1 - n
+        z0exp <- n - 1
         nat_mort <- ext_mort_params$nat_mort
         nat_mort <- rep(nat_mort, nrow(species_params(params)))
         allo_mort <- outer(nat_mort, params@w^(z0exp))
@@ -354,7 +391,7 @@ newReefParams <- function( # Original mizer parameters
     } else {
         # Set coefficient for each species. Here we choose 0.1 for each species
         z0pre <- rep(z0pre, nrow(species_params(params)))
-        z0exp <- 1 - n
+        z0exp <- n - 1
         # Multiply by power of size with exponent, here chosen to be -1/4
         # The outer() function makes it an array species x size
         allo_mort <- outer(z0pre, w(params)^z0exp)

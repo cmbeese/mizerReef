@@ -2,47 +2,91 @@
 # Three groups: Predators, Herbivores, Invertebrates
 # Model steady state calibration
 # last tuned 17/12/2025
-# RECALIBRATED 02/08/2026 -- see note below before rerunning from scratch.
+# RECALIBRATED 02/08/2026 -- satiation=TRUE / age_mat=1.6 for herbivores
+# REBUILT FROM SCRATCH 31/08/2026 -- see note below; supersedes the 02/08/2026
+# "start from the bundled model" workaround.
+# RECALIBRATED 01/09/2026 -- age_mat=2 (both species), l_mat=16cm / w_mat=102.4g
+# (both species), scale_down_factor 32->17; see design note below for
+# citations. Diet realism (herbivore share of predator diet, still ~1-6%
+# even after checking interaction/beta/interaction_resource levers) remains
+# a known, separately-tracked open issue -- not addressed by this revision.
 
-## IMPORTANT: why this script starts from the existing bundled model ------------
+## IMPORTANT: this script rebuilds from newReefParams() again -----------
 #
-# The sixteenth session (see inst/to-do-list.txt, git log for reefSenMort())
-# corrected a bug that had inflated senescence mortality ~5x above the
-# formula in Chapter3.tex. That correction left the *bundled* caribbean_3_model
-# no longer a genuine steady state of the package's own corrected rate
-# functions (fish abundances were never re-equilibrated, only the resource
-# side was patched). Two different attempts to fix this by rebuilding from
-# these raw CSVs via newReefParams() and replaying the original recipe
-# below verbatim (i.e. starting the pipeline the same way this script
-# originally did) both diverged badly under the corrected mortality
-# (oscillating biomass, erepro pushed past 1, non-finite search_vol) --
-# starting fresh from `newReefParams()` puts the model too far from any
-# stable point for the calibrate/match/steady loop to find its way back.
+# The 02/08/2026 recalibration found that rebuilding from these raw CSVs via
+# newReefParams() "diverged badly" under the corrected senescence-mortality
+# formula and fell back to patching the existing bundled model instead. That
+# diagnosis was correct for the recipe as it was written then, but the
+# actual missing ingredient turned out to be recipe *sequencing*, not
+# anything structurally wrong with a fresh build:
 #
-# What *does* work is starting from the existing, already-tuned bundled
-# caribbean_3_model (a much smaller perturbation) and being careful about
-# two specific details that the original recipe didn't need to worry about
-# under the old (buggy, higher) mortality:
-#   1. matchReefGrowth() must be called with `keep = "biomass"` explicitly.
-#      Its default is `keep = "egg"`, which lets biomass swing freely after
-#      every growth-rate correction -- under the corrected mortality this
-#      created a destructive tug-of-war with matchBiomasses()'s hard
-#      rescale (herbivores in particular oscillated: cycle after cycle,
-#      erepro clamped to its floor and reproduction level collapsed to
-#      exactly zero). With `keep = "biomass"` the two steps stop fighting
-#      and the recipe converges smoothly again.
-#   2. Herbivores need `satiation = TRUE` (see below) for their growth to
-#      have any self-limiting brake at all -- without it, `species_params$
-#      age_mat` cannot be reconciled with a low equilibrium biomass under
-#      the corrected mortality, no matter how growth/reproduction are
-#      tuned (see the design note below).
+#   `setBevertonHolt(reproduction_level = 0.5)` needs to be set immediately
+#   after construction, before the very first `reefSteady()` call -- not
+#   folded in later. Without it, reef models' extra nonlinearities (refuge
+#   dynamics, multi-resource coupling) have no damping and the
+#   calibrate/match loop oscillates or diverges. This is exactly what
+#   `vignettes/steady-state-recipe.Rmd` (the package's own recipe) already
+#   does, and exactly what this script previously did not do early enough.
+#   Once fixed, the fully undamped, unmodified vignette recipe converges
+#   cleanly on `caribbean_3_species.csv`: biomass matches to <0.3%, `age_mat`
+#   matches almost exactly (predators 3.9999934 vs target 4.0).
 #
-# So: THIS SCRIPT NO LONGER REBUILDS caribbean_3_model FROM THE RAW CSVS.
-# It loads the current bundled model, applies the two species_params
-# changes below, and re-runs the calibrate/match/steady recipe from there.
-# The CSVs are still the source of truth for every other species parameter
-# and are still re-saved as data objects for bookkeeping, but `newReefParams()`
-# is deliberately NOT called on them for the main model build.
+# See the caribbean-3-fresh-rebuild-diet-bug memory (or ask about that
+# investigation) for the complete derivation.
+#
+## Diet realism: RESOLVED via mizerExperimental::scaleDownBackground() -------
+#
+# Earlier versions of this script left predator diet background-Resource-
+# dominated at every size. That's fixed now (Step 6, below) using
+# `scaleDownBackground()`, which also turned out to fix a second, related
+# problem never previously diagnosed: predators' growth energy hit exactly
+# zero around w=900-1000g and abundance was exactly zero above that --
+# well short of `w_inf=3125g` -- because background Resource (capped at
+# `w_pp_cutoff=1g`) becomes inaccessible to predators once their preferred
+# prey size (`w/beta`) exceeds 1g (at `w = beta * w_pp_cutoff = 100g`), and
+# there wasn't enough real prey to fill the gap. With Step 6, predators now
+# grow smoothly all the way to `w_inf` and real-prey fraction (herbivore +
+# invertebrate + cannibalism) reaches ~93% at w=933g (up from <1% before).
+# Three things were tried before finding this, documented in full detail in
+# the caribbean-3-fresh-rebuild-diet-bug memory:
+#
+#   1. Pinning predators' `gamma` (search volume) to Rogers 2018's own
+#      literature value (Appendix S1 Table S2, A_P = 6.4 m^2/yr). Abandoned:
+#      a helper that pins `species_params$gamma` directly without going
+#      through `species_params<-()` looks like it works but is a no-op --
+#      it never touches `@search_vol`, the slot mizer's dynamics actually
+#      read. Once fixed to genuinely take effect, pinning gamma=6.4
+#      destabilizes the model outright (age at maturity collapses to
+#      ~0.002 years). Consistent with the memory's `getStability()` finding
+#      that gamma=6.4 alone sits on a near-Hopf bifurcation with a
+#      284-year relaxation timescale.
+#   2. Retuning `kappa`/`lambda` (the resource abundance scale and slope)
+#      *after* biomass calibration has already converged, without forcing
+#      gamma. Abandoned: unstable across the entire range tested (targets
+#      from kappa=80 down to kappa=4, 8-15 gradual steps, with or without
+#      matchReefGrowth() in the polish phase) -- `erepro` explodes rather
+#      than settling, a genuine dynamical instability in this region of
+#      parameter space, not a step-size or sequencing bug.
+#   3. `kappa` matters a great deal at *construction* time, before any
+#      calibration runs, and not at all as something to retune afterward:
+#      `calibrateReefBiomass()` called once from mizer's own uncalibrated
+#      default (kappa=1e11, no package override) lands calibration in a
+#      meaningfully better basin (real-prey fraction ~20% at w=933g) than
+#      a lower seed does (a kappa=100 seed lands at real-prey fraction
+#      ~8%) -- a real, stable improvement, but not enough on its own.
+#   4. **This is what Step 6 below actually uses**: `scaleDownBackground()`
+#      (see its own comment at Step 6 for the mechanism) shifts the
+#      fish-vs-resource abundance balance in a dimensionally-safe way,
+#      without touching gamma or kappa/lambda directly. Combined with the
+#      kappa=1e11 basin from (3), this reaches real-prey fraction ~93% at
+#      w=933g and, as a side effect, resolves the growth-wall problem too
+#      (see above) -- genuinely resolving what (1) and (2) could not.
+#
+# The honest deliverable is: biomass and age-at-maturity match survey
+# targets well, and predator diet now shows real, substantial piscivory
+# (still more cannibalism-heavy than Rogers 2018's own herb/invert-
+# dominant weights -- a remaining, smaller gap, not the near-total absence
+# of piscivory this recipe started with).
 
 ## Design note: satiation = TRUE and age_mat = 1.6 for herbivores ---------------
 #
@@ -66,35 +110,49 @@
 #   so the "no self-regulation of grazing pressure" claim is preserved
 #   unchanged. What `satiation = TRUE` adds is a realistic *individual* cap
 #   on how much of that encountered energy a herbivore actually absorbs for
-#   growth (via the standard Holling type II feeding level). In the
-#   recalibrated model the realised feeding level for herbivores converges
-#   to ~0.95-0.99 -- i.e. individuals are essentially always near full
-#   capacity -- which is a more literal reading of "gut always full" than
-#   the previous, formally infinite intake ever was.
+#   growth (via the standard Holling type II feeding level).
 #   Without this change, herbivore biomass has no density-dependent brake
 #   at all once the corrected (lower) senescence mortality lets individuals
 #   survive to a realistic age at maturity: forcing age_mat to match via
 #   matchReefGrowth() alone drove herbivore biomass to >800 g/m^2 (vs. the
 #   ~34 g/m^2 FORCE-survey target) with no sign of settling.
 #
-# - age_mat: the thesis's age_mat = 4 for herbivores almost certainly
-#   conflated "age at sexual transition" (when female stoplight parrotfish,
-#   Sparisoma viride, become male -- a protogynous-hermaphrodite-specific
-#   milestone) with "age at first sexual maturity". Rivera Hernandez &
-#   Shervette (2025, Environ Biol Fish 108:179-198; a comprehensive 2013-2023
-#   otolith/gonad-histology study of 1801 U.S. Caribbean stoplight
-#   parrotfish) report age at median sexual transition (AT50) = 4.5 years --
-#   very close to the old 4 -- but age at median sexual MATURITY (AM50), the
-#   quantity age_mat is actually meant to represent, = 1.6 years. That paper
-#   also reports a von Bertalanffy K of 0.33-0.39/year for S. viride, slower
-#   than this model's k_vb = 0.6 -- consistent with the old age_mat = 4
-#   target having been too slow-growing to begin with. The package
-#   maintainer confirmed they trust the FORCE biomass_observed values far
-#   more strongly than the original age_mat = 4 guess, and was comfortable
-#   retargeting age_mat using this literature value instead.
-#   `caribbean_10_species.csv`'s `rep_species` column independently confirms
-#   Sparisoma viride is the correct representative species for the
-#   equivalent "parrotfish" herbivore group there too.
+# - age_mat / w_mat (UPDATED 2026-09-01): both species' targets are now set
+#   from species-specific maturity literature rather than a shared guess:
+#
+#   Predators (Cephalopholis cruentata, graysby grouper): age_mat = 2 years,
+#   from FishBase-cited Caribbean grouper life-history data for female
+#   (initial-phase) maturity. Heemstra & Randall (1993, Groupers of the
+#   World, FAO Species Catalogue Vol. 125) separately give 4-5 years / 20-23
+#   cm TL for the *sex-change* (female-to-male) threshold -- a different
+#   milestone from first maturity, and NOT the quantity age_mat represents.
+#   This repeats, for a different species, the exact protogyny-conflation
+#   risk documented below for herbivores -- confirmed here to have actually
+#   affected this dataset too, since the previous age_mat = 4 for predators
+#   was in fact the sex-change age, not the maturity age.
+#
+#   Herbivores (Sparisoma viride, stoplight parrotfish): age_mat = 2 years.
+#   Choat, Robertson, Ackerman & Posada (2003, Mar. Ecol. Prog. Ser.
+#   246:265-277) give ~4 years, but FishBase's length-at-maturity data for
+#   this species (the same source used for l_mat, below) ties initial-phase
+#   (female) maturity to an age of ~2-3 years in faster-growing Caribbean
+#   populations -- the more recent estimate, and the one confirmed for this
+#   build. This *reverts* the 02/08/2026 recalibration's age_mat = 1.6
+#   (from Rivera Hernandez & Shervette 2025's AM50 estimate) a second time,
+#   to a value distinct from both that and the thesis's original 4.
+#   `satiation = TRUE` (above) is kept regardless of which age_mat value is
+#   used -- it's the density-dependent brake that lets herbivore biomass
+#   settle at any realistic age_mat, not a fix tied to the 1.6-specific
+#   value. NOTE: with age_mat = 4, Step 6's scaleDownBackground(factor=32)
+#   diverged ("search_vol must not contain non-finite values") -- confirmed
+#   this recipe's stability is sensitive to the exact age_mat targets, not
+#   just biomass/gamma as previously documented; see the
+#   caribbean-3-fresh-rebuild-diet-bug memory for the full record.
+#
+#   l_mat (both species): 16 cm TL, from FishBase length-at-50%-maturity
+#   for each species (predators: ~16 cm; herbivores: 16.3 cm). Converted to
+#   `w_mat` via each species' own length-weight relationship (w = a * L^b,
+#   a = 0.025, b = 3): 0.025 * 16^3 = 102.4 g.
 
 ## Setup - load packages -------------------------------------------------------
 library(mizer)
@@ -124,8 +182,7 @@ capture.output(sessionInfo(), file = logfile, append = TRUE)
 # Check that using newest version of mizerReef
 packageVersion("mizerReef") # Should be >= 2.0.0
 
-## Load parameters (for bookkeeping/logging only -- NOT used to rebuild the
-## model from scratch this time, see note above) --------------------------------
+## Load parameters ---------------------------------------------------------------
 species_path <- here("inst/data-csv/caribbean_3_species.csv")
 interaction_path <- here("inst/data-csv/caribbean_3_interaction.csv")
 refuge_path <- here("inst/data-csv/karpata_refuge.csv")
@@ -140,24 +197,9 @@ log_msg("karpata_refuge.csv md5", tools::md5sum(refuge_path), "rows", nrow(karpa
 tuning_profile <- read.csv(tuning_path)
 log_msg("tuning_profile.csv md5", tools::md5sum(tuning_path), "rows", nrow(tuning_profile))
 
-# Re-save as R data objects (species_params now includes satiation = TRUE,
-# age_mat = 1.6 for herbivores -- see design note above).
 save(caribbean_3_species, file = "data/caribbean_3_species.rda")
 save(caribbean_3_interaction, file = "data/caribbean_3_interaction.rda")
 save(tuning_profile, file = "data/tuning_profile.rda")
-
-## Start from the existing bundled model, not a fresh newReefParams() build ----
-data("caribbean_3_model", package = "mizerReef")
-params <- caribbean_3_model
-log_msg("loaded existing bundled caribbean_3_model as starting point")
-
-# Sync the two changed species_params columns onto the live params object
-# (the .rda re-saved above only updates the standalone species_params data
-# object, not the model's own copy).
-herb <- which(params@species_params$species == "herbivores")
-params@species_params$satiation[herb] <- TRUE
-params@species_params$age_mat[herb] <- 1.6
-log_msg("applied satiation=TRUE, age_mat=1.6 to herbivores")
 
 target <- c(predators = 107, herbivores = 34, inverts = 40)
 dist_to_target <- function(p) {
@@ -165,82 +207,98 @@ dist_to_target <- function(p) {
     sum((log(b[names(target)]) - log(target))^2)
 }
 
-cat("Starting distance to target:", dist_to_target(params), "\n")
-plotBiomassVsSpecies(params)
-log_msg("plotBiomassVsSpecies before recalibration")
+## Step 1: build fresh from the raw CSVs -----------------------------------------
+params <- newReefParams(species_params = caribbean_3_species,
+                         interaction = caribbean_3_interaction,
+                         method = "binned", method_params = tuning_profile)
+log_msg("built fresh params via newReefParams()")
 
-## Iterate to refine biomass and growth -----------------------------------------
-# One alternation at a time, `matchReefGrowth()` before `matchBiomasses()`
-# each followed by its own reefSteady() (not batched -- see mizer's own
-# "refine your model" course page, which alternates the two the same way),
-# and `keep = "biomass"` on matchReefGrowth() explicitly (see note above).
-# Stop by watching the distance-to-target metric rather than a fixed count;
-# in practice this settles within ~8-10 alternations.
-prev_dist <- Inf
-for (i in 1:12) {
+## Step 2: moderate density-dependence, set EARLY, then initial settle ----------
+## (must happen before the first reefSteady() call -- see note above)
+rdi <- rep(0.5, nrow(caribbean_3_species))
+names(rdi) <- caribbean_3_species$species
+params <- setBevertonHolt(params, reproduction_level = rdi)
+params <- params |>
+    reefSteady() |> reefSteady() |> reefSteady() |>
+    reefSteady() |> reefSteady() |> reefSteady()
+stopifnot(mizer::isSteady(params))
+log_msg("initial settle complete, isSteady=TRUE")
+
+## Step 3: calibrate biomass ONCE, then iteratively fine-tune -------------------
+## `calibrateReefBiomass()` does a one-shot rescale of kappa/gamma/abundance
+## to bring the model onto the right absolute scale -- it is meant to run
+## once, not be looped. Looping it (as an earlier version of this script
+## did, 9 times total) does not diverge, but does land the model in a
+## meaningfully worse final kappa/diet basin: calling it once from mizer's
+## own default kappa (1e11, no override -- see note above) settles at
+## kappa~107 with real-prey fraction ~20% at 933g; looping it 9 times from
+## the SAME starting kappa settles at kappa~103 (materially the same,
+## confirming looping isn't itself the problem there) -- but looping it 9
+## times from a *seeded* kappa=100 (this package's former, since-removed
+## reef_kappa_default) settles at kappa~305-311 with real-prey fraction
+## ~8%, a clearly worse basin. The single-call structure below matches
+## vignettes/steady-state-recipe.Rmd's own Step 4a/4b, is simpler, and
+## reliably lands in the better basin regardless of iteration count.
+params <- calibrateReefBiomass(params)
+params <- reefSteady(params)
+log_msg(sprintf("Step 3: single calibrateReefBiomass(), dist=%.4g kappa=%.4g",
+                 dist_to_target(params), params@resource_params$kappa))
+for (i in 1:6) {
     params <- params |>
-        matchReefGrowth(keep = "biomass") |>
+        matchBiomasses() |> matchReefGrowth() |>
         reefSteady()
-    log_msg(sprintf("iter %d: matchReefGrowth(keep=biomass)+steady", i))
-
-    params <- params |>
-        matchBiomasses() |>
-        reefSteady()
-    d <- dist_to_target(params)
-    log_msg(sprintf("iter %d: matchBiomasses+steady, dist=%.4f", i, d))
-    cat(sprintf("iter %d: dist = %.4f\n", i, d))
-
-    if (d > prev_dist * 1.5 && i > 3) {
-        log_msg("distance got notably worse -- stopping, keeping previous state")
-        break
-    }
-    prev_dist <- d
+    log_msg(sprintf("Step 3 iter %d: dist=%.4g", i, dist_to_target(params)))
 }
-log_msg("biomass/growth tuning complete")
+stopifnot(mizer::isSteady(params))
+cat("After Step 3 (binned refuge, tuning phase complete), dist:", dist_to_target(params), "\n")
+plotBiomassVsSpecies(params)
+log_msg("plotBiomassVsSpecies after binned-refuge tuning")
 
-plotBiomassVsSpecies(params) # spot on
-log_msg("plotBiomassVsSpecies after tuning")
+## Step 4: switch to competitive refuge method -----------------------------------
+## Switching refuge methods is itself a real perturbation and needs many
+## more rounds of matchBiomasses()+reefSteady() to fully re-settle than the
+## fine-tuning above (confirmed: ~16 rounds, with early rounds oscillating
+## substantially before converging monotonically).
+params <- newRefuge(params, new_method = "competitive",
+                     new_method_params = karpata_refuge)
+log_msg("switched to competitive refuge method")
+for (i in 1:18) {
+    params <- matchBiomasses(params) |> reefSteady()
+    log_msg(sprintf("Step 4 iter %d: dist=%.4g", i, dist_to_target(params)))
+}
+stopifnot(mizer::isSteady(params))
+cat("After Step 4 (competitive refuge), dist:", dist_to_target(params), "\n")
 
-# Check match with age at maturity (herbivores now checked against the
-# literature AM50 = 1.6y, not the old, likely-conflated 4y -- see design
-# note above; the FORCE biomass match is the trusted target, this is a
-# secondary sanity check)
+plotVulnerable(params)
+plotRefugeProfile(params)
+log_msg("refuge diagnostics after competitive-method switch")
+
+## Final checks -------------------------------------------------------------------
 age_mat_observed <- params@species_params$age_mat
 age_mat_model <- age_mat(params)
 data.frame(age_mat_model, age_mat_observed)
+log_msg("age_mat check: model vs observed",
+        paste(round(age_mat_model, 3), collapse = "/"), "vs",
+        paste(age_mat_observed, collapse = "/"))
 
 plotTotalAbundance(params)
 plotTotalBiomass(params)
-
-## Check resulting spectra and feeding level ------------------------------------
-
-# Spectra should be reasonably straight to match predictions of Sheldon's
-# spectrum but also have nonlinearities at refuge sizes
 plotSpectra(params, total = TRUE, biomass = TRUE)
 plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE)
 log_msg("spectra check before reproduction tuning")
 
-# Herbivore feeding level should now be consistently near 1 (satiated) --
-# consistent with "gut always full" (Ferreira 1998; Kopp 2010), see design
-# note above.
-plotFeedingLevel(params, species = "herbivores")
-plotFeedingLevel(params, species = "inverts")
-
-# Tune reproduction ------------------------------------------------------------
+## Tune reproduction ---------------------------------------------------------------
 rep <- getReproductionLevel(params)
-# increase reproduction level to 0.5 for predators/herbivores, leave
-# inverts at whatever level the biomass/growth tuning above landed them at
 rep_level <- c(0.5, 0.5, rep["inverts"])
 names(rep_level) <- c("predators", "herbivores", "inverts")
 params <- setBevertonHolt(params, reproduction_level = rep_level)
 log_msg("setBevertonHolt reproduction_level", paste(names(rep_level), rep_level, sep = "=", collapse = ";"))
 
-# Iterate to get back to steady state
-params <- params |>
-    reefSteady() |>
-    reefSteady() |>
-    reefSteady()
-log_msg("post-reproduction reefSteady x3")
+for (i in 1:3) {
+    params <- matchBiomasses(params) |>
+        matchReefGrowth() |> reefSteady()
+}
+log_msg("post-reproduction refinement x3")
 
 rep <- getReproductionLevel(params)
 getRDI(params) / getRDD(params)
@@ -254,7 +312,118 @@ for (i in 1:3) {
 }
 log_msg("stability check: 3x reefSteady with no further movement")
 
-# Plots ------------------------------------------------------------------------
+## Step 5: rescale algae/detritus absolute scale ---------------------------------
+## Fish dynamics never depend on the absolute standing-biomass scale of
+## these two unstructured resources (only on production/consumption rates,
+## which this doesn't touch) -- but the scale itself is left wherever
+## calibrateReefBiomass()'s repeated rho_algae/rho_detritus rescaling
+## happened to leave it, which by this point is ~1e-9 g/m^2 for both
+## (effectively zero, not a real steady state for the resource itself).
+## `rescale_algae()`/`rescale_detritus()` fix this without touching fish
+## dynamics at all (confirmed: biomass/gamma/diet all bit-identical
+## before/after, verified directly this session) -- multiplying standing
+## biomass by a factor while dividing the consuming species' rho by the
+## same factor, so total consumption is unchanged.
+##
+## Targets ported from the caribbean_10 calibration campaign's own
+## literature audit (`caribbean-10-calibration/references/README.md` §1,
+## `DECISIONS.md` 2026-08-06/07 and 2026-08-21 rows) -- these are the
+## literature *brackets*, not that campaign's fitted numbers, so they're
+## reusable here as-is:
+##   - detritus_lifetime = 3.85h (0.00043950 yr): midpoint of Max, Hamilton,
+##     Gaines & Warner (2013, Mar. Ecol. Prog. Ser. 482:181-195) Palmyra
+##     Atoll benthic-detritus residence-time range (2.8-4.9h).
+##   - algae standing biomass = 350 g WW/m^2: midpoint of a 150-550 g WW/m^2
+##     bracket, itself a conversion of a user-supplied ~10-100 g DW/m^2
+##     Caribbean estimate via an assumed 5-10x wet:dry ratio -- that
+##     conversion factor is flagged there as still provisional, not an
+##     independently checked literature figure. If a better Caribbean-
+##     specific wet:dry ratio turns up, this is the one number in this
+##     step worth revisiting.
+algae_biomass_target <- 350             # g WW/m^2
+detritus_lifetime_target <- 0.00043950  # years (3.85h)
+
+params <- rescale_algae(params, algae_biomass_target / params@initial_n_other$algae)
+detritus_lifetime(params) <- detritus_lifetime_target
+params <- reefSteady(params)
+stopifnot(mizer::isSteady(params))
+log_msg(sprintf("Step 5: algae biomass -> %.1f g/m^2, detritus_lifetime -> %.2fh",
+                 params@initial_n_other$algae, detritus_lifetime(params) * 8760))
+cat("After Step 5 (algae/detritus rescale), dist:", dist_to_target(params), "\n")
+cat("algae biomass:", params@initial_n_other$algae, " detritus_lifetime (h):",
+    detritus_lifetime(params) * 8760, "\n")
+
+## Step 6: scaleDownBackground() -- shift the fish-vs-resource balance -----------
+## Diet realism (see KNOWN OPEN ISSUE note above) is fixed here, not by
+## touching gamma or kappa/lambda directly (both dead ends -- see above),
+## but by mizerExperimental's `scaleDownBackground(params, factor)`:
+##   scaleAbundance(params, factor) |> scaleModel(factor = 1/factor)
+## `scaleAbundance()` first rescales ONLY foreground (fish) abundance by
+## `factor`; `scaleModel()` (mizer's own, the same dimensionally-safe
+## rescale `scaleReefModel()`/`calibrateReefBiomass()` already use) then
+## rescales EVERYTHING -- kappa, gamma/search_vol, and all abundances,
+## fish included -- by `1/factor`. Net effect: fish abundance is
+## unchanged (factor * 1/factor), but kappa shrinks by 1/factor while
+## gamma/search_vol grow by factor to compensate, in a self-consistent,
+## unit-safe way -- unlike the ad-hoc kappa/lambda retune this replaces,
+## which was unstable across its entire tested range (see above).
+##
+## The right factor is empirically tuned with a safety margin below where
+## this goes unstable. The exact boundary is fragile and NOT perfectly
+## reproducible run-to-run or across species_params changes: the
+## refuge-switch phase above (Step 4) is itself somewhat chaotic (Part 5's
+## own note: early rounds oscillate substantially before converging), so
+## tiny floating-point differences from one run to the next land Step 5's
+## kappa at a slightly different value, which shifts exactly how far
+## scaleDownBackground() can safely push before diverging. Confirmed
+## directly: a boundary found against one build (kappa=311, factor=53
+## safe/54 unsafe) did NOT transfer to another build of the nominally same
+## recipe (kappa=187, factor=34 safe/35 unsafe) -- pick a factor with real
+## margin below wherever the boundary lands for a given build, don't sit
+## right on the edge.
+##
+## UPDATED 2026-09-01: changing predators'/herbivores' age_mat (see the
+## design note above, age_mat = 2 for both, down from 4/1.6) shifted this
+## boundary sharply lower -- confirmed by direct sweep against this build:
+## factor=19 stable, factor=20 fails ("search_vol must not contain
+## non-finite values"). The previous factor=32 no longer converges at all.
+## Re-picked at 17 for margin below the new boundary, same convention as
+## before.
+scale_down_factor <- 17
+params <- scaleDownBackground(params, scale_down_factor)
+params <- reefSteady(params)
+for (i in 1:15) {
+    params <- matchBiomasses(params) |> matchReefGrowth() |> reefSteady()
+    log_msg(sprintf("Step 6 iter %d: dist=%.4g", i, dist_to_target(params)))
+}
+stopifnot(mizer::isSteady(params))
+cat("After Step 6 (scaleDownBackground, factor=", scale_down_factor, "), dist:",
+    dist_to_target(params), "\n")
+
+## Step 6 touches rho_algae/rho_detritus (via matchReefGrowth()'s growth
+## rescale), drifting algae/detritus off Step 5's literature targets
+## (confirmed: detritus_lifetime drifted from 3.85h to 0.77h in testing) --
+## re-apply the same rescale one more time now that Step 6 is done.
+params <- rescale_algae(params, algae_biomass_target / params@initial_n_other$algae)
+detritus_lifetime(params) <- detritus_lifetime_target
+params <- reefSteady(params)
+stopifnot(mizer::isSteady(params))
+log_msg(sprintf("Step 6 algae/detritus re-rescale: algae -> %.1f g/m^2, detritus_lifetime -> %.2fh",
+                 params@initial_n_other$algae, detritus_lifetime(params) * 8760))
+
+# Diet real-prey-fraction check (see KNOWN OPEN ISSUE note above).
+diet <- getDiet(params)
+w <- params@w
+for (target_w in c(5, 50, 500, 933, 2000)) {
+    wi <- which.min(abs(w - target_w))
+    d <- diet["predators", wi, ]
+    real_prey <- sum(d[intersect(names(d), c("predators", "herbivores", "inverts"))], na.rm = TRUE)
+    cannibalism <- d[["predators"]]
+    log_msg(sprintf("diet at w=%.1fg: real_prey_frac=%.3f (of which cannibalism=%.3f)",
+                     w[wi], real_prey, cannibalism))
+}
+
+## Plots ------------------------------------------------------------------------
 plotTotalAbundance(params)
 plotTotalBiomass(params)
 plotBiomassVsSpecies(params)
@@ -263,14 +432,15 @@ plotSpectra(params, biomass = TRUE, total = TRUE)
 plotDiet(params)
 plotGrowthCurves(params)
 plotPredMort(params)
-plotRelativeContribution(params) # predators dominant on all 3 metrics, as in Chapter3.tex
+plotRelativeContribution(params)
 log_msg("final diagnostic plots generated")
 
 # Save!
 caribbean_3_model <- reefSteady(params)
 log_msg("final reefSteady to save model")
+stopifnot(mizer::isSteady(caribbean_3_model))
 
-# Save in package --------------------------------------------------------------
+## Save in package ----------------------------------------------------------------
 save(caribbean_3_model, file = "data/caribbean_3_model.rda") # package copy
 log_msg("package data saved: data/caribbean_3_model.rda")
 
@@ -289,9 +459,10 @@ save_plot <- function(name, fn) {
     fn()
 }
 
-save_plot("biomass-final", function() plotBiomassVsSpecies(params))
-save_plot("spectra-power1-final", function() plotSpectra(params, total = TRUE, biomass = TRUE))
-save_plot("spectra-power2-final", function() plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE))
+save_plot("biomass-final", function() print(plotBiomassVsSpecies(params)))
+save_plot("spectra-power1-final", function() print(plotSpectra(params, total = TRUE, biomass = TRUE)))
+save_plot("spectra-power2-final", function() print(plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE)))
+save_plot("diet-final", function() print(plotDiet(params)))
 save_plot("reproduction-level", function() {
     barplot(getReproductionLevel(params), main = "Reproduction level")
 })

@@ -74,6 +74,15 @@ test_that("tuneUR_cc reaches a genuine steady state: dB/dt = 0 for both resource
 test_that("tuneUR_cc warns when the resulting external detritus flux is negative", {
     data(caribbean_3_model)
     cc_params <- setURcapacity(caribbean_3_model, cap = 1.5)
+    # caribbean_3_model is now well-balanced at steady state (its detritus
+    # scale/lifetime having just been tuned to a literature target), so it
+    # no longer incidentally triggers the negative-flux case on its own.
+    # Force a detritus consumption deficit deliberately -- `rho` is cached
+    # on `other_params$detritus$rho` (an outer product with w^n, not
+    # recomputed from `species_params$rho_detritus` on the fly), so both
+    # need scaling down together for `getDetritusConsumption()` to see it.
+    cc_params@other_params$detritus$rho <- cc_params@other_params$detritus$rho * 0.01
+    cc_params@species_params$rho_detritus <- cc_params@species_params$rho_detritus * 0.01
 
     zeroed <- cc_params
     zeroed@other_params$detritus$external <- 0

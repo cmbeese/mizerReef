@@ -135,6 +135,93 @@
   report by name via `with_info_level()`'s `except` argument targets the
   right one.
 
+- `newReefParams()` now warns when `resource_params$kappa` is still at
+  mizer's uncalibrated default (`1e11`) while `biomass_observed` is set.
+  `gamma` is derived by mizer's `get_gamma_default()` to be self-consistent
+  with whatever `kappa` exists at construction time (see mizer PR #603 for
+  this staleness trap in general); left uncalibrated, `gamma` ends up sized
+  for a Resource pool ~11 orders of magnitude larger than any real fish
+  abundance, making encounter with real fish/invert prey numerically
+  negligible even though `matchReefGrowth()`/`matchBiomasses()` can still
+  bring total biomass to the right target -- silently producing a model
+  whose predators converge on realistic biomass while eating ~0% fish prey.
+  Confirmed directly for a from-scratch rebuild of `caribbean_3_model` that
+  skipped `calibrateReefBiomass()`. Run `calibrateReefBiomass()` before
+  `matchReefGrowth()`/`matchBiomasses()` to resolve it.
+
+## Bug fixes
+
+- The bundled `caribbean_3_model`/`caribbean_3_species`/
+  `caribbean_3_interaction` have been regenerated from a fresh,
+  from-scratch rebuild (`inst/scripts/Caribbean_3_model-calibration.R`),
+  rather than patched from the previous bundled model as the 02/08/2026
+  recalibration did. Biomass and age at maturity both match the
+  `biomass_observed`/`age_mat` targets closely (predators 107.09/107,
+  herbivores 34.00/34, inverts 40.00/40 g/m^2; age_mat 4.00/4.0,
+  1.60/1.6 years). Predators' realized diet, previously dominated by
+  background "Resource" at essentially every size (a pre-existing issue,
+  not introduced here), now shows real, substantial piscivory across the
+  size range (real-prey fraction 0.3% -> 4% -> 62% -> 92% -> 99.7% at
+  w=4.7/53/510/933/1986g) via a new final calibration step using
+  `mizerExperimental::scaleDownBackground()`, which shifts the
+  fish-vs-resource abundance balance in a dimensionally-safe way. Two
+  other approaches to the same problem were tried and abandoned first:
+  pinning predators' `gamma` to Rogers et al. 2018's literature value
+  (Appendix S1 Table S2, 6.4 m^2/yr, which destabilizes the model once an
+  earlier no-op bug in the pinning helper is fixed) and retuning the
+  resource abundance scale/slope directly after biomass calibration
+  (unstable across its entire tested range). As a side effect,
+  `scaleDownBackground()` also resolved a previously undiagnosed growth
+  wall: predators' growth energy hit exactly zero around w=900-1000g
+  (well short of `w_inf=3125g`) because background Resource, capped at
+  `w_pp_cutoff=1g`, becomes inaccessible to predators once their
+  preferred prey size exceeds that cutoff, and there wasn't enough real
+  prey to fill the gap. See the `caribbean-3-fresh-rebuild-diet-bug`
+  project history for the full derivation.
+
+- The bundled `caribbean_3_model`/`caribbean_3_species` have been
+  regenerated again with corrected maturity targets, using the same
+  from-scratch script as above. Both predators (`Cephalopholis cruentata`,
+  graysby grouper) and herbivores (`Sparisoma viride`, stoplight parrotfish)
+  are protogynous hermaphrodites, and both species' previous `age_mat`
+  values (4 and 1.6 years respectively) turned out to reflect the wrong
+  life-history milestone or a superseded estimate rather than age at first
+  maturity -- see the calibration script's own design note for full
+  citations. New targets: `age_mat = 2` years and `l_mat = 16` cm TL (->
+  `w_mat = 102.4` g via each species' length-weight relationship) for both
+  species. Biomass and age at maturity still match targets closely
+  (predators 107.04/107, herbivores 34.00/34, inverts 40.67/40 g/m^2;
+  age_mat 2.00/2.0 for both). The new `age_mat` targets shifted the stable
+  range for the `scaleDownBackground()` factor (see above) sharply lower --
+  the previous `factor=32` no longer converges at all; re-tuned to `17`
+  (stable boundary confirmed at 19/20 for this build). Predators' realized
+  diet is a little weaker as a result (real-prey fraction ~76% at w=933g,
+  down from ~92%, though still meaningfully non-zero piscivory) -- herbivore
+  share of predator diet specifically remains low (~1-6% across the size
+  range) regardless of this change. Three candidate levers for improving
+  that specifically (raising predators' interaction weight on herbivores,
+  lowering predators' `beta`, lowering predators' `interaction_resource`)
+  were tested directly: only the first is numerically stable, and even at
+  its maximum (1.0, from 0.17) only raises herbivore diet share to ~6.5%;
+  the latter two both break biomass matching outright. None adopted in this
+  build -- diet composition (see above) remains a known, open issue.
+
+- `newReefParams()`'s residual (non-senescence) natural mortality,
+  $\mu_{nat.i}(w) = \mu_{nat}\, w^{z0exp}$, computed `z0exp <- 1 - n` instead
+  of `z0exp <- n - 1`, so with the default `n = 0.75` mortality *increased*
+  with body size (`w^0.25`) instead of decreasing (`w^-0.25`) -- the opposite
+  of the allometric decline the function's own documentation described, of
+  mizer's own `setExtMort()` default (`z0exp = resource_params$n - 1`), and
+  of the literature this formula is drawn from (Rogers et al. 2018 Appendix
+  S1, Table S2: $D_{iO}(m) = \mu\, m^{-0.25} + \dots$). Affected both the
+  `include_ext_mort = TRUE` and `= FALSE` branches, and has been present
+  since the function's first commit. Confirmed via a controlled comparison
+  that the sign was not the source of the `caribbean_3` fresh-rebuild
+  growth-matching instability (see the guard-rail warning above) -- both
+  signs diverge at the same iteration once predators' `gamma` is held at its
+  literature value -- so this is a standalone correctness fix, not a
+  resolution of that instability.
+
 ## Not converted, deliberately
 
 Ten reports stay as plain `message()`/`warning()` calls:

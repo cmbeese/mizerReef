@@ -239,7 +239,7 @@ to use default senescence mortality. Defaults to TRUE.}
 
 \item{z0pre}{If \code{include_ext_mort}is FALSE, the external mortality rate for
 each species calculated as z0pre * w_max ^ z0exp. z0exp defaults
-to 1-n where n is the given allometric scaling exponent and
+to n-1 where n is the given allometric scaling exponent and
 z0pre defaults to 0.2.}
 
 \item{info_level}{How much mizer should say about the choices it makes

@@ -60,11 +60,20 @@ test_that("tuneUR reaches a genuine steady state: production equals consumption 
 test_that("tuneUR warns when the resulting external detritus flux is negative", {
     data(caribbean_3_model)
     params <- caribbean_3_model
+    # caribbean_3_model is now well-balanced at steady state (its detritus
+    # scale/lifetime having just been tuned to a literature target), so it
+    # no longer incidentally triggers the negative-flux case on its own.
+    # Force a detritus consumption deficit deliberately -- `rho` is cached
+    # on `other_params$detritus$rho` (an outer product with w^n, not
+    # recomputed from `species_params$rho_detritus` on the fly), so both
+    # need scaling down together for `getDetritusConsumption()` to see it.
+    params@other_params$detritus$rho <- params@other_params$detritus$rho * 0.01
+    params@species_params$rho_detritus <- params@species_params$rho_detritus * 0.01
     zeroed <- params
     zeroed@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(zeroed))
     dout <- sum(getDetritusConsumption(params))
-    expect_gt(din, dout) # caribbean_3_model triggers the negative-flux case
+    expect_gt(din, dout) # the deficit above triggers the negative-flux case
 
     expect_warning(tuneUR(params), "flux of external detritus is negative")
 })
