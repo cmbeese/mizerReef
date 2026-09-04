@@ -11,16 +11,23 @@
 #' @return An upgraded `mizerReef` object.
 #' @exportS3Method utils::upgrade
 upgrade.mizerReef <- function(object, ...) {
-    if (!is.null(object$refuge_params) && is.null(object@other_params$refuge_params)) {
-        object@other_params$refuge_params <- object$refuge_params
+    # A genuinely pre-3.4 S4 object (still `isS4(object)`) has no `$` method
+    # at all, so a direct `object$refuge_params` errors rather than returning
+    # NULL. tryCatch() here treats that the same as "no old-style data to
+    # migrate" instead of letting it crash validParams().
+    old_refuge   <- tryCatch(object$refuge_params, error = function(e) NULL)
+    old_algae    <- tryCatch(object$algae_params, error = function(e) NULL)
+    old_detritus <- tryCatch(object$detritus_params, error = function(e) NULL)
+    if (!is.null(old_refuge) && is.null(object@other_params$refuge_params)) {
+        object@other_params$refuge_params <- old_refuge
         object$refuge_params <- NULL
     }
-    if (!is.null(object$algae_params) && is.null(object@other_params$algae)) {
-        object@other_params$algae <- object$algae_params
+    if (!is.null(old_algae) && is.null(object@other_params$algae)) {
+        object@other_params$algae <- old_algae
         object$algae_params <- NULL
     }
-    if (!is.null(object$detritus_params) && is.null(object@other_params$detritus)) {
-        object@other_params$detritus <- object$detritus_params
+    if (!is.null(old_detritus) && is.null(object@other_params$detritus)) {
+        object@other_params$detritus <- old_detritus
         object$detritus_params <- NULL
     }
     object
