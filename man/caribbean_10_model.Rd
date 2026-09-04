@@ -5,8 +5,12 @@
 \alias{caribbean_10_model}
 \title{mizerReef model for a generic Caribbean reef (10 functional groups)}
 \format{
-A \code{mizerReef} object (extends \link[mizer:MizerParams]{MizerParams}) with
-10 species, competitive refuge, and algae/detritus components.
+A \link[=mizerReef-class]{mizerReef} object with 10 species, competitive refuge, and
+algae/detritus components.
+
+The object was created with \code{\link[=newReefParams]{newReefParams()}} and is stored in the package's
+\verb{data/} directory. R's standard lazy-loading preserves its S3 class vector
+and extension metadata.
 }
 \source{
 PhD Thesis, FORCE dataset
@@ -69,9 +73,6 @@ at a time rather than mizerExperimental's usual batched workflow.
 FORCE dataset. From: Dryden, C. (2017). Habitat structural
 complexity of Caribbean coral reefs and its relationships with fish
 community structure. PhD Thesis, Newcastle University.
-
-Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
-https://doi.org/10.26686/wgtn.26421523
 }
 \seealso{
 \code{\link{caribbean_10_species}}, \code{\link{caribbean_10_interaction}},

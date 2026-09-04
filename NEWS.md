@@ -1,3 +1,19 @@
+# mizerReef 2.1.0
+
+## Migration to mizer 3.4 S3 extension architecture
+
+- **S3 extension classes**: `mizerReef` and `mizerReefSim` are now ordinary entries
+  in the object's S3 class vector (e.g. `c("mizerReef", "MizerParams")`), matching
+  mizer 3.4's transition from S4 to S3.
+- **Removed session extension registry**: Removed `.onLoad()` registration and
+  the dynamic S4 marker class mechanism. Extensions now record themselves directly
+  on the object with `recordExtension()`, and `coerceToExtensionClass()` sets the
+  S3 class vector.
+- **S3 generic methods**: Added `findSteadyState.mizerReef` method (directing to the
+  project solver).
+- **Cleaned up legacy S4 usages**: Replaced `is(x, "MizerParams")` and `slot()`
+  calls across code and tests with `inherits()` and list indexing.
+
 # MizerReef 2.0.3
 
 ## Bug fixes

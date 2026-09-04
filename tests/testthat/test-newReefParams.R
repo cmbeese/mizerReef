@@ -8,7 +8,7 @@ test_that("newReefParams returns a mizerReef object for the binned method", {
         method = "binned",
         method_params = tuning_profile
     ))
-    expect_s4_class(result, "mizerReef")
+    expect_s3_class(result, "mizerReef")
     expect_identical(result@other_params$refuge_params$method, "binned")
 })
 
@@ -23,7 +23,7 @@ test_that("newReefParams returns a mizerReef object for the competitive method",
         method = "competitive",
         method_params = competitive_mp
     ))
-    expect_s4_class(result, "mizerReef")
+    expect_s3_class(result, "mizerReef")
     expect_identical(result@other_params$refuge_params$method, "competitive")
 })
 

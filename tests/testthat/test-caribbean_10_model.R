@@ -1,7 +1,7 @@
 test_that("caribbean_10_model is a valid mizerReef object", {
     data(caribbean_10_model)
     params <- caribbean_10_model
-    expect_s4_class(params, "mizerReef")
+    expect_s3_class(params, "mizerReef")
     expect_error(mizer::validParams(params), NA)
     expect_equal(nrow(params@species_params), 10)
 })
