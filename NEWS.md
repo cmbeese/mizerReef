@@ -1,5 +1,84 @@
 # MizerReef 2.0.3
 
+## Bug fixes
+
+- `newReefParams()`'s `crit_feed` (the target feeding level used to
+  calibrate each species' algae/detritus encounter rate, `rho`, when a
+  species doesn't have its own `f0`) defaulted to `0.7`, diverging from
+  mizer's own default for the same quantity (`f0`'s documented fallback,
+  `0.6`, see `get_f0_default()`) with no stated reason anywhere in the
+  source. Found while auditing mizerReef's defaults for the vignette
+  documentation work below; changed to `0.6` to match mizer's convention.
+  This changes the `rho_algae`/`rho_detritus` mizerReef calculates for any
+  species without its own `f0`, for any model built from scratch with
+  `crit_feed` left at its default -- **the bundled `caribbean_3_model`/
+  `caribbean_10_model` objects are themselves unaffected** (they're
+  pre-built data, not reconstructed on load), but rebuilding either from
+  its documented calibration script will now produce a slightly different
+  model than the currently-bundled one, since that script doesn't pass
+  `crit_feed` explicitly.
+
+## Documentation
+
+- Vignettes reviewed and updated for accuracy against mizer 3.3 and the
+  `info_level` reporting mechanism (see New features below): `mizerReef`
+  and `steady-state-recipe` now mention `info_level` where model
+  construction is at its noisiest, and `setAlgaeParams()`/
+  `setDetritusParams()`'s roxygen docs no longer refer to a nonexistent
+  `resource_interaction` column (the actual column is
+  `interaction_resource`).
+- `steady-state-recipe.Rmd`'s "Understanding Reproduction Level and
+  Convergence" section is substantially condensed (it repeated the same
+  point about four times), and gains a new final step for rescaling algae
+  and detritus to a realistic absolute standing-biomass/turnover-time scale
+  with `rescale_algae()`/`detritus_lifetime()<-`, run only after diet,
+  biomass and growth tuning since it doesn't disturb consumption.
+- The "Getting started with MizerReef" vignette is split in two:
+  `mizerReef` now covers building and tuning a first model, and a new
+  `running-simulations` vignette covers changing the refuge profile and
+  projecting a tuned model forward (fishing pressure, habitat-degradation
+  trajectories).
+- `karpata_model-description.Rmd` and `caribbean_3_model-description.Rmd`
+  no longer restate the general model theory already covered in
+  `model-description.Rmd` (growth, mortality, reproduction, resource
+  dynamics); each now links out to it and keeps only what's specific to
+  its own example model. Their introductions are also sharpened:
+  `caribbean_3_model` reproduces the 3-group trait-based model from
+  Rogers (2018), while `caribbean_10_model`/Karpata is the field-calibrated,
+  finer-resolution extension of it.
+- New vignette `tuning-diet-composition.Rmd`, covering where diet
+  composition lives (`interaction_resource` vs. mizerReef's own
+  `interaction_algae`/`interaction_detritus`), how `tuneUR()`/`tuneUR_cc()`
+  keep algae and detritus in relative-scale balance as diet changes
+  (algae: fixed production, solved biomass; detritus: fixed biomass, solved
+  production -- the two are not symmetric), and how to read `plotDiet()`.
+- Every value mizerReef itself chooses as a default (as opposed to mizer's
+  own defaults, which are only pointed at mizer's reference page rather
+  than restated) is now named across the vignettes, with its actual value
+  and how to override it: the species-level flags in `mizerReef.Rmd`
+  (including a fix -- `satiation` was documented as defaulting to TRUE for
+  herbivores, when it actually defaults to TRUE only for pure
+  detritivores, matching `model-description.Rmd`'s always-correct
+  description and the source), the refuge-profile scalars
+  (`max_protect`, `tau`, `w_settle`, `a_bar`/`b_bar`,
+  `use_dummy_fish_bins`), `newReefParams()`'s own construction-level
+  choices (`w_pp_cutoff = 1` vs. mizer's `10`; `n = 0.75`, also reused as
+  `p`, vs. mizer's `2/3`; `crit_feed = 0.7`), and the algae/detritus/
+  external-mortality model-level defaults (`algae_growth_initial`,
+  capacities, `sen_decomp`/`ext_decomp`, `nat_mort`/`sen_prop`/`sen_curve`,
+  `use_UR_cc`). Distinguished three different kinds of default:
+  reef-specific biology worth reconsidering for a non-reef system
+  (`a_bar`/`b_bar`, `algae_growth_initial`); `w_pp_cutoff = 1` (vs.
+  mizer's `10`), a deliberate architectural choice -- mizerReef's
+  plankton spectrum represents plankton only, since invertebrates get
+  their own explicit species/spectrum instead of sharing the single
+  background resource the way a typical mizer model's often does; and
+  `n`/`p` (`0.75`, vs. mizer's `2/3`), which has no documented rationale
+  for differing from mizer's own default -- it traces to Rogers (2018)'s
+  own parameterisation, not a reef-specific finding, so it's a candidate
+  for sensitivity-testing rather than a value to trust as-is. (`crit_feed`
+  was in this last category too -- see Bug fixes above.)
+
 ## New features
 
 - The reports mizerReef makes while building or changing a model go through

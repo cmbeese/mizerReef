@@ -24,8 +24,12 @@ navbar:
         href: articles/index.html
       - text: Getting Started
         href: articles/mizerReef.html
+      - text: Running Simulations
+        href: articles/running-simulations.html
       - text: Tuning and Simulation
         href: articles/steady-state-recipe.html
+      - text: Tuning Diet Composition
+        href: articles/tuning-diet-composition.html
       - text: Functional Group Example
         href: articles/karpata_model-description.html
       - text: Simple 3-Group Example
@@ -164,9 +168,11 @@ articles:
   - title: "Getting Started"
     contents:
       - mizerReef
+      - running-simulations
   - title: "Tuning and Simulation"
     contents:
       - steady-state-recipe
+      - tuning-diet-composition
   - title: "Model Description"
     contents:
       - karpata_model-description

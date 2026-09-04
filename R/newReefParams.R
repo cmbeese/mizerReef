@@ -55,7 +55,13 @@
 #'
 #' @param min_w_pp Minimum size of plankton in grams
 #'
-#' @param w_pp_cutoff Maximum size of plankton in grams, default to 1 g
+#' @param w_pp_cutoff Maximum size of plankton in grams, default to 1 g.
+#'                    Deliberately narrower than mizer's own default
+#'                    (10 g): mizerReef's plankton resource represents
+#'                    plankton only, since a reef model gives invertebrates
+#'                    their own explicit species/spectrum rather than
+#'                    folding them into the single background resource the
+#'                    way a typical mizer model often does.
 #'
 #' @param n Allometric growth exponent (also used as metabolic exponent p)
 #'
@@ -263,9 +269,11 @@ newReefParams <- function( # Original mizer parameters
     # Algae & Detritus ----
     ### Calculate Rho ----
     # Determine the necessary detritus and algae encounter rates so that at
-    # maximum size the species has feeding level f0
+    # maximum size the species has feeding level f0. 0.6 matches mizer's own
+    # default for f0 (get_f0_default()); crit_feed used to default to 0.7,
+    # a divergence from mizer's convention with no documented rationale.
     if (is.null(crit_feed)) {
-        crit_feed <- 0.7
+        crit_feed <- 0.6
     }
     f0 <- mizer::set_species_param_default(params@species_params, "f0", crit_feed)$f0
 
