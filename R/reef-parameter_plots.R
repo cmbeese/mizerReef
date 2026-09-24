@@ -50,7 +50,7 @@ plotVulnerable <- function(object,
         is.flag(return_data)
     )
 
-    if (is(object, "MizerSim")) {
+    if (inherits(object, "MizerSim")) {
         ## sim values ----
         params <- object@params
         # Get time for end of simulation
@@ -60,7 +60,7 @@ plotVulnerable <- function(object,
             t <- time_step
         }
         vul <- getVulnerable(object, time_range = t)
-    } else if (is(object, "MizerParams")) {
+    } else if (inherits(object, "MizerParams")) {
         ## params values ----
         params <- object
 
@@ -210,11 +210,11 @@ plotRefugeProfile <- function(object,
         is.flag(return_data)
     )
 
-    if (is(object, "MizerSim")) {
+    if (inherits(object, "MizerSim")) {
         ## sim values ----
         params <- object@params
         warning("You are plotting the refuge profile from the steady state. To view refuge density through time, use plotRefugeDensity.")
-    } else if (is(object, "MizerParams")) {
+    } else if (inherits(object, "MizerParams")) {
         ## params ----
         params <- object
     }
@@ -429,15 +429,13 @@ plotDegradationScale <- function(object = NULL,
                 algae = "algae_scale",
                 recovery = "recovery_scale"
             )
-            # Try to load the data object from the package
-            if (!exists(data_name, envir = .GlobalEnv)) {
-                data(list = data_name, package = "mizerReef", envir = .GlobalEnv)
-            }
-            if (exists(data_name, envir = .GlobalEnv)) {
-                dat <- get(data_name, envir = .GlobalEnv)
-            } else if (exists(data_name, envir = asNamespace("mizerReef"))) {
-                dat <- get(data_name, envir = asNamespace("mizerReef"))
-            } else {
+            # Load the package's own copy into a local environment, so a
+            # same-named object in the user's workspace is never used instead
+            # and nothing is added to it
+            e <- new.env()
+            data(list = data_name, package = "mizerReef", envir = e)
+            dat <- e[[data_name]]
+            if (is.null(dat)) {
                 stop(paste("Could not find data object:", data_name))
             }
             if (is.data.frame(dat)) {

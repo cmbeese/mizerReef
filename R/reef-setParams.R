@@ -95,7 +95,7 @@ setAlgaeParams <- function(params,
                            algae_colour = "darkseagreen3",
                            info_level = mizer::default_info_level()) {
     mizer::with_info_level(info_level = info_level, {
-    assert_that(is(params, "MizerParams"))
+    assert_that(inherits(params, "MizerParams"))
     no_sp <- nrow(params@species_params)
     assert_that(is.flag(use_UR_cc))
     params@other_params$use_UR_cc <- use_UR_cc
@@ -245,7 +245,7 @@ setDetritusParams <- function(params,
                               detritus_colour = "plum4",
                               info_level = mizer::default_info_level()) {
     mizer::with_info_level(info_level = info_level, {
-    assert_that(is(params, "MizerParams"))
+    assert_that(inherits(params, "MizerParams"))
     no_sp <- nrow(params@species_params)
     assert_that(is.flag(use_UR_cc))
     params@other_params$use_UR_cc <- use_UR_cc
@@ -388,7 +388,7 @@ setDetritusParams <- function(params,
 setExtMortParams <- function(params,
                              ext_mort_params = NULL) {
     # object - Check if mizerParams is valid
-    assert_that(is(params, "MizerParams"))
+    assert_that(inherits(params, "MizerParams"))
 
     # mort_params - Check if user provided valid mortality parameters
     if (!is.null(ext_mort_params)) {
@@ -695,7 +695,7 @@ setRefuge <- function(params, method, method_params = NULL,
                       ...) {
     mizer::with_info_level(info_level = info_level, {
     # Object validation
-    assert_that(is(params, "MizerParams"))
+    assert_that(inherits(params, "MizerParams"))
 
     # Find number of species for checks
     no_sp <- nrow(params@species_params)
@@ -1063,7 +1063,7 @@ setRefuge <- function(params, method, method_params = NULL,
 #' @export
 getRefuge <- function(params, use_dummy_fish_bins = TRUE, ...) {
     # object - Check if mizerParams is valid
-    assert_that(is(params, "MizerParams"))
+    assert_that(inherits(params, "MizerParams"))
 
     # Extract relevant data from params
     refuge_params <- params@other_params$refuge_params
@@ -1350,7 +1350,7 @@ newRefuge <- function(params, new_refuge = FALSE,
 
     # object check
     # Check if given mizerParams object is valid
-    assert_that(is(params, "MizerParams"))
+    assert_that(inherits(params, "MizerParams"))
 
     # Extract relevant data from params
     refuge_params <- params@other_params$refuge_params

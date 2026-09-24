@@ -104,8 +104,8 @@ test_that("upgradeReefParams migrates a fake 1.x object to a valid mizerReef obj
     fake <- make_fake_v1()
     out <- capture_result_and_warnings(upgradeReefParams(fake))
 
-    expect_s4_class(out$result, "mizerReef")
-    expect_true(is(mizer::validParams(out$result), "mizerReef"))
+    expect_s3_class(out$result, "mizerReef")
+    expect_true(inherits(mizer::validParams(out$result), "mizerReef"))
     expect_match(out$warnings, "rate-function overrides", all = FALSE)
     expect_match(out$warnings, "not guaranteed to be at a genuine joint steady state",
                  all = FALSE)
@@ -181,7 +181,7 @@ test_that("upgradeReefParams leaves core mizer slots untouched", {
     core_slots <- c("w", "dw", "w_full", "initial_n", "search_vol", "psi",
                     "intake_max", "metab", "interaction")
     for (s in core_slots) {
-        expect_equal(slot(result, s), slot(fake, s), info = s)
+        expect_equal(result[[s]], fake[[s]], info = s)
     }
 })
 
@@ -202,7 +202,7 @@ test_that("upgradeReefParams works for each refuge method", {
         fake <- make_fake_v1(method = method, method_params = method_params_by_method[[method]])
         result <- suppressWarnings(upgradeReefParams(fake))
         expect_equal(result@other_params$refuge_params$method, method, info = method)
-        expect_s4_class(result, "mizerReef")
+        expect_s3_class(result, "mizerReef")
     }
 })
 
@@ -233,7 +233,7 @@ test_that("upgradeReefParams leaves an already-current mizerReef object unchange
         }
     )
     expect_match(messages, "already a mizerReef object", all = FALSE)
-    expect_s4_class(result, "mizerReef")
+    expect_s3_class(result, "mizerReef")
     expect_equal(result@other_params, caribbean_3_model@other_params)
 })
 

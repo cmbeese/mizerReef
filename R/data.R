@@ -111,11 +111,11 @@
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish community
 #' structure. PhD Thesis, Newcastle University.
-#' @references Beese, C. (2025). PhD Thesis. "Modelling Coral Reef Futures:
-#' Exploring the role of structural complexity in sustaining ecosystem services."
-#' Victoria University of Wellington.
-#' https://doi.org/10.26686/wgtn.26421523
-#' @format mizerParams object
+#' @format A [mizerReef-class] object.
+#'
+#' The object was created with [newReefParams()] and is stored in the package's
+#' `data/` directory. R's standard lazy-loading preserves its S3 class vector
+#' and extension metadata.
 #' @source PhD Thesis, FORCE dataset
 "caribbean_3_model"
 
@@ -312,10 +312,12 @@
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish
 #' community structure. PhD Thesis, Newcastle University.
-#' @references Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
-#'   https://doi.org/10.26686/wgtn.26421523
-#' @format A \code{mizerReef} object (extends [MizerParams]) with
-#'   10 species, competitive refuge, and algae/detritus components.
+#' @format A [mizerReef-class] object with 10 species, competitive refuge, and
+#'   algae/detritus components.
+#'
+#' The object was created with [newReefParams()] and is stored in the package's
+#' `data/` directory. R's standard lazy-loading preserves its S3 class vector
+#' and extension metadata.
 #' @source PhD Thesis, FORCE dataset
 "caribbean_10_model"
 

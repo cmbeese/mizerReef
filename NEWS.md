@@ -1,3 +1,40 @@
+# mizerReef 2.1.0
+
+## Migration to mizer 3.4 S3 extension architecture
+
+- **S3 extension classes**: `mizerReef` and `mizerReefSim` are now ordinary entries
+  in the object's S3 class vector (e.g. `c("mizerReef", "MizerParams")`), matching
+  mizer 3.4's transition from S4 to S3.
+- **Removed session extension registry**: Removed `.onLoad()` registration and
+  the dynamic S4 marker class mechanism. Extensions now record themselves directly
+  on the object with `recordExtension()`, and `coerceToExtensionClass()` sets the
+  S3 class vector.
+- **S3 generic methods**: Added `findSteadyState.mizerReef` method (directing to the
+  project solver).
+- **Cleaned up legacy S4 usages**: Replaced `is(x, "MizerParams")` and `slot()`
+  calls across code and tests with `inherits()` and list indexing.
+- **Bundled models stored as S3 objects**: `caribbean_3_model` was regenerated
+  under mizer 3.4 from its calibration script. `caribbean_10_model` was
+  converted to the S3 format as-is, with its parameters unchanged, because
+  its recalibration is tracked separately; the old S4 copy made the
+  `karpata_model-description` and `running-simulations` vignettes fail to
+  build. Until that recalibration lands, `caribbean_10_model` is not at
+  steady state under the current code: projected forward, several species'
+  biomasses drift far from their starting values.
+- **mizerMR vignette temporarily hidden**: mizerMR does not yet support mizer
+  3.4, so the "Combining mizerReef with mizerMR" vignette has moved to
+  `vignettes-hidden/`, which is not built, and mizerMR has been removed from
+  `Suggests` and `Remotes`. mizerReef itself never depended on mizerMR. The
+  vignette will return once mizerMR supports mizer 3.4.
+
+## Bug fixes
+
+- `plotDegradationScale(trajectory = "rubble")` (and `"algae"`,
+  `"recovery"`) loaded the built-in trajectory into your global environment,
+  and used an object of the same name there in preference to the package's
+  own data if you already had one. It now always uses the package's data and
+  leaves your workspace unchanged.
+
 # MizerReef 2.0.3
 
 ## Bug fixes

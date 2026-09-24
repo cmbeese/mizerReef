@@ -285,8 +285,12 @@ scaleReefModel <- function(params, factor) {
     # a later recalculation cannot quietly restore the unscaled values.
     sp <- mizer::species_params(params)
 
-    params@other_params$algae$rho <- params@other_params$algae$rho / factor
-    sp$rho_algae <- sp$rho_algae / factor
+    if (!is.null(params@other_params$algae$rho)) {
+        params@other_params$algae$rho <- params@other_params$algae$rho / factor
+    }
+    if ("rho_algae" %in% names(sp)) {
+        sp$rho_algae <- sp$rho_algae / factor
+    }
 
     # algae$growth is a fixed, literature-informed production rate (see
     # setAlgaeParams()), deliberately NOT rescaled here -- unlike everything
@@ -302,53 +306,19 @@ scaleReefModel <- function(params, factor) {
     # reef that has just been suddenly decimated and hasn't had time to
     # respond -- so keeping it proportional to the (also scaled) fish
     # abundance here is what makes that frozen snapshot self-consistent.
-    params@other_params$detritus$rho <- params@other_params$detritus$rho / factor
-    sp$rho_detritus <- sp$rho_detritus / factor
-    params@other_params$detritus$external <- params@other_params$detritus$external * factor
+    if (!is.null(params@other_params$detritus$rho)) {
+        params@other_params$detritus$rho <- params@other_params$detritus$rho / factor
+    }
+    if ("rho_detritus" %in% names(sp)) {
+        sp$rho_detritus <- sp$rho_detritus / factor
+    }
+    if (!is.null(params@other_params$detritus$external)) {
+        params@other_params$detritus$external <- params@other_params$detritus$external * factor
+    }
 
     mizer::species_params(params, recalculate = FALSE) <- sp
 
-    # Now comes the code of mizer's standard scaleModel(), with one
-    # deliberate change: mizer's own version writes the scaled R_max and
-    # gamma directly into the `@species_params` slot, which has the same
-    # given-value bug fixed above (and throughout this package, following
-    # matchGrowth()'s precedent) for rho_algae/rho_detritus/
-    # matchReefGrowth() -- a later recalculation would silently revert
-    # R_max/gamma back to their pre-scale values. Reported upstream at
-    # https://github.com/sizespectrum/mizer/issues/599; routed through
-    # `recalculate = FALSE` here rather than waiting on that fix. The
-    # r_max -> R_max rename just below is left as a direct slot write, as it
-    # always was -- it only relabels an existing column -- and the
-    # `species_params<-()` call after it records the *scaled* result.
-    params <- validParams(params)
-    assert_that(is.number(factor), factor > 0)
-    params@cc_pp <- params@cc_pp * factor
-    params@resource_params$kappa <- params@resource_params$kappa * factor
-    if ("r_max" %in% names(params@species_params)) {
-        params@species_params$R_max <- params@species_params$r_max
-        params@species_params$r_max <- NULL
-        mizer::signal_info("R_max",
-                           "The 'r_max' column has been renamed to 'R_max'.",
-                           level = 1, unhandled = "show")
-    }
-    sp <- mizer::species_params(params)
-    if ("R_max" %in% names(sp)) {
-        sp$R_max <- sp$R_max * factor
-    }
-    params@search_vol <- params@search_vol / factor
-    if ("gamma" %in% names(sp)) {
-        sp$gamma <- sp$gamma / factor
-    }
-    mizer::species_params(params, recalculate = FALSE) <- sp
-    initial_n_other <- params@initial_n_other
-    for (res in names(initial_n_other)) {
-        initial_n_other[[res]] <- initial_n_other[[res]] * factor
-    }
-    initialN(params) <- params@initial_n * factor
-    initialNResource(params) <- params@initial_n_pp * factor
-    initialNOther(params) <- initial_n_other
-    params@sc <- params@sc * factor
-    return(params)
+    mizer::scaleModel(params, factor)
 }
 
 #' Scale background down by a factor
@@ -507,7 +477,7 @@ constant_dynamics <- function(params, n_other, component, ...) {
 #' @export
 matchReefGrowth <- function(params, species = NULL,
                             keep = c("egg", "biomass", "number")) {
-    assert_that(is(params, "MizerParams"))
+    assert_that(inherits(params, "MizerParams"))
     sel <- valid_species_arg(params,
         species = species,
         return.logical = TRUE

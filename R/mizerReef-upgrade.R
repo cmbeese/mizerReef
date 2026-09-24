@@ -1,43 +1,35 @@
 #' Upgrade a mizerReef params object to the current layout
 #'
 #' Called automatically by [mizer::validParams()] when an object created with
-#' an older version of mizerReef is loaded. Migrates data stored in the old
-#' custom S4 slots (`refuge_params`, `algae_params`, `detritus_params`) to the
+#' an older version of mizerReef is loaded. Migrates data stored in old
+#' custom locations (`refuge_params`, `algae_params`, `detritus_params`) to the
 #' current `other_params` sub-lists (`other_params$refuge_params`,
 #' `other_params$algae`, `other_params$detritus`).
 #'
 #' @param object A `mizerReef` params object (possibly from an older version).
 #' @param ... Unused.
 #' @return An upgraded `mizerReef` object.
-#' @importFrom methods .hasSlot slot
 #' @exportS3Method utils::upgrade
 upgrade.mizerReef <- function(object, ...) {
-    # Migrate old S4 slot data to other_params sub-lists if needed.
-    # The old class had three extra slots: refuge_params, algae_params,
-    # and detritus_params. These are stored as named lists inside
-    # other_params instead, at other_params$refuge_params,
-    # other_params$algae, and other_params$detritus (the mizer-canonical
-    # other_params[[component]] location for algae/detritus specifically,
-    # matching mizer::setComponent()'s/getComponent()'s contract -- see
-    # inst/to-do-list.txt's algae/detritus consolidation session).
-    #
-    # Because the slots no longer exist in the class definition, attempting to
-    # access them via @ would raise an error. We use tryCatch to detect the
-    # old layout structurally and migrate it safely.
-    tryCatch({
-        old_refuge <- .hasSlot(object, "refuge_params")
-        old_algae  <- .hasSlot(object, "algae_params")
-        old_det    <- .hasSlot(object, "detritus_params")
-        if (old_refuge && is.null(object@other_params$refuge_params)) {
-            object@other_params$refuge_params  <- slot(object, "refuge_params")
-        }
-        if (old_algae && is.null(object@other_params$algae)) {
-            object@other_params$algae   <- slot(object, "algae_params")
-        }
-        if (old_det && is.null(object@other_params$detritus)) {
-            object@other_params$detritus <- slot(object, "detritus_params")
-        }
-    }, error = function(e) NULL)  # silently ignore if slots do not exist
+    # A genuinely pre-3.4 S4 object (still `isS4(object)`) has no `$` method
+    # at all, so a direct `object$refuge_params` errors rather than returning
+    # NULL. tryCatch() here treats that the same as "no old-style data to
+    # migrate" instead of letting it crash validParams().
+    old_refuge   <- tryCatch(object$refuge_params, error = function(e) NULL)
+    old_algae    <- tryCatch(object$algae_params, error = function(e) NULL)
+    old_detritus <- tryCatch(object$detritus_params, error = function(e) NULL)
+    if (!is.null(old_refuge) && is.null(object@other_params$refuge_params)) {
+        object@other_params$refuge_params <- old_refuge
+        object$refuge_params <- NULL
+    }
+    if (!is.null(old_algae) && is.null(object@other_params$algae)) {
+        object@other_params$algae <- old_algae
+        object$algae_params <- NULL
+    }
+    if (!is.null(old_detritus) && is.null(object@other_params$detritus)) {
+        object@other_params$detritus <- old_detritus
+        object$detritus_params <- NULL
+    }
     object
 }
 
@@ -88,9 +80,9 @@ upgrade.mizerReef <- function(object, ...) {
 #' }
 #' @export
 upgradeReefParams <- function(params) {
-    assert_that(is(params, "MizerParams"))
+    assert_that(inherits(params, "MizerParams"))
 
-    if (is(params, "mizerReef")) {
+    if (inherits(params, "mizerReef")) {
         message(
             "This params object is already a mizerReef object created ",
             "with a current version of the package. Nothing to upgrade -- ",
@@ -245,7 +237,9 @@ upgradeReefParams <- function(params) {
     # merely been loaded, not applied to it.
     params <- mizer::recordExtension(
         params, "mizerReef",
-        version = as.character(utils::packageVersion("mizerReef")))
+        version = as.character(utils::packageVersion("mizerReef")),
+        requirement = "cmbeese/mizerReef"
+    )
     params <- mizer::coerceToExtensionClass(params)
     params <- mizer::validParams(params)
 
