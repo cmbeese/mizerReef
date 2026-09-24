@@ -13,6 +13,14 @@
   project solver).
 - **Cleaned up legacy S4 usages**: Replaced `is(x, "MizerParams")` and `slot()`
   calls across code and tests with `inherits()` and list indexing.
+- **Bundled models stored as S3 objects**: `caribbean_3_model` was regenerated
+  under mizer 3.4 from its calibration script. `caribbean_10_model` was
+  converted to the S3 format as-is, with its parameters unchanged, because
+  its recalibration is tracked separately; the old S4 copy made the
+  `karpata_model-description` and `running-simulations` vignettes fail to
+  build. Until that recalibration lands, `caribbean_10_model` is not at
+  steady state under the current code: projected forward, several species'
+  biomasses drift far from their starting values.
 
 # MizerReef 2.0.3
 
