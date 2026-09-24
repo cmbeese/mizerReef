@@ -624,7 +624,7 @@ section.
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] knitr_1.52              mizerReef_2.1.0         mizerExperimental_3.3.1
+    ## [1] knitr_1.52              mizerReef_2.0.3.9000    mizerExperimental_3.3.1
     ## [4] mizer_3.4.0.9000       
     ## 
     ## loaded via a namespace (and not attached):

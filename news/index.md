@@ -1,6 +1,6 @@
 # Changelog
 
-## mizerReef 2.1.0
+## mizerReef (development version)
 
 ### Migration to mizer 3.4 S3 extension architecture
 

@@ -19,13 +19,13 @@ Source:
 
 Beese C, Delius G, Mumby P, Rogers A (2026). *MizerReef: an R package to
 create multi-species size spectrum models for structurally complex
-habitats*. R package version 2.1.0,
+habitats*. R package version 2.0.3.9000,
 <https://github.com/cmbeese/mizerReef>.
 
     @Manual{,
       title = {MizerReef: an R package to create multi-species size spectrum models for structurally complex habitats},
       author = {Chelsey M. Beese and Gustav Delius and Peter J. Mumby and Alice Rogers},
       year = {2026},
-      note = {R package version 2.1.0},
+      note = {R package version 2.0.3.9000},
       url = {https://github.com/cmbeese/mizerReef},
     }

@@ -623,7 +623,7 @@ caribbean_10_model <- reefSteady(params)
     #> 
     #> other attached packages:
     #> [1] knitr_1.52              dplyr_1.2.1             ggplot2_4.0.3          
-    #> [4] mizerExperimental_3.3.1 mizerReef_2.1.0         mizer_3.4.0.9000       
+    #> [4] mizerExperimental_3.3.1 mizerReef_2.0.3.9000    mizer_3.4.0.9000       
     #> 
     #> loaded via a namespace (and not attached):
     #>  [1] plotly_4.12.1       sass_0.4.10         generics_0.1.4     
