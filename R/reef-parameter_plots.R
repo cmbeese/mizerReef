@@ -429,15 +429,13 @@ plotDegradationScale <- function(object = NULL,
                 algae = "algae_scale",
                 recovery = "recovery_scale"
             )
-            # Try to load the data object from the package
-            if (!exists(data_name, envir = .GlobalEnv)) {
-                data(list = data_name, package = "mizerReef", envir = .GlobalEnv)
-            }
-            if (exists(data_name, envir = .GlobalEnv)) {
-                dat <- get(data_name, envir = .GlobalEnv)
-            } else if (exists(data_name, envir = asNamespace("mizerReef"))) {
-                dat <- get(data_name, envir = asNamespace("mizerReef"))
-            } else {
+            # Load the package's own copy into a local environment, so a
+            # same-named object in the user's workspace is never used instead
+            # and nothing is added to it
+            e <- new.env()
+            data(list = data_name, package = "mizerReef", envir = e)
+            dat <- e[[data_name]]
+            if (is.null(dat)) {
                 stop(paste("Could not find data object:", data_name))
             }
             if (is.data.frame(dat)) {

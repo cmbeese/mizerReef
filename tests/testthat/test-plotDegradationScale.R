@@ -60,6 +60,28 @@ test_that("plotDegradationScale errors when neither object nor trajectory is pro
     expect_error(plotDegradationScale(), "Either 'object' or 'trajectory' must be provided")
 })
 
+test_that("plotDegradationScale uses the package's own trajectory data and leaves the global environment alone", {
+    had_global <- exists("rubble_scale", envir = .GlobalEnv, inherits = FALSE)
+    if (had_global) old <- get("rubble_scale", envir = .GlobalEnv)
+    withr::defer({
+        if (had_global) {
+            assign("rubble_scale", old, envir = .GlobalEnv)
+        } else if (exists("rubble_scale", envir = .GlobalEnv, inherits = FALSE)) {
+            rm("rubble_scale", envir = .GlobalEnv)
+        }
+    })
+
+    # A same-named object in the user's workspace must not be used instead
+    assign("rubble_scale", matrix(99, 2, 2), envir = .GlobalEnv)
+    result <- plotDegradationScale(trajectory = "rubble", return_data = TRUE)
+    expect_false(any(result$Scaling == 99))
+
+    # Loading the built-in data must not add it to the user's workspace
+    rm("rubble_scale", envir = .GlobalEnv)
+    plotDegradationScale(trajectory = "rubble", return_data = TRUE)
+    expect_false(exists("rubble_scale", envir = .GlobalEnv, inherits = FALSE))
+})
+
 test_that("plotDegradationScale errors on an invalid trajectory name", {
     expect_error(plotDegradationScale(trajectory = "bogus"), "Invalid trajectory")
 })

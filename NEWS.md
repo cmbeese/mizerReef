@@ -27,6 +27,14 @@
   `Suggests` and `Remotes`. mizerReef itself never depended on mizerMR. The
   vignette will return once mizerMR supports mizer 3.4.
 
+## Bug fixes
+
+- `plotDegradationScale(trajectory = "rubble")` (and `"algae"`,
+  `"recovery"`) loaded the built-in trajectory into your global environment,
+  and used an object of the same name there in preference to the package's
+  own data if you already had one. It now always uses the package's data and
+  leaves your workspace unchanged.
+
 # MizerReef 2.0.3
 
 ## Bug fixes
