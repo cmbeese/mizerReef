@@ -98,5 +98,5 @@ and consumption are equal for the chosen steady state abundances.
 data(caribbean_3_model)
 getDetritusProduction(caribbean_3_model)
 #>     feces    decomp  external 
-#>  176.0479  119.4528 -110.7587 
+#>  56.66259  15.05136 -49.92613 
 ```

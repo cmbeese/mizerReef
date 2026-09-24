@@ -4,11 +4,15 @@
 
 - [Getting started with
   MizerReef](https://cmbeese.github.io/mizerReef/articles/mizerReef.md):
+- [Running MizerReef
+  Simulations](https://cmbeese.github.io/mizerReef/articles/running-simulations.md):
 
 ### Tuning and Simulation
 
 - [MizerReef Steady State
   Recipe](https://cmbeese.github.io/mizerReef/articles/steady-state-recipe.md):
+- [Tuning Diet
+  Composition](https://cmbeese.github.io/mizerReef/articles/tuning-diet-composition.md):
 
 ### Model Description
 
@@ -23,5 +27,3 @@
 
 - [How mizerReef extends
   mizer](https://cmbeese.github.io/mizerReef/articles/extension_mechanism.md):
-- [Combining mizerReef with mizerMR: multiple background
-  resources](https://cmbeese.github.io/mizerReef/articles/using-multiple-resources.md):

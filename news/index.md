@@ -1,6 +1,138 @@
 # Changelog
 
+## mizerReef 2.1.0
+
+### Migration to mizer 3.4 S3 extension architecture
+
+- **S3 extension classes**: `mizerReef` and `mizerReefSim` are now
+  ordinary entries in the object’s S3 class vector
+  (e.g. `c("mizerReef", "MizerParams")`), matching mizer 3.4’s
+  transition from S4 to S3.
+- **Removed session extension registry**: Removed `.onLoad()`
+  registration and the dynamic S4 marker class mechanism. Extensions now
+  record themselves directly on the object with
+  [`recordExtension()`](https://sizespectrum.org/mizer/reference/recordExtension.html),
+  and
+  [`coerceToExtensionClass()`](https://sizespectrum.org/mizer/reference/coerceToExtensionClass.html)
+  sets the S3 class vector.
+- **S3 generic methods**: Added `findSteadyState.mizerReef` method
+  (directing to the project solver).
+- **Cleaned up legacy S4 usages**: Replaced `is(x, "MizerParams")` and
+  `slot()` calls across code and tests with
+  [`inherits()`](https://rdrr.io/r/base/class.html) and list indexing.
+- **Bundled models stored as S3 objects**: `caribbean_3_model` was
+  regenerated under mizer 3.4 from its calibration script.
+  `caribbean_10_model` was converted to the S3 format as-is, with its
+  parameters unchanged, because its recalibration is tracked separately;
+  the old S4 copy made the `karpata_model-description` and
+  `running-simulations` vignettes fail to build. Until that
+  recalibration lands, `caribbean_10_model` is not at steady state under
+  the current code: projected forward, several species’ biomasses drift
+  far from their starting values.
+- **mizerMR vignette temporarily hidden**: mizerMR does not yet support
+  mizer 3.4, so the “Combining mizerReef with mizerMR” vignette has
+  moved to `vignettes-hidden/`, which is not built, and mizerMR has been
+  removed from `Suggests` and `Remotes`. mizerReef itself never depended
+  on mizerMR. The vignette will return once mizerMR supports mizer 3.4.
+
+### Bug fixes
+
+- `plotDegradationScale(trajectory = "rubble")` (and `"algae"`,
+  `"recovery"`) loaded the built-in trajectory into your global
+  environment, and used an object of the same name there in preference
+  to the package’s own data if you already had one. It now always uses
+  the package’s data and leaves your workspace unchanged.
+
 ## MizerReef 2.0.3
+
+### Bug fixes
+
+- [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)‘s
+  `crit_feed` (the target feeding level used to calibrate each species’
+  algae/detritus encounter rate, `rho`, when a species doesn’t have its
+  own `f0`) defaulted to `0.7`, diverging from mizer’s own default for
+  the same quantity (`f0`’s documented fallback, `0.6`, see
+  [`get_f0_default()`](https://sizespectrum.org/mizer/reference/get_f0_default.html))
+  with no stated reason anywhere in the source. Found while auditing
+  mizerReef’s defaults for the vignette documentation work below;
+  changed to `0.6` to match mizer’s convention. This changes the
+  `rho_algae`/`rho_detritus` mizerReef calculates for any species
+  without its own `f0`, for any model built from scratch with
+  `crit_feed` left at its default – **the bundled `caribbean_3_model`/
+  `caribbean_10_model` objects are themselves unaffected** (they’re
+  pre-built data, not reconstructed on load), but rebuilding either from
+  its documented calibration script will now produce a slightly
+  different model than the currently-bundled one, since that script
+  doesn’t pass `crit_feed` explicitly.
+
+### Documentation
+
+- Vignettes reviewed and updated for accuracy against mizer 3.3 and the
+  `info_level` reporting mechanism (see New features below): `mizerReef`
+  and `steady-state-recipe` now mention `info_level` where model
+  construction is at its noisiest, and
+  [`setAlgaeParams()`](https://cmbeese.github.io/mizerReef/reference/setAlgaeParams.md)/
+  [`setDetritusParams()`](https://cmbeese.github.io/mizerReef/reference/setDetritusParams.md)’s
+  roxygen docs no longer refer to a nonexistent `resource_interaction`
+  column (the actual column is `interaction_resource`).
+- `steady-state-recipe.Rmd`’s “Understanding Reproduction Level and
+  Convergence” section is substantially condensed (it repeated the same
+  point about four times), and gains a new final step for rescaling
+  algae and detritus to a realistic absolute
+  standing-biomass/turnover-time scale with
+  [`rescale_algae()`](https://cmbeese.github.io/mizerReef/reference/rescale_algae.md)/`detritus_lifetime()<-`,
+  run only after diet, biomass and growth tuning since it doesn’t
+  disturb consumption.
+- The “Getting started with MizerReef” vignette is split in two:
+  `mizerReef` now covers building and tuning a first model, and a new
+  `running-simulations` vignette covers changing the refuge profile and
+  projecting a tuned model forward (fishing pressure,
+  habitat-degradation trajectories).
+- `karpata_model-description.Rmd` and
+  `caribbean_3_model-description.Rmd` no longer restate the general
+  model theory already covered in `model-description.Rmd` (growth,
+  mortality, reproduction, resource dynamics); each now links out to it
+  and keeps only what’s specific to its own example model. Their
+  introductions are also sharpened: `caribbean_3_model` reproduces the
+  3-group trait-based model from Rogers (2018), while
+  `caribbean_10_model`/Karpata is the field-calibrated, finer-resolution
+  extension of it.
+- New vignette `tuning-diet-composition.Rmd`, covering where diet
+  composition lives (`interaction_resource` vs. mizerReef’s own
+  `interaction_algae`/`interaction_detritus`), how
+  [`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md)/[`tuneUR_cc()`](https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.md)
+  keep algae and detritus in relative-scale balance as diet changes
+  (algae: fixed production, solved biomass; detritus: fixed biomass,
+  solved production – the two are not symmetric), and how to read
+  [`plotDiet()`](https://sizespectrum.org/mizer/reference/plotDiet.html).
+- Every value mizerReef itself chooses as a default (as opposed to
+  mizer’s own defaults, which are only pointed at mizer’s reference page
+  rather than restated) is now named across the vignettes, with its
+  actual value and how to override it: the species-level flags in
+  `mizerReef.Rmd` (including a fix – `satiation` was documented as
+  defaulting to TRUE for herbivores, when it actually defaults to TRUE
+  only for pure detritivores, matching `model-description.Rmd`’s
+  always-correct description and the source), the refuge-profile scalars
+  (`max_protect`, `tau`, `w_settle`, `a_bar`/`b_bar`,
+  `use_dummy_fish_bins`),
+  [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)’s
+  own construction-level choices (`w_pp_cutoff = 1` vs. mizer’s `10`;
+  `n = 0.75`, also reused as `p`, vs. mizer’s `2/3`; `crit_feed = 0.7`),
+  and the algae/detritus/ external-mortality model-level defaults
+  (`algae_growth_initial`, capacities, `sen_decomp`/`ext_decomp`,
+  `nat_mort`/`sen_prop`/`sen_curve`, `use_UR_cc`). Distinguished three
+  different kinds of default: reef-specific biology worth reconsidering
+  for a non-reef system (`a_bar`/`b_bar`, `algae_growth_initial`);
+  `w_pp_cutoff = 1` (vs. mizer’s `10`), a deliberate architectural
+  choice – mizerReef’s plankton spectrum represents plankton only, since
+  invertebrates get their own explicit species/spectrum instead of
+  sharing the single background resource the way a typical mizer model’s
+  often does; and `n`/`p` (`0.75`, vs. mizer’s `2/3`), which has no
+  documented rationale for differing from mizer’s own default – it
+  traces to Rogers (2018)’s own parameterisation, not a reef-specific
+  finding, so it’s a candidate for sensitivity-testing rather than a
+  value to trust as-is. (`crit_feed` was in this last category too – see
+  Bug fixes above.)
 
 ### New features
 
@@ -87,6 +219,111 @@
   by name via
   [`with_info_level()`](https://sizespectrum.org/mizer/reference/with_info_level.html)’s
   `except` argument targets the right one.
+
+- [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
+  now warns when `resource_params$kappa` is still at mizer’s
+  uncalibrated default (`1e11`) while `biomass_observed` is set. `gamma`
+  is derived by mizer’s
+  [`get_gamma_default()`](https://sizespectrum.org/mizer/reference/get_gamma_default.html)
+  to be self-consistent with whatever `kappa` exists at construction
+  time (see mizer PR
+  [\#603](https://github.com/cmbeese/mizerReef/issues/603) for this
+  staleness trap in general); left uncalibrated, `gamma` ends up sized
+  for a Resource pool ~11 orders of magnitude larger than any real fish
+  abundance, making encounter with real fish/invert prey numerically
+  negligible even though
+  [`matchReefGrowth()`](https://cmbeese.github.io/mizerReef/reference/matchReefGrowth.md)/[`matchBiomasses()`](https://sizespectrum.org/mizer/reference/matchBiomasses.html)
+  can still bring total biomass to the right target – silently producing
+  a model whose predators converge on realistic biomass while eating ~0%
+  fish prey. Confirmed directly for a from-scratch rebuild of
+  `caribbean_3_model` that skipped
+  [`calibrateReefBiomass()`](https://cmbeese.github.io/mizerReef/reference/calibrateReefBiomass.md).
+  Run
+  [`calibrateReefBiomass()`](https://cmbeese.github.io/mizerReef/reference/calibrateReefBiomass.md)
+  before
+  [`matchReefGrowth()`](https://cmbeese.github.io/mizerReef/reference/matchReefGrowth.md)/[`matchBiomasses()`](https://sizespectrum.org/mizer/reference/matchBiomasses.html)
+  to resolve it.
+
+### Bug fixes
+
+- The bundled `caribbean_3_model`/`caribbean_3_species`/
+  `caribbean_3_interaction` have been regenerated from a fresh,
+  from-scratch rebuild (`inst/scripts/Caribbean_3_model-calibration.R`),
+  rather than patched from the previous bundled model as the 02/08/2026
+  recalibration did. Biomass and age at maturity both match the
+  `biomass_observed`/`age_mat` targets closely (predators 107.09/107,
+  herbivores 34.00/34, inverts 40.00/40 g/m^2; age_mat 4.00/4.0,
+  1.60/1.6 years). Predators’ realized diet, previously dominated by
+  background “Resource” at essentially every size (a pre-existing issue,
+  not introduced here), now shows real, substantial piscivory across the
+  size range (real-prey fraction 0.3% -\> 4% -\> 62% -\> 92% -\> 99.7%
+  at w=4.7/53/510/933/1986g) via a new final calibration step using
+  [`mizerExperimental::scaleDownBackground()`](https://sizespectrum.org/mizerExperimental/reference/scaleDownBackground.html),
+  which shifts the fish-vs-resource abundance balance in a
+  dimensionally-safe way. Two other approaches to the same problem were
+  tried and abandoned first: pinning predators’ `gamma` to Rogers et
+  al. 2018’s literature value (Appendix S1 Table S2, 6.4 m^2/yr, which
+  destabilizes the model once an earlier no-op bug in the pinning helper
+  is fixed) and retuning the resource abundance scale/slope directly
+  after biomass calibration (unstable across its entire tested range).
+  As a side effect,
+  [`scaleDownBackground()`](https://sizespectrum.org/mizerExperimental/reference/scaleDownBackground.html)
+  also resolved a previously undiagnosed growth wall: predators’ growth
+  energy hit exactly zero around w=900-1000g (well short of
+  `w_inf=3125g`) because background Resource, capped at
+  `w_pp_cutoff=1g`, becomes inaccessible to predators once their
+  preferred prey size exceeds that cutoff, and there wasn’t enough real
+  prey to fill the gap. See the `caribbean-3-fresh-rebuild-diet-bug`
+  project history for the full derivation.
+
+- The bundled `caribbean_3_model`/`caribbean_3_species` have been
+  regenerated again with corrected maturity targets, using the same
+  from-scratch script as above. Both predators
+  (`Cephalopholis cruentata`, graysby grouper) and herbivores
+  (`Sparisoma viride`, stoplight parrotfish) are protogynous
+  hermaphrodites, and both species’ previous `age_mat` values (4 and 1.6
+  years respectively) turned out to reflect the wrong life-history
+  milestone or a superseded estimate rather than age at first maturity –
+  see the calibration script’s own design note for full citations. New
+  targets: `age_mat = 2` years and `l_mat = 16` cm TL (-\>
+  `w_mat = 102.4` g via each species’ length-weight relationship) for
+  both species. Biomass and age at maturity still match targets closely
+  (predators 107.04/107, herbivores 34.00/34, inverts 40.67/40 g/m^2;
+  age_mat 2.00/2.0 for both). The new `age_mat` targets shifted the
+  stable range for the
+  [`scaleDownBackground()`](https://sizespectrum.org/mizerExperimental/reference/scaleDownBackground.html)
+  factor (see above) sharply lower – the previous `factor=32` no longer
+  converges at all; re-tuned to `17` (stable boundary confirmed at 19/20
+  for this build). Predators’ realized diet is a little weaker as a
+  result (real-prey fraction ~76% at w=933g, down from ~92%, though
+  still meaningfully non-zero piscivory) – herbivore share of predator
+  diet specifically remains low (~1-6% across the size range) regardless
+  of this change. Three candidate levers for improving that specifically
+  (raising predators’ interaction weight on herbivores, lowering
+  predators’ `beta`, lowering predators’ `interaction_resource`) were
+  tested directly: only the first is numerically stable, and even at its
+  maximum (1.0, from 0.17) only raises herbivore diet share to ~6.5%;
+  the latter two both break biomass matching outright. None adopted in
+  this build – diet composition (see above) remains a known, open issue.
+
+- [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)‘s
+  residual (non-senescence) natural mortality,
+  $`\mu_{nat.i}(w) = \mu_{nat}\, w^{z0exp}`$, computed `z0exp <- 1 - n`
+  instead of `z0exp <- n - 1`, so with the default `n = 0.75` mortality
+  *increased* with body size (`w^0.25`) instead of decreasing
+  (`w^-0.25`) – the opposite of the allometric decline the function’s
+  own documentation described, of mizer’s own
+  [`setExtMort()`](https://sizespectrum.org/mizer/reference/setExtMort.html)
+  default (`z0exp = resource_params$n - 1`), and of the literature this
+  formula is drawn from (Rogers et al. 2018 Appendix S1, Table S2:
+  $`D_{iO}(m) = \mu\, m^{-0.25} + \dots`$). Affected both the
+  `include_ext_mort = TRUE` and `= FALSE` branches, and has been present
+  since the function’s first commit. Confirmed via a controlled
+  comparison that the sign was not the source of the `caribbean_3`
+  fresh-rebuild growth-matching instability (see the guard-rail warning
+  above) – both signs diverge at the same iteration once predators’
+  `gamma` is held at its literature value – so this is a standalone
+  correctness fix, not a resolution of that instability.
 
 ### Not converted, deliberately
 
@@ -315,18 +552,16 @@ Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and
   record only mizerReef in `@extensions`, via
   [`mizer::recordExtension()`](https://sizespectrum.org/mizer/reference/recordExtension.html),
   instead of copying the whole session extension registry with
-  [`getRegisteredExtensions()`](https://sizespectrum.org/mizer/reference/getRegisteredExtensions.html).
-  An extension can be loaded without having been applied to a particular
-  model, so the old code made the model claim it: with mizerMR merely
-  loaded,
+  `getRegisteredExtensions()`. An extension can be loaded without having
+  been applied to a particular model, so the old code made the model
+  claim it: with mizerMR merely loaded,
   [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
   returned an object recording mizerMR and promoted to S4 class
   `mizerMR`, with no `MR` component for mizerMR’s methods to read.
   Chaining is unaffected – each extension records itself as it is
   applied, and the bundled `caribbean_3_model` has only ever recorded
-  mizerReef – so
-  [`setMultipleResources()`](https://sizespectrum.org/mizerMR/reference/setMultipleResources.html)
-  still produces a properly chained `mizerMR`/`mizerReef` object.
+  mizerReef – so `setMultipleResources()` still produces a properly
+  chained `mizerMR`/`mizerReef` object.
 
 ### New features
 
@@ -359,8 +594,7 @@ Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and
   additionally require the biomass drift to settle.
 
 - Dropped the `splus2R` dependency. It was used for a single
-  [`splus2R::is.number()`](https://rdrr.io/pkg/splus2R/man/is.number.html)
-  call in
+  `splus2R::is.number()` call in
   [`getSenMort()`](https://cmbeese.github.io/mizerReef/reference/getSenMort.md),
   where every other predicate in the same
   [`assert_that()`](https://rdrr.io/pkg/assertthat/man/assert_that.html)
@@ -373,9 +607,7 @@ Upgraded to mizer 3.3. `DESCRIPTION` now requires `mizer (>= 3.3.0)` and
   renamed to `guide-use-extension-packages` and
   `guide-create-extension-package`. Example code now uses
   `biomass`/`per_log_size` in place of `power`. This needs mizerMR
-  0.3.1.2 or later in
-  [`vignette("using-multiple-resources")`](https://cmbeese.github.io/mizerReef/articles/using-multiple-resources.md):
-  0.3.1.1’s
+  0.3.1.2 or later in `vignette("using-multiple-resources")`: 0.3.1.1’s
   [`plotSpectra()`](https://sizespectrum.org/mizer/reference/plotSpectra.html)
   method still had the pre-3.3 signature and passed its own `power` down
   to [`NextMethod()`](https://rdrr.io/r/base/UseMethod.html), so the

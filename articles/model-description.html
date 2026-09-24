@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,12 +41,13 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/index.html">All articles</a></li>
     <li><a class="dropdown-item" href="../articles/mizerReef.html">Getting Started</a></li>
+    <li><a class="dropdown-item" href="../articles/running-simulations.html">Running Simulations</a></li>
     <li><a class="dropdown-item" href="../articles/steady-state-recipe.html">Tuning and Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/tuning-diet-composition.html">Tuning Diet Composition</a></li>
     <li><a class="dropdown-item" href="../articles/karpata_model-description.html">Functional Group Example</a></li>
     <li><a class="dropdown-item" href="../articles/caribbean_3_model-description.html">Simple 3-Group Example</a></li>
     <li><a class="dropdown-item" href="../articles/model-description.html">General Model Description</a></li>
     <li><a class="dropdown-item" href="../articles/extension_mechanism.html">Extension Mechanism</a></li>
-    <li><a class="dropdown-item" href="../articles/using-multiple-resources.html">Multiple Resources</a></li>
   </ul>
 </li>
       </ul>
@@ -123,6 +124,15 @@ runs over the modelled functional groups rather than taxonomic species;
 in mizerReef the entries of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>w</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_i(w)</annotation></semantics></math>
 are usually size spectra of feeding guilds.</p>
+<p>Every quantity below labelled a “mizerReef default” is a value the
+package fills in for you if you don’t supply your own – distinct from
+mizer’s own defaults, which this page doesn’t restate (see mizer’s <a href="https://sizespectrum.org/mizer/reference/setParams.html" class="external-link">Setting
+Parameters</a> reference page). Several were chosen for coral reefs and
+small-bodied reef fish specifically
+(e.g. <code>a_bar</code>/<code>b_bar</code>, algae’s production rate),
+so check them against your own system rather than assuming they transfer
+to a different kind of ecosystem; see <code><a href="../articles/mizerReef.html">vignette("mizerReef")</a></code>
+for the full listing and how to override each one.</p>
 </div>
 <div class="section level2">
 <h2 id="state-variables">State variables<a class="anchor" aria-label="anchor" href="#state-variables"></a>
@@ -214,7 +224,7 @@ for predators that can reach into refuge.</p>
 <p>The refuge profile is capped at a maximum protection level,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>w</mi><mo stretchy="false" form="postfix">)</mo><mo>≤</mo><msub><mi>r</mi><mi mathvariant="normal">max</mi></msub></mrow><annotation encoding="application/x-tex">R_i(w) \le
 r_{\max}</annotation></semantics></math> (<code>max_protect</code>,
-default
+mizerReef default
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.98</mn><annotation encoding="application/x-tex">0.98</annotation></semantics></math>),
 so that some food always remains accessible.</p>
 <div class="section level3">
@@ -232,8 +242,19 @@ and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>=</mo><mi>a</mi><mspace width="0.167em"></mspace><msup><mi>L</mi><mi>b</mi></msup></mrow><annotation encoding="application/x-tex">w = a\,
 L^{b}</annotation></semantics></math>), using either group-specific
 values or a set of “dummy fish” values
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>a</mi><mo accent="true">‾</mo></mover><mo>,</mo><mover><mi>b</mi><mo accent="true">‾</mo></mover></mrow><annotation encoding="application/x-tex">\bar a, \bar b</annotation></semantics></math>,
-depending on how the field data were collected.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>a</mi><mo accent="true">‾</mo></mover><mo>,</mo><mover><mi>b</mi><mo accent="true">‾</mo></mover></mrow><annotation encoding="application/x-tex">\bar a, \bar b</annotation></semantics></math>
+(mizerReef defaults
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.025</mn><annotation encoding="application/x-tex">0.025</annotation></semantics></math>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>,
+<code>a_bar</code>/<code>b_bar</code> – also used to fill in a real
+species’ own
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+if it’s missing one), depending on how the field data were collected.
+Fish below a settlement weight
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mtext mathvariant="normal">settle</mtext></msub><annotation encoding="application/x-tex">w_{\text{settle}}</annotation></semantics></math>
+(<code>w_settle</code>, mizerReef default
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.1</mn><annotation encoding="application/x-tex">0.1</annotation></semantics></math>
+g) are excluded from the refuge calculation altogether, as unsettled
+larvae.</p>
 <p><strong>Sigmoidal.</strong> A smooth decline in protection around a
 threshold length
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>L</mi><mtext mathvariant="normal">refuge</mtext></msub><annotation encoding="application/x-tex">L_{\text{refuge}}</annotation></semantics></math>,
@@ -273,7 +294,7 @@ refuge-using groups
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ℓ</mi><annotation encoding="application/x-tex">\ell</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>
-(<code>tau</code>, default
+(<code>tau</code>, mizerReef default
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>)
 is the fraction of individuals with access to a refuge that actually use
 it. When there are no competitors the protection is set to
@@ -310,7 +331,14 @@ are user-supplied scaling factors (the columns of
 <code>deg_scale</code>) giving the fractional change in refuge density
 in each successive year post-disturbance. Optionally the algal growth
 rate and carrying capacity can be boosted over the same period to
-represent the algal proliferation that often follows coral loss.</p>
+represent the algal proliferation that often follows coral loss
+(<code>algae_boost</code>, mizerReef default <code>FALSE</code>; when
+enabled,
+<code>algae_growth_boost</code>/<code>algae_capacity_boost</code>
+default to a 1.11x/2x multiplier). Degradation itself is off by default
+(<code>degrade = FALSE</code> in <code><a href="../reference/newReefParams.html">newReefParams()</a></code>) – it has
+to be requested explicitly, along with a disturbance trajectory, since
+there’s no sensible default trajectory to fall back on.</p>
 </div>
 </div>
 <div class="section level2">
@@ -365,7 +393,18 @@ set the overall consumption power, and the allometric exponents
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>m</mi><mrow><mi>a</mi><mi>l</mi><mi>g</mi></mrow></msub><mo>,</mo><msub><mi>m</mi><mrow><mi>d</mi><mi>e</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">m_{alg}, m_{det}</annotation></semantics></math>
 control how intake scales with consumer size. This contribution is added
 through mizer’s standard component mechanism
-(<code><a href="../reference/encounter_contribution.html">encounter_contribution()</a></code>).</p>
+(<code><a href="../reference/encounter_contribution.html">encounter_contribution()</a></code>). <code><a href="../reference/newReefParams.html">newReefParams()</a></code>
+calculates
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ρ</mi><mrow><mi>i</mi><mo>,</mo><mi>A</mi></mrow></msub><annotation encoding="application/x-tex">\rho_{i,A}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ρ</mi><mrow><mi>i</mi><mo>,</mo><mi>D</mi></mrow></msub><annotation encoding="application/x-tex">\rho_{i,D}</annotation></semantics></math>
+automatically for you, from <code>interaction_algae</code>/
+<code>interaction_detritus</code> and a target feeding level at maximum
+size (<code>crit_feed</code>, mizerReef default
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.6</mn><annotation encoding="application/x-tex">0.6</annotation></semantics></math>,
+matching mizer’s own default for the same quantity) – see
+<code><a href="../articles/mizerReef.html">vignette("mizerReef")</a></code>’s [Creating your first model]
+section.</p>
 </div>
 <div class="section level2">
 <h2 id="consumption-and-satiation">Consumption and satiation<a class="anchor" aria-label="anchor" href="#consumption-and-satiation"></a>
@@ -482,13 +521,13 @@ refuge apply the full mortality. This is computed by
 </h3>
 <p>Mortality from sources not modelled explicitly (predators outside the
 model, disease, and so on) is taken to be allometric in size,
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>n</mi><mi>a</mi><mi>t</mi><mi>.</mi><mi>i</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>w</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>μ</mi><mrow><mi>n</mi><mi>a</mi><mi>t</mi></mrow></msub><mspace width="0.167em"></mspace><msup><mi>w</mi><mrow><mspace width="0.167em"></mspace><mn>1</mn><mo>−</mo><mi>n</mi></mrow></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">
-\mu_{nat.i}(w) = \mu_{nat}\, w^{\,1-n},
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>n</mi><mi>a</mi><mi>t</mi><mi>.</mi><mi>i</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>w</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>μ</mi><mrow><mi>n</mi><mi>a</mi><mi>t</mi></mrow></msub><mspace width="0.167em"></mspace><msup><mi>w</mi><mrow><mspace width="0.167em"></mspace><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\mu_{nat.i}(w) = \mu_{nat}\, w^{\,n-1},
 </annotation></semantics></math> with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mrow><mi>n</mi><mi>a</mi><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">\mu_{nat}</annotation></semantics></math>
 the rate at
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-g (<code>nat_mort</code>, default
+g (<code>nat_mort</code>, mizerReef default
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.2</mn><annotation encoding="application/x-tex">0.2</annotation></semantics></math>)
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
@@ -496,7 +535,14 @@ the growth exponent. This is mizerReef’s external mortality
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>e</mi><mi>x</mi><mi>t</mi><mi>.</mi><mi>i</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>w</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mu_{ext.i}(w)</annotation></semantics></math>
 and plays the same role as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><msub><mn>0</mn><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">z0_i</annotation></semantics></math>
-in mizer.</p>
+in mizer, which defaults to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.6</mn><annotation encoding="application/x-tex">0.6</annotation></semantics></math>
+(<code>z0pre</code>) for the analogous rate under mizer’s own, simpler
+allometric formula – used only if you set
+<code>include_ext_mort = FALSE</code> to opt out of the mechanism above
+(mizerReef defaults <code>z0pre</code> to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.2</mn><annotation encoding="application/x-tex">0.2</annotation></semantics></math>
+too, in that case).</p>
 </div>
 <div class="section level3">
 <h3 id="senescence-mortality">Senescence mortality<a class="anchor" aria-label="anchor" href="#senescence-mortality"></a>
@@ -514,15 +560,23 @@ g. Here
 is the maximum weight of group
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>k</mi><mrow><mi>s</mi><mi>e</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">k_{sen}</annotation></semantics></math>
-(<code>sen_prop</code>) is the rate the curve approaches as
+(<code>sen_prop</code>, mizerReef default
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.1</mn><annotation encoding="application/x-tex">0.1</annotation></semantics></math>)
+is the rate the curve approaches as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi><mo>→</mo><msub><mi>w</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi><mi>.</mi><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">w \to w_{max.i}</annotation></semantics></math>
 (where the ratio is exactly 1), and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mrow><mi>s</mi><mi>e</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">p_{sen}</annotation></semantics></math>
-(<code>sen_curve</code>) controls the steepness with which mortality
-climbs as individuals approach their maximum size. Senescence mortality
-is included only when the model is set up to use it; both it and the
-residual natural mortality are configured through
-<code><a href="../reference/setExtMortParams.html">setExtMortParams()</a></code>.</p>
+(<code>sen_curve</code>, mizerReef default
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.3</mn><annotation encoding="application/x-tex">0.3</annotation></semantics></math>)
+controls the steepness with which mortality climbs as individuals
+approach their maximum size. All three of
+<code>nat_mort</code>/<code>sen_prop</code>/<code>sen_curve</code> are
+set together through <code><a href="../reference/setExtMortParams.html">setExtMortParams()</a></code>’s
+<code>ext_mort_params</code> argument – pass your own values there
+rather than accepting the package defaults if you have system-specific
+estimates. Senescence mortality itself is included by default
+(<code>include_sen_mort = TRUE</code> in <code><a href="../reference/newReefParams.html">newReefParams()</a></code>)
+but can be turned off.</p>
 </div>
 <div class="section level3">
 <h3 id="resource-mortality">Resource mortality<a class="anchor" aria-label="anchor" href="#resource-mortality"></a>
@@ -608,6 +662,13 @@ step the equation integrates to
 B_A(t + dt) = B_A(t)\, e^{-c_A\, dt}
   + \frac{P_A}{c_A}\left(1 - e^{-c_A\, dt}\right).
 </annotation></semantics></math></p>
+<p><code><a href="../reference/tuneUR.html">tuneUR()</a></code>/<code><a href="../reference/tuneUR_cc.html">tuneUR_cc()</a></code> (via
+<code><a href="../reference/reefSteady.html">reefSteady()</a></code>) keep
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mi>A</mi></msub><annotation encoding="application/x-tex">B_A</annotation></semantics></math>
+at this <em>relative</em>-scale balance as the fish sub-model changes.
+Getting the resulting <em>absolute</em> biomass onto a realistic scale
+is a separate, optional step, <code><a href="../reference/rescale_algae.html">rescale_algae()</a></code>, covered in
+<code><a href="../articles/steady-state-recipe.html">vignette("steady-state-recipe")</a></code>.</p>
 </div>
 <div class="section level3">
 <h3 id="detritus">Detritus<a class="anchor" aria-label="anchor" href="#detritus"></a>
@@ -657,6 +718,15 @@ that decompose to detritus rather than being exported.</li>
 as sponges, coral mucus and pelagic sinking (<code>external</code>), set
 to close the steady-state budget.</li>
 </ul>
+<p>Unlike algae, it’s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mrow><mi>D</mi><mo>,</mo><mtext mathvariant="normal">ext</mtext></mrow></msub><annotation encoding="application/x-tex">p_{D,\text{ext}}</annotation></semantics></math>
+that <code><a href="../reference/tuneUR.html">tuneUR()</a></code>/<code><a href="../reference/tuneUR_cc.html">tuneUR_cc()</a></code> solve for at each
+<em>relative</em>-scale balance – detritus’s current biomass
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mi>D</mi></msub><annotation encoding="application/x-tex">B_D</annotation></semantics></math>
+is left alone. As with algae, correcting the resulting <em>absolute</em>
+scale is a separate, optional step,
+<code><a href="../reference/rescale_detritus.html">rescale_detritus()</a></code>/<code>detritus_lifetime()&lt;-</code>,
+covered in <code><a href="../articles/steady-state-recipe.html">vignette("steady-state-recipe")</a></code>.</p>
 </div>
 <div class="section level3">
 <h3 id="carrying-capacity-variant">Carrying-capacity variant<a class="anchor" aria-label="anchor" href="#carrying-capacity-variant"></a>
@@ -716,7 +786,7 @@ B(t + dt) = B(t)\, e^{-\frac{dt}{K}(P + K c)}
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><msub><mn>0</mn><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">z0_i</annotation></semantics></math>
 </td>
 <td>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>n</mi><mi>a</mi><mi>t</mi></mrow></msub><mspace width="0.167em"></mspace><msup><mi>w</mi><mrow><mn>1</mn><mo>−</mo><mi>n</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\mu_{nat}\,w^{1-n}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>n</mi><mi>a</mi><mi>t</mi></mrow></msub><mspace width="0.167em"></mspace><msup><mi>w</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\mu_{nat}\,w^{n-1}</annotation></semantics></math>
 plus senescence
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>s</mi><mi>e</mi><mi>n</mi><mi>.</mi><mi>i</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>w</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mu_{sen.i}(w)</annotation></semantics></math>
 </td>

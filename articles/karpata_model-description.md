@@ -2,17 +2,20 @@
 
 ## Model Description
 
-[Skip to Size Spectrum Dynamics](#size-spectrum-dynamics)
+[Skip to Resources](#resources)
 
-The model includes 9 species groups of fish as well as a general group
-of benthic invertebrates. Species groups were assigned based on
-functional traits, body size, diet, and interactions with habitat
-structure. Estimates of observed biomass for each group were used to
-tune reproduction and resource consumption parameters so that steady
-state abundances agree with empirical observations. The process of
-establishing a steady state that agrees with empirical observations is
-nontrivial. The R script used to tune the steady state parameters is
-included at the end of this file.
+`caribbean_10_model` is mizerReef’s field-calibrated flagship example: 9
+fish species groups plus a general group of benthic invertebrates,
+parameterised against field data from Karpata Reef, Bonaire. Species
+groups were assigned based on functional traits, body size, diet, and
+interactions with habitat structure. It is the finer-resolution
+counterpart to the [3-group Caribbean
+model](https://cmbeese.github.io/mizerReef/articles/caribbean_3_model-description.md),
+which reproduces the coarser trait-based structure of Rogers et al.
+(2018) using the same marine-reserve dataset described below. This page
+documents this model’s specific parameters and how they were tuned; for
+the general mizerReef formulation these parameters plug into, see
+[`vignette("model-description")`](https://cmbeese.github.io/mizerReef/articles/model-description.md).
 
 Biomass estimates were based on data collected from Karpata Reef in
 Bonaire, a site with low fishing levels in a marine reserve (Rogers et
@@ -35,34 +38,13 @@ per square meter in grams.
 | farm_damsel   |                       0.40 |                NA |
 | herbs         |                       1.50 |          75.75344 |
 
-## Size Spectrum Dynamics
-
-[Skip to Resources](#resources)
-
-These dynamics expand on those used in standard Mizer models, see Delius
-et al. (2023).
-
-### Growth
-
-The growth of organisms is dependent on the energy they are able to
-obtain from consumed food resources.
-
-#### Predator-prey encounter rate
-
-The rate $`E_{i}(w)`$ at which a predator of species $`i`$ and weight
-$`w`$ encounters food is dictated by the predation power
-$`\gamma_i(w)`$, interaction matrix $`\theta_{ij}`$, the vulnerability
-to predation $`V_{ij}(w_p)`$, and the size selectivity of predator,
-given by the predation kernel $`\phi_i(w,w_p)`$.
-
-##### Interaction Matrix
+### Interaction matrix
 
 The $`\theta_{ij}`$ matrix sets the interaction strength between
-predator group $`i`$ prey group $`j`$. The predator/prey interaction
-matrix has entries between 0 (if the groups can not interact) and 1, see
-the figure below. All organisms were assumed to interact equally, with
-the exception of nocturnal invertivores which are known to hunt off the
-reef at night.
+predator group $`i`$ and prey group $`j`$, with entries between 0
+(groups cannot interact) and 1. All organisms were assumed to interact
+equally, with the exception of nocturnal invertivores which are known to
+hunt off the reef at night.
 
 ![Interaction strength between each predator group (rows) and prey group
 (columns) in the 10-group Karpata Reef
@@ -71,14 +53,13 @@ model.](karpata_model-description_files/figure-html/unnamed-chunk-3-1.png)
 Interaction strength between each predator group (rows) and prey group
 (columns) in the 10-group Karpata Reef model.
 
-##### Predation Kernel
+### Predation kernel
 
 The parameters for the predation kernels were based on trait-based
-studies of prey size selectivity, diet studies that estimate predator
-prey mass ratio, and home range size estimates from Nash et al. (2014).
-Values were tuned to achieve expected diet compositions. All estimates
-fall within observed ranges. All groups use a lognormal predation
-kernel. The parameters are given in the table below.
+studies of prey size selectivity, diet studies that estimate
+predator-prey mass ratio, and home range size estimates from Nash et al.
+(2014), tuned to achieve expected diet compositions. All estimates fall
+within observed ranges. All groups use a lognormal predation kernel.
 
 |             | beta | sigma |     gamma |
 |:------------|-----:|------:|----------:|
@@ -93,36 +74,17 @@ kernel. The parameters are given in the table below.
 | herbs       |   30 |     1 | 2.4050383 |
 | inverts     |   30 |     1 | 9.6181106 |
 
-#### Vulnerability to Predation
+### Vulnerability to predation
 
-The refuge function, $`R_j(w_p)`$, describes the proportion of fish of
-size $`w_p`$ in prey group $`j`$ that are hidden from predators.
-$`1 - R_j(w_p)`$ is then the proportion of fish of weight $`w_p`$ and
-prey group $`j`$ that are vulnerable to consumption by predators. This
-model uses the method to determine the **refuge profile**, the set of
-proportions that describe refuge availability across the entire size
-range of model fish (Rogers et al. (2018)). The proportion of prey of
-weight $`w_p`$ and group $`j`$ with access to refuge $`R_j(w_p)`$ is
-given by
-
-``` math
-R_j(w_p) = min\left \{R_{max} \, , \frac{\tau\cdot\eta_k}{\sum_{i}\int_{w_{k-1}}^{w_k} N_i(w)~dw}
-            ~~~~~~~ w_p \in (~w_{k-1}, w_k~] \right \}
-```
-{#eq-refuge_data}
-
-The parameter $`\tau`$ is the proportion of fish with access to refuge
-that are expected to utilize it, $`\eta_k`$ is the density
-($`no./m^{2}`$) of refuges in size range $`(w_{k-1}, w_k]`$ and
-$`\sum_{i} \int_{w_{k-1}}^{w_k} N_i(w)~dw`$ gives the total density
-($`no./m^{2}`$) of fish from any group in size range $`(w_{k-1}, w_k]`$.
-This represents the density of competitors for refuges in size class
-$`k`$. With this method, the refuge profile is density dependent.
-
-All fish are assumed to utilize refuge ($`\tau = 1`$). Fish smaller than
-0.1 g are assumed to be larval reef fish that have not yet settled to
-the reef. A maximum proportion of 98 % of fish are protected at any
-given time.
+This model uses the refuge method (see
+[`vignette("model-description")`](https://cmbeese.github.io/mizerReef/articles/model-description.md)’s
+[refuge
+profiles](https://cmbeese.github.io/mizerReef/articles/model-description.html#refuge-profiles)
+section for the general formulation and Rogers et al. (2018) for its
+derivation). All fish are assumed to utilize refuge ($`\tau = 1`$). Fish
+smaller than 0.1 g are assumed to be larval reef fish that have not yet
+settled to the reef. A maximum proportion of 98 % of fish are protected
+at any given time.
 
 Refuge length bins and densities used in the steady state (Karpata Reef,
 FORCE data)
@@ -143,8 +105,7 @@ FORCE data)
 How each species group interacts with predation refuge
 
 Each species group utilises benthic structures differently depending on
-their specific traits. The table below indicates how each species group
-interacts with structures that provide predation refuge.
+their specific traits.
 
 | Group       | Uses refuge? | Accesses prey in refuge? |
 |:------------|:-------------|:-------------------------|
@@ -159,9 +120,8 @@ interacts with structures that provide predation refuge.
 | herbs       | Yes          | Yes                      |
 | inverts     | ×            | Yes                      |
 
-the figure below shows the density-dependent refuge profile produced by
-the competitive method for the simple trait-based Bonaire model at
-steady state.
+The figure below shows the density-dependent refuge profile produced by
+the competitive method at steady state.
 
 ![Proportion of each refuge-using group protected from predation, by
 body length, at steady state, for the 10-group Karpata Reef
@@ -170,23 +130,19 @@ model.](karpata_model-description_files/figure-html/unnamed-chunk-8-1.png)
 Proportion of each refuge-using group protected from predation, by body
 length, at steady state, for the 10-group Karpata Reef model.
 
-#### Consumption
+### Consumption
 
 Invertebrate consumption of the detrital resource and planktivory are
-subject to a Holling functional response type II to represent satiation.
-This relationship is defined by the maximum intake rate, which increases
-allometrically with body size at rate $`n`$. The parameter $`h`$ is the
-max consumption rate for an invertebrate consumer of size 1 gram. Values
-for $`h`$ were chosen so that invertebrates are neither too starved nor
-totally satiated.
-
-Only a proportion $`\alpha_i`$ of consumed biomass is retained, while a
-proportion $`1-\alpha_i`$ is expelled in the form of feces, which
-contribute to the detritus. See the table below for the max consumption
-rate for invertebrates.
-
-No maximum consumption rate is imposed for predatory or herbivorous
-groups.
+subject to a Holling type II functional response (see
+[`vignette("model-description")`](https://cmbeese.github.io/mizerReef/articles/model-description.md)’s
+[Consumption and
+satiation](https://cmbeese.github.io/mizerReef/articles/model-description.html#consumption-and-satiation)
+section for the general formula). $`h`$ is the max consumption rate for
+an invertebrate consumer of size 1 gram, chosen so that invertebrates
+are neither too starved nor totally satiated; $`\alpha_i`$ is the
+proportion of consumed biomass retained, with $`1-\alpha_i`$ expelled as
+faeces, which contribute to detritus. No maximum consumption rate is
+imposed for predatory or herbivorous groups.
 
 |             |         h | alpha |    n |
 |:------------|----------:|------:|-----:|
@@ -196,14 +152,12 @@ groups.
 | herbs       |  58.95293 |   0.6 | 0.75 |
 | inverts     | 235.76163 |   0.6 | 0.75 |
 
-##### Metabolic Losses
+#### Metabolic losses
 
-The energy losses to metabolic needs are comprised of two components.
-Standard metabolism occurs at rate $`k_{s.i}`$, scaling allometrically
-with body size at rate $`p`$. The units of the coefficients $`k_{s.i}`$
-are $`\text{grams}^{1-p}`$ per year. Losses due to activity and movement
-occur at rate $`k_i`$ in grams per year, scaling with body size at rate
-$`1`$.
+Standard metabolism occurs at rate $`k_{s.i}`$; losses due to activity
+and movement occur at rate $`k_i`$ (see
+[`vignette("model-description")`](https://cmbeese.github.io/mizerReef/articles/model-description.md)
+for the general growth/reproduction formulation).
 
 |             |        ks |    p |   k |
 |:------------|----------:|-----:|----:|
@@ -218,13 +172,7 @@ $`1`$.
 | herbs       | 0.2339976 | 0.75 |   0 |
 | inverts     | 0.1000000 | 0.75 |   0 |
 
-##### Energy Invested into Reproduction
-
-A proportion $`\psi_i(w)`$ of the energy available for growth and
-reproduction is used for reproduction. This proportion changes from zero
-below the weight $`w_{mat.i}`$ of maturation to one at the maximum
-weight $`w_{max.i}`$, where all available energy is used for
-reproduction.
+#### Maturation and growth
 
 Maturation length and age data were based on the most observed species
 from each species group in the FORCE data set (Rogers et al. 2014,
@@ -243,21 +191,11 @@ Williams et al. 2015, 2016, Newman et al. 2015, Dryden 2016).
 | herbs       | 105.0 | 1269.327573 |     2.0 |
 | inverts     |   0.1 |  675.000000 |      NA |
 
-##### Somatic growth
-
-Energy that is left over after metabolism and reproduction is invested
-in somatic growth. The growth rate of an individual of from group $`i`$
-and weight $`w`$ is
-``` math
-  g_i(w) = E_{r.i}(w)\left(1-\psi_i(w)\right).
-```
-{#eq-growth} When food supply does not cover the requirements of
-metabolism and activity, growth and reproduction stops. There is no
-negative growth or starvation mortality.
-
-The values for the model parameters were chosen so that the resulting
-growth curves would be close to von Bertalanffy growth curves. The
-parameters in the table below were taken from the literature.
+The values for the growth parameters below were chosen so that the
+resulting growth curves would be close to von Bertalanffy growth curves;
+$`a`$ and $`b`$ are the allometric weight-length parameters
+$`w = a l^b`$ ($`w`$ in grams, $`l`$ in centimetres), taken from the
+literature. There is no negative growth or starvation mortality.
 
 |             | k_vb |       w_max |       a |    b |
 |:------------|-----:|------------:|--------:|-----:|
@@ -272,69 +210,25 @@ parameters in the table below were taken from the literature.
 | herbs       | 0.40 | 1269.327573 | 0.02570 | 2.95 |
 | inverts     | 2.00 |  675.000000 | 0.02500 | 3.00 |
 
-Here the parameters $`a`$ and $`b`$ are parameters for the allometric
-weight-length relationship $`w = a l^b`$ where $`w`$ is measured in
-grams and $`l`$ is measured in centimetres.
-
 ### Mortality
 
-The mortality rate $`\mu_i(w)`$ of an individual of group $`i`$ and
-weight $`w`$ has three sources: predation mortality $`\mu_{p.i}(w)`$,
-external mortality $`\mu_{ext.i}(w)`$, fishing mortality
-$`\mu_{f.i}(w)`$. External mortality is composed of residual natural
-mortality $`\mu_{nat.i}(w)`$, and senescence $`\mu_{sen.i}(w)`$. The
-mortality rate for group $`i`$ is then given by:
-``` math
-\mu_i(w)=\mu_{p.i}(w)+\mu_{ext.i}(w)+\mu_{f.i}(w)
-```
-{#eq-mort}
+See
+[`vignette("model-description")`](https://cmbeese.github.io/mizerReef/articles/model-description.md)’s
+[Mortality](https://cmbeese.github.io/mizerReef/articles/model-description.html#mortality)
+section for the general formulation. This model’s residual-natural- and
+senescence-mortality parameters:
 
-#### Predation mortality
+We use a residual natural mortality rate of $`\mu_{nat} =`$ 0.2 per year
+at size 1 gram, and senescence mortality parameters $`k_{sen} =`$ 0.1
+(`sen_prop`) and $`p_{sen} =`$ 0.3 (`sen_curve`, the exponent governing
+how steeply mortality climbs as individuals approach their maximum
+size), both based on estimates from Hatcher (1988).
 
-All consumption by fish translates into corresponding predation
-mortalities on the ingested prey individuals. the rate at which all
-predators from $`j`$ consume prey of size $`w_p`$ is
-``` math
-  \mathtt{pred\_rate}_j(w_p) = \int \phi_j(w,w_p) \gamma_j(w) N_j(w) \, dw.
-```
-{#eq-pred_rate}
-
-The mortality rate due to predation is then obtained as
-``` math
-  \mu_{p.i}(w_p) = \sum_j \mathtt{pred\_rate}_j(w_p)\, V_{ji}(w_p)\, \theta_{ji}.
-```
-{#eq-mup}
-
-#### Fishing Mortality
-
-Like in `mizer`, fishing mortality in `mizerReef` is imposed by fishing
-gears. The total per-capita fishing mortality (1/year) is obtained by
-summing over the mortality from all gears,
-
-``` math
-\mu_{f.i}(w) = \sum_g F_{g,i}(w)
-```
-
-where the fishing mortality $`F_{g,i}(w)`$ imposed by gear $`g`$ on
-group $`i`$ at size $`w`$ is calculated as:
-
-``` math
-F_{g,i}(w) = S_{g,i}(w) Q_{g,i} E_{g}
-```
-
-The constant $`S`$ is the selectivity by group, gear and size, $`Q`$ is
-the catchability by group and gear and $`E`$ is the fishing effort by
-gear.
+#### Fishing mortality
 
 Fishing parameters for mizerReef models can be set up with
-[`setFishing()`](https://sizespectrum.org/mizer/reference/setFishing.html),
-which contains the details of how to set up gears with different
-selectivities and catchabilities for each group.
-
-Fishing mortality $`\mu_{f.i}(w)`$ is calculated with the function
-[`getFMort()`](https://sizespectrum.org/mizer/reference/getFMort.html).
-The vignettes were run with following fishing parameters (the table
-below).
+[`setFishing()`](https://sizespectrum.org/mizer/reference/setFishing.html).
+The vignettes were run with the following fishing parameters:
 
 | Group       | Minimum fishing size \[g\] | Catchability \[1/year\] |
 |:------------|---------------------------:|------------------------:|
@@ -349,52 +243,14 @@ below).
 | herbs       |                      105.0 |                       1 |
 | inverts     |                        0.1 |                       1 |
 
-#### External Mortality
-
-##### Residual natural mortality
-
-Mortality caused by illness, fishing, or predators not explicitly
-included in the model is captured by $`\mu_{nat.i}(w)`$, which is
-independent of group identities and abundances. It is assumed to
-decrease allometrically with body size:
-
-``` math
-\mu_{nat.i}(w) = \mu_{nat} w^{1 - n}
-```
-{#eq-z0} where $`\mu_{nat}`$ is the residual natural mortality rate and
-$`n`$ is the allometric scaling exponent. We use a residual mortality
-rate of $`\mu_{nat} =`$ 0.2 per year at size 1 gram.
-
-##### Senescence mortality
-
-Senescence mortality $`\mu_{sen.i}(w)`$ is intended to capture mortality
-due to illness or old age. It is independent of group abundances.
-Senescence mortality is assumed to increase allometrically with body
-size. The rate of senescence mortality is given by:
-
-``` math
-\mu_{sen.i}(w) = k_{sen} \left(\frac{log_{10}(w)}
-                                    {log_{10}(w_{max.i})}\right)^{p_{sen}}
-```
-{#eq-extmort} with the ratio floored at zero for $`w < 1`$ g. Here
-$`k_{sen}`$ (`sen_prop`) is the rate the curve approaches as $`w \to
-w_{max.i}`$, and $`p_{sen}`$ (`sen_curve`) controls the steepness with
-which mortality climbs as individuals approach their maximum size, and
-$`w_{max.i}`$ is the maximum body size of species group $`i`$ in grams.
-
-Senescence mortality due to illness and old age uses $`k_{sen} =`$ 0.1
-and $`p_{sen} =`$ 0.3 for this model.
-
 ### Reproduction
 
 The reproduction parameters $`\epsilon_i`$ and $`R_{max.i}`$ are not
-directly observable. The values were instead chosen so as to produce
+directly observable. Their values were instead chosen so as to produce
 steady-state abundances of the groups that are in line with observations
-and to give reasonable values for the reproduction level.
-
-the table below gives the steady-state reproduction level which is
-defined as the ratio between the actual reproduction rate $`R_i`$ and
-the maximal possible reproduction rate $`R_{\max.i}`$.
+and to give reasonable values for the reproduction level – the ratio
+between the actual reproduction rate $`R_i`$ and the maximal possible
+reproduction rate $`R_{\max.i}`$.
 
 |             | w_min |     erepro |      R_max |
 |:------------|------:|-----------:|-----------:|
@@ -413,53 +269,25 @@ the maximal possible reproduction rate $`R_{\max.i}`$.
 
 [Skip to Tuning the Steady State](#tuning-the-steady-state)
 
-The fish spectrum is fed by three background resources: plankton ,
-algae, and detritus. Small individuals of all species will feed on
-plankton while only herbivorous groups and invertebrates feed on algae
-or detritus. The general mathematical form of the algae and detritus
-dynamics – a linear production/consumption balance for each pool, solved
-analytically each time step – was adapted from Delius et al. (2022, de
-Juan et al. 2023). This is not a direct port: mizerShelf represents its
-detritus/carrion pools by rescaling the total biomass of mizer’s
-size-structured background resource spectrum, whereas mizerReef’s algae
-and detritus are genuinely unstructured scalar pools with their own
-dedicated encounter-rate matrices, added as independent components via
-[`setComponent()`](https://sizespectrum.org/mizer/reference/setComponent.html).
-mizerReef also adds coral-reef-specific behaviour with no equivalent in
-mizerShelf, most notably that algae production is treated as a fixed
-rate of primary production decoupled from consumer demand rather than
-tuned to match consumption (see
-[`algae_consumption()`](https://cmbeese.github.io/mizerReef/reference/algae_consumption.md)’s
-documentation for the ecological rationale and citations).
+The fish spectrum is fed by three background resources: plankton, algae,
+and detritus. Small individuals of all species feed on plankton, while
+only herbivorous groups and invertebrates feed on algae or detritus. See
+[`vignette("model-description")`](https://cmbeese.github.io/mizerReef/articles/model-description.md)’s
+[unstructured resource
+dynamics](https://cmbeese.github.io/mizerReef/articles/model-description.html#unstructured-resource-dynamics)
+section for the general formulation and its relationship to mizerShelf.
 
 #### Plankton
 
-The plankton spectrum $`N_P(w)`$ tracks the abundance all planktonic
-food sources. This spectrum starts at a smaller size than the fish
-spectrum in order to provide food for the smallest individuals (larvae)
-of the fish spectrum.
-
 The plankton spectrum ranges from $`w_0=9\times 10^{-13}`$ to
 $`w_{cutoff}=0.1`$ grams. The steady state abundance of plankton at size
-1 gram is $`\kappa=11.4[g/m^{-2}]`$. The slope of the plankton spectrum
-is set to $`\lambda=2.05`$.
+1 gram is $`\kappa=11.4 (g/m^{2})`$, with slope $`\lambda=2.05`$.
 
 #### Algae
 
-The algal resource is described only by its total biomass $`B_A`$.
-Feeding on algae is not is not size-based. Herbivores can feed on algae
-of any size. In the steady state the total algal biomass per square
-meter is $`B_A = 4.15\times 10^{-9}`$ grams.
-
-##### Algal consumption
-
-For each consumer species $`i`$, a parameter $`\rho_{A.i}`$ determines
-the rate at which individuals of that species encounter algal biomass.
-The parameters $`\rho_{i.A}`$ have units of $`g^{-n}`$ per year. They
-are non-zero only for species that consume at least some algae. The
-preference $`\theta_{i.A}`$ for algae is a value between 0 and 1
-specifying the proportion of consumer diets that are comprised of algal
-matter.
+The algal resource is described only by its total biomass $`B_A`$, and
+feeding on it is not size-based. In the steady state the total algal
+biomass per square meter is $`B_A = 4.15\times 10^{-9}`$ grams.
 
 |             |         rho | interaction_algae |
 |:------------|------------:|------------------:|
@@ -467,29 +295,20 @@ matter.
 | farm_damsel |  9563740389 |               0.5 |
 | herbs       | 37601006284 |               0.5 |
 
-##### Algal production
-
-The rate at which algal biomass is produced by the ecosystem is given by
-a constant growth rate with units of grams per unit area per unit time.
-At steady state algal production is 2000 grams per square meter per
-year.
+Algal *production* – a fixed, literature-informed constant,
+`algae_growth_initial` in
+[`setAlgaeParams()`](https://cmbeese.github.io/mizerReef/reference/setAlgaeParams.md)
+– is 2000 grams per square meter per year at steady state. Note this
+value is not retuned to match consumption the way detritus production is
+(see below); see
+[`vignette("model-description")`](https://cmbeese.github.io/mizerReef/articles/model-description.md)’s
+Algae section for why.
 
 #### Detritus
 
-Detritus is consumed by herbivores and benthic invertebrates. Feeding on
-detritus is not size-based as fish can feed on detritus particles of any
-size. The detritus resource is described only by its total biomass
-$`B_D`$. In the steady state the total detrital biomass per square meter
-is $`B_D = 1.143\times 10^{-10}`$ grams.
-
-##### Detrital consumption
-
-For each consumer species $`i`$, a parameter $`\rho_{D.i}`$ determines
-the rate at which individuals of that species encounter detritus. The
-parameters $`\rho_{i.D}`$ have units of $`g^{-n}`$ per year. They are
-non-zero only for species that consume at least some detritus. The
-preference $`\theta_{i.D}`$ for detritus is a value between 0 and 1
-specifying the proportion of consumer diets comprised of detritus.
+Detritus is consumed by herbivores and benthic invertebrates, also not
+size-based. In the steady state the total detrital biomass per square
+meter is $`B_D = 1.143\times 10^{-10}`$ grams.
 
 |             |          rho | interaction_detritus |
 |:------------|-------------:|---------------------:|
@@ -499,28 +318,24 @@ specifying the proportion of consumer diets comprised of detritus.
 | herbs       |  37601006284 |                  0.5 |
 | inverts     | 300744178552 |                  1.0 |
 
-##### Detrital production
-
-Detritus comes from defecation and decomposing dead organisms that die
-as a result of sources of external mortality. At steady state detritus
-from decomposing dead organisms is 46.09 g/year and defecation produces
-284.23 g/year. A proportion `ext_decomp` of the external mortality and a
-proportion `sen_decomp` of senescence mortality decomposes to detritus.
-The proportion of detritus that sinks from external mortality is 80 %
-and the proportion that decomposes from senescence mortality is 80 %.
-These values are based on estimates from Hatcher (1988).
-
-External detritus is generated by unmodelled sources or sinks in from
-the pelagic zone. At steady state external detritus production is
--305.69 g/year. This value is set so that steady state abundances match
-empirical observations. Where it is negative, feces and mortality are
-producing more detritus than can be consumed. Detrital biomass is
-assumed to be washed away by wave action in this case.
+Detritus production comes from three sources: defecation, decomposing
+dead organisms, and external input. At steady state, decomposing dead
+organisms contribute 46.09 g/year and defecation contributes 284.23
+g/year – 80 % of external mortality and 80 % of senescence mortality is
+assumed to decompose to detritus (estimates from Hatcher (1988)). The
+remaining external-input term is solved for so that, unlike algae,
+detritus *production* matches current consumption: at steady state it is
+-305.69 g/year. Where this is negative, faeces and mortality alone
+already produce more detritus than is consumed, and the excess is
+assumed to be washed away.
 
 ## Tuning the Steady State
 
 The following R script was used to tune the steady state parameters for
-this model.
+this model (see
+[`vignette("steady-state-recipe")`](https://cmbeese.github.io/mizerReef/articles/steady-state-recipe.md)
+for the general recipe this follows, including the final algae/detritus
+absolute-scale rescaling step).
 
 Show the full steady-state calibration script
 
@@ -543,16 +358,18 @@ karpata_int     <- read.csv(here("inst/data-csv/caribbean_10_interaction.csv"),
 karpata_refuge  <- karpata_refuge
 tuning_profile  <- tuning_profile
 
-# Herbivores consume plankton at small sizes and 
+# Herbivores consume plankton at small sizes and
 #   transition to detritus and algae as they grow
 # Invertebrates consume plankton and detritus,
 #   with the proportion of detritus increasing with size
 
-## Set model ----------------------------------------
+## Set model, with info_level = 1 to keep only the reports that say
+## something went differently from what was asked, not every default fill ---
 params <- newReefParams(species_params = karpata_10plus,
                         interaction = karpata_int,
                         method = "binned",
-                        method_params = tuning_profile)
+                        method_params = tuning_profile,
+                        info_level = 1)
 
 ## Reduce density dependent of reproduction ----------------
 rdi <- rep(0.5, dim(karpata_int)[1])
@@ -563,7 +380,7 @@ getReproductionLevel(params)
 ## Project to first steady state -------------------------------
 params <- params |>
     reefSteady() |> reefSteady() |> reefSteady() |> reefSteady() |>
-    reefSteady() |> reefSteady() 
+    reefSteady() |> reefSteady()
 
 ## Calibrate biomasses and growth ---------------------------------
 # Match observed species group biomasses
@@ -577,11 +394,11 @@ params <- reefSteady(params)
 
 # Iterate to refine biomass
 params <- params |>
-    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|>
     reefSteady()|>
-    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|>
     reefSteady()|>
-    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|> 
+    calibrateReefBiomass() |> matchBiomasses()|> matchReefGrowth()|>
     reefSteady()
 
 # Check biomass match
@@ -606,10 +423,10 @@ params <- newRefuge(params,
 
 # Match biomasses again
 params <- params |>
-    matchBiomasses()|> reefSteady()|> 
     matchBiomasses()|> reefSteady()|>
     matchBiomasses()|> reefSteady()|>
-    matchBiomasses()|> reefSteady() 
+    matchBiomasses()|> reefSteady()|>
+    matchBiomasses()|> reefSteady()
 
 # Make sure new refuge is in place
 plotVulnerable(params)
@@ -646,7 +463,7 @@ params <- reefSteady(params)
 # Check reproduction level (value between 0 and 1) - should be higher for
 # larger, slow growing species and low for small, fast growing ones
 getReproductionLevel(params)
-# A reproduction level closer to one means reproduction rate is 
+# A reproduction level closer to one means reproduction rate is
 # almost totally independent of the investment into reproduction
 # These are near one for all species except farming damsels
 
@@ -675,23 +492,15 @@ plotFeedingLevel(params)
 plotDiet(params) + scale_x_log10(limits = c(1, 1e4))
 plotSpectra(params, biomass = TRUE)
 
+# Rescale algae/detritus to a realistic absolute scale, now that diet,
+# biomass and growth are tuned -- see vignette("steady-state-recipe")'s
+# final step for the literature targets and why this belongs last.
+params <- rescale_algae(params, target_biomass / algae_biomass(params))
+detritus_lifetime(params) <- target_lifetime
+
 # Save!
 caribbean_10_model <- reefSteady(params)
 ```
-
-de Juan, S., G. Delius, and F. Maynou. 2023. [A model of size-spectrum
-dynamics to estimate the effects of improving fisheries selectivity and
-reducing discards in mediterranean mixed demersal
-fisheries](https://doi.org/10.1016/j.fishres.2023.106764). Fisheries
-Research 266:106764.
-
-Delius, G., S. de Juan, and F. Maynou. 2022. [mizerShelf: Mizer models
-with carrion and detritus components suitable for continental shelf
-ecosystems](https://sizespectrum.org/mizerShelf/).
-
-Delius, G., F. Scott, J. Blanchard, and K. Andersen. 2023. [Mizer:
-Dynamic multi-species size spectrum
-modelling](https://CRAN.R-project.org/package=mizer).
 
 Dryden, C. 2016. Habitat structural complexity of caribbean coral reefs
 and its relationships with fish community structure. PhD thesis,

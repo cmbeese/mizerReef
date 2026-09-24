@@ -34,6 +34,18 @@ Throughout, the index $`i`$ (or $`j`$) runs over the modelled functional
 groups rather than taxonomic species; in mizerReef the entries of
 $`N_i(w)`$ are usually size spectra of feeding guilds.
 
+Every quantity below labelled a “mizerReef default” is a value the
+package fills in for you if you don’t supply your own – distinct from
+mizer’s own defaults, which this page doesn’t restate (see mizer’s
+[Setting
+Parameters](https://sizespectrum.org/mizer/reference/setParams.html)
+reference page). Several were chosen for coral reefs and small-bodied
+reef fish specifically (e.g. `a_bar`/`b_bar`, algae’s production rate),
+so check them against your own system rather than assuming they transfer
+to a different kind of ecosystem; see
+[`vignette("mizerReef")`](https://cmbeese.github.io/mizerReef/articles/mizerReef.md)
+for the full listing and how to override each one.
+
 ## State variables
 
 A mizerReef model carries the same consumer spectra $`N_i(w)`$ and
@@ -93,8 +105,8 @@ value $`1-R_i(w)`$ for blocked predators and $`1`$ for predators that
 can reach into refuge.
 
 The refuge profile is capped at a maximum protection level, $`R_i(w) \le
-r_{\max}`$ (`max_protect`, default $`0.98`$), so that some food always
-remains accessible.
+r_{\max}`$ (`max_protect`, mizerReef default $`0.98`$), so that some
+food always remains accessible.
 
 ### Refuge profiles
 
@@ -104,8 +116,12 @@ which offers three ways to specify it plus a trivial “no refuge” option.
 All three convert between length and weight using length–weight
 parameters $`a`$ and $`b`$ (so that $`w = a\,
 L^{b}`$), using either group-specific values or a set of “dummy fish”
-values $`\bar a, \bar b`$, depending on how the field data were
-collected.
+values $`\bar a, \bar b`$ (mizerReef defaults $`0.025`$/$`3`$,
+`a_bar`/`b_bar` – also used to fill in a real species’ own $`a`$/$`b`$
+if it’s missing one), depending on how the field data were collected.
+Fish below a settlement weight $`w_{\text{settle}}`$ (`w_settle`,
+mizerReef default $`0.1`$ g) are excluded from the refuge calculation
+altogether, as unsettled larvae.
 
 **Sigmoidal.** A smooth decline in protection around a threshold length
 $`L_{\text{refuge}}`$, appropriate when the refuge-size distribution is
@@ -138,9 +154,9 @@ R_i(w) = \min\!\left(r_{\max},\;
   \qquad w \in (w_{k-1}, w_k],
 ```
 where the sum runs over all refuge-using groups $`\ell`$ and $`\tau`$
-(`tau`, default $`1`$) is the fraction of individuals with access to a
-refuge that actually use it. When there are no competitors the
-protection is set to $`r_{\max}`$.
+(`tau`, mizerReef default $`1`$) is the fraction of individuals with
+access to a refuge that actually use it. When there are no competitors
+the protection is set to $`r_{\max}`$.
 
 The competitive profile is the only one that couples back to the fish
 abundances: as a size class becomes crowded, the same number of refuges
@@ -171,7 +187,14 @@ where the $`s_k(t)`$ are user-supplied scaling factors (the columns of
 `deg_scale`) giving the fractional change in refuge density in each
 successive year post-disturbance. Optionally the algal growth rate and
 carrying capacity can be boosted over the same period to represent the
-algal proliferation that often follows coral loss.
+algal proliferation that often follows coral loss (`algae_boost`,
+mizerReef default `FALSE`; when enabled,
+`algae_growth_boost`/`algae_capacity_boost` default to a 1.11x/2x
+multiplier). Degradation itself is off by default (`degrade = FALSE` in
+[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md))
+– it has to be requested explicitly, along with a disturbance
+trajectory, since there’s no sensible default trajectory to fall back
+on.
 
 ## Encounter rate
 
@@ -212,6 +235,13 @@ consumption power, and the allometric exponents $`m_{alg}, m_{det}`$
 control how intake scales with consumer size. This contribution is added
 through mizer’s standard component mechanism
 ([`encounter_contribution()`](https://cmbeese.github.io/mizerReef/reference/encounter_contribution.md)).
+[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
+calculates $`\rho_{i,A}`$ and $`\rho_{i,D}`$ automatically for you, from
+`interaction_algae`/ `interaction_detritus` and a target feeding level
+at maximum size (`crit_feed`, mizerReef default $`0.6`$, matching
+mizer’s own default for the same quantity) – see
+[`vignette("mizerReef")`](https://cmbeese.github.io/mizerReef/articles/mizerReef.md)’s
+\[Creating your first model\] section.
 
 ## Consumption and satiation
 
@@ -305,11 +335,15 @@ refuge apply the full mortality. This is computed by
 Mortality from sources not modelled explicitly (predators outside the
 model, disease, and so on) is taken to be allometric in size,
 ``` math
-\mu_{nat.i}(w) = \mu_{nat}\, w^{\,1-n},
+\mu_{nat.i}(w) = \mu_{nat}\, w^{\,n-1},
 ```
-with $`\mu_{nat}`$ the rate at $`1`$ g (`nat_mort`, default $`0.2`$) and
-$`n`$ the growth exponent. This is mizerReef’s external mortality
-$`\mu_{ext.i}(w)`$ and plays the same role as $`z0_i`$ in mizer.
+with $`\mu_{nat}`$ the rate at $`1`$ g (`nat_mort`, mizerReef default
+$`0.2`$) and $`n`$ the growth exponent. This is mizerReef’s external
+mortality $`\mu_{ext.i}(w)`$ and plays the same role as $`z0_i`$ in
+mizer, which defaults to $`0.6`$ (`z0pre`) for the analogous rate under
+mizer’s own, simpler allometric formula – used only if you set
+`include_ext_mort = FALSE` to opt out of the mechanism above (mizerReef
+defaults `z0pre` to $`0.2`$ too, in that case).
 
 ### Senescence mortality
 
@@ -322,13 +356,19 @@ adds a size-increasing senescence term
   \left(\frac{\log_{10} w}{\log_{10} w_{max.i}} \right)^{p_{sen}},
 ```
 with the ratio floored at zero for $`w < 1`$ g. Here $`w_{max.i}`$ is
-the maximum weight of group $`i`$, $`k_{sen}`$ (`sen_prop`) is the rate
-the curve approaches as $`w \to w_{max.i}`$ (where the ratio is exactly
-1), and $`p_{sen}`$ (`sen_curve`) controls the steepness with which
-mortality climbs as individuals approach their maximum size. Senescence
-mortality is included only when the model is set up to use it; both it
-and the residual natural mortality are configured through
-[`setExtMortParams()`](https://cmbeese.github.io/mizerReef/reference/setExtMortParams.md).
+the maximum weight of group $`i`$, $`k_{sen}`$ (`sen_prop`, mizerReef
+default $`0.1`$) is the rate the curve approaches as $`w \to w_{max.i}`$
+(where the ratio is exactly 1), and $`p_{sen}`$ (`sen_curve`, mizerReef
+default $`0.3`$) controls the steepness with which mortality climbs as
+individuals approach their maximum size. All three of
+`nat_mort`/`sen_prop`/`sen_curve` are set together through
+[`setExtMortParams()`](https://cmbeese.github.io/mizerReef/reference/setExtMortParams.md)’s
+`ext_mort_params` argument – pass your own values there rather than
+accepting the package defaults if you have system-specific estimates.
+Senescence mortality itself is included by default
+(`include_sen_mort = TRUE` in
+[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md))
+but can be turned off.
 
 ### Resource mortality
 
@@ -404,6 +444,16 @@ B_A(t + dt) = B_A(t)\, e^{-c_A\, dt}
   + \frac{P_A}{c_A}\left(1 - e^{-c_A\, dt}\right).
 ```
 
+[`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md)/[`tuneUR_cc()`](https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.md)
+(via
+[`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md))
+keep $`B_A`$ at this *relative*-scale balance as the fish sub-model
+changes. Getting the resulting *absolute* biomass onto a realistic scale
+is a separate, optional step,
+[`rescale_algae()`](https://cmbeese.github.io/mizerReef/reference/rescale_algae.md),
+covered in
+[`vignette("steady-state-recipe")`](https://cmbeese.github.io/mizerReef/articles/steady-state-recipe.md).
+
 ### Detritus
 
 Detritus obeys the same form,
@@ -445,6 +495,15 @@ P_D = p_{D,f} + p_{D,d} + p_{D,\text{ext}}.
   and pelagic sinking (`external`), set to close the steady-state
   budget.
 
+Unlike algae, it’s $`p_{D,\text{ext}}`$ that
+[`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md)/[`tuneUR_cc()`](https://cmbeese.github.io/mizerReef/reference/tuneUR_cc.md)
+solve for at each *relative*-scale balance – detritus’s current biomass
+$`B_D`$ is left alone. As with algae, correcting the resulting
+*absolute* scale is a separate, optional step,
+[`rescale_detritus()`](https://cmbeese.github.io/mizerReef/reference/rescale_detritus.md)/`detritus_lifetime()<-`,
+covered in
+[`vignette("steady-state-recipe")`](https://cmbeese.github.io/mizerReef/articles/steady-state-recipe.md).
+
 ### Carrying-capacity variant
 
 For scenarios in which the benthos saturates, both pools can instead be
@@ -470,7 +529,7 @@ and reduces to the linear case as $`K \to \infty`$.
 | Prey availability | full abundance $`N_j(w)`$ | discounted by vulnerability $`V_{ij}(w)\,N_j(w)`$ |
 | Encounter | plankton + fish | plankton + fish + algae + detritus |
 | Satiation | all groups | optional; off for carnivores |
-| External mortality | constant $`z0_i`$ | $`\mu_{nat}\,w^{1-n}`$ plus senescence $`\mu_{sen.i}(w)`$ |
+| External mortality | constant $`z0_i`$ | $`\mu_{nat}\,w^{n-1}`$ plus senescence $`\mu_{sen.i}(w)`$ |
 | Extra resources | resource spectrum only | plus unstructured pools $`B_A`$, $`B_D`$ |
 
 For how these equations are realised through mizer’s extension mechanism

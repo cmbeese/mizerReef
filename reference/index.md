@@ -9,6 +9,7 @@ steady state for the dynamical system.
   : Set up parameters for a mizerReef model
 - [`steady(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md)
   [`tuneSteadyState(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md)
+  [`findSteadyState(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md)
   : Steady state methods for mizerReef models
 - [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
   : Project a mizerReef model to steady state
@@ -282,7 +283,7 @@ mizer’s extension mechanism. See
 for details.
 
 - [`mizerReef-class`](https://cmbeese.github.io/mizerReef/reference/mizerReef-class.md)
-  : S4 marker class for mizerReef extension
+  : mizerReef extension classes
 - [`getBiomass(`*`<mizerReefSim>`*`)`](https://cmbeese.github.io/mizerReef/reference/getBiomass.mizerReefSim.md)
   : Get the biomass of species and unstructured components through time
 - [`upgrade(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/upgrade.mizerReef.md)

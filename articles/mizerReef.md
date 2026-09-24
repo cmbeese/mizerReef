@@ -5,7 +5,7 @@
 The mizerReef package enables multi-species dynamic size-spectrum
 modelling in R, with an explicit, mechanistic representation of habitat
 structural complexity. In this vignette, we walk through the basic steps
-needed to build and explore your first MizerReef model, including:
+needed to build, tune and explore your first MizerReef model, including:
 
 1.  [Installing MizerReef](#installing-mizerreef)
 2.  [Setting species parameters](#setting-species-parameters)
@@ -13,8 +13,12 @@ needed to build and explore your first MizerReef model, including:
 4.  [Creating your first model](#creating-your-first-model)
 5.  [Tuning the steady state](#tuning-the-steady-state)
 6.  [Exploring results](#exploring-results)
-7.  [Changing the refuge profile](#changing-the-refuge-profile)
-8.  [Running a simulation](#running-a-simulation)
+
+Once you have a tuned model,
+[`vignette("running-simulations")`](https://cmbeese.github.io/mizerReef/articles/running-simulations.md)
+picks up from there: changing the refuge profile and projecting a model
+forward in time (fishing pressure, habitat degradation trajectories, and
+so on).
 
 > **Model context:** Habitat structure mediates system dynamics by
 > providing predation refuge. The most effective refuges fit prey while
@@ -175,16 +179,27 @@ MizerReef, add these columns to your species parameter data frame:
 |:---|:---|:---|
 | refuge_user | logical | TRUE if the group uses predation refuge (i.e., individuals hide inside habitat structure to avoid predators; typical for small-bodied or cryptic reef fish). FALSE for species that do not use refuge. FALSE by default |
 | blocked_pred | logical | TRUE if the group is blocked from accessing prey in refuge (i.e., predators that cannot reach prey hiding in refuge). FALSE for species with behavioural or morphological adaptations (e.g., eels) that allow them to access prey in refuge. FALSE by default. |
-| satiation | logical | TRUE if group is subject to satiation on unstructured resources (algae or detritus; default is TRUE for herbivores, FALSE for carnivores). |
+| satiation | logical | TRUE if group is subject to satiation on unstructured resources (algae or detritus). By default TRUE only for detritivores – species that eat detritus but do not also graze algae or eat other species – and FALSE for every other group, including herbivores. |
 | interaction_algae | numeric | Proportion of diet from algae (0–1). 0 by default. |
 | interaction_detritus | numeric | Proportion of diet from detritus (0–1). 0 by default |
 
 Additional columns required for mizerReef species parameters. {.table}
 
-By default, MizerReef will assign values to any missing parameters so
-that the corresponding feature is disabled, and issue a warning. See
-\[setRefuge()\], \[setAlgaeParams()\] and \[setDetritusParams()\] for
-additional details.
+Every one of these is a **mizerReef default**, not a mizer one: leave a
+column out (or leave a cell blank/`NA`) and mizerReef fills it in with
+the value above, switching that feature off for the species and
+reporting that it did so. Override any of them by including the column
+in your own species table, or afterwards with
+`species_params(params)$refuge_user <- ...` (and similarly for the
+others) or the relevant setter
+([`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md)
+for the first three,
+[`setAlgaeParams()`](https://cmbeese.github.io/mizerReef/reference/setAlgaeParams.md)/[`setDetritusParams()`](https://cmbeese.github.io/mizerReef/reference/setDetritusParams.md)
+for the interaction columns). Those two setters also fill in several
+*model-level* defaults – not tied to one species, e.g. how much of a
+refuge is ever protected, or algae’s production rate – covered next in
+[Setting the refuge profile](#setting-the-refuge-profile) and in
+[`vignette("tuning-diet-composition")`](https://cmbeese.github.io/mizerReef/articles/tuning-diet-composition.md).
 
 > 💡 **Tip:** When importing your species parameter table from a CSV,
 > make sure that missing values are represented as NA or blank cells,
@@ -316,6 +331,28 @@ this when you have empirical refuge density data.
   )
   ```
 
+A few more refuge settings apply across all three methods, and mizerReef
+fills them in with a default if you don’t set them via
+[`setRefuge()`](https://cmbeese.github.io/mizerReef/reference/setRefuge.md)/[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md):
+
+| Argument | Default | Description |
+|:---|:---|:---|
+| max_protect | 0.98 | Cap on the proportion of any size class that refuge can ever protect, so some food always remains accessible to predators. |
+| tau | 1 | Proportion of refuge-eligible individuals that actually use a refuge when one is available. |
+| w_settle | 0.1 g | Weight below which fish are assumed unsettled larvae, exempt from the refuge calculation. |
+| a_bar / b_bar | 0.025 / 3 | Length-weight parameters for a ‘dummy fish’, used to convert refuge bin boundaries between length and weight, and to fill in a real species’ own a/b if it’s missing one. |
+| use_dummy_fish_bins | TRUE | Whether refuge bins are set by weight, using a_bar/b_bar (TRUE), or by length, using each species’ own a/b (FALSE). |
+
+mizerReef’s default refuge settings, shared across all three methods.
+{.table}
+
+`a_bar`/`b_bar` and `w_settle` were chosen for small-bodied coral-reef
+fish, not for fish in general – a pelagic species’ length-weight
+relationship, for instance, can be very different from `a_bar = 0.025`,
+`b_bar = 3`. If your system isn’t a coral reef, treat every default on
+this page as a starting point to check against your own species’ traits,
+not a universal constant.
+
 ### Refuge profiles and body shape
 
 This plot shows example refuge profiles created using each method and
@@ -396,6 +433,51 @@ caribbean_10_model <- newReefParams(species_params = caribbean_10_species,
                                     method_params = tuning_profile)
 ```
 
+Besides the species-level and refuge-level defaults already covered
+above,
+[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
+(all three of these are set directly in its own function signature/body,
+not inherited from a setter) makes a few default choices of its own
+about the underlying mizer model:
+
+| Argument | mizerReef default | mizer’s own default | Description |
+|:---|:---|:---|:---|
+| w_pp_cutoff | 1 g | 10 g | Maximum size of the plankton resource spectrum. |
+| n (and p) | 0.75 | 2/3 (≈0.667); p defaults independently to 0.7 | Allometric growth exponent; mizerReef also uses it for the metabolic exponent p, rather than defaulting p independently. |
+| crit_feed | 0.6 | 0.6, for the f0 species parameter | Target feeding level; fills in f0 for any species that doesn’t have its own, which in turn calibrates that species’ algae/detritus encounter rate (rho) at maximum size. |
+
+mizerReef’s own defaults for underlying mizer construction arguments.
+{.table}
+
+These are ordinary arguments, so pass your own value the same way as any
+other (e.g. `newReefParams(..., w_pp_cutoff = 10)`). They don’t all have
+the same kind of justification, though:
+
+- **`w_pp_cutoff` is a deliberate, architectural choice**, not an
+  oversight. mizerReef’s narrower plankton spectrum represents plankton
+  *only* – unlike a typical mizer model, where the single background
+  resource often also stands in for small invertebrates, a reef model
+  gives invertebrates their own explicit species/spectrum instead, so
+  the plankton resource doesn’t need to reach as high in size.
+- **`crit_feed` matches mizer’s own `f0` default** (it used to be `0.7`,
+  with no documented reason for the divergence – fixed in 2.0.3).
+- **`n`/`p` has no documented rationale for differing from mizer’s own
+  default.** It traces to the trait-based model in Rogers (2018) (see
+  [`vignette("caribbean_3_model-description")`](https://cmbeese.github.io/mizerReef/articles/caribbean_3_model-description.md))
+  rather than a reef-specific finding, so it’s a starting point worth
+  sensitivity-testing for your own system, not a value to trust just
+  because it’s what mizerReef ships.
+
+For every other construction argument (`species_params`, `interaction`,
+`kappa`, `resource_rate`, and so on),
+[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
+simply passes your value straight through to
+[`newMultispeciesParams()`](https://sizespectrum.org/mizer/reference/newMultispeciesParams.html),
+so mizer’s own defaults and the messages it reports when using them
+apply unchanged – see mizer’s [Setting
+Parameters](https://sizespectrum.org/mizer/reference/setParams.html)
+reference page for those.
+
 After creating your initial `params` object, you will typically run
 through a tuning sequence to calibrate biomasses and adjust
 reproduction, growth, and unstructured resource parameters to match
@@ -451,7 +533,7 @@ recipe](https://cmbeese.github.io/mizerReef/articles/steady-state-recipe.md).
 
 ## Exploring results
 
-[Skip to Changing the refuge profile](#changing-the-refuge-profile)
+[Skip to Next steps](#next-steps)
 
 After reaching a steady state, you should explore the results to ensure
 they make ecological sense and match expectations for your system.
@@ -508,358 +590,22 @@ plots](https://cmbeese.github.io/mizerReef/reference/index.html#summary-plots)
 and [mizer’s plotting results reference
 page](https://sizespectrum.org/mizer/reference/index.html#plotting-results).
 
-## Changing the refuge profile
-
-[Skip to Running a simulation](#running-a-simulation)
-
-Changing the refuge profile allows you to explore how habitat structure
-affects model dynamics, such as biomass and productivity. This is useful
-for simulating habitat degradation or restoration scenarios.
-
-**Workflow:**
-
-1.  Use
-    [`newRefuge()`](https://cmbeese.github.io/mizerReef/reference/newRefuge.md)
-    to change the refuge profile in your model.
-2.  Run
-    [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
-    several times to reach a new steady state.
-3.  Compare results (e.g., biomass and productivity) using built-in
-    plotting functions.
-
-``` r
-
-# Change to a non-complex (no refuge) profile
-non_complex <- newRefuge(caribbean_10_model, new_method = "noncomplex")
-
-# Run to steady state
-non_complex <- non_complex |> reefSteady() |> reefSteady() |> reefSteady()
-
-# Compare biomass and productivity between models. Invertebrates aren't
-# included in the productivity calculation, so only plot2TotalBiomass()'s
-# legend has the complete set of species - keep that one and drop the
-# other, rather than collecting both (which would duplicate the legend
-# since the two plots' fill scales don't have identical levels).
-all_biom11 <- plot2TotalBiomass(non_complex, caribbean_10_model,
-                                name1 = "Flat",
-                                name2 = "Complex",
-                                stack = TRUE) +
-    ggplot2::theme_bw() +
-    ggplot2::guides(alpha = "none") +
-    ggplot2::theme(legend.position = "bottom")
-
-all_prod11 <- plot2Productivity(non_complex, caribbean_10_model,
-                                name1 = "Flat",
-                                name2 = "Complex",
-                                stack = TRUE) +
-    ggplot2::theme_bw() +
-    ggplot2::guides(alpha = "none") +
-    ggplot2::theme(legend.position = "none")
-
-patchwork::wrap_plots(all_biom11, all_prod11)
-```
-
-![Two-panel plot: left panel shows total biomass for flat vs complex
-reef, right panel shows productivity for flat vs complex reef. Each
-panel compares model output for two habitat
-types.](mizerReef_files/figure-html/change-refuge-1.png)
-
-Figure 3. The biomass (left) and productivity (right) for a model with
-no predation refuge (non-complex) and a model with predation refuge
-based on data from Karpata Reef in Bonaire (complex). Colours represent
-species groups.
-
-As we can see in Figure 3, removing refuge availability reduces total
-biomass substantially. Total productivity, by contrast, is only modestly
-affected here – refuge changes *which* species contribute most to
-production more than it changes the total. Biomass and productivity can
-decouple like this because refuge protects juveniles from predation,
-letting populations skew toward larger, slower-growing individuals:
-standing biomass goes up, but production per unit biomass goes down.
-
-> 💡 **Tip:** If your results look odd after changing the refuge
-> profile, run `reefSteady()`.
->
-> It needs to run enough times to reach a new steady state. To learn
-> more about modifying refuge profiles and their parameters, see
-> \[setRefuge()\].
-
-For more information on the example data used in this vignette, see the
-[mizerReef model description
-vignette](https://cmbeese.github.io/mizerReef/articles/karpata_model-description.md).
-
-## Running a simulation
-
-[Skip to Links and further reading](#links-and-further-reading)
-
-Once you have a tuned model at steady state, you can project it forward
-in time with mizer’s
-[`project()`](https://sizespectrum.org/mizer/reference/project.html)
-function, exactly as you would for a standard mizer model. This section
-shows two common scenarios: adding fishing pressure, and letting a
-parameter (here, the refuge profile) change part-way through a
-simulation.
-
-### Simulating fishing pressure
-
-`caribbean_10_model` already has gear parameters set up, so you can
-project it forward at a chosen fishing effort. Comparing an unfished run
-(`effort = 0`) against a fished run shows the effect of fishing on total
-biomass:
-
-``` r
-
-sim_unfished <- project(caribbean_10_model, effort = 0, t_max = 20,
-                        progress_bar = FALSE)
-sim_fished <- project(caribbean_10_model, effort = 1, t_max = 20,
-                      progress_bar = FALSE)
-
-# Total biomass after 20 years, unfished vs. fished
-c(unfished = sum(mizer::getBiomass(sim_unfished)[21, ]),
-  fished = sum(mizer::getBiomass(sim_fished)[21, ]))
-```
-
-    ## unfished   fished 
-    ## 453.4778 276.6875
-
-``` r
-
-plotBiomass(sim_fished) +
-    ggplot2::theme_bw()
-```
-
-![Line plot of total biomass by species over 20 years of simulation with
-fishing effort
-1.](mizerReef_files/figure-html/plot-fished-biomass-1.png)
-
-Figure 4. Total biomass over time for the fished simulation.
-
-Yield (the catch taken by the fishery) can be plotted the same way:
-
-``` r
-
-plotYield(sim_fished) +
-    ggplot2::theme_bw()
-```
-
-![Line plot of fishing yield by species over 20 years of simulation with
-fishing effort 1.](mizerReef_files/figure-html/plot-fished-yield-1.png)
-
-Yield over time for the fished simulation.
-
-See mizer’s own [effort and fishing mortality
-articles](https://sizespectrum.org/mizer/articles/mizer.html) for more
-on setting up gears, selectivity, and effort schedules.
-
-### Simulating habitat decline
-
-Refuge parameters can also be changed between projection steps, so a
-simulation can represent a habitat that is gradually declining (or
-recovering) rather than staying fixed. The example below uses the
-sigmoidal method (the simplest of the three refuge methods) purely to
-illustrate the *mechanism*: shrink the refuge threshold length and the
-maximum protected proportion a little each year for five years,
-projecting one year at a time and carrying the model’s state forward
-with
-[`mizer::finalParams()`](https://sizespectrum.org/mizer/reference/getParams.html).
-The refuge is then left at its final, most-degraded setting for ten more
-years so the community has time to settle into a new steady state.
-
-``` r
-
-params <- newRefuge(caribbean_10_model, new_method = "sigmoidal",
-                    new_method_params = list(L_refuge = 10, prop_protect = 0.8))
-sim <- project(params, t_max = 1, progress_bar = FALSE)
-params <- mizer::finalParams(sim)
-params_yr1 <- params
-
-# Refuge threshold length and maximum protection shrinking over 5 years,
-# then held fixed for 10 more years to let the community re-equilibrate
-L_seq <- c(10, 8, 6, 4, 2)
-prop_seq <- c(0.8, 0.6, 0.4, 0.2, 0.05)
-n_years <- length(L_seq) + 10
-
-biomass_trend <- numeric(n_years)
-productivity_trend <- numeric(n_years)
-biomass_trend[1] <- sum(mizer::getBiomass(params_yr1))
-productivity_trend[1] <- sum(getProductivity(params_yr1))
-
-for (i in 2:n_years) {
-    if (i <= length(L_seq)) {
-        params <- newRefuge(params, new_method = "sigmoidal",
-                            new_L_refuge = L_seq[i], new_prop_protect = prop_seq[i])
-    }
-    sim <- project(params, t_max = 1, progress_bar = FALSE)
-    params <- mizer::finalParams(sim)
-    biomass_trend[i] <- sum(mizer::getBiomass(sim)[dim(sim@n)[1], ])
-    productivity_trend[i] <- sum(getProductivity(params))
-}
-params_yr15 <- params
-```
-
-``` r
-
-# Normalise to year 1 so biomass and productivity (different units) can
-# share one y-axis and be compared directly on the same plot.
-trend_data <- data.frame(
-    year = rep(seq_len(n_years), 2),
-    pct = c(biomass_trend / biomass_trend[1] * 100,
-           productivity_trend / productivity_trend[1] * 100),
-    metric = rep(c("Biomass", "Productivity"), each = n_years)
-)
-
-ggplot2::ggplot(trend_data, ggplot2::aes(x = year, y = pct, color = metric,
-                                         shape = metric, linetype = metric)) +
-    ggplot2::geom_line() +
-    ggplot2::geom_point(size = 2) +
-    ggplot2::scale_color_manual(values = c(Biomass = "#1B9E77", Productivity = "#D95F02")) +
-    ggplot2::labs(x = "Year", y = "% of year-1 value", color = NULL, shape = NULL, linetype = NULL) +
-    ggplot2::theme_bw()
-```
-
-![Line plot of total biomass and productivity over fifteen years as the
-refuge threshold length and maximum protected proportion shrink then
-hold, ending at different levels relative to their starting
-values.](mizerReef_files/figure-html/plot-degradation-trend-1.png)
-
-Total biomass and productivity over fifteen years as refuge shrinks then
-holds at its final degraded state, each shown as a percentage of its
-year-1 value so the two can share one axis.
-
-Biomass ends up lower than where it started (about 90% of its year-1
-value), but productivity actually settles at a *higher* new steady state
-(about 125%). Aggregate totals like these can hide a lot of detail,
-though - looking at individual species groups tells a very different
-story:
-
-``` r
-
-species_names <- species_params(caribbean_10_model)$species
-species_comparison <- data.frame(
-    species = rep(species_names, 2),
-    year = rep(c("Year 1", "Year 15"), each = length(species_names)),
-    biomass = c(as.numeric(mizer::getBiomass(params_yr1)),
-               as.numeric(mizer::getBiomass(params_yr15)))
-)
-
-ggplot2::ggplot(species_comparison, ggplot2::aes(x = species, y = biomass, fill = year)) +
-    ggplot2::geom_col(position = "dodge") +
-    ggplot2::scale_y_log10(limits = c(1e-3, NA), oob = scales::squish) +
-    ggplot2::labs(x = "Species Group", y = expression("Biomass (g/m"^2*", log scale)"), fill = NULL) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
-```
-
-![Grouped bar chart of biomass by species group, comparing year 1 and
-year 15, on a log scale. Several bars for year 15 are clipped at the
-floor of the axis, indicating functional
-extinction.](mizerReef_files/figure-html/plot-species-collapse-1.png)
-
-Species-level biomass before (year 1) and after (year 15) refuge loss,
-log scale. Several groups collapse to near zero.
-
-Four of the ten species groups - Engulfers, Eels, Nocturnal Invertivores
-and Planktivores, all species that rely on refuge for protection -
-collapse to functionally zero biomass. Parrotfish (the dominant group by
-biomass) barely changes, and Invertebrates increase substantially, which
-is why the *aggregate* biomass and productivity trends above look like a
-moderate decline rather than a multi-species collapse.
-[`plotRelativeContribution()`](https://cmbeese.github.io/mizerReef/reference/plotRelativeContribution.md)
-makes the same point from a different angle, comparing how much each
-species group contributes to abundance, biomass, and productivity before
-and after:
-
-``` r
-
-patchwork::wrap_plots(
-    plotRelativeContribution(params_yr1) + ggplot2::ggtitle("Year 1 (with refuge)") + ggplot2::theme_bw(),
-    plotRelativeContribution(params_yr15) + ggplot2::ggtitle("Year 15 (refuge lost)") + ggplot2::theme_bw()
-) +
-  patchwork::plot_layout(guides = "collect") &
-  ggplot2::theme(
-    legend.position = "bottom",
-    legend.title = ggplot2::element_blank(),
-    legend.text = ggplot2::element_text(size = 8),
-    legend.key.height = grid::unit(0.35, "cm"),
-    legend.key.width = grid::unit(0.6, "cm"),
-    legend.spacing.x = grid::unit(0.1, "cm")
-  )
-```
-
-![Two side-by-side stacked bar charts comparing the relative
-contribution of each species group to abundance, biomass and
-productivity, one for year 1 and one for year 15. The abundance panel
-shows the Planktivores' share present in year 1 has vanished by year
-15.](mizerReef_files/figure-html/plot-relative-contribution-1.png)
-
-Relative contribution of each species group to abundance, biomass, and
-productivity, comparing year 1 (with refuge) and year 15 (refuge lost).
-
-The Planktivores’ share of total abundance in year 1 (the blue band) is
-entirely gone by year 15 - direct visual confirmation of the collapse
-shown in the previous figure, this time in terms of each group’s
-relative share rather than its absolute biomass.
-
-> 💡 **Tip:** This is a mechanism demo, not a calibrated analysis.
->
-> Switching refuge methods abruptly (as done here) skips the tuning
-> workflow described in [Tuning the steady
-> state](#tuning-the-steady-state); for a real analysis, follow that
-> recipe after switching methods, not just after creating the model.
-> `MizerReef` also supports fully specified, data-driven
-> habitat-degradation trajectories via \[setDegradation()\] and
-> \[reefDegrade()\] for the `"competitive"` refuge method — see their
-> reference pages for details.
-
-## Links and further reading
-
-[Skip to Model description context](#model-description-context)
-
-**MizerReef documentation and tutorials:**
-
-- [MizerReef documentation](https://cmbeese.github.io/mizerReef/): Main
-  package documentation and reference manual
-- [MizerReef model description
-  vignette](https://cmbeese.github.io/mizerReef/articles/karpata_model-description.md):
-  Detailed explanation of model structure and example workflows
-- [MizerReef Steady State
-  recipe](https://cmbeese.github.io/mizerReef/articles/steady-state-recipe.md):
-  Step-by-step guide for tuning models to steady state
-- [Example models and built-in
-  data](https://cmbeese.github.io/mizerReef/reference/index.html#example-models):
-  Reference for example species, interaction matrices, and refuge
-  profiles
-
-**Plotting and function references:**
-
-- [MizerReef summary
-  plots](https://cmbeese.github.io/mizerReef/reference/index.html#summary-plots):
-  List of available summary and diagnostic plots
-- [setRefuge() function
-  documentation](https://cmbeese.github.io/mizerReef/reference/setRefuge.html):
-  Details on modifying refuge profiles and parameters
-- [Mizer plotting results
-  reference](https://sizespectrum.org/mizer/reference/index.html#plotting-results):
-  Reference for plotting functions in mizer
-
-**General mizer resources:**
-
-- [Official mizer getting started
-  guide](https://sizespectrum.org/mizer/articles/mizer.html): General
-  introduction to mizer
-
-**Further research:**
-
-- [Modelling Coral Reef Futures: Exploring the role of structural
-  complexity in sustaining ecosystem services (PhD Thesis,
-  VUW)](https://openaccess.wgtn.ac.nz/articles/thesis/Modelling_Coral_Reef_Futures_Exploring_the_role_of_structural_complexity_in_sustaining_ecosystem_services/26421523?file=48064144):
-  In-depth research and context for MizerReef
+## Next steps
+
+Once your model is calibrated and validated as above, see [Running
+MizerReef
+Simulations](https://cmbeese.github.io/mizerReef/articles/running-simulations.md)
+for how to change the refuge profile and project a tuned model forward
+in time – fishing pressure, habitat degradation trajectories, and more –
+including that vignette’s own [Links and further
+reading](https://cmbeese.github.io/mizerReef/articles/running-simulations.html#links-and-further-reading)
+section.
 
 ## Session info
 
     ## R version 4.6.1 (2026-06-24)
     ## Platform: x86_64-pc-linux-gnu
-    ## Running under: Ubuntu 24.04.4 LTS
+    ## Running under: Ubuntu 24.04.5 LTS
     ## 
     ## Matrix products: default
     ## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -878,27 +624,26 @@ relative share rather than its absolute biomass.
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] knitr_1.51              mizerReef_2.0.3         mizerExperimental_3.3.1
-    ## [4] mizer_3.3.1            
+    ## [1] knitr_1.52              mizerReef_2.1.0         mizerExperimental_3.3.1
+    ## [4] mizer_3.4.0.9000       
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] plotly_4.12.1       sass_0.4.10         generics_0.1.4     
     ##  [4] tidyr_1.3.2         stringi_1.8.9       digest_0.6.39      
     ##  [7] magrittr_2.0.5      timechange_0.4.0    evaluate_1.0.5     
     ## [10] grid_4.6.1          RColorBrewer_1.1-3  fastmap_1.2.0      
-    ## [13] plyr_1.8.9          jsonlite_2.0.0      httr_1.4.8         
+    ## [13] plyr_1.8.9          jsonlite_2.0.0      httr_1.4.9         
     ## [16] purrr_1.2.2         viridisLite_0.4.3   scales_1.4.0       
     ## [19] textshaping_1.0.5   jquerylib_0.1.4     cli_3.6.6          
-    ## [22] rlang_1.3.0         withr_3.0.3         cachem_1.1.0       
-    ## [25] yaml_2.3.12         otel_0.2.0          tools_4.6.1        
-    ## [28] reshape2_1.4.5      dplyr_1.2.1         ggplot2_4.0.3      
-    ## [31] assertthat_0.2.1    vctrs_0.7.3         R6_2.6.1           
-    ## [34] lubridate_1.9.5     lifecycle_1.0.5     stringr_1.6.0      
-    ## [37] fs_2.1.0            htmlwidgets_1.6.4   ragg_1.5.2         
-    ## [40] pkgconfig_2.0.3     desc_1.4.3          pkgdown_2.2.1      
-    ## [43] pillar_1.11.1       bslib_0.12.0        gtable_0.3.6       
-    ## [46] glue_1.8.1          data.table_1.18.6.1 Rcpp_1.1.2         
-    ## [49] systemfonts_1.3.2   xfun_0.60           tibble_3.3.1       
-    ## [52] tidyselect_1.2.1    farver_2.1.2        patchwork_1.3.2    
-    ## [55] htmltools_0.5.9     labeling_0.4.3      rmarkdown_2.31     
-    ## [58] compiler_4.6.1      S7_0.2.2
+    ## [22] rlang_1.3.0         cachem_1.1.0        yaml_2.3.12        
+    ## [25] otel_0.2.0          tools_4.6.1         reshape2_1.4.5     
+    ## [28] dplyr_1.2.1         ggplot2_4.0.3       assertthat_0.2.1   
+    ## [31] vctrs_0.7.3         R6_2.6.1            lubridate_1.9.5    
+    ## [34] lifecycle_1.0.5     stringr_1.6.0       fs_2.1.0           
+    ## [37] htmlwidgets_1.6.4   ragg_1.5.2          pkgconfig_2.0.3    
+    ## [40] desc_1.4.3          pkgdown_2.2.1       pillar_1.11.1      
+    ## [43] bslib_0.12.0        gtable_0.3.6        glue_1.8.1         
+    ## [46] data.table_1.18.6.1 Rcpp_1.1.2          systemfonts_1.3.2  
+    ## [49] xfun_0.61           tibble_3.3.1        tidyselect_1.2.1   
+    ## [52] farver_2.1.2        htmltools_0.5.9     rmarkdown_2.32     
+    ## [55] compiler_4.6.1      S7_0.2.2

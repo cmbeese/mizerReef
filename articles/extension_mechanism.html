@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerReef</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,12 +41,13 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/index.html">All articles</a></li>
     <li><a class="dropdown-item" href="../articles/mizerReef.html">Getting Started</a></li>
+    <li><a class="dropdown-item" href="../articles/running-simulations.html">Running Simulations</a></li>
     <li><a class="dropdown-item" href="../articles/steady-state-recipe.html">Tuning and Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/tuning-diet-composition.html">Tuning Diet Composition</a></li>
     <li><a class="dropdown-item" href="../articles/karpata_model-description.html">Functional Group Example</a></li>
     <li><a class="dropdown-item" href="../articles/caribbean_3_model-description.html">Simple 3-Group Example</a></li>
     <li><a class="dropdown-item" href="../articles/model-description.html">General Model Description</a></li>
     <li><a class="dropdown-item" href="../articles/extension_mechanism.html">Extension Mechanism</a></li>
-    <li><a class="dropdown-item" href="../articles/using-multiple-resources.html">Multiple Resources</a></li>
   </ul>
 </li>
       </ul>
@@ -107,14 +108,15 @@ maximum size.</li>
 <tbody>
 <tr class="odd">
 <td>
-<code>.onLoad</code> + <code><a href="https://sizespectrum.org/mizer/reference/registerExtension.html" class="external-link">registerExtension()</a></code>
+<code><a href="https://sizespectrum.org/mizer/reference/recordExtension.html" class="external-link">recordExtension()</a></code> +
+<code><a href="https://sizespectrum.org/mizer/reference/coerceToExtensionClass.html" class="external-link">coerceToExtensionClass()</a></code>
 </td>
-<td>Register the package with mizer so params objects know which
-extensions they need</td>
+<td>Record the extension metadata on params objects and set the S3 class
+vector</td>
 </tr>
 <tr class="even">
-<td>S4 marker classes + S3 dispatch</td>
-<td>Define <code>mizerReef</code>/<code>mizerReefSim</code> so
+<td>S3 extension classes + S3 dispatch</td>
+<td>Enable <code>mizerReef</code>/<code>mizerReefSim</code> so
 reef-specific methods run automatically</td>
 </tr>
 <tr class="odd">
@@ -137,67 +139,38 @@ satiation, and senescence effects</td>
 the single entry point for building a reef model.</p>
 </div>
 <div class="section level2">
-<h2 id="the-mizerreef-marker-class">The <code>mizerReef</code> marker class<a class="anchor" aria-label="anchor" href="#the-mizerreef-marker-class"></a>
+<h2 id="the-mizerreef-s3-extension-class">The <code>mizerReef</code> S3 extension class<a class="anchor" aria-label="anchor" href="#the-mizerreef-s3-extension-class"></a>
 </h2>
-<p>mizerReef defines two S4 marker subclasses:</p>
+<p><code>MizerParams</code> and <code>MizerSim</code> are S3 objects.
+<code>mizerReef</code> and <code>mizerReefSim</code> are ordinary
+entries in their S3 class vectors:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">setClass</span><span class="op">(</span><span class="st">"mizerReef"</span>,    contains <span class="op">=</span> <span class="st">"MizerParams"</span><span class="op">)</span></span>
-<span><span class="kw">setClass</span><span class="op">(</span><span class="st">"mizerReefSim"</span>, contains <span class="op">=</span> <span class="st">"MizerSim"</span><span class="op">)</span></span></code></pre></div>
-<p>These classes carry no extra slots — all reef-specific state (refuge,
-algae and detritus parameters) lives in
-<code>other_params(params)</code>. The classes exist purely to trigger
-S3 dispatch, exactly as described for marker classes in
-<code><a href="https://sizespectrum.org/mizer/articles/guide-create-extension-package.html" class="external-link">vignette("guide-create-extension-package", package = "mizer")</a></code>.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
+<span><span class="co"># [1] "mizerReef"   "MizerParams"</span></span></code></pre></div>
+<p>No class declaration or session registration is needed. All
+reef-specific state (refuge, algae, and detritus parameters) lives in
+<code>other_params(params)</code>. The class label enables S3 dispatch
+of mizer generics to mizerReef-specific methods.</p>
 <div class="section level3">
-<h3 id="registration-via--onload">Registration via <code>.onLoad</code><a class="anchor" aria-label="anchor" href="#registration-via--onload"></a>
+<h3 id="recording-the-extension">Recording the extension<a class="anchor" aria-label="anchor" href="#recording-the-extension"></a>
 </h3>
+<p>When a reef model is constructed with <code><a href="../reference/newReefParams.html">newReefParams()</a></code>,
+the extension is recorded on the object and the object is coerced to the
+extension class:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">.onLoad</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">libname</span>, <span class="va">pkgname</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/registerExtension.html" class="external-link">registerExtension</a></span><span class="op">(</span><span class="va">pkgname</span>, requirement <span class="op">=</span> <span class="st">"sizespectrum/mizerReef"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>This registers mizerReef with mizer’s extension chain as soon as the
-package is loaded. <code><a href="../reference/newReefParams.html">newReefParams()</a></code> then records the chain
-and coerces the result to the marker class at the very end of
-construction:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">params</span><span class="op">@</span><span class="va">extensions</span> <span class="op">&lt;-</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/getRegisteredExtensions.html" class="external-link">getRegisteredExtensions</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/recordExtension.html" class="external-link">recordExtension</a></span><span class="op">(</span></span>
+<span>    <span class="va">params</span>, <span class="st">"mizerReef"</span>,</span>
+<span>    version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"mizerReef"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    requirement <span class="op">=</span> <span class="st">"cmbeese/mizerReef"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/coerceToExtensionClass.html" class="external-link">coerceToExtensionClass</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span></code></pre></div>
-<p>Recording the chain in <code>params@extensions</code> is what lets
+<p>Recording the extension in the object’s metadata is what lets
 <code><a href="https://sizespectrum.org/mizer/reference/project.html" class="external-link">project()</a></code> produce a <code>mizerReefSim</code> automatically
 (via <code><a href="https://sizespectrum.org/mizer/reference/MizerSim.html" class="external-link">MizerSim()</a></code>’s own call to
 <code><a href="https://sizespectrum.org/mizer/reference/coerceToExtensionClass.html" class="external-link">coerceToExtensionClass()</a></code>), and what lets
 <code><a href="https://sizespectrum.org/mizer/reference/saveParams.html" class="external-link">readParams()</a></code> restore the correct class — and warn about
 missing or outdated extensions — when a saved object is reloaded in a
 later session.</p>
-<div class="section level4">
-<h4 id="a-known-gap-bundled-example-models-and-multiple-extensions">A known gap: bundled example models and multiple extensions<a class="anchor" aria-label="anchor" href="#a-known-gap-bundled-example-models-and-multiple-extensions"></a>
-</h4>
-<p>mizerReef ships two pre-built example models as package data
-(<code>caribbean_10_model</code>, <code>caribbean_3_model</code>).
-<code>.onLoad</code> also contains a <code><a href="https://rdrr.io/r/base/bindenv.html" class="external-link">makeActiveBinding()</a></code>
-call, scoped to <code>caribbean_3_model</code> only, intended to
-re-coerce that object to the correct class if a <em>second</em> mizer
-extension is loaded alongside mizerReef, since a bundled
-<code>.rda</code> is fixed at save time and can’t know in advance what
-else will be loaded in the same session. In the current mizer/mizerReef
-versions this mechanism does not fire — <code><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists()</a></code> on the
-bundled object inside <code>.onLoad</code> is always <code>FALSE</code>
-at that point, so the active binding is never installed. This is not
-mizerReef-specific: the identical dead-code pattern exists in
-mizerShelf’s own current source for its bundled
-<code>NWMed_params</code> object.</p>
-<p>For everyday single-extension use this is harmless, since both
-bundled objects already carry the correct class from when they were
-saved. It would only matter if you loaded mizerReef together with a
-second dispatching extension on one of these two specific objects — for
-example, the mizerMR combination shown in
-<code><a href="../articles/using-multiple-resources.html">vignette("using-multiple-resources")</a></code>. That combination does
-work (mizer’s extension chain, a separate mechanism, correctly promotes
-the object’s class when both extensions are registered), but the
-underlying <code>.onLoad</code> dead-code gap described above is still
-unfixed upstream; see <code>inst/to-do-list.txt</code> for the current
-state.</p>
-</div>
 </div>
 <div class="section level3">
 <h3 id="methods-dispatched-on-mizerreef">Methods dispatched on <code>mizerReef</code><a class="anchor" aria-label="anchor" href="#methods-dispatched-on-mizerreef"></a>
@@ -268,14 +241,13 @@ This is not automatic just because a package touches a mizer model:
 mizer still supports an older, non-chaining mechanism
 (<code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">mizer::setRateFunction()</a></code>) that swaps in a single named
 function for a rate, with no dispatch at all, and a params object uses
-one mechanism or the other for a given rate, never both. See the caveat
-in <code><a href="../articles/using-multiple-resources.html">vignette("using-multiple-resources")</a></code> for a concrete
-example (mizerReef’s dispatching encounter-rate chain versus therMizer’s
-non-chaining <code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">setRateFunction()</a></code> approach, and why combining
-them does not currently give you both effects together). The next two
-sections look at mizerReef’s own rate methods in detail, because they
-illustrate both the easy case (a purely additive modification) and a
-harder case that needed more thought.</p>
+one mechanism or the other for a given rate, never both. therMizer, for
+example, is a dispatching extension, so on a model set up with both
+packages its temperature effects and mizerReef’s refuge correction
+combine in one encounter-rate calculation. The next two sections look at
+mizerReef’s own rate methods in detail, because they illustrate both the
+easy case (a purely additive modification) and a harder case that needed
+more thought.</p>
 </div>
 </div>
 <div class="section level2">
@@ -304,7 +276,7 @@ one of four profile methods (<code>"sigmoidal"</code>,
 resource that same-size individuals compete for, so vulnerability
 depends on the actual local density of competitors at each time step,
 not just on size.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotVulnerable.html">plotVulnerable</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span></code></pre></div>
 <p><img src="extension_mechanism_files/figure-html/plot-vulnerable-1.png" class="r-plt" alt="" width="576"></p>
 <div class="section level3">
@@ -326,7 +298,7 @@ calculation twice — once with unmodified inputs to get the standard
 result, and once more with a vulnerability-modified input to get the
 correction — and then combining the two by predator row. Both calls go
 through <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>, so both stay fully composable:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">projectEncounter.mizerReef</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">blocked_pred</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">@</span><span class="va">species_params</span><span class="op">$</span><span class="va">blocked_pred</span> <span class="op">==</span> <span class="cn">TRUE</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">blocked_pred</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -351,7 +323,7 @@ using the linearity of the predation-mortality calculation in
 <code>pred_rate</code> to isolate the contribution of
 <code>blocked_pred</code> predators by zeroing out every other
 predator’s row before recomputing:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">projectPredMort.mizerReef</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span> <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>                                      <span class="va">pred_rate</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">blocked_pred</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">@</span><span class="va">species_params</span><span class="op">$</span><span class="va">blocked_pred</span> <span class="op">==</span> <span class="cn">TRUE</span></span>
@@ -390,7 +362,7 @@ testing surfaced a serious problem: once a generic has more than two
 formal arguments, passing an explicit named override to
 <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> corrupts the matching of the <em>other</em>
 arguments. A minimal reproduction:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">UseMethod</a></span><span class="op">(</span><span class="st">"f"</span><span class="op">)</span></span>
 <span><span class="va">f.default</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"default sees length(n_pp) ="</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">n_pp</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
@@ -419,7 +391,7 @@ input, with none of the argument-corruption.</p>
 <p>Algae and detritus are each registered as a scalar <em>other</em>
 component via <code><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">setComponent()</a></code> inside
 <code><a href="../reference/newReefParams.html">newReefParams()</a></code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">setComponent</a></span><span class="op">(</span></span>
 <span>    <span class="va">params</span>, <span class="st">"algae"</span>,</span>
 <span>    initial_value <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -448,7 +420,7 @@ is a species- and size-dependent encounter-rate coefficient stored in
 writes to above, and what
 <code><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">mizer::getComponent()</a></code>/<code><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">removeComponent()</a></code> read
 from, so algae and detritus need no special-casing here:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">encounter_contribution</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n_other</span>, <span class="va">component</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">params</span><span class="op">@</span><span class="va">other_params</span><span class="op">[[</span><span class="va">component</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">rho</span> <span class="op">*</span> <span class="va">n_other</span><span class="op">[[</span><span class="va">component</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -473,11 +445,11 @@ flux, so [tuneUR()]/[tuneUR_cc()] instead solve for that external flux
 to balance a given detritus biomass against consumption. Both have
 getters/setters for inspecting and tuning the steady-state balance,
 e.g.:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/detritus_lifetime.html">detritus_lifetime</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3.17783e-13</span></span>
+<span><span class="co">#&gt; [1] 0.0004394672</span></span>
 <span><span class="fu"><a href="../reference/algae_biomass.html">algae_biomass</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2.171433e-10</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 349.9999</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="getbiomass-mizerreefsim">
 <code>getBiomass.mizerReefSim()</code><a class="anchor" aria-label="anchor" href="#getbiomass-mizerreefsim"></a>
@@ -486,7 +458,7 @@ e.g.:</p>
 mizerReef’s method — following the same pattern as mizerShelf’s
 <code>getBiomass.mizerShelf()</code> — appends the algae and detritus
 biomass by reading them directly out of <code>n_other</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">getBiomass.mizerReefSim</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">sim</span> <span class="op">&lt;-</span> <span class="va">object</span></span>
 <span>    <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">unclass</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -508,7 +480,7 @@ algae and detritus alongside fish species — and it works regardless of
 whether <code>mizer</code> or <code>mizerReef</code> was loaded first,
 since it is triggered by S3 dispatch on the object’s class rather than
 by masking mizer’s function.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">params</span>, t_max <span class="op">=</span> <span class="fl">5</span>, progress_bar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotBiomass.html" class="external-link">plotBiomass</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></code></pre></div>
 <p><img src="extension_mechanism_files/figure-html/plot-biomass-1.png" class="r-plt" alt="" width="672"></p>
@@ -523,7 +495,7 @@ additive/input-transform case that <code><a href="https://rdrr.io/r/base/UseMeth
 cleanly.</p>
 <p><code>projectMort.mizerReef()</code> adds senescence mortality,
 <code><a href="../reference/reefSenMort.html">reefSenMort()</a></code>, on top of the standard mortality:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">projectMort.mizerReef</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span> <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>                                  <span class="va">f_mort</span>, <span class="va">pred_mort</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">mort</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -538,7 +510,7 @@ satiation response <em>before</em> delegating — a formal argument
 reassigned inside a method body is correctly picked up by a bare
 <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> call (unlike the explicit-override case
 described above):</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">projectFeedingLevel.mizerReef</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span> <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>                                          <span class="va">encounter</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">params</span><span class="op">@</span><span class="va">intake_max</span><span class="op">[</span><span class="va">params</span><span class="op">@</span><span class="va">species_params</span><span class="op">$</span><span class="va">satiation</span> <span class="op">==</span> <span class="cn">FALSE</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">Inf</span></span>
@@ -555,7 +527,7 @@ described above):</p>
 <code>rho</code> matrices, which live outside the standard mizer slots
 that <code>removeSpecies.MizerParams()</code> already knows how to
 trim:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">removeSpecies.mizerReef</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">species</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">keep</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/valid_species_arg.html" class="external-link">valid_species_arg</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">species</span>, return.logical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>    <span class="va">p</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -565,7 +537,7 @@ trim:</p>
 <span>        <span class="va">p</span><span class="op">@</span><span class="va">other_params</span><span class="op">$</span><span class="va">detritus</span><span class="op">$</span><span class="va">rho</span><span class="op">[</span><span class="va">keep</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
 <span>    <span class="va">p</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/removeSpecies.html" class="external-link">removeSpecies</a></span><span class="op">(</span><span class="va">params</span>, <span class="st">"predators"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/species_params.html" class="external-link">species_params</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span><span class="op">$</span><span class="va">species</span></span>
 <span><span class="co">#&gt; [1] "herbivores" "inverts"</span></span></code></pre></div>
@@ -586,7 +558,7 @@ which means an object saved with that design needs to be migrated before
 it can be used. <code><a href="../reference/upgrade.mizerReef.html">upgrade.mizerReef()</a></code> handles this
 automatically, and will also handle any future within-2.x layout changes
 the same way:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">upgrade.mizerReef</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>        <span class="va">old_refuge</span> <span class="op">&lt;-</span> <span class="fu">.hasSlot</span><span class="op">(</span><span class="va">object</span>, <span class="st">"refuge_params"</span><span class="op">)</span></span>
@@ -629,7 +601,7 @@ object afterwards.</p>
 <div class="section level2">
 <h2 id="how-the-pieces-fit-together-in-newreefparams">How the pieces fit together in <code>newReefParams()</code><a class="anchor" aria-label="anchor" href="#how-the-pieces-fit-together-in-newreefparams"></a>
 </h2>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">newReefParams</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">species_params</span>, <span class="va">method</span>, <span class="va">method_params</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="co"># Standard multispecies model</span></span>
 <span>    <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/newMultispeciesParams.html" class="external-link">newMultispeciesParams</a></span><span class="op">(</span><span class="va">species_params</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -652,16 +624,20 @@ object afterwards.</p>
 <span>    <span class="co"># Senescence and external mortality parameters</span></span>
 <span>    <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/setExtMortParams.html">setExtMortParams</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span>    <span class="co"># Register the extension chain and promote to the mizerReef S4 class.</span></span>
+<span>    <span class="co"># Record the extension metadata and promote to the mizerReef S3 class.</span></span>
 <span>    <span class="co"># Rate overrides (Encounter, FeedingLevel, PredMort, Mort) are handled by</span></span>
 <span>    <span class="co"># the project*.mizerReef methods shown above, not by setRateFunction(),</span></span>
 <span>    <span class="co"># so they compose with other extension packages.</span></span>
-<span>    <span class="va">params</span><span class="op">@</span><span class="va">extensions</span> <span class="op">&lt;-</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/getRegisteredExtensions.html" class="external-link">getRegisteredExtensions</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/recordExtension.html" class="external-link">recordExtension</a></span><span class="op">(</span></span>
+<span>        <span class="va">params</span>, <span class="st">"mizerReef"</span>,</span>
+<span>        version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"mizerReef"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>        requirement <span class="op">=</span> <span class="st">"cmbeese/mizerReef"</span></span>
+<span>    <span class="op">)</span></span>
 <span>    <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/coerceToExtensionClass.html" class="external-link">coerceToExtensionClass</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span>
 <span>    <span class="va">params</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>The marker-class promotion happens last, after every other slot has
-been populated — exactly as
+<p>The class coercion happens last, after every other component has been
+populated — exactly as
 <code><a href="https://sizespectrum.org/mizer/articles/guide-create-extension-package.html" class="external-link">vignette("guide-create-extension-package", package = "mizer")</a></code>
 recommends, so that no earlier step in construction accidentally
 dispatches to a reef-specific method on a not-yet-fully-built
@@ -673,27 +649,27 @@ object.</p>
 <p>mizerReef illustrates the following extension mechanisms working
 together:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong><code>.onLoad</code> +
-<code><a href="https://sizespectrum.org/mizer/reference/registerExtension.html" class="external-link">registerExtension()</a></code></strong> — announces mizerReef to
-mizer’s extension chain as soon as the package is loaded.</p></li>
-<li><p><strong>S4 marker classes + S3 dispatch</strong> —
+<li><p><strong><code><a href="https://sizespectrum.org/mizer/reference/recordExtension.html" class="external-link">recordExtension()</a></code></strong> — records
+mizerReef’s metadata and version on the object so required extensions
+can be verified on load.</p></li>
+<li><p><strong>S3 extension classes + S3 dispatch</strong> —
 <code>mizerReef</code> and <code>mizerReefSim</code> ensure that
 reef-specific methods (<code>projectEncounter</code>,
 <code>projectFeedingLevel</code>, <code>projectPredMort</code>,
 <code>projectMort</code>, <code>getBiomass</code>,
 <code>removeSpecies</code>, <code>steady</code>,
-<code>tuneSteadyState</code>) are dispatched automatically, with every
-method calling <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> at least once so the standard
-mizer pipeline, and any other extension package stacked below mizerReef,
-keeps working. The rate methods all chain through
-<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>; the two steady-state methods instead replace
-the run wholesale, because reaching a reef steady state means tuning the
-algae and detritus pools that mizer knows nothing about (see
-<code><a href="../reference/reefSteady.html">?reefSteady</a></code>). Before mizerReef 2.0.2 those two were not
-methods at all: <code><a href="../reference/reefSteady.html">reefSteady()</a></code> was written over
-<code><a href="https://sizespectrum.org/mizer/reference/superseded_steady.html" class="external-link">mizer::steady()</a></code> with <code><a href="https://rdrr.io/r/utils/getFromNamespace.html" class="external-link">assignInNamespace()</a></code>,
-which replaced mizer’s generic for every model in the session, reef or
-not.</p></li>
+<code>tuneSteadyState</code>, <code>findSteadyState</code>) are
+dispatched automatically, with every method calling
+<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> at least once so the standard mizer pipeline,
+and any other extension package stacked below mizerReef, keeps working.
+The rate methods all chain through <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>; the
+steady-state methods instead replace the run wholesale, because reaching
+a reef steady state means tuning the algae and detritus pools that mizer
+knows nothing about (see <code><a href="../reference/reefSteady.html">?reefSteady</a></code>). Before mizerReef
+2.0.2 those two were not methods at all: <code><a href="../reference/reefSteady.html">reefSteady()</a></code> was
+written over <code><a href="https://sizespectrum.org/mizer/reference/superseded_steady.html" class="external-link">mizer::steady()</a></code> with
+<code><a href="https://rdrr.io/r/utils/getFromNamespace.html" class="external-link">assignInNamespace()</a></code>, which replaced mizer’s generic for
+every model in the session, reef or not.</p></li>
 <li><p><strong><code><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">setComponent()</a></code></strong> — algae and detritus
 are scalar dynamical variables whose biomass evolves each time step and
 whose contribution to the encounter rate is automatically included via a

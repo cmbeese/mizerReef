@@ -59,5 +59,5 @@ rate:
 ``` r
 data(caribbean_3_model)
 detritus_consumption(caribbean_3_model)
-#> [1] 3.146801e+12
+#> [1] 2275.483
 ```

@@ -73,7 +73,12 @@ newReefParams(
 
 - w_pp_cutoff:
 
-  Maximum size of plankton in grams, default to 1 g
+  Maximum size of plankton in grams, default to 1 g. Deliberately
+  narrower than mizer's own default (10 g): mizerReef's plankton
+  resource represents plankton only, since a reef model gives
+  invertebrates their own explicit species/spectrum rather than folding
+  them into the single background resource the way a typical mizer model
+  often does.
 
 - n:
 
@@ -313,7 +318,7 @@ newReefParams(
 - z0pre:
 
   If `include_ext_mort`is FALSE, the external mortality rate for each
-  species calculated as z0pre \* w_max ^ z0exp. z0exp defaults to 1-n
+  species calculated as z0pre \* w_max ^ z0exp. z0exp defaults to n-1
   where n is the given allometric scaling exponent and z0pre defaults to
   0.2.
 
@@ -366,7 +371,7 @@ An object of type
      algae biomass will be limited by the specified capacity.
 
      Note: Interaction with size-structured resources, such as plankton,
-     is set with the resource_interaction column of the species parameters
+     is set with the interaction_resource column of the species parameters
      dataframe.
 
 ## Detritus as an unstructured resource
@@ -398,7 +403,7 @@ An object of type
      biomass will be limited by the specified capacity.
 
      Note: Interaction with size-structured resources, such as plankton, is
-     set with the resource_interaction column of the species parameters dataframe.
+     set with the interaction_resource column of the species parameters dataframe.
 
 ## Senescence mortality
 
@@ -525,8 +530,7 @@ params <- newReefParams(
 #> ℹ For species where no growth information is available the parameter h has been set to h = 30.
 #> ℹ Using z0 = z0pre * w_inf ^ z0exp for calculated z0 values.
 #> ℹ Using f0, h, lambda, kappa and the predation kernel to calculate gamma.
+#> Warning: `kappa` is still at mizer's uncalibrated default (1e11) while `biomass_observed` is set. `gamma` has been derived to match this placeholder resource scale, so encounter with real fish/invert prey will be numerically negligible until the model's scale is calibrated -- run `calibrateReefBiomass()` before `matchReefGrowth()`/ `matchBiomasses()`, or predators may converge on the right total biomass while eating ~0% fish prey.
 class(params)
-#> [1] "mizerReef"
-#> attr(,"package")
-#> [1] ".GlobalEnv"
+#> [1] "mizerReef"   "MizerParams"
 ```

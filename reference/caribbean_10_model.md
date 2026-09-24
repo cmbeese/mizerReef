@@ -17,9 +17,15 @@ caribbean_10_model
 
 ## Format
 
-A `mizerReef` object (extends
-[MizerParams](https://sizespectrum.org/mizer/reference/MizerParams.html))
-with 10 species, competitive refuge, and algae/detritus components.
+A
+[mizerReef](https://cmbeese.github.io/mizerReef/reference/mizerReef-class.md)
+object with 10 species, competitive refuge, and algae/detritus
+components.
+
+The object was created with
+[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
+and is stored in the package's `data/` directory. R's standard
+lazy-loading preserves its S3 class vector and extension metadata.
 
 ## Source
 
@@ -85,9 +91,6 @@ workflow.
 FORCE dataset. From: Dryden, C. (2017). Habitat structural complexity of
 Caribbean coral reefs and its relationships with fish community
 structure. PhD Thesis, Newcastle University.
-
-Beese, C. (2025). PhD Thesis. Victoria University of Wellington.
-https://doi.org/10.26686/wgtn.26421523
 
 ## See also
 

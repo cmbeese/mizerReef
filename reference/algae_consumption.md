@@ -76,5 +76,5 @@ N_i(w)\theta\_{i.A}\\dw\$\$
 ``` r
 data(caribbean_3_model)
 algae_consumption(caribbean_3_model)
-#> [1] 9.21051e+12
+#> [1] 5.714287
 ```

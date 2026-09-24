@@ -20,8 +20,8 @@ The package uses the mechanisms described in
 
 | Extension mechanism | Used for |
 |----|----|
-| `.onLoad` + [`registerExtension()`](https://sizespectrum.org/mizer/reference/registerExtension.html) | Register the package with mizer so params objects know which extensions they need |
-| S4 marker classes + S3 dispatch | Define `mizerReef`/`mizerReefSim` so reef-specific methods run automatically |
+| [`recordExtension()`](https://sizespectrum.org/mizer/reference/recordExtension.html) + [`coerceToExtensionClass()`](https://sizespectrum.org/mizer/reference/coerceToExtensionClass.html) | Record the extension metadata on params objects and set the S3 class vector |
+| S3 extension classes + S3 dispatch | Enable `mizerReef`/`mizerReefSim` so reef-specific methods run automatically |
 | `project*` rate methods | Override Encounter, FeedingLevel, PredMort and Mort to add refuge, satiation, and senescence effects |
 | [`setComponent()`](https://sizespectrum.org/mizer/reference/setComponent.html) | Add algae and detritus as scalar dynamical components |
 | [`utils::upgrade()`](https://rdrr.io/r/utils/upgrade.html) | Migrate objects saved with older mizerReef versions |
@@ -30,44 +30,40 @@ All of these are wired together inside
 [`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md),
 the single entry point for building a reef model.
 
-## The `mizerReef` marker class
+## The `mizerReef` S3 extension class
 
-mizerReef defines two S4 marker subclasses:
+`MizerParams` and `MizerSim` are S3 objects. `mizerReef` and
+`mizerReefSim` are ordinary entries in their S3 class vectors:
 
 ``` r
 
-setClass("mizerReef",    contains = "MizerParams")
-setClass("mizerReefSim", contains = "MizerSim")
+class(params)
+# [1] "mizerReef"   "MizerParams"
 ```
 
-These classes carry no extra slots — all reef-specific state (refuge,
-algae and detritus parameters) lives in `other_params(params)`. The
-classes exist purely to trigger S3 dispatch, exactly as described for
-marker classes in
-[`vignette("guide-create-extension-package", package = "mizer")`](https://sizespectrum.org/mizer/articles/guide-create-extension-package.html).
+No class declaration or session registration is needed. All
+reef-specific state (refuge, algae, and detritus parameters) lives in
+`other_params(params)`. The class label enables S3 dispatch of mizer
+generics to mizerReef-specific methods.
 
-### Registration via `.onLoad`
+### Recording the extension
 
-``` r
-
-.onLoad <- function(libname, pkgname) {
-    mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerReef")
-}
-```
-
-This registers mizerReef with mizer’s extension chain as soon as the
-package is loaded.
-[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md)
-then records the chain and coerces the result to the marker class at the
-very end of construction:
+When a reef model is constructed with
+[`newReefParams()`](https://cmbeese.github.io/mizerReef/reference/newReefParams.md),
+the extension is recorded on the object and the object is coerced to the
+extension class:
 
 ``` r
 
-params@extensions <- mizer::getRegisteredExtensions()
+params <- mizer::recordExtension(
+    params, "mizerReef",
+    version = as.character(utils::packageVersion("mizerReef")),
+    requirement = "cmbeese/mizerReef"
+)
 params <- mizer::coerceToExtensionClass(params)
 ```
 
-Recording the chain in `params@extensions` is what lets
+Recording the extension in the object’s metadata is what lets
 [`project()`](https://sizespectrum.org/mizer/reference/project.html)
 produce a `mizerReefSim` automatically (via
 [`MizerSim()`](https://sizespectrum.org/mizer/reference/MizerSim.html)’s
@@ -77,34 +73,6 @@ and what lets
 [`readParams()`](https://sizespectrum.org/mizer/reference/saveParams.html)
 restore the correct class — and warn about missing or outdated
 extensions — when a saved object is reloaded in a later session.
-
-#### A known gap: bundled example models and multiple extensions
-
-mizerReef ships two pre-built example models as package data
-(`caribbean_10_model`, `caribbean_3_model`). `.onLoad` also contains a
-[`makeActiveBinding()`](https://rdrr.io/r/base/bindenv.html) call,
-scoped to `caribbean_3_model` only, intended to re-coerce that object to
-the correct class if a *second* mizer extension is loaded alongside
-mizerReef, since a bundled `.rda` is fixed at save time and can’t know
-in advance what else will be loaded in the same session. In the current
-mizer/mizerReef versions this mechanism does not fire —
-[`exists()`](https://rdrr.io/r/base/exists.html) on the bundled object
-inside `.onLoad` is always `FALSE` at that point, so the active binding
-is never installed. This is not mizerReef-specific: the identical
-dead-code pattern exists in mizerShelf’s own current source for its
-bundled `NWMed_params` object.
-
-For everyday single-extension use this is harmless, since both bundled
-objects already carry the correct class from when they were saved. It
-would only matter if you loaded mizerReef together with a second
-dispatching extension on one of these two specific objects — for
-example, the mizerMR combination shown in
-[`vignette("using-multiple-resources")`](https://cmbeese.github.io/mizerReef/articles/using-multiple-resources.md).
-That combination does work (mizer’s extension chain, a separate
-mechanism, correctly promotes the object’s class when both extensions
-are registered), but the underlying `.onLoad` dead-code gap described
-above is still unfixed upstream; see `inst/to-do-list.txt` for the
-current state.
 
 ### Methods dispatched on `mizerReef`
 
@@ -130,15 +98,12 @@ older, non-chaining mechanism
 ([`mizer::setRateFunction()`](https://sizespectrum.org/mizer/reference/setRateFunction.html))
 that swaps in a single named function for a rate, with no dispatch at
 all, and a params object uses one mechanism or the other for a given
-rate, never both. See the caveat in
-[`vignette("using-multiple-resources")`](https://cmbeese.github.io/mizerReef/articles/using-multiple-resources.md)
-for a concrete example (mizerReef’s dispatching encounter-rate chain
-versus therMizer’s non-chaining
-[`setRateFunction()`](https://sizespectrum.org/mizer/reference/setRateFunction.html)
-approach, and why combining them does not currently give you both
-effects together). The next two sections look at mizerReef’s own rate
-methods in detail, because they illustrate both the easy case (a purely
-additive modification) and a harder case that needed more thought.
+rate, never both. therMizer, for example, is a dispatching extension, so
+on a model set up with both packages its temperature effects and
+mizerReef’s refuge correction combine in one encounter-rate calculation.
+The next two sections look at mizerReef’s own rate methods in detail,
+because they illustrate both the easy case (a purely additive
+modification) and a harder case that needed more thought.
 
 ## Predation refuge: a multiplicative rate modification
 
@@ -358,9 +323,9 @@ e.g.:
 ``` r
 
 detritus_lifetime(params)
-#> [1] 3.17783e-13
+#> [1] 0.0004394672
 algae_biomass(params)
-#> [1] 2.171433e-10
+#> [1] 349.9999
 ```
 
 ### `getBiomass.mizerReefSim()`
@@ -558,17 +523,21 @@ newReefParams <- function(species_params, method, method_params, ...) {
     # Senescence and external mortality parameters
     params <- setExtMortParams(params, ...)
 
-    # Register the extension chain and promote to the mizerReef S4 class.
+    # Record the extension metadata and promote to the mizerReef S3 class.
     # Rate overrides (Encounter, FeedingLevel, PredMort, Mort) are handled by
     # the project*.mizerReef methods shown above, not by setRateFunction(),
     # so they compose with other extension packages.
-    params@extensions <- mizer::getRegisteredExtensions()
+    params <- mizer::recordExtension(
+        params, "mizerReef",
+        version = as.character(utils::packageVersion("mizerReef")),
+        requirement = "cmbeese/mizerReef"
+    )
     params <- mizer::coerceToExtensionClass(params)
     params
 }
 ```
 
-The marker-class promotion happens last, after every other slot has been
+The class coercion happens last, after every other component has been
 populated — exactly as
 [`vignette("guide-create-extension-package", package = "mizer")`](https://sizespectrum.org/mizer/articles/guide-create-extension-package.html)
 recommends, so that no earlier step in construction accidentally
@@ -579,21 +548,21 @@ dispatches to a reef-specific method on a not-yet-fully-built object.
 mizerReef illustrates the following extension mechanisms working
 together:
 
-1.  **`.onLoad` +
-    [`registerExtension()`](https://sizespectrum.org/mizer/reference/registerExtension.html)**
-    — announces mizerReef to mizer’s extension chain as soon as the
-    package is loaded.
+1.  **[`recordExtension()`](https://sizespectrum.org/mizer/reference/recordExtension.html)**
+    — records mizerReef’s metadata and version on the object so required
+    extensions can be verified on load.
 
-2.  **S4 marker classes + S3 dispatch** — `mizerReef` and `mizerReefSim`
-    ensure that reef-specific methods (`projectEncounter`,
-    `projectFeedingLevel`, `projectPredMort`, `projectMort`,
-    `getBiomass`, `removeSpecies`, `steady`, `tuneSteadyState`) are
-    dispatched automatically, with every method calling
+2.  **S3 extension classes + S3 dispatch** — `mizerReef` and
+    `mizerReefSim` ensure that reef-specific methods
+    (`projectEncounter`, `projectFeedingLevel`, `projectPredMort`,
+    `projectMort`, `getBiomass`, `removeSpecies`, `steady`,
+    `tuneSteadyState`, `findSteadyState`) are dispatched automatically,
+    with every method calling
     [`NextMethod()`](https://rdrr.io/r/base/UseMethod.html) at least
     once so the standard mizer pipeline, and any other extension package
     stacked below mizerReef, keeps working. The rate methods all chain
     through [`NextMethod()`](https://rdrr.io/r/base/UseMethod.html); the
-    two steady-state methods instead replace the run wholesale, because
+    steady-state methods instead replace the run wholesale, because
     reaching a reef steady state means tuning the algae and detritus
     pools that mizer knows nothing about (see
     [`?reefSteady`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)).

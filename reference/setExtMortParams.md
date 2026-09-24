@@ -50,8 +50,8 @@ A `MizerParams` object with updated external mortality parameters
      assumed to decrease allometrically with body size. Residual natural
      mortality is a rate with units 1/year given by:
 
-     \deqn{\mu_{nat.i}(w) = \mu_{nat}\, w^{1-n}.}
-          {\mu_{nat.i}(w) = \mu_{nat}\, w^{1-n}.}
+     \deqn{\mu_{nat.i}(w) = \mu_{nat}\, w^{n-1}.}
+          {\mu_{nat.i}(w) = \mu_{nat}\, w^{n-1}.}
 
       Here \eqn{\mu_{nat}} is the residual natural mortality rate at size
       1 g and \eqn{n} is the allometric scaling exponent. In mizerReef,

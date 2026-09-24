@@ -39,6 +39,9 @@ tuneSteadyState(
   info_level = mizer::default_info_level(),
   ...
 )
+
+# S3 method for class 'mizerReef'
+findSteadyState(params, solver = c("project", "newton"), ...)
 ```
 
 ## Arguments
