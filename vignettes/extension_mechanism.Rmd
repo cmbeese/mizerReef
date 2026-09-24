@@ -101,7 +101,10 @@ follows the same convention*. This is not automatic just because a package
 touches a mizer model: mizer still supports an older, non-chaining mechanism
 (`mizer::setRateFunction()`) that swaps in a single named function for a
 rate, with no dispatch at all, and a params object uses one mechanism or the
-other for a given rate, never both. The next two sections look at mizerReef's own
+other for a given rate, never both. therMizer, for example, is a dispatching
+extension, so on a model set up with both packages its temperature effects
+and mizerReef's refuge correction combine in one encounter-rate calculation.
+The next two sections look at mizerReef's own
 rate methods in detail, because they illustrate both the easy case (a purely
 additive modification) and a harder case that needed more thought.
 

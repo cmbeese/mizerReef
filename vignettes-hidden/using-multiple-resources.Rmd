@@ -325,33 +325,22 @@ inside every method that overrides a shared generic. mizer still supports an
 older, simpler mechanism for changing a single rate calculation:
 `mizer::setRateFunction(params, "Encounter", "my_fun")` swaps in one named
 function, with no chaining at all. A params object uses *one mechanism or the
-other* for a given rate, never both: `getEncounter()` (and the other rate
-generics) checks whether the object has been coerced to a dispatching
-extension's class at all, and if so walks the full `NextMethod()` chain — a
-path that computes the encounter rate directly and never consults
-`rates_funcs` — otherwise it calls the single function named in
-`rates_funcs$Encounter` directly.
+other* for a given rate, never both. mizer looks at `rates_funcs` first: if it
+still names mizer's default function for that rate (`"mizerEncounter"` for
+the encounter rate), mizer walks the full `NextMethod()` chain of dispatching
+extensions. If it names a replacement set with `setRateFunction()`, mizer
+calls that function directly, and no extension's method for that rate runs
+unless the replacement itself calls the generic (`projectEncounter()` for the
+encounter rate).
 
 A concrete example: [therMizer](https://github.com/sizespectrum/therMizer)
-(temperature effects) modifies the encounter rate via
-`setRateFunction(params, "Encounter", "therMizerEncounter")` — the older,
-non-chaining mechanism; it does not register itself as a dispatching
-extension. Once mizerReef has coerced a params object to its own dispatching
-class (which happens automatically inside `newReefParams()`), that object's
-encounter rate is computed by walking mizerReef's `NextMethod()` chain, and
-`rates_funcs$Encounter` — including a `therMizerEncounter` registration — is
-never consulted at all. The reverse is equally true: on an object still
-carrying the base `MizerParams` class, `rates_funcs$Encounter` runs alone and
-mizerReef's refuge correction never applies. So combining mizerReef with an
-extension like therMizer does not currently give you both effects together —
-whichever mechanism happens to govern that rate for the object determines
-the outcome, regardless of the order the two were set up in. Getting genuine
-composition (as demonstrated above for mizerReef + mizerMR) requires *both*
-extensions to be written as dispatching extensions that call `NextMethod()`
-— even then, if either method skips `NextMethod()`, the extension loaded
-**first** (further down the chain) is the one that gets shadowed. Truly
-composable behaviour across *any* pair of mizer extensions, regardless of
-which mechanism each uses, is still an evolving part of the mizer ecosystem.
+(temperature effects) is also a dispatching extension. On a model set up with
+both mizerReef and therMizer, a single encounter-rate calculation applies
+therMizer's temperature scaling of search volume and mizerReef's refuge
+correction together. Genuine composition like this requires every extension
+involved to be a dispatching extension that calls `NextMethod()`. If a method
+skips `NextMethod()`, every extension further down the chain (those applied
+to the model earlier) is shadowed for that rate.
 
 For more on the extension mechanism — including how the extensions are recorded in
 the object and restored when you save and reload it — see
