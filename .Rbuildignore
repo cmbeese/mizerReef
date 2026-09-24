@@ -24,3 +24,4 @@ test_i2.rda
 ^CLAUDE\.md$
 ^GEMINI\.md$
 ^MIZER-AGENTS\.md$
+^vignettes-hidden$

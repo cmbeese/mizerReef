@@ -38,8 +38,6 @@ navbar:
         href: articles/model-description.html
       - text: Extension Mechanism
         href: articles/extension_mechanism.html
-      - text: Multiple Resources
-        href: articles/using-multiple-resources.html
 home:
   links:
   - text: Getting Started
@@ -181,4 +179,3 @@ articles:
   - title: "Package Internals"
     contents:
       - extension_mechanism
-      - using-multiple-resources

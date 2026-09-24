@@ -21,6 +21,11 @@
   build. Until that recalibration lands, `caribbean_10_model` is not at
   steady state under the current code: projected forward, several species'
   biomasses drift far from their starting values.
+- **mizerMR vignette temporarily hidden**: mizerMR does not yet support mizer
+  3.4, so the "Combining mizerReef with mizerMR" vignette has moved to
+  `vignettes-hidden/`, which is not built, and mizerMR has been removed from
+  `Suggests` and `Remotes`. mizerReef itself never depended on mizerMR. The
+  vignette will return once mizerMR supports mizer 3.4.
 
 # MizerReef 2.0.3
 
