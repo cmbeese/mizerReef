@@ -8,6 +8,6 @@ bibentry(
         person("Alice", "Rogers", email = "alice.rogers@vuw.ac.nz", role = "aut")
     ),
     year = "2026",
-    note = "R package version 2.1.0",
+    note = paste("R package version", meta$Version),
     url = "https://github.com/cmbeese/mizerReef"
 )
