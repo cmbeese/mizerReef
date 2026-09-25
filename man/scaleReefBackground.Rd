@@ -13,6 +13,15 @@ scaleReefBackground(params, factor)
 will be reduced}
 }
 \description{
-Replaces scale down background function
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}} Use \code{\link[=scaleDownPlankton]{scaleDownPlankton()}} instead, which
+leaves algae and detritus completely unchanged and keeps each species'
+reproduction level.
+}
+\details{
+Multiplies the fish abundances by \code{factor} with \code{\link[=scaleReefAbundance]{scaleReefAbundance()}},
+which resets every species' reproduction level to 1/2, and then scales the
+whole model by \code{1 / factor} with \code{\link[mizer:scaleModel]{mizer::scaleModel()}}. Algae and detritus
+biomasses end up divided by \code{factor}, and their encounter coefficients
+\code{rho} multiplied by \code{factor}.
 }
 \concept{Uresources}

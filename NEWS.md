@@ -27,8 +27,31 @@
   `Suggests` and `Remotes`. mizerReef itself never depended on mizerMR. The
   vignette will return once mizerMR supports mizer 3.4.
 
+## New features
+
+- New `scaleDownPlankton()` reduces the plankton resource by a factor
+  relative to the fish, algae and detritus, so that predators' diets shift
+  from plankton towards fish during calibration. It does the job of
+  `mizerExperimental::scaleDownBackground()`, but leaves algae and detritus
+  completely unchanged and keeps each species' reproduction level instead of
+  resetting it to 1/4. `scaleReefBackground()` is superseded by it.
+
 ## Bug fixes
 
+- mizer's `scaleModel()` now scales a mizerReef model's algae and detritus
+  parameters, exactly as `scaleReefModel()` always has. It used to multiply
+  the algae and detritus biomasses by the factor but leave their encounter
+  coefficients (`rho`) unchanged, so every function that rescales a model
+  through `scaleModel()` changed how much algae and detritus the fish
+  encounter. `mizerExperimental::scaleDownBackground()` and
+  `scaleReefBackground()` with a factor of F divided the herbivores' algae
+  encounter and the invertebrates' detritus encounter by F. Algae recovered
+  during `reefSteady()`, but detritus is held fixed there, so invertebrates
+  lost most of their detritus food for good: at F = 17, detritus fell from
+  97% to 24% of their diet in the `caribbean_3` calibration. This also
+  affected `mizer::calibrateBiomass()` and `mizer::calibrateNumber()` on
+  mizerReef models. The bundled `caribbean_3_model` was calibrated with the
+  old behaviour and will be recalibrated separately.
 - `plotDegradationScale(trajectory = "rubble")` (and `"algae"`,
   `"recovery"`) loaded the built-in trajectory into your global environment,
   and used an object of the same name there in preference to the package's

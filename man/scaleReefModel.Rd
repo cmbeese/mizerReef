@@ -2,19 +2,47 @@
 % Please edit documentation in R/reef-components.R
 \name{scaleReefModel}
 \alias{scaleReefModel}
+\alias{scaleModel.mizerReef}
 \title{Scale model parameters}
 \usage{
 scaleReefModel(params, factor)
+
+\method{scaleModel}{mizerReef}(params, factor, ...)
 }
 \arguments{
 \item{params}{a mizer model object}
 
 \item{factor}{a numeric value by which to scale the model}
+
+\item{...}{Unused}
 }
 \value{
 a mizer model object with scaled parameters
 }
 \description{
 This function scales various model parameters by a given factor.
+}
+\details{
+The fish abundances, the plankton and the algae and detritus biomasses are
+multiplied by \code{factor}, and the search volume and the algae and detritus
+encounter coefficients \code{rho} are divided by it, so every encounter rate is
+unchanged at first. The external detritus flux is multiplied by \code{factor}.
+
+Two things are properties of the reef, not of the fish, and are
+deliberately not scaled. The algae production rate is a literature value,
+so algae biomass then settles to whatever level the new grazing pressure
+allows. The refuge density of the competitive refuge method comes from
+data, so scaling the fish abundance changes how many fish find a refuge.
+The algae and detritus carrying capacities (with \code{use_UR_cc = TRUE}) are
+not scaled either.
+
+On a mizerReef model, mizer's own \code{\link[mizer:scaleModel]{mizer::scaleModel()}} does exactly the
+same as \code{scaleReefModel()}. So mizer and mizerExperimental functions that
+rescale a model through \code{scaleModel()}, such as \code{\link[mizer:calibrateBiomass]{mizer::calibrateBiomass()}}
+and \code{\link[mizerExperimental:scaleDownBackground]{mizerExperimental::scaleDownBackground()}}, scale algae and detritus in
+the same way.
+}
+\seealso{
+\code{\link[=scaleDownPlankton]{scaleDownPlankton()}}
 }
 \concept{calibration}
