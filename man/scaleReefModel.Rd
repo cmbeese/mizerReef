@@ -2,19 +2,35 @@
 % Please edit documentation in R/reef-components.R
 \name{scaleReefModel}
 \alias{scaleReefModel}
+\alias{scaleModel.mizerReef}
 \title{Scale model parameters}
 \usage{
 scaleReefModel(params, factor)
+
+\method{scaleModel}{mizerReef}(params, factor, ...)
 }
 \arguments{
 \item{params}{a mizer model object}
 
 \item{factor}{a numeric value by which to scale the model}
+
+\item{...}{Unused}
 }
 \value{
 a mizer model object with scaled parameters
 }
 \description{
 This function scales various model parameters by a given factor.
+}
+\details{
+On a mizerReef model, mizer's own \code{\link[mizer:scaleModel]{mizer::scaleModel()}} does exactly the
+same as \code{scaleReefModel()}: both scale the algae and detritus parameters
+along with the rest of the model. So mizer and mizerExperimental functions
+that rescale a model through \code{scaleModel()}, such as
+\code{\link[mizer:calibrateBiomass]{mizer::calibrateBiomass()}} and \code{\link[mizerExperimental:scaleDownBackground]{mizerExperimental::scaleDownBackground()}},
+treat algae and detritus correctly as well.
+}
+\seealso{
+\code{\link[=scaleDownPlankton]{scaleDownPlankton()}}
 }
 \concept{calibration}

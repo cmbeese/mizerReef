@@ -63,3 +63,46 @@ test_that("scaleReefModel with factor = 1 leaves algae/detritus parameters uncha
     expect_equal(result@other_params$algae, params@other_params$algae)
     expect_equal(result@other_params$detritus, params@other_params$detritus)
 })
+
+test_that("mizer's scaleModel() scales a mizerReef model exactly as scaleReefModel() does", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+
+    expect_equal(mizer::scaleModel(params, factor = 3), scaleReefModel(params, factor = 3))
+})
+
+test_that("scaleModel() on a mizerReef model leaves the rates unchanged", {
+    # With the competitive refuge method, the number of refuges is an
+    # absolute density, so scaling the fish abundance genuinely changes how
+    # many fish find a refuge. The binned method has no such scale.
+    data(caribbean_3_model)
+    data(tuning_profile)
+    params <- newRefuge(caribbean_3_model, new_method = "binned",
+                        new_method_params = tuning_profile)
+    result <- mizer::scaleModel(params, factor = 3)
+
+    # The rate arrays carry their params object as an attribute, which does
+    # differ, so compare only the rates themselves.
+    expect_equal(getEncounter(result), getEncounter(params), ignore_attr = "params")
+    expect_equal(getEGrowth(result), getEGrowth(params), ignore_attr = "params")
+    expect_equal(getMort(result), getMort(params), ignore_attr = "params")
+    for (component in c("algae", "detritus")) {
+        expect_equal(
+            encounter_contribution(result, result@initial_n_other, component),
+            encounter_contribution(params, params@initial_n_other, component)
+        )
+    }
+})
+
+test_that("mizerExperimental::scaleDownBackground() leaves the algae and detritus encounter rates unchanged on a mizerReef model", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    result <- mizerExperimental::scaleDownBackground(params, factor = 5)
+
+    for (component in c("algae", "detritus")) {
+        expect_equal(
+            encounter_contribution(result, result@initial_n_other, component),
+            encounter_contribution(params, params@initial_n_other, component)
+        )
+    }
+})

@@ -272,13 +272,44 @@ scaleReefAbundance <- function(params, factor) {
 #'
 #' This function scales various model parameters by a given factor.
 #'
+#' On a mizerReef model, mizer's own [mizer::scaleModel()] does exactly the
+#' same as `scaleReefModel()`: both scale the algae and detritus parameters
+#' along with the rest of the model. So mizer and mizerExperimental functions
+#' that rescale a model through `scaleModel()`, such as
+#' [mizer::calibrateBiomass()] and [mizerExperimental::scaleDownBackground()],
+#' treat algae and detritus correctly as well.
+#'
 #' @param params a mizer model object
 #' @param factor a numeric value by which to scale the model
+#' @param ... Unused
 #'
 #' @return a mizer model object with scaled parameters
+#' @seealso [scaleDownPlankton()]
 #' @concept calibration
 #' @export
 scaleReefModel <- function(params, factor) {
+    # A mizerReef object dispatches to scaleModel.mizerReef(), which scales
+    # the algae and detritus parameters itself -- scaling them here as well
+    # would scale them twice.
+    if (inherits(params, "mizerReef")) {
+        return(mizer::scaleModel(params, factor))
+    }
+    mizer::scaleModel(scale_reef_components(params, factor), factor)
+}
+
+#' @rdname scaleReefModel
+#' @method scaleModel mizerReef
+#' @export
+scaleModel.mizerReef <- function(params, factor, ...) {
+    params <- scale_reef_components(params, factor)
+    NextMethod()
+}
+
+# Scales the algae and detritus parameters that mizer's own scaleModel() does
+# not know about. Without this, scaleModel() multiplies the algae and detritus
+# biomasses by `factor` but leaves their encounter coefficients `rho`
+# unchanged, so the encounter rate `rho * biomass` changes by `factor`.
+scale_reef_components <- function(params, factor) {
     # Algae and detritus. `recalculate = FALSE` because the rho arrays in
     # other_params are scaled by the same factor right here, so there is
     # nothing to rebuild -- but the scaled scalars are recorded as given, so
@@ -318,12 +349,82 @@ scaleReefModel <- function(params, factor) {
 
     mizer::species_params(params, recalculate = FALSE) <- sp
 
-    mizer::scaleModel(params, factor)
+    params
+}
+
+#' Scale down the plankton resource by a factor
+#'
+#' Reduces the abundance of the size-structured plankton resource by `factor`
+#' relative to the fish, algae and detritus. Every species then encounters
+#' `factor` times as much fish prey relative to plankton, which shifts
+#' predators' diets away from plankton and towards fish during calibration.
+#'
+#' The plankton abundance, its carrying capacity and `kappa` are divided by
+#' `factor`, and every species' search volume and `gamma` are multiplied by
+#' `factor`. So each species encounters as much plankton as before, and
+#' `factor` times as much fish prey. Algae and detritus are left completely
+#' unchanged, so herbivores and invertebrates still encounter as much of them
+#' as before. Each species keeps its reproduction level: `erepro` and `R_max`
+#' are retuned with [mizer::setBevertonHolt()].
+#'
+#' This changes the model's rates, so the model is no longer at steady state.
+#' Follow it with [reefSteady()] and then re-match biomasses and growth, for
+#' example with [mizer::matchBiomasses()] and [matchReefGrowth()].
+#'
+#' [mizerExperimental::scaleDownBackground()] also scales down the plankton,
+#' but it resets every species' reproduction level to 1/4, and it divides the
+#' algae and detritus biomasses by `factor`. It multiplies their encounter
+#' coefficients `rho` by `factor` to make up for that, which leaves the
+#' encounter rates unchanged but makes algae and detritus turn over `factor`
+#' times faster.
+#'
+#' @param params A MizerParams object
+#' @param factor A number greater than 0 giving the factor by which the
+#'   plankton abundance is reduced
+#' @return An updated MizerParams object
+#' @seealso [scaleReefModel()]
+#' @concept calibration
+#' @examples
+#' data(caribbean_3_model)
+#' params <- scaleDownPlankton(caribbean_3_model, factor = 2)
+#' @export
+scaleDownPlankton <- function(params, factor) {
+    params <- validParams(params)
+    assert_that(is.number(factor), factor > 0)
+    reproduction_level <- getReproductionLevel(params)
+
+    # Less plankton...
+    params@cc_pp <- params@cc_pp / factor
+    params@resource_params$kappa <- params@resource_params$kappa / factor
+    initialNResource(params) <- params@initial_n_pp / factor
+
+    # ...searched for with a proportionally larger search volume, so the
+    # plankton encounter rate is unchanged while the encounter rate with
+    # fish prey goes up by `factor`. Algae and detritus encounter goes
+    # through `rho`, not the search volume, so it is not affected.
+    params@search_vol <- params@search_vol * factor
+    sp <- mizer::species_params(params)
+    if ("gamma" %in% names(sp)) {
+        sp$gamma <- sp$gamma * factor
+    }
+    mizer::species_params(params, recalculate = FALSE) <- sp
+
+    params <- setBevertonHolt(params, reproduction_level = reproduction_level)
+    params@time_modified <- lubridate::now()
+    params
 }
 
 #' Scale background down by a factor
 #'
-#' Replaces scale down background function
+#' `r lifecycle::badge("superseded")` Use [scaleDownPlankton()] instead, which
+#' leaves algae and detritus completely unchanged and keeps each species'
+#' reproduction level.
+#'
+#' Multiplies the fish abundances by `factor` with [scaleReefAbundance()],
+#' which resets every species' reproduction level to 1/2, and then scales the
+#' whole model by `1 / factor` with [mizer::scaleModel()]. Algae and detritus
+#' biomasses end up divided by `factor`, and their encounter coefficients
+#' `rho` multiplied by `factor`.
 #'
 #' @param params a mizer model object
 #' @param factor A number giving the factor by which the background abundance
