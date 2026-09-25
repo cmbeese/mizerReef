@@ -48,7 +48,10 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scaleReefModel</span><span class="op">(</span><span class="va">params</span>, <span class="va">factor</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scaleReefModel</span><span class="op">(</span><span class="va">params</span>, <span class="va">factor</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'mizerReef'</span></span>
+<span><span class="fu">scaleModel</span><span class="op">(</span><span class="va">params</span>, <span class="va">factor</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -62,10 +65,37 @@
 <dt id="arg-factor">factor<a class="anchor" aria-label="anchor" href="#arg-factor"></a></dt>
 <dd><p>a numeric value by which to scale the model</p></dd>
 
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Unused</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>a mizer model object with scaled parameters</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The fish abundances, the plankton and the algae and detritus biomasses are
+multiplied by <code>factor</code>, and the search volume and the algae and detritus
+encounter coefficients <code>rho</code> are divided by it, so every encounter rate is
+unchanged at first. The external detritus flux is multiplied by <code>factor</code>.</p>
+<p>Two things are properties of the reef, not of the fish, and are
+deliberately not scaled. The algae production rate is a literature value,
+so algae biomass then settles to whatever level the new grazing pressure
+allows. The refuge density of the competitive refuge method comes from
+data, so scaling the fish abundance changes how many fish find a refuge.
+The algae and detritus carrying capacities (with <code>use_UR_cc = TRUE</code>) are
+not scaled either.</p>
+<p>On a mizerReef model, mizer's own <code><a href="https://sizespectrum.org/mizer/reference/scaleModel.html" class="external-link">mizer::scaleModel()</a></code> does exactly the
+same as <code>scaleReefModel()</code>. So mizer and mizerExperimental functions that
+rescale a model through <code>scaleModel()</code>, such as <code><a href="https://sizespectrum.org/mizer/reference/calibrateBiomass.html" class="external-link">mizer::calibrateBiomass()</a></code>
+and <code><a href="https://sizespectrum.org/mizerExperimental/reference/scaleDownBackground.html" class="external-link">mizerExperimental::scaleDownBackground()</a></code>, scale algae and detritus in
+the same way.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="scaleDownPlankton.html">scaleDownPlankton()</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

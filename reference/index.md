@@ -28,9 +28,12 @@ observations.
   : Calibrate the model scale to match total observed number
 - [`matchReefGrowth()`](https://cmbeese.github.io/mizerReef/reference/matchReefGrowth.md)
   : Match observed growth rates
+- [`scaleDownPlankton()`](https://cmbeese.github.io/mizerReef/reference/scaleDownPlankton.md)
+  : Scale down the plankton resource by a factor
 - [`scaleReefAbundance()`](https://cmbeese.github.io/mizerReef/reference/scaleReefAbundance.md)
   : Scale reef abundances
 - [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md)
+  [`scaleModel(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md)
   : Scale model parameters
 - [`tuning_profile`](https://cmbeese.github.io/mizerReef/reference/tuning_profile.md)
   : Constant refuge profile for tuning steady states
@@ -197,7 +200,7 @@ assess these dynamics.
 - [`rescaleComponents()`](https://cmbeese.github.io/mizerReef/reference/rescaleComponents.md)
   : Rescale algae and detritus biomass without changing anything else
 - [`scaleReefBackground()`](https://cmbeese.github.io/mizerReef/reference/scaleReefBackground.md)
-  : Scale background down by a factor
+  **\[superseded\]** : Scale background down by a factor
 - [`setURcapacity()`](https://cmbeese.github.io/mizerReef/reference/setURcapacity.md)
   : Switch to unstructured resource dynamics with carrying capacities
 - [`tuneUR()`](https://cmbeese.github.io/mizerReef/reference/tuneUR.md)

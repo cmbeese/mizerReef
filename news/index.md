@@ -35,8 +35,45 @@
   removed from `Suggests` and `Remotes`. mizerReef itself never depended
   on mizerMR. The vignette will return once mizerMR supports mizer 3.4.
 
+### New features
+
+- New
+  [`scaleDownPlankton()`](https://cmbeese.github.io/mizerReef/reference/scaleDownPlankton.md)
+  reduces the plankton resource by a factor relative to the fish, algae
+  and detritus, so that predators’ diets shift from plankton towards
+  fish during calibration. It does the job of
+  [`mizerExperimental::scaleDownBackground()`](https://sizespectrum.org/mizerExperimental/reference/scaleDownBackground.html),
+  but leaves algae and detritus completely unchanged and keeps each
+  species’ reproduction level instead of resetting it to 1/4.
+  [`scaleReefBackground()`](https://cmbeese.github.io/mizerReef/reference/scaleReefBackground.md)
+  is superseded by it.
+
 ### Bug fixes
 
+- mizer’s
+  [`scaleModel()`](https://sizespectrum.org/mizer/reference/scaleModel.html)
+  now scales a mizerReef model’s algae and detritus parameters, exactly
+  as
+  [`scaleReefModel()`](https://cmbeese.github.io/mizerReef/reference/scaleReefModel.md)
+  always has. It used to multiply the algae and detritus biomasses by
+  the factor but leave their encounter coefficients (`rho`) unchanged,
+  so every function that rescales a model through
+  [`scaleModel()`](https://sizespectrum.org/mizer/reference/scaleModel.html)
+  changed how much algae and detritus the fish encounter.
+  [`mizerExperimental::scaleDownBackground()`](https://sizespectrum.org/mizerExperimental/reference/scaleDownBackground.html)
+  and
+  [`scaleReefBackground()`](https://cmbeese.github.io/mizerReef/reference/scaleReefBackground.md)
+  with a factor of F divided the herbivores’ algae encounter and the
+  invertebrates’ detritus encounter by F. Algae recovered during
+  [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md),
+  but detritus is held fixed there, so invertebrates lost most of their
+  detritus food for good: at F = 17, detritus fell from 97% to 24% of
+  their diet in the `caribbean_3` calibration. This also affected
+  [`mizer::calibrateBiomass()`](https://sizespectrum.org/mizer/reference/calibrateBiomass.html)
+  and
+  [`mizer::calibrateNumber()`](https://sizespectrum.org/mizer/reference/calibrateNumber.html)
+  on mizerReef models. The bundled `caribbean_3_model` was calibrated
+  with the old behaviour and will be recalibrated separately.
 - `plotDegradationScale(trajectory = "rubble")` (and `"algae"`,
   `"recovery"`) loaded the built-in trajectory into your global
   environment, and used an object of the same name there in preference
