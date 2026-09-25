@@ -24,11 +24,26 @@ predators' diets away from plankton and towards fish during calibration.
 \details{
 The plankton abundance, its carrying capacity and \code{kappa} are divided by
 \code{factor}, and every species' search volume and \code{gamma} are multiplied by
-\code{factor}. So each species encounters as much plankton as before, and
-\code{factor} times as much fish prey. Algae and detritus are left completely
-unchanged, so herbivores and invertebrates still encounter as much of them
-as before. Each species keeps its reproduction level: \code{erepro} and \code{R_max}
-are retuned with \code{\link[mizer:setBevertonHolt]{mizer::setBevertonHolt()}}.
+\code{factor}. So at first each species encounters as much plankton as before,
+and \code{factor} times as much fish prey. Algae and detritus are left
+completely unchanged, so herbivores and invertebrates still encounter as
+much of them as before.
+
+The fish then graze the plankton \code{factor} times harder, though. Once the
+model is run back to steady state, the plankton settles below 1/\code{factor}
+of its former abundance wherever grazing is strong compared with the
+plankton's regrowth rate, so the eventual shift towards fish prey is
+larger than \code{factor} alone suggests.
+
+Background species (\code{is_background = TRUE}) count as background food, as
+in \code{\link[mizerExperimental:scaleDownBackground]{mizerExperimental::scaleDownBackground()}}, and are scaled down with the
+plankton. Size-structured resources added by other extensions are not
+scaled.
+
+If the model uses Beverton-Holt recruitment, each species keeps its
+reproduction level: \code{erepro} and \code{R_max} are retuned with
+\code{\link[mizer:setBevertonHolt]{mizer::setBevertonHolt()}}. Any other recruitment function is left as it
+is.
 
 This changes the model's rates, so the model is no longer at steady state.
 Follow it with \code{\link[=reefSteady]{reefSteady()}} and then re-match biomasses and growth, for
@@ -39,7 +54,8 @@ but it resets every species' reproduction level to 1/4, and it divides the
 algae and detritus biomasses by \code{factor}. It multiplies their encounter
 coefficients \code{rho} by \code{factor} to make up for that, which leaves the
 encounter rates unchanged but makes algae and detritus turn over \code{factor}
-times faster.
+times faster. It also divides the external detritus flux by \code{factor}, so
+the detritus budget no longer balances until \code{\link[=reefSteady]{reefSteady()}} retunes it.
 }
 \examples{
 data(caribbean_3_model)

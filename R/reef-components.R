@@ -272,12 +272,24 @@ scaleReefAbundance <- function(params, factor) {
 #'
 #' This function scales various model parameters by a given factor.
 #'
+#' The fish abundances, the plankton and the algae and detritus biomasses are
+#' multiplied by `factor`, and the search volume and the algae and detritus
+#' encounter coefficients `rho` are divided by it, so every encounter rate is
+#' unchanged at first. The external detritus flux is multiplied by `factor`.
+#'
+#' Two things are properties of the reef, not of the fish, and are
+#' deliberately not scaled. The algae production rate is a literature value,
+#' so algae biomass then settles to whatever level the new grazing pressure
+#' allows. The refuge density of the competitive refuge method comes from
+#' data, so scaling the fish abundance changes how many fish find a refuge.
+#' The algae and detritus carrying capacities (with `use_UR_cc = TRUE`) are
+#' not scaled either.
+#'
 #' On a mizerReef model, mizer's own [mizer::scaleModel()] does exactly the
-#' same as `scaleReefModel()`: both scale the algae and detritus parameters
-#' along with the rest of the model. So mizer and mizerExperimental functions
-#' that rescale a model through `scaleModel()`, such as
-#' [mizer::calibrateBiomass()] and [mizerExperimental::scaleDownBackground()],
-#' treat algae and detritus correctly as well.
+#' same as `scaleReefModel()`. So mizer and mizerExperimental functions that
+#' rescale a model through `scaleModel()`, such as [mizer::calibrateBiomass()]
+#' and [mizerExperimental::scaleDownBackground()], scale algae and detritus in
+#' the same way.
 #'
 #' @param params a mizer model object
 #' @param factor a numeric value by which to scale the model
@@ -301,6 +313,10 @@ scaleReefModel <- function(params, factor) {
 #' @method scaleModel mizerReef
 #' @export
 scaleModel.mizerReef <- function(params, factor, ...) {
+    # validParams() first, so that an object still waiting for
+    # upgrade.mizerReef() has its rho arrays where scale_reef_components()
+    # looks for them.
+    params <- validParams(params)
     params <- scale_reef_components(params, factor)
     NextMethod()
 }
@@ -361,11 +377,26 @@ scale_reef_components <- function(params, factor) {
 #'
 #' The plankton abundance, its carrying capacity and `kappa` are divided by
 #' `factor`, and every species' search volume and `gamma` are multiplied by
-#' `factor`. So each species encounters as much plankton as before, and
-#' `factor` times as much fish prey. Algae and detritus are left completely
-#' unchanged, so herbivores and invertebrates still encounter as much of them
-#' as before. Each species keeps its reproduction level: `erepro` and `R_max`
-#' are retuned with [mizer::setBevertonHolt()].
+#' `factor`. So at first each species encounters as much plankton as before,
+#' and `factor` times as much fish prey. Algae and detritus are left
+#' completely unchanged, so herbivores and invertebrates still encounter as
+#' much of them as before.
+#'
+#' The fish then graze the plankton `factor` times harder, though. Once the
+#' model is run back to steady state, the plankton settles below 1/`factor`
+#' of its former abundance wherever grazing is strong compared with the
+#' plankton's regrowth rate, so the eventual shift towards fish prey is
+#' larger than `factor` alone suggests.
+#'
+#' Background species (`is_background = TRUE`) count as background food, as
+#' in [mizerExperimental::scaleDownBackground()], and are scaled down with the
+#' plankton. Size-structured resources added by other extensions are not
+#' scaled.
+#'
+#' If the model uses Beverton-Holt recruitment, each species keeps its
+#' reproduction level: `erepro` and `R_max` are retuned with
+#' [mizer::setBevertonHolt()]. Any other recruitment function is left as it
+#' is.
 #'
 #' This changes the model's rates, so the model is no longer at steady state.
 #' Follow it with [reefSteady()] and then re-match biomasses and growth, for
@@ -376,7 +407,8 @@ scale_reef_components <- function(params, factor) {
 #' algae and detritus biomasses by `factor`. It multiplies their encounter
 #' coefficients `rho` by `factor` to make up for that, which leaves the
 #' encounter rates unchanged but makes algae and detritus turn over `factor`
-#' times faster.
+#' times faster. It also divides the external detritus flux by `factor`, so
+#' the detritus budget no longer balances until [reefSteady()] retunes it.
 #'
 #' @param params A MizerParams object
 #' @param factor A number greater than 0 giving the factor by which the
@@ -391,17 +423,26 @@ scale_reef_components <- function(params, factor) {
 scaleDownPlankton <- function(params, factor) {
     params <- validParams(params)
     assert_that(is.number(factor), factor > 0)
-    reproduction_level <- getReproductionLevel(params)
+    # Only Beverton-Holt recruitment has a reproduction level to keep.
+    beverton_holt <- identical(params@rates_funcs$RDD, "BevertonHoltRDD")
+    if (beverton_holt) {
+        reproduction_level <- getReproductionLevel(params)
+    }
 
-    # Less plankton...
+    # Less plankton, and fewer background species...
     params@cc_pp <- params@cc_pp / factor
     params@resource_params$kappa <- params@resource_params$kappa / factor
     initialNResource(params) <- params@initial_n_pp / factor
+    background <- which(params@species_params$is_background %in% TRUE)
+    if (length(background) > 0) {
+        params@initial_n[background, ] <- params@initial_n[background, ] / factor
+    }
 
     # ...searched for with a proportionally larger search volume, so the
-    # plankton encounter rate is unchanged while the encounter rate with
-    # fish prey goes up by `factor`. Algae and detritus encounter goes
-    # through `rho`, not the search volume, so it is not affected.
+    # plankton and background encounter rates are unchanged at first while
+    # the encounter rate with fish prey goes up by `factor`. Algae and
+    # detritus encounter goes through `rho`, not the search volume, so it is
+    # not affected.
     params@search_vol <- params@search_vol * factor
     sp <- mizer::species_params(params)
     if ("gamma" %in% names(sp)) {
@@ -409,7 +450,9 @@ scaleDownPlankton <- function(params, factor) {
     }
     mizer::species_params(params, recalculate = FALSE) <- sp
 
-    params <- setBevertonHolt(params, reproduction_level = reproduction_level)
+    if (beverton_holt) {
+        params <- setBevertonHolt(params, reproduction_level = reproduction_level)
+    }
     params@time_modified <- lubridate::now()
     params
 }

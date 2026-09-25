@@ -50,6 +50,27 @@ test_that("scaleDownPlankton multiplies only the encounter rate with fish prey b
     expect_equal(fish_after, fish_before * 4, ignore_attr = "params")
 })
 
+test_that("scaleDownPlankton leaves a recruitment function other than Beverton-Holt alone", {
+    data(caribbean_3_model)
+    params <- setReproduction(caribbean_3_model, RDD = "noRDD")
+    params@species_params$R_max <- NULL
+    result <- scaleDownPlankton(params, factor = 4)
+
+    expect_equal(result@rates_funcs$RDD, "noRDD")
+    expect_equal(result@species_params$erepro, params@species_params$erepro)
+    expect_equal(result@search_vol, params@search_vol * 4)
+})
+
+test_that("scaleDownPlankton scales background species down with the plankton", {
+    data(caribbean_3_model)
+    params <- markBackground(caribbean_3_model, "inverts")
+    result <- scaleDownPlankton(params, factor = 4)
+
+    expect_equal(result@initial_n["inverts", ], params@initial_n["inverts", ] / 4)
+    expect_equal(result@initial_n[c("predators", "herbivores"), ],
+                 params@initial_n[c("predators", "herbivores"), ])
+})
+
 test_that("scaleDownPlankton with factor = 1 changes no rates", {
     data(caribbean_3_model)
     params <- caribbean_3_model
