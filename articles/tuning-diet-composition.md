@@ -206,6 +206,14 @@ Diet composition by predator and size for caribbean_3_model.
   size but doesn’t) usually means the allometric exponents on encounter
   ($`m_{alg}`$/$`m_{det}`$, or the predation kernel for fish prey) need
   adjusting, not just the preference values.
+- **Refuge hides prey from blocked predators.** For predators with
+  `blocked_pred = TRUE`,
+  [`plotDiet()`](https://sizespectrum.org/mizer/reference/plotDiet.html)
+  counts only the prey outside refuge (see
+  [`getVulnerable()`](https://cmbeese.github.io/mizerReef/reference/getVulnerable.md)),
+  as the model does. So a prey group that uses refuge can be a small
+  part of their diet despite a large interaction value, if most of it is
+  hidden at the sizes they eat.
 - **Compare against
   [`plotFeedingLevel()`](https://sizespectrum.org/mizer/reference/plotFeedingLevel.html)**
   alongside diet: a species pinned near a feeding level of 1 (fully

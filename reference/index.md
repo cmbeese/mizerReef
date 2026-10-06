@@ -289,6 +289,9 @@ for details.
   : mizerReef extension classes
 - [`getBiomass(`*`<mizerReefSim>`*`)`](https://cmbeese.github.io/mizerReef/reference/getBiomass.mizerReefSim.md)
   : Get the biomass of species and unstructured components through time
+- [`getDiet(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/getDiet.mizerReef.md)
+  [`getDiet(`*`<mizerReefSim>`*`)`](https://cmbeese.github.io/mizerReef/reference/getDiet.mizerReef.md)
+  : Get the diet composition of a mizerReef model
 - [`upgrade(`*`<mizerReef>`*`)`](https://cmbeese.github.io/mizerReef/reference/upgrade.mizerReef.md)
   : Upgrade a mizerReef params object to the current layout
 

@@ -83,27 +83,47 @@ extensions — when a saved object is reloaded in a later session.
 | `projectPredMort.mizerReef()` | Discounts predation mortality from refuge-blocked predators by prey vulnerability |
 | `projectMort.mizerReef()` | Adds senescence mortality on top of the standard mortality |
 | [`getBiomass.mizerReefSim()`](https://cmbeese.github.io/mizerReef/reference/getBiomass.mizerReefSim.md) | Adds algae and detritus biomass to the species biomasses |
+| [`getDiet.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/getDiet.mizerReef.md) | Counts only prey outside refuge in the diet of refuge-blocked predators, and uses the model’s feeding level at the given algae and detritus biomasses and time |
+| [`getDiet.mizerReefSim()`](https://cmbeese.github.io/mizerReef/reference/getDiet.mizerReef.md) | Passes each saved time on to [`getDiet.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/getDiet.mizerReef.md) |
 | [`removeSpecies.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/removeSpecies.mizerReef.md) | Updates the algae/detritus encounter-rate matrices `rho` |
 | [`upgrade.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/upgrade.mizerReef.md) | Migrates objects created with an earlier mizerReef 2.x layout to the current one (automatic; for mizerReef 1.x objects, see [`upgradeReefParams()`](https://cmbeese.github.io/mizerReef/reference/upgradeReefParams.md) instead) |
 | [`steady.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md) | Runs [`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md), so the algae and detritus pools are tuned along with the fish sub-model |
 | [`tuneSteadyState.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md) | The same, under mizer 3.3’s current name for [`steady()`](https://sizespectrum.org/mizer/reference/superseded_steady.html) |
 
-Every one of these methods calls
-[`NextMethod()`](https://rdrr.io/r/base/UseMethod.html) at least once,
-so multiple *dispatching* extensions can modify the same rate or generic
+The four `project*()` methods,
+[`getBiomass.mizerReefSim()`](https://cmbeese.github.io/mizerReef/reference/getBiomass.mizerReefSim.md),
+[`getDiet.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/getDiet.mizerReef.md)
+and
+[`removeSpecies.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/removeSpecies.mizerReef.md)
+call [`NextMethod()`](https://rdrr.io/r/base/UseMethod.html), so
+multiple *dispatching* extensions can modify the same rate or generic
 without silently overwriting each other’s contribution — *provided every
-extension involved follows the same convention*. This is not automatic
-just because a package touches a mizer model: mizer still supports an
-older, non-chaining mechanism
+extension involved follows the same convention*. The other four do not
+chain:
+[`getDiet.mizerReefSim()`](https://cmbeese.github.io/mizerReef/reference/getDiet.mizerReef.md)
+replaces mizer’s simulation method, because mizer’s does not pass each
+saved time on (sizespectrum/mizer#613);
+[`upgrade.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/upgrade.mizerReef.md)
+only migrates mizerReef’s own data; and
+[`steady.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md)
+and
+[`tuneSteadyState.mizerReef()`](https://cmbeese.github.io/mizerReef/reference/reef-steady-methods.md)
+run
+[`reefSteady()`](https://cmbeese.github.io/mizerReef/reference/reefSteady.md)
+directly. This is not automatic just because a package touches a mizer
+model: mizer still supports an older, non-chaining mechanism
 ([`mizer::setRateFunction()`](https://sizespectrum.org/mizer/reference/setRateFunction.html))
 that swaps in a single named function for a rate, with no dispatch at
 all, and a params object uses one mechanism or the other for a given
 rate, never both. therMizer, for example, is a dispatching extension, so
 on a model set up with both packages its temperature effects and
 mizerReef’s refuge correction combine in one encounter-rate calculation.
-The next two sections look at mizerReef’s own rate methods in detail,
-because they illustrate both the easy case (a purely additive
-modification) and a harder case that needed more thought.
+[`getDiet.mizerReefSim()`](https://cmbeese.github.io/mizerReef/reference/getDiet.mizerReef.md)
+replaces mizer’s method instead of chaining to it, because mizer’s
+method does not pass each saved time on. The next two sections look at
+mizerReef’s own rate methods in detail, because they illustrate both the
+easy case (a purely additive modification) and a harder case that needed
+more thought.
 
 ## Predation refuge: a multiplicative rate modification
 

@@ -358,6 +358,13 @@ allometric exponents on encounter
 or the predation kernel for fish prey) need adjusting, not just the
 preference values.</li>
 <li>
+<strong>Refuge hides prey from blocked predators.</strong> For
+predators with <code>blocked_pred = TRUE</code>, <code><a href="https://sizespectrum.org/mizer/reference/plotDiet.html" class="external-link">plotDiet()</a></code>
+counts only the prey outside refuge (see <code><a href="../reference/getVulnerable.html">getVulnerable()</a></code>),
+as the model does. So a prey group that uses refuge can be a small part
+of their diet despite a large interaction value, if most of it is hidden
+at the sizes they eat.</li>
+<li>
 <strong>Compare against <code><a href="https://sizespectrum.org/mizer/reference/plotFeedingLevel.html" class="external-link">plotFeedingLevel()</a></code></strong>
 alongside diet: a species pinned near a feeding level of 1 (fully
 satiated) can have a diet share that looks reasonable in proportion
