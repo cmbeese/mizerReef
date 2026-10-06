@@ -38,6 +38,18 @@
 
 ## Bug fixes
 
+- `getDiet()` and `plotDiet()` now account for predation refuge. mizerReef
+  had no `getDiet()` method, so mizer's own computed the diet of predators
+  blocked by refuge (`blocked_pred = TRUE`) from the whole prey population.
+  The model itself only lets them encounter prey outside refuge,
+  `getVulnerable() * n`, so their diets overstated every prey group that uses
+  refuge. In the bundled `caribbean_3_model`, a 500 g predator appeared to get
+  6.4% of its food from other predators; in the model it gets 0.2%. Only the
+  reported diet was wrong: biomass, growth, mortality and projections have
+  always used the refuge. The diet figures in the vignettes change
+  accordingly, as does mizerExperimental's `plotDietX()`. `getDiet()` on a
+  simulation now also passes each saved time to the refuge, which matters
+  when refuge degradation is switched on.
 - mizer's `scaleModel()` now scales a mizerReef model's algae and detritus
   parameters, exactly as `scaleReefModel()` always has. It used to multiply
   the algae and detritus biomasses by the factor but leave their encounter
