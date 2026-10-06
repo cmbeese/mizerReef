@@ -143,9 +143,10 @@ test_that("getDiet() applies the refuge with default, named and positional argum
 test_that("getDiet() runs an extension stacked above mizerReef once", {
     data(caribbean_3_model)
     params <- caribbean_3_model
-    registerS3method("getDiet", "testStackedExt",
-                     function(object, proportion = TRUE, ...) 2 * NextMethod(),
-                     envir = asNamespace("mizer"))
+    # Defined here, S3 dispatch finds it without registering it globally
+    getDiet.testStackedExt <- function(object, proportion = TRUE, ...) {
+        2 * NextMethod()
+    }
     stacked <- params
     class(stacked) <- c("testStackedExt", class(params))
     expect_equal(getDiet(stacked, proportion = FALSE),
@@ -154,6 +155,47 @@ test_that("getDiet() runs an extension stacked above mizerReef once", {
                          n_pp = initialNResource(params),
                          n_other = initialNOther(params)),
                  2 * getDiet(params, proportion = FALSE))
+})
+
+test_that("getDiet() keeps t when an extension above passes positional arguments", {
+    data(caribbean_3_model, rubble_scale)
+    params <- setDegradation(caribbean_3_model, deg_scale = rubble_scale,
+                             bleach_time = 1, degrade = TRUE)
+    # The refuge changes at t = 1, so a wrong t would show
+    expect_false(isTRUE(all.equal(getDiet(params), getDiet(params, t = 1))))
+    # An extension above using the same named-NextMethod() pattern
+    getDiet.testUpperExt <- function(object, proportion = TRUE,
+                                     n = initialN(object),
+                                     n_pp = initialNResource(object),
+                                     n_other = initialNOther(object), ...) {
+        NextMethod(proportion = proportion, n = n, n_pp = n_pp,
+                   n_other = n_other)
+    }
+    upper <- params
+    class(upper) <- c("testUpperExt", class(params))
+    expect_equal(getDiet(upper, TRUE, initialN(params)), getDiet(params))
+})
+
+test_that("getDiet() asks for t rather than time_range on a params object", {
+    data(caribbean_3_model)
+    expect_error(getDiet(caribbean_3_model, time_range = 3), "single time as `t`")
+})
+
+test_that("getDiet() works with NaN abundances, as mizer's method does", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    n <- initialN(params)
+    n["herbivores", 50:60] <- NaN
+    expect_no_error(mizer_getDiet(params, n = n))
+    expect_no_error(getDiet(params, n = n))
+    expect_no_error(getDiet(params, proportion = FALSE, n = n))
+})
+
+test_that("getDiet() equals mizer's method when nothing hides in refuge", {
+    data(caribbean_3_model)
+    params <- newRefuge(caribbean_3_model, new_method = "noncomplex")
+    expect_true(all(getVulnerable(params) == 1))
+    expect_equal(getDiet(params), mizer_getDiet(params), ignore_attr = TRUE)
 })
 
 test_that("getDiet() proportions sum to 1 wherever fish eat", {

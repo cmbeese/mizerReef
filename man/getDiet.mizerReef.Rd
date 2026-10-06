@@ -11,8 +11,8 @@
   n = initialN(object),
   n_pp = initialNResource(object),
   n_other = initialNOther(object),
-  t = 0,
-  ...
+  ...,
+  t = 0
 )
 
 \method{getDiet}{mizerReefSim}(object, proportion = TRUE, time_range, drop = FALSE, ...)
@@ -33,15 +33,17 @@ initial resource abundance.}
 \item{n_other}{A list of abundances for other dynamical components, such
 as algae and detritus. Defaults to the initial values.}
 
-\item{t}{For a params object, the time at which the refuge and the feeding
-level are calculated. It only matters when refuge degradation is switched
-on (see \code{\link[=setDegradation]{setDegradation()}}). For a \code{mizerReefSim}, each saved time is
-used; choose times with \code{time_range}.}
-
 \item{...}{Passed on to \code{\link[mizer:getDiet]{mizer::getDiet()}}.}
 
-\item{time_range}{The times for which to return the diet, for a
-\code{mizerReefSim}. Defaults to all saved times.}
+\item{t}{For a params object, the time (a single year) at which the refuge
+and the feeding level are calculated. It matters when refuge degradation
+is switched on (see \code{\link[=setDegradation]{setDegradation()}}) or another extension makes rates
+depend on time. Give it by name. For a \code{mizerReefSim}, each saved time is
+used; choose times with \code{time_range}.}
+
+\item{time_range}{The range of times for which to return the diet, for a
+\code{mizerReefSim}. Defaults to all saved times. For a params object, use
+\code{t} instead.}
 
 \item{drop}{If \code{TRUE}, dimensions of length 1 are removed from the array
 returned for a \code{mizerReefSim}.}
@@ -65,6 +67,11 @@ The diet of predators that are not blocked by refuge comes from the whole
 prey population, as in mizer. For every consumer, the part of the
 encounter that is eaten uses the model's feeding level at the given
 abundances, algae and detritus biomasses and time.
+
+mizer computes the diet from the feeding kernel itself rather than
+through the model's encounter rate. So changes that other extensions make
+to the encounter rate, such as a temperature effect, are not included in
+the diet.
 }
 \seealso{
 \code{\link[=getVulnerable]{getVulnerable()}}

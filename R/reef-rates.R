@@ -310,6 +310,11 @@ getEGrowthTime <- function(object, n, n_pp, n_other,
 #' encounter that is eaten uses the model's feeding level at the given
 #' abundances, algae and detritus biomasses and time.
 #'
+#' mizer computes the diet from the feeding kernel itself rather than
+#' through the model's encounter rate. So changes that other extensions make
+#' to the encounter rate, such as a temperature effect, are not included in
+#' the diet.
+#'
 #' @param object A `mizerReef` params object or a `mizerReefSim` object
 #' @param proportion If `TRUE` (default) the function returns the diet as a
 #'   proportion of the total consumption rate. If `FALSE` it returns the
@@ -320,12 +325,14 @@ getEGrowthTime <- function(object, n, n_pp, n_other,
 #'   initial resource abundance.
 #' @param n_other A list of abundances for other dynamical components, such
 #'   as algae and detritus. Defaults to the initial values.
-#' @param t For a params object, the time at which the refuge and the feeding
-#'   level are calculated. It only matters when refuge degradation is switched
-#'   on (see [setDegradation()]). For a `mizerReefSim`, each saved time is
+#' @param t For a params object, the time (a single year) at which the refuge
+#'   and the feeding level are calculated. It matters when refuge degradation
+#'   is switched on (see [setDegradation()]) or another extension makes rates
+#'   depend on time. Give it by name. For a `mizerReefSim`, each saved time is
 #'   used; choose times with `time_range`.
-#' @param time_range The times for which to return the diet, for a
-#'   `mizerReefSim`. Defaults to all saved times.
+#' @param time_range The range of times for which to return the diet, for a
+#'   `mizerReefSim`. Defaults to all saved times. For a params object, use
+#'   `t` instead.
 #' @param drop If `TRUE`, dimensions of length 1 are removed from the array
 #'   returned for a `mizerReefSim`.
 #' @param ... Passed on to [mizer::getDiet()].
@@ -342,36 +349,47 @@ getDiet.mizerReef <- function(object, proportion = TRUE,
                               n = initialN(object),
                               n_pp = initialNResource(object),
                               n_other = initialNOther(object),
-                              t = 0, ...) {
+                              ..., t = 0) {
+    if ("time_range" %in% names(list(...))) {
+        stop("For a params object, getDiet() takes a single time as `t`. ",
+             "`time_range` selects the times of a simulation.", call. = FALSE)
+    }
     params <- validParams(object)
     # mizer's method multiplies the encounter by (1 - feeding level), but
     # computes that feeding level from the initial algae and detritus at
     # t = 0. So pass it a copy without satiation, which makes the factor 1,
     # and apply the model's own feeding level below. The model is unchanged.
+    # This relies on the feeding level being 0 when intake_max is Inf, as it
+    # is for mizer's and mizerReef's feeding level.
     feeding_level <- getFeedingLevel(params, n = n, n_pp = n_pp,
                                      n_other = n_other, time_range = t)
     object <- params
     object@intake_max[] <- Inf
 
-    # Name all four arguments. NextMethod() ignores a new value for an
-    # argument the caller left out, and naming only some of them shifts
-    # positional arguments (see the note in reef-project_methods.R). With all
-    # four named, positional copies just end up in the next method's `...`.
+    # Name the arguments. NextMethod() ignores a new value for an argument
+    # the caller left out, and naming only some of them shifts positional
+    # arguments (see the note in reef-project_methods.R). With these named,
+    # copies of the caller's positional arguments are still passed on, but
+    # only bind to further arguments the next method has before `...`.
+    # mizer's own method has none.
     diet <- NextMethod(proportion = FALSE, n = n, n_pp = n_pp,
-                       n_other = n_other)
+                       n_other = n_other, t = t)
 
     blocked <- params@species_params$blocked_pred %in% TRUE
-    if (any(blocked)) {
-        # Blocked predators only encounter the prey outside refuge
-        n_vul <- getVulnerable(params, n = n, n_pp = n_pp, n_other = n_other,
-                               time_range = t) * n
+    vulnerable <- if (any(blocked)) {
+        getVulnerable(params, n = n, n_pp = n_pp, n_other = n_other,
+                      time_range = t)
+    }
+    # Blocked predators only encounter the prey outside refuge
+    if (any(blocked) && any(vulnerable < 1, na.rm = TRUE)) {
+        n_vul <- vulnerable * n
         # mizer's method zeroes the diet of predator sizes where n is 0, so
         # keep sizes that refuge hides completely just above zero. As prey
         # they then contribute nothing measurable.
-        hidden <- n > 0 & n_vul == 0
+        hidden <- which(n > 0 & n_vul == 0)
         n_vul[hidden] <- pmax(n[hidden] * 1e-20, .Machine$double.xmin)
         diet_vul <- NextMethod(proportion = FALSE, n = n_vul, n_pp = n_pp,
-                               n_other = n_other)
+                               n_other = n_other, t = t)
         fish <- seq_len(nrow(n))
         diet[blocked, , fish] <- diet_vul[blocked, , fish, drop = FALSE]
     }
