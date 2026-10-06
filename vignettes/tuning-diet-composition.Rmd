@@ -190,6 +190,11 @@ plotDiet(params)
   doesn't) usually means the allometric exponents on encounter
   ($m_{alg}$/$m_{det}$, or the predation kernel for fish prey) need
   adjusting, not just the preference values.
+- **Refuge hides prey from blocked predators.** For predators with
+  `blocked_pred = TRUE`, `plotDiet()` counts only the prey outside refuge
+  (see `getVulnerable()`), as the model does. So a prey group that uses
+  refuge can be a small part of their diet despite a large interaction
+  value, if most of it is hidden at the sizes they eat.
 - **Compare against `plotFeedingLevel()`** alongside diet: a species pinned
   near a feeding level of 1 (fully satiated) can have a diet share that
   looks reasonable in proportion while still indicating the *absolute* food

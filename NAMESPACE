@@ -2,6 +2,8 @@
 
 S3method(findSteadyState,mizerReef)
 S3method(getBiomass,mizerReefSim)
+S3method(getDiet,mizerReef)
+S3method(getDiet,mizerReefSim)
 S3method(projectEncounter,mizerReef)
 S3method(projectFeedingLevel,mizerReef)
 S3method(projectMort,mizerReef)

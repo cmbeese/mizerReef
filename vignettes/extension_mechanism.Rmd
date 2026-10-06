@@ -89,21 +89,31 @@ is reloaded in a later session.
 | `projectPredMort.mizerReef()` | Discounts predation mortality from refuge-blocked predators by prey vulnerability |
 | `projectMort.mizerReef()` | Adds senescence mortality on top of the standard mortality |
 | `getBiomass.mizerReefSim()` | Adds algae and detritus biomass to the species biomasses |
+| `getDiet.mizerReef()` | Counts only prey outside refuge in the diet of refuge-blocked predators, and uses the model's feeding level at the given algae and detritus biomasses and time |
+| `getDiet.mizerReefSim()` | Passes each saved time on to `getDiet.mizerReef()` |
 | `removeSpecies.mizerReef()` | Updates the algae/detritus encounter-rate matrices `rho` |
 | `upgrade.mizerReef()` | Migrates objects created with an earlier mizerReef 2.x layout to the current one (automatic; for mizerReef 1.x objects, see `upgradeReefParams()` instead) |
 | `steady.mizerReef()` | Runs `reefSteady()`, so the algae and detritus pools are tuned along with the fish sub-model |
 | `tuneSteadyState.mizerReef()` | The same, under mizer 3.3's current name for `steady()` |
 
-Every one of these methods calls `NextMethod()` at least once, so multiple
-*dispatching* extensions can modify the same rate or generic without silently
-overwriting each other's contribution — *provided every extension involved
-follows the same convention*. This is not automatic just because a package
+The four `project*()` methods, `getBiomass.mizerReefSim()`,
+`getDiet.mizerReef()` and `removeSpecies.mizerReef()` call `NextMethod()`, so
+multiple *dispatching* extensions can modify the same rate or generic without
+silently overwriting each other's contribution — *provided every extension
+involved follows the same convention*. The other four do not chain:
+`getDiet.mizerReefSim()` replaces mizer's simulation method, because mizer's
+does not pass each saved time on (sizespectrum/mizer#613);
+`upgrade.mizerReef()` only migrates mizerReef's own data; and
+`steady.mizerReef()` and `tuneSteadyState.mizerReef()` run `reefSteady()`
+directly. This is not automatic just because a package
 touches a mizer model: mizer still supports an older, non-chaining mechanism
 (`mizer::setRateFunction()`) that swaps in a single named function for a
 rate, with no dispatch at all, and a params object uses one mechanism or the
 other for a given rate, never both. therMizer, for example, is a dispatching
 extension, so on a model set up with both packages its temperature effects
 and mizerReef's refuge correction combine in one encounter-rate calculation.
+`getDiet.mizerReefSim()` replaces mizer's method instead of chaining to it,
+because mizer's method does not pass each saved time on.
 The next two sections look at mizerReef's own
 rate methods in detail, because they illustrate both the easy case (a purely
 additive modification) and a harder case that needed more thought.

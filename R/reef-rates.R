@@ -293,3 +293,140 @@ getEGrowthTime <- function(object, n, n_pp, n_other,
         return(grow_time)
     }
 }
+
+
+#' Get the diet composition of a mizerReef model
+#'
+#' Extends [mizer::getDiet()] so that the diet agrees with what mizerReef
+#' does when it projects the model. Predators blocked by refuge
+#' (`blocked_pred = TRUE`) only encounter the prey that are not hidden in
+#' refuge, `getVulnerable() * n`. mizer's own method does not know about
+#' refuge and would compute their diet from the whole prey population,
+#' overstating how much they eat of every group that uses refuge. Because
+#' [mizer::plotDiet()] calls `getDiet()`, it shows the refuge-aware diet too.
+#'
+#' The diet of predators that are not blocked by refuge comes from the whole
+#' prey population, as in mizer. For every consumer, the part of the
+#' encounter that is eaten uses the model's feeding level at the given
+#' abundances, algae and detritus biomasses and time.
+#'
+#' mizer computes the diet from the feeding kernel itself rather than
+#' through the model's encounter rate. So changes that other extensions make
+#' to the encounter rate, such as a temperature effect, are not included in
+#' the diet (sizespectrum/mizer#613).
+#'
+#' @param object A `mizerReef` params object or a `mizerReefSim` object
+#' @param proportion If `TRUE` (default) the function returns the diet as a
+#'   proportion of the total consumption rate. If `FALSE` it returns the
+#'   consumption rate in grams per year.
+#' @param n A matrix of species abundances (species x size). Defaults to the
+#'   initial abundances.
+#' @param n_pp A vector of the resource abundance by size. Defaults to the
+#'   initial resource abundance.
+#' @param n_other A list of abundances for other dynamical components, such
+#'   as algae and detritus. Defaults to the initial values.
+#' @param t For a params object, the time (a single year) at which the refuge
+#'   and the feeding level are calculated. It matters when refuge degradation
+#'   is switched on (see [setDegradation()]) or another extension makes rates
+#'   depend on time. Give it by name. For a `mizerReefSim`, each saved time is
+#'   used; choose times with `time_range`.
+#' @param time_range The range of times for which to return the diet, for a
+#'   `mizerReefSim`. Defaults to all saved times. For a params object, use
+#'   `t` instead.
+#' @param drop If `TRUE`, dimensions of length 1 are removed from the array
+#'   returned for a `mizerReefSim`.
+#' @param ... Passed on to [mizer::getDiet()].
+#'
+#' @return For a params object, an array (predator species x predator size x
+#'   prey), as returned by [mizer::getDiet()]. For a `mizerReefSim`, an array
+#'   with an additional first dimension for time.
+#'
+#' @seealso [getVulnerable()]
+#' @method getDiet mizerReef
+#' @export
+getDiet.mizerReef <- function(object, proportion = TRUE,
+                              n = initialN(object),
+                              n_pp = initialNResource(object),
+                              n_other = initialNOther(object),
+                              ..., t = 0) {
+    if ("time_range" %in% ...names()) {
+        stop("For a params object, getDiet() takes a single time as `t`. ",
+             "`time_range` selects the times of a simulation.", call. = FALSE)
+    }
+    assert_that(is.number(t))
+    params <- validParams(object)
+    # mizer's method multiplies the encounter by (1 - feeding level), but
+    # computes that feeding level from the initial algae and detritus at
+    # t = 0. So pass it a copy without satiation, which makes the factor 1,
+    # and apply the model's own feeding level below. The model is unchanged.
+    # This relies on the feeding level being 0 when intake_max is Inf, as it
+    # is for mizer's and mizerReef's feeding level.
+    feeding_level <- getFeedingLevel(params, n = n, n_pp = n_pp,
+                                     n_other = n_other, time_range = t)
+    object <- params
+    object@intake_max[] <- Inf
+
+    # Name the arguments. NextMethod() ignores a new value for an argument
+    # the caller left out, and naming only some of them shifts positional
+    # arguments (see the note in reef-project_methods.R). With these named,
+    # copies of the caller's positional arguments are still passed on, but
+    # only bind to further arguments the next method has before `...`.
+    # mizer's own method has none.
+    diet <- NextMethod(proportion = FALSE, n = n, n_pp = n_pp,
+                       n_other = n_other, t = t)
+
+    # Blocked predators only encounter the prey outside refuge. As in
+    # projectEncounter.mizerReef(), their whole diet, including any other
+    # components, comes from those prey.
+    blocked <- params@species_params$blocked_pred %in% TRUE
+    if (any(blocked)) {
+        vulnerable <- getVulnerable(params, n = n, n_pp = n_pp,
+                                    n_other = n_other, time_range = t)
+        if (any(vulnerable < 1, na.rm = TRUE)) {
+            n_vul <- vulnerable * n
+            # mizer's method zeroes the diet of predator sizes where n is 0,
+            # so keep sizes that refuge hides completely just above zero. As
+            # prey they then contribute a negligible amount, where the model
+            # has none.
+            hidden <- which(n > 0 & n_vul == 0)
+            n_vul[hidden] <- pmax(n[hidden] * 1e-20, .Machine$double.xmin)
+            diet_vul <- NextMethod(proportion = FALSE, n = n_vul,
+                                   n_pp = n_pp, n_other = n_other, t = t)
+            diet[blocked, , ] <- diet_vul[blocked, , , drop = FALSE]
+        }
+    }
+
+    diet <- sweep(diet, c(1, 2), 1 - feeding_level, "*")
+    if (proportion) {
+        total <- rowSums(diet, dims = 2)
+        diet <- sweep(diet, c(1, 2), total, "/")
+        diet[is.nan(diet)] <- 0
+    }
+    diet
+}
+
+#' @rdname getDiet.mizerReef
+#' @method getDiet mizerReefSim
+#' @export
+getDiet.mizerReefSim <- function(object, proportion = TRUE, time_range,
+                                 drop = FALSE, ...) {
+    # mizer's MizerSim method does not pass each saved time on, which the
+    # refuge and the feeding level need (sizespectrum/mizer#613). If mizer
+    # passed it, this method could call NextMethod() instead.
+    sim <- object
+    if (missing(time_range)) {
+        time_range <- dimnames(sim@n)$time
+    }
+    time_elements <- mizer::get_time_elements(sim, time_range)
+    diet_time <- plyr::aaply(which(time_elements), 1, function(i) {
+        n <- array(sim@n[i, , ], dim = dim(sim@n)[2:3])
+        dimnames(n) <- dimnames(sim@n)[2:3]
+        n_other <- sim@n_other[i, ]
+        names(n_other) <- dimnames(sim@n_other)$component
+        getDiet(sim@params, proportion = proportion, n = n,
+                n_pp = sim@n_pp[i, ], n_other = n_other,
+                t = as.numeric(dimnames(sim@n)$time[[i]]), ...)
+    }, .drop = FALSE)
+    names(dimnames(diet_time))[[1]] <- "time"
+    diet_time[, , , , drop = drop]
+}
