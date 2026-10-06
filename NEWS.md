@@ -47,9 +47,13 @@
   6.4% of its food from other predators; in the model it gets 0.2%. Only the
   reported diet was wrong: biomass, growth, mortality and projections have
   always used the refuge. The diet figures in the vignettes change
-  accordingly, as does mizerExperimental's `plotDietX()`. `getDiet()` on a
-  simulation now also passes each saved time to the refuge, which matters
-  when refuge degradation is switched on.
+  accordingly, as does mizerExperimental's `plotDietX()`. `getDiet()` also
+  uses the model's feeding level at the given algae and detritus biomasses
+  and time. mizer's own method used the initial algae and detritus at t = 0,
+  which misreported how much satiating consumers, such as herbivores and
+  invertebrates, eat once algae or detritus change. On a simulation it now
+  uses each saved time, which also matters for the refuge when degradation
+  is switched on.
 - mizer's `scaleModel()` now scales a mizerReef model's algae and detritus
   parameters, exactly as `scaleReefModel()` always has. It used to multiply
   the algae and detritus biomasses by the factor but leave their encounter

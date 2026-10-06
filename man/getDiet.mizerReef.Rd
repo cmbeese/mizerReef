@@ -30,11 +30,13 @@ initial abundances.}
 \item{n_pp}{A vector of the resource abundance by size. Defaults to the
 initial resource abundance.}
 
-\item{n_other}{A list of abundances for other dynamical components.
-Defaults to the initial values.}
+\item{n_other}{A list of abundances for other dynamical components, such
+as algae and detritus. Defaults to the initial values.}
 
-\item{t}{The time at which refuge vulnerability is calculated. It only
-matters when refuge degradation is switched on (see \code{\link[=setDegradation]{setDegradation()}}).}
+\item{t}{For a params object, the time at which the refuge and the feeding
+level are calculated. It only matters when refuge degradation is switched
+on (see \code{\link[=setDegradation]{setDegradation()}}). For a \code{mizerReefSim}, each saved time is
+used; choose times with \code{time_range}.}
 
 \item{...}{Passed on to \code{\link[mizer:getDiet]{mizer::getDiet()}}.}
 
@@ -50,8 +52,8 @@ prey), as returned by \code{\link[mizer:getDiet]{mizer::getDiet()}}. For a \code
 with an additional first dimension for time.
 }
 \description{
-Extends \code{\link[mizer:getDiet]{mizer::getDiet()}} so that the diet agrees with the encounter rate
-mizerReef uses when it projects the model. Predators blocked by refuge
+Extends \code{\link[mizer:getDiet]{mizer::getDiet()}} so that the diet agrees with what mizerReef
+does when it projects the model. Predators blocked by refuge
 (\code{blocked_pred = TRUE}) only encounter the prey that are not hidden in
 refuge, \code{getVulnerable() * n}. mizer's own method does not know about
 refuge and would compute their diet from the whole prey population,
@@ -59,7 +61,10 @@ overstating how much they eat of every group that uses refuge. Because
 \code{\link[mizer:plotDiet]{mizer::plotDiet()}} calls \code{getDiet()}, it shows the refuge-aware diet too.
 }
 \details{
-The diet of predators that are not blocked by refuge is unchanged.
+The diet of predators that are not blocked by refuge comes from the whole
+prey population, as in mizer. For every consumer, the part of the
+encounter that is eaten uses the model's feeding level at the given
+abundances, algae and detritus biomasses and time.
 }
 \seealso{
 \code{\link[=getVulnerable]{getVulnerable()}}
