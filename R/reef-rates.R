@@ -313,7 +313,7 @@ getEGrowthTime <- function(object, n, n_pp, n_other,
 #' mizer computes the diet from the feeding kernel itself rather than
 #' through the model's encounter rate. So changes that other extensions make
 #' to the encounter rate, such as a temperature effect, are not included in
-#' the diet.
+#' the diet (sizespectrum/mizer#613).
 #'
 #' @param object A `mizerReef` params object or a `mizerReefSim` object
 #' @param proportion If `TRUE` (default) the function returns the diet as a
@@ -342,7 +342,6 @@ getEGrowthTime <- function(object, n, n_pp, n_other,
 #'   with an additional first dimension for time.
 #'
 #' @seealso [getVulnerable()]
-#' @concept refugeRates
 #' @method getDiet mizerReef
 #' @export
 getDiet.mizerReef <- function(object, proportion = TRUE,
@@ -350,10 +349,11 @@ getDiet.mizerReef <- function(object, proportion = TRUE,
                               n_pp = initialNResource(object),
                               n_other = initialNOther(object),
                               ..., t = 0) {
-    if ("time_range" %in% names(list(...))) {
+    if ("time_range" %in% ...names()) {
         stop("For a params object, getDiet() takes a single time as `t`. ",
              "`time_range` selects the times of a simulation.", call. = FALSE)
     }
+    assert_that(is.number(t))
     params <- validParams(object)
     # mizer's method multiplies the encounter by (1 - feeding level), but
     # computes that feeding level from the initial algae and detritus at
@@ -375,23 +375,25 @@ getDiet.mizerReef <- function(object, proportion = TRUE,
     diet <- NextMethod(proportion = FALSE, n = n, n_pp = n_pp,
                        n_other = n_other, t = t)
 
+    # Blocked predators only encounter the prey outside refuge. As in
+    # projectEncounter.mizerReef(), their whole diet, including any other
+    # components, comes from those prey.
     blocked <- params@species_params$blocked_pred %in% TRUE
-    vulnerable <- if (any(blocked)) {
-        getVulnerable(params, n = n, n_pp = n_pp, n_other = n_other,
-                      time_range = t)
-    }
-    # Blocked predators only encounter the prey outside refuge
-    if (any(blocked) && any(vulnerable < 1, na.rm = TRUE)) {
-        n_vul <- vulnerable * n
-        # mizer's method zeroes the diet of predator sizes where n is 0, so
-        # keep sizes that refuge hides completely just above zero. As prey
-        # they then contribute nothing measurable.
-        hidden <- which(n > 0 & n_vul == 0)
-        n_vul[hidden] <- pmax(n[hidden] * 1e-20, .Machine$double.xmin)
-        diet_vul <- NextMethod(proportion = FALSE, n = n_vul, n_pp = n_pp,
-                               n_other = n_other, t = t)
-        fish <- seq_len(nrow(n))
-        diet[blocked, , fish] <- diet_vul[blocked, , fish, drop = FALSE]
+    if (any(blocked)) {
+        vulnerable <- getVulnerable(params, n = n, n_pp = n_pp,
+                                    n_other = n_other, time_range = t)
+        if (any(vulnerable < 1, na.rm = TRUE)) {
+            n_vul <- vulnerable * n
+            # mizer's method zeroes the diet of predator sizes where n is 0,
+            # so keep sizes that refuge hides completely just above zero. As
+            # prey they then contribute a negligible amount, where the model
+            # has none.
+            hidden <- which(n > 0 & n_vul == 0)
+            n_vul[hidden] <- pmax(n[hidden] * 1e-20, .Machine$double.xmin)
+            diet_vul <- NextMethod(proportion = FALSE, n = n_vul,
+                                   n_pp = n_pp, n_other = n_other, t = t)
+            diet[blocked, , ] <- diet_vul[blocked, , , drop = FALSE]
+        }
     }
 
     diet <- sweep(diet, c(1, 2), 1 - feeding_level, "*")
@@ -409,8 +411,8 @@ getDiet.mizerReef <- function(object, proportion = TRUE,
 getDiet.mizerReefSim <- function(object, proportion = TRUE, time_range,
                                  drop = FALSE, ...) {
     # mizer's MizerSim method does not pass each saved time on, which the
-    # refuge and the feeding level need. If mizer passed it, this method
-    # could call NextMethod() instead.
+    # refuge and the feeding level need (sizespectrum/mizer#613). If mizer
+    # passed it, this method could call NextMethod() instead.
     sim <- object
     if (missing(time_range)) {
         time_range <- dimnames(sim@n)$time

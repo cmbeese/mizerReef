@@ -71,9 +71,8 @@ abundances, algae and detritus biomasses and time.
 mizer computes the diet from the feeding kernel itself rather than
 through the model's encounter rate. So changes that other extensions make
 to the encounter rate, such as a temperature effect, are not included in
-the diet.
+the diet (sizespectrum/mizer#613).
 }
 \seealso{
 \code{\link[=getVulnerable]{getVulnerable()}}
 }
-\concept{refugeRates}

@@ -107,6 +107,25 @@ test_that("getDiet() uses the given algae and detritus for the feeding level", {
     expect_diet_consistent(params, diet, s)
 })
 
+test_that("getDiet() takes other components from the prey outside refuge for blocked predators", {
+    data(caribbean_3_model)
+    # A component whose encounter depends on the fish abundances. For blocked
+    # predators the model evaluates it with the prey outside refuge.
+    assign("test_n_encounter", function(params, n, ...) {
+        matrix(1e-3 * colSums(n * params@w), nrow = nrow(n), ncol = ncol(n),
+               byrow = TRUE)
+    }, envir = .GlobalEnv)
+    assign("test_n_dynamics", function(params, n_other, component, ...) {
+        n_other[[component]]
+    }, envir = .GlobalEnv)
+    withr::defer(rm("test_n_encounter", "test_n_dynamics", envir = .GlobalEnv))
+    params <- setComponent(caribbean_3_model, "fish_dependent",
+                           initial_value = 1,
+                           dynamics_fun = "test_n_dynamics",
+                           encounter_fun = "test_n_encounter")
+    expect_diet_consistent(params, getDiet(params, proportion = FALSE))
+})
+
 test_that("getDiet() leaves the diet of predators not blocked by refuge unchanged", {
     data(caribbean_10_model)
     params <- caribbean_10_model
@@ -134,10 +153,18 @@ test_that("getDiet() applies the refuge with default, named and positional argum
                         n_other = initialNOther(params), t = 0)
     expect_equal(getDiet(params), explicit)
     expect_equal(getDiet(params, FALSE), getDiet(params, proportion = FALSE))
-    expect_equal(getDiet(params, FALSE, initialN(params), initialNResource(params)),
-                 getDiet(params, proportion = FALSE))
     expect_false(isTRUE(all.equal(getDiet(params), mizer_getDiet(params),
                                   ignore_attr = TRUE)))
+
+    # Positional abundances that differ from the defaults must be used
+    sim <- project(params, t_max = 2, t_save = 1, progress_bar = FALSE)
+    s <- sim_state(sim, 3)
+    expect_false(isTRUE(all.equal(s$n, initialN(params))))
+    positional <- getDiet(params, FALSE, s$n, s$n_pp, s$n_other)
+    expect_diet_consistent(params, positional, s)
+    expect_equal(positional,
+                 getDiet(params, proportion = FALSE, n = s$n, n_pp = s$n_pp,
+                         n_other = s$n_other))
 })
 
 test_that("getDiet() runs an extension stacked above mizerReef once", {
@@ -179,6 +206,7 @@ test_that("getDiet() keeps t when an extension above passes positional arguments
 test_that("getDiet() asks for t rather than time_range on a params object", {
     data(caribbean_3_model)
     expect_error(getDiet(caribbean_3_model, time_range = 3), "single time as `t`")
+    expect_error(getDiet(caribbean_3_model, t = c(0, 5)), "not a number")
 })
 
 test_that("getDiet() works with NaN abundances, as mizer's method does", {
