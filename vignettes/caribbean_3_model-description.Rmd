@@ -73,13 +73,19 @@ params@species_params %>%
 ## Interaction matrix
 
 The $\theta_{ij}$ matrix sets the interaction strength between predator group
-$i$ and prey group $j$, with entries between 0 (groups cannot interact) and 1.
+$i$ and prey group $j$, where 0 means the groups cannot interact. Only
+predators eat other groups. Their interaction strengths were calibrated so
+that adult predators' diet is 33% predators, 17% herbivores and 50%
+invertebrates, the proportions used by @Rogers_2018. The herbivore value is
+above 1 because most herbivores of the size predators prefer are hiding in
+refuge.
 
 ```{r, echo = FALSE, fig.height = 3.5, fig.width = 5, fig.cap = "Interaction strength between each predator group (rows) and prey group (columns). Predators consume all three groups, at different strengths; herbivores and invertebrates do not prey on fish."}
 ggplot(melt(params@interaction),
        aes(x = prey, y = reorder(predator, desc(predator)), fill = value)) +
     geom_tile(colour = "black", linewidth = 0.25) +
-    scale_fill_gradient(low = "white", high = "blue", limit = c(0, 1),
+    scale_fill_gradient(low = "white", high = "blue",
+                        limit = c(0, max(params@interaction)),
                         guide = "legend") +
     labs(y = "Predator", x = "Prey", fill = "Interaction") +
     scale_x_discrete(labels = c("Predators","Herbivores", "Inverts")) +
@@ -108,7 +114,7 @@ params@species_params %>%
 refuge_params <- params@other_params$refuge_params
 ```
 
-This model uses the `r print(params@other_params$refuge_params$method)`
+This model uses the `r params@other_params$refuge_params$method`
 refuge method (see `vignette("model-description")`'s
 [refuge profiles](model-description.html#refuge-profiles) section for the
 general formulation and @Rogers_2018 for its derivation). All fish are
@@ -116,7 +122,8 @@ assumed to utilize refuge ($\tau = 1$). Fish smaller than
 `r paste(refuge_params$w_settle,"g")` are assumed to be larval reef fish that
 have not yet settled to the reef. A maximum proportion of
 `r paste(100*refuge_params$max_protect,"%")` of fish are protected at any
-given time.
+given time. In this model holes outnumber fish, so fish between 2.5 and
+20 cm long are protected at that maximum.
 
 <details>
 <summary>Refuge length bins and densities used in the steady state (same Bonaire FORCE data as the 10-group model)</summary>
@@ -178,16 +185,14 @@ proportion of consumed biomass retained, with $1-\alpha_i$ expelled as
 faeces, which contribute to detritus.
 
 No maximum consumption rate is imposed for predators. Herbivores are subject
-to satiation here, unlike the package default for herbivorous groups:
-recalibrating this model against the corrected senescence-mortality formula
-showed herbivore biomass has no density-dependent brake at all without some
-cap on individual intake once mortality is realistically low. The realised
-feeding level for herbivores is consistently close to 1, consistent with
-Caribbean herbivores' guts being observed to be full essentially continuously
-[@Ferreira1998; @Kopp2010] -- the citations behind the package's
-herbivore-satiation default describe grazing *pressure on the shared algae
-resource* not self-regulating when food is abundant, which is unaffected by
-this change (see [the main model description's Algae
+to satiation here, unlike the package default for herbivorous groups: without
+it, herbivores eating the algae production used here mature in under half a
+year. The realised feeding level for herbivores is close to 1, consistent
+with Caribbean herbivores' guts being observed to be full essentially
+continuously [@Ferreira1998; @Kopp2010] -- the citations behind the
+package's herbivore-satiation default describe grazing *pressure on the
+shared algae resource* not self-regulating when food is abundant, which is
+unaffected by this change (see [the main model description's Algae
 section](model-description.html#algae)).
 
 ```{r, echo = FALSE}
@@ -218,14 +223,15 @@ this was the graysby grouper, *Cephalopholis cruentata*. The most commonly
 observed herbivore was the stoplight parrotfish, *Sparisoma viride*. Relevant
 maturity parameters were pulled from FishBase [@FishBase].
 
-The herbivore `age_mat` value is set to 1.6 years, the age at median sexual
-maturity (AM50) reported for *S. viride* by @RiveraHernandez2025 -- a
-2013-2023 otolith/gonad-histology study of 1801 U.S. Caribbean stoplight
-parrotfish. An earlier version of this model used `age_mat = 4`, which
-appears to have conflated AM50 with that same study's age at median sexual
-transition (AT50 = 4.5 years, the age at which female stoplight parrotfish --
-a protogynous hermaphrodite species -- become male), a distinct milestone
-from first reproductive maturity.
+Both species are protogynous hermaphrodites, so first (female) maturity and
+the later change from female to male are easy to confuse. The `age_mat`
+values below are the age at first maturity for both species, 2 years, from
+FishBase; earlier versions of this model used the age at sex change for
+predators (4 years) and other estimates for herbivores (4 and 1.6 years).
+`w_mat` is the weight at 16 cm, FishBase's length at 50% maturity for both
+species. In the steady state, predators mature at
+`r round(age_mat(params)[["predators"]], 1)` years and herbivores at
+`r round(age_mat(params)[["herbivores"]], 1)` years.
 
 ```{r, echo = FALSE}
 params@species_params %>%
@@ -233,9 +239,10 @@ params@species_params %>%
     kable()
 ```
 
-The values for the growth parameters below were chosen so that the resulting
-growth curves would be close to von Bertalanffy growth curves; $a$ and $b$
-are the allometric weight-length parameters $w = a l^b$ ($w$ in grams, $l$ in
+The model's growth was calibrated to the age at maturity, not to a whole
+growth curve, so it does not follow the von Bertalanffy curve given by
+`k_vb` below (compare with `plotGrowthCurves(params)`); $a$ and $b$ are the
+allometric weight-length parameters $w = a l^b$ ($w$ in grams, $l$ in
 centimetres), taken from the literature.
 
 ```{r, echo = FALSE}
@@ -282,7 +289,9 @@ observable. Their values were instead chosen so as to produce steady-state
 abundances of the groups that are in line with observations and to give
 reasonable values for the reproduction level -- the ratio between the actual
 reproduction rate $R_i$ and the maximal possible reproduction rate
-$R_{\max.i}$.
+$R_{\max.i}$. Herbivore reproduction was also tuned to give about 10
+juveniles (0.03-1.6 g) per square metre, as in @Rogers_2018. Fish start life
+at $w_{min} = 10^{-1.5}$ g, the smallest fish size in @Rogers_2018.
 
 ```{r, echo = FALSE}
 df <- params@species_params
@@ -298,8 +307,8 @@ df %>%
 :::
 
 The fish spectrum is fed by three background resources: plankton, algae, and
-detritus. Small individuals of all species feed on plankton, while only
-herbivorous groups and invertebrates feed on algae or detritus. See
+detritus. As in @Rogers_2018, only predators feed on plankton (when small),
+herbivores feed only on algae, and invertebrates only on detritus. See
 `vignette("model-description")`'s [unstructured resource
 dynamics](model-description.html#unstructured-resource-dynamics) section for
 the general formulation and its relationship to mizerShelf.
@@ -320,6 +329,16 @@ $\lambda=`r signif(lambda, digits = 3)`$.
 The algal resource is described only by its total biomass $B_A$, and feeding
 on it is not size-based. In the steady state the total algal biomass per
 square meter is $B_A = `r signif(algae_biomass(params), digits = 3)`$ grams.
+Herbivores' interaction with algae was chosen to give a standing biomass of
+350 g/m^2, the midpoint of a 150-550 g/m^2 range (a Caribbean estimate of 10-100 g dry
+weight per m^2, converted with an assumed wet:dry ratio of 5-10).
+
+Algae has a carrying capacity of
+$K_A = `r signif(params@other_params$algae$capacity, digits = 4)`$ g/m^2
+(see the main model description's [carrying-capacity
+variant](model-description.html#carrying-capacity-variant)), so algae cannot
+grow without limit if grazing falls, for example on a degraded reef.
+Detritus has no carrying capacity.
 
 ```{r, echo = FALSE}
 params@species_params %>%
@@ -340,9 +359,12 @@ consumption the way detritus production is (see below); see
 `vignette("model-description")`'s Algae section for why.
 
 ### Detritus
-Detritus is consumed by herbivores and benthic invertebrates, also not
-size-based. In the steady state the total detrital biomass per square meter
-is $B_D = `r signif(detritus_biomass(params), digits = 4)`$ grams.
+Detritus is consumed by benthic invertebrates, also not size-based. In the
+steady state the total detrital biomass per square meter is
+$B_D = `r signif(detritus_biomass(params), digits = 4)`$ grams.
+Invertebrates' interaction with detritus was chosen to give a detritus
+lifetime of 3.85 hours, the midpoint of the 2.8-4.9 hour residence time of benthic detritus measured
+at Palmyra Atoll (Max et al. 2013, *Mar. Ecol. Prog. Ser.* 482: 181-195).
 
 ```{r, echo = FALSE}
 params@species_params %>%
@@ -374,135 +396,25 @@ than is consumed, and the excess is assumed to be washed away.
 
 # Tuning the Steady State
 
-The following R script was used to tune the steady state parameters for this
-model (see `inst/scripts/Caribbean_3_model-calibration.R` in the package
-source for the exact, currently-runnable version, and
-`vignette("steady-state-recipe")` for the general recipe this follows,
-including the final algae/detritus absolute-scale rescaling step).
+The parameter tables (`caribbean_3_species`, `caribbean_3_interaction`)
+already hold the calibrated values, so the model is rebuilt from scratch by a
+short script: it reads the tables, sets up the model with `newReefParams()`,
+and projects it forward until it settles at steady state (see
+`inst/scripts/caribbean-3-calibration-clean.r` in the package source).
+
+The values were found once, by a search that adjusted seven parameters (the
+predators' three interaction strengths, the reproduction of each group, and
+plankton abundance) until the steady state matched seven targets: the three
+observed biomasses, about 10 herbivore juveniles per m^2, the 33% and 17%
+shares of predators and herbivores in adult predators' diet, and predators
+maturing at age 2. That search does not need to be repeated to use or
+rebuild the model. For how to calibrate a new model, see
+`vignette("steady-state-recipe")`.
 
 <details>
-<summary>Show the full steady-state calibration script</summary>
+<summary>Show the script that builds the model</summary>
 
-```{r, echo = TRUE, eval = FALSE}
-# Setting up a generic Caribbean coral reef model with multiple resources
-# Three groups: Predators, Herbivores, Invertebrates
-# Model steady state calibration
-
-## Setup - load packages --------------------------------------------------
-library(mizer)
-library(mizerExperimental)
-library(mizerReef)
-library(here)
-
-## Load parameters ----------------------------------------------------------
-caribbean_3_species <- read.csv(here("inst/data-csv/caribbean_3_species.csv"))
-caribbean_3_interaction <- read.csv(here("inst/data-csv/caribbean_3_interaction.csv"),
-                                    row.names = 1)
-# Refuge densities from Karpata reef in Bonaire, FORCE dataset
-karpata_refuge <- read.csv(here("inst/data-csv/karpata_refuge.csv"))
-tuning_profile <- read.csv(here("inst/data-csv/tuning_profile.csv"))
-
-# With these parameters, herbivores consume plankton at small sizes and
-#   transition fully to algae by maturity
-# With these parameters, invertebrates consume plankton and detritus,
-#   with the proportion of detritus increasing with size
-
-## Set model, with info_level = 1 to keep only the reports that say
-## something went differently from what was asked, not every default fill ---
-params <- newReefParams(
-    species_params = caribbean_3_species,
-    interaction = caribbean_3_interaction,
-    method = "binned",
-    method_params = tuning_profile,
-    info_level = 1
-)
-
-## Project to first steady state ----------------------------------------------
-params <- reefSteady(params)
-
-## Calibrate biomasses and growth ----------------------------------------------
-
-# Match observed species group biomasses
-params <- calibrateReefBiomass(params)
-params <- matchBiomasses(params)
-params <- reefSteady(params)
-
-# Match observed growth rates
-params <- matchReefGrowth(params)
-params <- reefSteady(params)
-
-# Iterate to refine biomass - repeat many times; piping keeps it readable.
-params <- params |>
-    calibrateReefBiomass() |> matchBiomasses() |> matchReefGrowth() |>
-    reefSteady() |>
-    calibrateReefBiomass() |> matchBiomasses() |> matchReefGrowth() |>
-    reefSteady() |>
-    calibrateReefBiomass() |> matchBiomasses() |> matchReefGrowth() |>
-    reefSteady()
-# (repeated several more times in the full calibration script until
-#  plotBiomassVsSpecies(params) matches observations closely)
-
-plotBiomassVsSpecies(params) # spot on
-plotTotalAbundance(params)
-plotTotalBiomass(params)
-
-## Now switch to competitive method ---------------------------------------------
-params <- newRefuge(params,
-    new_method = "competitive",
-    new_method_params = karpata_refuge
-)
-
-# Match biomasses again with the new refuge profile
-params <- params |>
-    calibrateReefBiomass() |> matchBiomasses() |> matchReefGrowth() |>
-    reefSteady() |>
-    calibrateReefBiomass() |> matchBiomasses() |> matchReefGrowth() |>
-    reefSteady()
-# (repeated several more times in the full calibration script)
-
-# Make sure new refuge is in place
-plotVulnerable(params)
-plotRefugeProfile(params)
-plotBiomassVsSpecies(params) # spot on
-
-## Check resulting spectra and tune resources ------------------------------------
-
-# Spectra should be reasonably straight to match predictions of Sheldon's
-# spectrum but also have nonlinearities at refuge sizes
-plotSpectra(params, total = TRUE, biomass = TRUE)
-plotSpectra(params, total = TRUE, biomass = TRUE, per_log_size = TRUE)
-plotFeedingLevel(params, species = "inverts")
-
-# Tune reproduction -----------------------------------------------------------
-# We do not have yield or catch data - can't tune size distribution
-params <- setBevertonHolt(params, erepro = 0.0134)
-params <- reefSteady(params)
-
-# Increase reproduction level to reduce excessive density dependence
-rep_level <- c(0.5, 0.5, getReproductionLevel(params)["inverts"])
-names(rep_level) <- c("predators", "herbivores", "inverts")
-params <- setBevertonHolt(params, reproduction_level = rep_level)
-
-# Iterate to get back to steady state
-params <- params |> reefSteady() |> reefSteady() |> reefSteady()
-
-# Rescale algae/detritus to a realistic absolute scale, now that diet,
-# biomass and growth are tuned -- see vignette("steady-state-recipe")'s
-# final step for the literature targets and why this belongs last.
-params <- rescale_algae(params, target_biomass / algae_biomass(params))
-detritus_lifetime(params) <- target_lifetime
-
-# Final diagnostic plots
-plotBiomassVsSpecies(params)
-plotRefugeProfile(params)
-plotSpectra(params, biomass = TRUE, total = TRUE)
-plotDiet(params)
-plotGrowthCurves(params)
-plotPredMort(params)
-
-# Save!
-caribbean_3_model <- reefSteady(params)
-save(caribbean_3_model, file = "data/caribbean_3_model.rda")
+```{r, echo = TRUE, eval = FALSE, code = readLines(system.file("scripts", "caribbean-3-calibration-clean.r", package = "mizerReef"))}
 ```
 
 </details>

@@ -119,3 +119,17 @@ test_that("detritus_dynamics_cc's no-consumption branch leaves biomass unchanged
         n_other$detritus
     )
 })
+
+test_that("detritus_dynamics_cc with an infinite capacity matches the linear detritus_dynamics", {
+    # Inf means no carrying capacity, the K -> Inf limit of the logistic
+    # dynamics; the general formula would give Inf/Inf there.
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params@other_params$detritus$capacity <- Inf
+    n <- params@initial_n
+    n_other <- params@initial_n_other
+    n_other$detritus <- detritus_biomass(params) * 0.5
+    rates <- getRates(params)
+    expect_equal(detritus_dynamics_cc(params, n, n_other, rates, dt = 0.001),
+                 detritus_dynamics(params, n, n_other, rates, dt = 0.001))
+})

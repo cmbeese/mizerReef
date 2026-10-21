@@ -117,10 +117,11 @@ literature on *coral-reef algal turf and detritus* specifically (see
 dominant primary producer, look up your own system's value rather than
 keeping this one.
 
-Both bundled example models (`caribbean_3_model`, `caribbean_10_model`) use
-these defaults as-is for everything except `ext_decomp` (set to 0.8, not the
-0.2 default -- see `vignette("caribbean_3_model-description")` for the
-literature source).
+`caribbean_10_model` uses these defaults as-is for everything except
+`ext_decomp` (set to 0.8, not the 0.2 default). `caribbean_3_model` keeps
+`ext_decomp` at 0.2 but gives algae a carrying capacity (`use_UR_cc = TRUE`,
+`algae_capacity = 902.8`, `detritus_capacity = Inf`; see
+`vignette("caribbean_3_model-description")`).
 
 # Keeping algae and detritus in balance: `tuneUR()`
 

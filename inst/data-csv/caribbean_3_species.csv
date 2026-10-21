@@ -1,4 +1,4 @@
-species,l_max,w_inf,w_mat,age_mat,biomass_observed,biomass_cutoff,k_vb,a,b,beta,sigma,refuge_user,blocked_pred,interaction_resource,interaction_algae,interaction_detritus,satiation,linecolour,ks
-predators,50,3125,102.4,2,107,3.125,0.4,0.025,3,100,1,TRUE,TRUE,1,0,0,FALSE,#8E0408,0.15
-herbivores,50,3125,102.4,2,34,3.125,0.6,0.025,3,100,1,TRUE,FALSE,0.2,1,0,TRUE,#578979,0.1
-inverts,50,3125,0.1,NA,40,3.125,NA,0.025,3,100,1,FALSE,FALSE,0.2,0,1,TRUE,#D89958,0.1
+species,l_max,w_inf,w_mat,age_mat,biomass_observed,biomass_cutoff,k_vb,a,b,beta,sigma,refuge_user,blocked_pred,interaction_resource,interaction_algae,interaction_detritus,satiation,linecolour,ks,w_min,gamma,h,q,erepro,R_max
+predators,50,3125,102.4,2,107,3.125,0.4,0.025,3,100,1,TRUE,TRUE,1,0,0,FALSE,#8E0408,0.01383,0.03162,10.15,2.307,0.75,0.5628,1676
+herbivores,50,3125,102.4,2,34,3.125,0.6,0.025,3,100,1,TRUE,FALSE,0,0.02493,0,TRUE,#578979,0.05495,0.03162,60.48,13.75,0.75,0.2313,607.3
+inverts,50,3125,0.1,NA,40,3.125,NA,0.025,3,100,1,FALSE,FALSE,0,0,14.47,TRUE,#D89958,0.1,0.001,131.9,30,0.75,0.002171,66.74

@@ -20,35 +20,31 @@ caribbean_3_model
 \description{
 A \code{MizerParams} object for a simple
 Caribbean reef ecosystem model with three functional groups: predators,
-herbivores, and invertebrates. It is built using the \code{caribbean_3_species}
-and \code{caribbean_3_interaction} data, and includes all parameter settings and
-calibrations as described in the associated PhD thesis and FORCE dataset.
-This object can be used directly with mizer functions for simulation and
-analysis.
+herbivores, and invertebrates. It is built from \code{caribbean_3_species},
+\code{caribbean_3_interaction} and \code{karpata_refuge} by
+\code{inst/scripts/caribbean-3-calibration-clean.r}, which projects the model
+from its initial abundances to steady state. This object can be used
+directly with mizer functions for simulation and analysis.
 }
 \details{
-Recalibrated in 2026 against a corrected senescence-mortality formula
-(\code{reefSenMort()}) -- fish abundances, growth/consumption rates and
-reproduction parameters were all re-tuned to restore a genuine steady
-state under the corrected code (verified: repeated \code{reefSteady()} calls
-leave biomass unchanged). Two herbivore species_params were also changed
-from their original thesis values as part of this: \code{satiation} is now
-\code{TRUE} (was \code{FALSE}) since herbivore biomass has no density-dependent
-brake without some cap on individual intake once mortality is realistically
-low -- the realised feeding level is consistently close to 1, still
-consistent with the citations behind the package's usual herbivore
-default (Caribbean herbivores' guts observed to be full nearly
-continuously); and \code{age_mat} is now \code{1.6} (was \code{4}), the age at median
-sexual maturity for \emph{Sparisoma viride} (Rivera Hernandez & Shervette
-2025), replacing a value that appears to have conflated it with that
-species' age at sexual transition. See
-\code{inst/scripts/Caribbean_3_model-calibration.R}'s design note and
-\code{vignettes/caribbean_3_model-description.Rmd} for the full reasoning.
-Biomasses (predators/herbivores/inverts, g/m^2) are now 107.9/34.1/40.1,
-matching the FORCE-survey targets (107/34/40) essentially exactly.
+Recalibrated in 2026 to follow the structure of Rogers et al. (2018):
+herbivores eat only algae, invertebrates only detritus, and only predators
+eat plankton (up to 10^-1.5 g). Fish compete for refuge holes from 2.5 cm
+(\code{method = "competitive"}, hole densities from Karpata reef). Holes
+outnumber fish, so about 98\% of fish between 2.5 and 20 cm are protected.
+Algae has a carrying capacity; detritus does not. At steady state:
+\itemize{
+\item biomass above 3.125 g is 107 (predators), 34.1 (herbivores) and 40.1
+(invertebrates) g/m^2, matching the FORCE-survey targets (107/34/40);
+\item there are about 10 herbivore juveniles (0.03-1.6 g) per m^2;
+\item adult predators' diet is 33\% predators, 17\% herbivores and 50\%
+invertebrates;
+\item predators mature at age 2 and herbivores at 1.7;
+\item algae standing biomass is 350 g/m^2 and the detritus lifetime 3.85 hours.
+}
 
-For details on parameter derivation, model calibration, and implementation,
-see Chapter 3 of the PhD Thesis:
+For details on parameter derivation and implementation, see Chapter 3 of
+the PhD Thesis:
 Beese, C. (2025). "Modelling Coral Reef Futures: Exploring the role of
 structural complexity in sustaining ecosystem services."
 Victoria University of Wellington.
@@ -57,5 +53,10 @@ Victoria University of Wellington.
 FORCE dataset. From: Dryden, C. (2017). Habitat structural
 complexity of Caribbean coral reefs and its relationships with fish community
 structure. PhD Thesis, Newcastle University.
+
+Rogers, A., Blanchard, J.L., Newman, S.P., Dryden, C.S. &
+Mumby, P.J. (2018). High refuge availability on coral reefs increases the
+vulnerability of reef-associated predators to overexploitation. Ecology,
+99, 450-463. https://doi.org/10.1002/ecy.2103
 }
 \keyword{datasets}

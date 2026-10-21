@@ -39,7 +39,9 @@ an approximate 20\% dry-matter content for
 turf algae.}
 
 \item{algae_capacity}{Numeric. Carrying capacity for algae biomass in
-grams per year. Default is 1.}
+grams per year. Default is 1. \code{Inf} means no
+carrying capacity for algae even when \code{use_UR_cc}
+is TRUE, so that only detritus has one.}
 
 \item{UR_interaction}{Optional. A named list or array with one or more
 resource interaction vectors (e.g. interaction_algae,

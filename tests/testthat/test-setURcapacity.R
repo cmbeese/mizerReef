@@ -20,8 +20,7 @@ test_that("setURcapacity defaults to cap = 1.5", {
 })
 
 test_that("setURcapacity switches on carrying-capacity dynamics and the use_UR_cc flag", {
-    data(caribbean_3_model)
-    params <- caribbean_3_model
+    params <- linear_caribbean_3()
     expect_false(isTRUE(params@other_params$use_UR_cc))
 
     result <- setURcapacity(params)

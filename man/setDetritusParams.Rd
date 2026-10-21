@@ -20,7 +20,9 @@ setDetritusParams(
 \item{params}{A \code{MizerParams} object.}
 
 \item{detritus_capacity}{Numeric. Carrying capacity for detritus biomass in grams
-per year. Default is 1.}
+per year. Default is 1. \code{Inf} means no carrying
+capacity for detritus even when \code{use_UR_cc} is
+TRUE, so that only algae has one.}
 
 \item{sen_decomp}{Numeric. Proportion of decomposing mass from senescence mortality
 that becomes detritus. Default is 0.8.}

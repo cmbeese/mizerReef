@@ -80,7 +80,14 @@ algae_dynamics_cc <- function(params, n, n_other, rates, dt, t = 0, ...) {
     )
     ka <- params@other_params$algae$capacity * capacity_boost
 
-    if(is.nan(consumption)){ 
+    # An infinite capacity is no capacity: the limit of the dynamics below as
+    # ka -> Inf is the linear algae_dynamics(), which avoids the Inf/Inf here.
+    # This lets a model use a carrying capacity for detritus but not algae.
+    if (is.infinite(ka)) {
+        return(algae_dynamics(params, n, n_other, rates, dt, t = t, ...))
+    }
+
+    if(is.nan(consumption)){
         warning("The algae consumption function is producing NaNs.")
         }
 

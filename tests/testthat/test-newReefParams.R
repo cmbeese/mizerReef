@@ -94,6 +94,29 @@ test_that("newReefParams computes rho_algae/rho_detritus using the documented fo
     expect_equal(unname(result@species_params$rho_detritus), unname(expected_rho_detritus))
 })
 
+test_that("newReefParams scales algae and detritus encounter with w^n", {
+    # Algae used a fixed exponent of 0.86 until 2.1.0; it now uses n, like
+    # detritus. Check it follows a non-default n too.
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    for (n in c(0.75, 0.7)) {
+        result <- suppressMessages(newReefParams(
+            species_params = caribbean_3_species,
+            interaction = caribbean_3_interaction,
+            method = "binned",
+            method_params = tuning_profile,
+            n = n
+        ))
+        expect_equal(result@other_params$algae$rho,
+                     outer(result@species_params$rho_algae, result@w^n),
+                     ignore_attr = TRUE)
+        expect_equal(result@other_params$detritus$rho,
+                     outer(result@species_params$rho_detritus, result@w^n),
+                     ignore_attr = TRUE)
+    }
+})
+
 test_that("newReefParams computes external mortality using the allometric z0pre formula when include_ext_mort = FALSE", {
     data(caribbean_3_species)
     data(caribbean_3_interaction)

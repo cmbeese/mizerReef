@@ -80,3 +80,17 @@ test_that("algae_dynamics_cc uses a boosted carrying capacity at a boosted times
     )
     expect_false(isTRUE(all.equal(next_biomass_no_boost, next_biomass_boosted)))
 })
+
+test_that("algae_dynamics_cc with an infinite capacity matches the linear algae_dynamics", {
+    # Inf means no carrying capacity, the K -> Inf limit of the logistic
+    # dynamics; the general formula would give Inf/Inf there.
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params@other_params$algae$capacity <- Inf
+    n <- params@initial_n
+    n_other <- params@initial_n_other
+    n_other$algae <- algae_biomass(params) * 0.5
+    rates <- getRates(params)
+    expect_equal(algae_dynamics_cc(params, n, n_other, rates, dt = 0.1, t = 0),
+                 algae_dynamics(params, n, n_other, rates, dt = 0.1, t = 0))
+})

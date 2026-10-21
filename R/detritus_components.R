@@ -55,6 +55,14 @@ detritus_dynamics_cc <- function(params, n, n_other, rates, dt, ...) {
     production <- sum(getDetritusProduction(params))
     kd <- params@other_params$detritus$capacity
 
+    # An infinite capacity is no capacity: the limit of the dynamics below as
+    # kd -> Inf is the linear detritus_dynamics(), which avoids the Inf/Inf
+    # here. This lets a model use a carrying capacity for algae but not
+    # detritus.
+    if (is.infinite(kd)) {
+        return(detritus_dynamics(params, n, n_other, rates, dt, ...))
+    }
+
     if (is.nan(consumption)) {
         warning("The detritus consumption function is producing NaNs.")
     }

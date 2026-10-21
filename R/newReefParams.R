@@ -63,7 +63,9 @@
 #'                    folding them into the single background resource the
 #'                    way a typical mizer model often does.
 #'
-#' @param n Allometric growth exponent (also used as metabolic exponent p)
+#' @param n Allometric growth exponent (also used as metabolic exponent p,
+#'          and as the exponent of the algae and detritus encounter rates,
+#'          as in Rogers et al. 2018)
 #'
 #' @param crit_feed Critical feeding level
 #'
@@ -310,7 +312,10 @@ newReefParams <- function( # Original mizer parameters
     mizer::species_params(params, recalculate = FALSE) <- sp
 
     # Calculate rho * w^n for use in algae and detritus dynamic functions
-    rho_alg <- outer(params@species_params$rho_algae, params@w^0.86)
+    # Algae and detritus encounter both scale with w^n, as in Rogers et al.
+    # (2018). Algae used a fixed exponent of 0.86 until mizerReef 2.1.0, a
+    # value whose source could not be traced.
+    rho_alg <- outer(params@species_params$rho_algae, params@w^n)
     rho_det <- outer(params@species_params$rho_detritus, params@w^n)
 
     # Store rho values directly onto the (already-populated, by

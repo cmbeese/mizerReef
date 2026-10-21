@@ -11,29 +11,30 @@
 #' (www.fishbase.org) and published literature. See thesis for further details
 #' on parameter sources and derivation.
 #'
-#' For details on parameter derivation and model calibration, see Chapter 3 of
-#' the PhD Thesis:
+#' For details on parameter derivation, see Chapter 3 of the PhD Thesis:
 #' Beese, C. (2025). "Modelling Coral Reef Futures: Exploring the role of
 #' structural complexity in sustaining ecosystem services."
 #' Victoria University of Wellington.
 #'
-#' Two herbivore parameters were revised in 2026 during recalibration against
-#' a corrected senescence-mortality formula (see `caribbean_3_model`'s
-#' documentation and `inst/scripts/Caribbean_3_model-calibration.R`'s design
-#' note): `satiation` (FALSE -> TRUE) and `age_mat` (4 -> 1.6, the age at
-#' median sexual maturity reported for the stoplight parrotfish, *Sparisoma
-#' viride*, by Rivera Hernandez & Shervette (2025), replacing a value that
-#' appears to have conflated it with that species' age at sexual transition).
+#' Recalibrated in 2026 to follow the structure of Rogers et al. (2018). The
+#' table also holds the calibrated values that `caribbean_3_model` is built
+#' from: `w_min` (fish recruit at 10^-1.5 g), `gamma`, `h`, `ks`, `q`,
+#' `erepro` and `R_max`, and the interactions with plankton, algae and
+#' detritus. Only predators eat plankton; herbivores eat only algae and
+#' invertebrates only detritus. Herbivores' `interaction_algae` and
+#' invertebrates' `interaction_detritus` give an algae standing biomass of
+#' 350 g/m^2 and a detritus lifetime of 3.85 hours. See
+#' `inst/scripts/caribbean-3-calibration-clean.r`.
 #'
 #' @keywords datasets
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish
 #' community structure. PhD Thesis, Newcastle University.
 #' http://theses.ncl.ac.uk/jspui/handle/10443/3574
-#' @references Rivera Hernandez, J.M. & Shervette, V.R. (2025). Addressing
-#' life history information gaps for Caribbean parrotfishes: queen parrotfish
-#' Scarus vetula and stoplight parrotfish Sparisoma viride. Environmental
-#' Biology of Fishes, 108, 179-198. https://doi.org/10.1007/s10641-024-01651-x
+#' @references Rogers, A., Blanchard, J.L., Newman, S.P., Dryden, C.S. &
+#' Mumby, P.J. (2018). High refuge availability on coral reefs increases the
+#' vulnerability of reef-associated predators to overexploitation. Ecology,
+#' 99, 450-463. https://doi.org/10.1002/ecy.2103
 #' @references Beese, C. (2025). PhD Thesis. "Modelling Coral Reef Futures:
 #' Exploring the role of structural complexity in sustaining ecosystem
 #' services." Victoria University of Wellington.
@@ -47,21 +48,21 @@
 #' groups
 #'
 #' This data frame encodes the trophic interactions among three functional
-#' groups: predators, herbivores, and invertebrates. The interaction
-#' strengths set to 1 for all piscivores in this model. Herbivores consume
-#' algae and invertebrates consume both plankton and detritus, with the
-#' proportion of detritus increasing with size.
-#'
-#' For full details on interaction matrix construction, see Chapter 3 of the
-#' PhD Thesis:
-#' Beese, C. (2025). "Modelling Coral Reef Futures: Exploring the role of
-#' structural complexity in sustaining ecosystem services."
-#' Victoria University of Wellington.
+#' groups: predators, herbivores, and invertebrates. Only predators eat other
+#' groups. Their interactions were calibrated in 2026 so that adult
+#' predators' diet is 33% predators, 17% herbivores and 50% invertebrates,
+#' the proportions used by Rogers et al. (2018). Herbivores eat only algae and
+#' invertebrates only detritus; those interactions are in
+#' `caribbean_3_species`.
 #'
 #' @keywords datasets
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish
 #' community structure. PhD Thesis, Newcastle University.
+#' @references Rogers, A., Blanchard, J.L., Newman, S.P., Dryden, C.S. &
+#' Mumby, P.J. (2018). High refuge availability on coral reefs increases the
+#' vulnerability of reef-associated predators to overexploitation. Ecology,
+#' 99, 450-463. https://doi.org/10.1002/ecy.2103
 #' @references Beese, C. (2025). PhD Thesis. "Modelling Coral Reef Futures:
 #' Exploring the role of structural complexity in sustaining ecosystem
 #' services." Victoria University of Wellington.
@@ -75,34 +76,28 @@
 #'
 #' A `MizerParams` object for a simple
 #' Caribbean reef ecosystem model with three functional groups: predators,
-#' herbivores, and invertebrates. It is built using the `caribbean_3_species`
-#' and `caribbean_3_interaction` data, and includes all parameter settings and
-#' calibrations as described in the associated PhD thesis and FORCE dataset.
-#' This object can be used directly with mizer functions for simulation and
-#' analysis.
+#' herbivores, and invertebrates. It is built from `caribbean_3_species`,
+#' `caribbean_3_interaction` and `karpata_refuge` by
+#' `inst/scripts/caribbean-3-calibration-clean.r`, which projects the model
+#' from its initial abundances to steady state. This object can be used
+#' directly with mizer functions for simulation and analysis.
 #'
-#' Recalibrated in 2026 against a corrected senescence-mortality formula
-#' (`reefSenMort()`) -- fish abundances, growth/consumption rates and
-#' reproduction parameters were all re-tuned to restore a genuine steady
-#' state under the corrected code (verified: repeated `reefSteady()` calls
-#' leave biomass unchanged). Two herbivore species_params were also changed
-#' from their original thesis values as part of this: `satiation` is now
-#' `TRUE` (was `FALSE`) since herbivore biomass has no density-dependent
-#' brake without some cap on individual intake once mortality is realistically
-#' low -- the realised feeding level is consistently close to 1, still
-#' consistent with the citations behind the package's usual herbivore
-#' default (Caribbean herbivores' guts observed to be full nearly
-#' continuously); and `age_mat` is now `1.6` (was `4`), the age at median
-#' sexual maturity for *Sparisoma viride* (Rivera Hernandez & Shervette
-#' 2025), replacing a value that appears to have conflated it with that
-#' species' age at sexual transition. See
-#' `inst/scripts/Caribbean_3_model-calibration.R`'s design note and
-#' `vignettes/caribbean_3_model-description.Rmd` for the full reasoning.
-#' Biomasses (predators/herbivores/inverts, g/m^2) are now 107.9/34.1/40.1,
-#' matching the FORCE-survey targets (107/34/40) essentially exactly.
+#' Recalibrated in 2026 to follow the structure of Rogers et al. (2018):
+#' herbivores eat only algae, invertebrates only detritus, and only predators
+#' eat plankton (up to 10^-1.5 g). Fish compete for refuge holes from 2.5 cm
+#' (`method = "competitive"`, hole densities from Karpata reef). Holes
+#' outnumber fish, so about 98% of fish between 2.5 and 20 cm are protected.
+#' Algae has a carrying capacity; detritus does not. At steady state:
+#' * biomass above 3.125 g is 107 (predators), 34.1 (herbivores) and 40.1
+#'   (invertebrates) g/m^2, matching the FORCE-survey targets (107/34/40);
+#' * there are about 10 herbivore juveniles (0.03-1.6 g) per m^2;
+#' * adult predators' diet is 33% predators, 17% herbivores and 50%
+#'   invertebrates;
+#' * predators mature at age 2 and herbivores at 1.7;
+#' * algae standing biomass is 350 g/m^2 and the detritus lifetime 3.85 hours.
 #'
-#' For details on parameter derivation, model calibration, and implementation,
-#' see Chapter 3 of the PhD Thesis:
+#' For details on parameter derivation and implementation, see Chapter 3 of
+#' the PhD Thesis:
 #' Beese, C. (2025). "Modelling Coral Reef Futures: Exploring the role of
 #' structural complexity in sustaining ecosystem services."
 #' Victoria University of Wellington.
@@ -111,6 +106,10 @@
 #' @references FORCE dataset. From: Dryden, C. (2017). Habitat structural
 #' complexity of Caribbean coral reefs and its relationships with fish community
 #' structure. PhD Thesis, Newcastle University.
+#' @references Rogers, A., Blanchard, J.L., Newman, S.P., Dryden, C.S. &
+#' Mumby, P.J. (2018). High refuge availability on coral reefs increases the
+#' vulnerability of reef-associated predators to overexploitation. Ecology,
+#' 99, 450-463. https://doi.org/10.1002/ecy.2103
 #' @format A [mizerReef-class] object.
 #'
 #' The object was created with [newReefParams()] and is stored in the package's

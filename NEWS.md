@@ -27,7 +27,34 @@
   `Suggests` and `Remotes`. mizerReef itself never depended on mizerMR. The
   vignette will return once mizerMR supports mizer 3.4.
 
+## Breaking changes
+
+- **`caribbean_3_model` recalibrated** to follow the structure of Rogers et
+  al. (2018): herbivores eat only algae, invertebrates only detritus, and only
+  predators eat plankton (up to 10^-1.5 g, the smallest fish size). Fish
+  compete for refuge holes from 2.5 cm, and algae has a carrying capacity. At
+  steady state it matches the observed biomasses (107/34/40 g/m^2), has about
+  10 herbivore juveniles per m^2, an adult predator diet of 33% predators,
+  17% herbivores and 50% invertebrates, predators maturing at age 2, an algae
+  standing biomass of 350 g/m^2 and a detritus lifetime of 3.85 hours.
+  `caribbean_3_species` and `caribbean_3_interaction` now hold the calibrated
+  values, and `inst/scripts/caribbean-3-calibration-clean.r` builds the
+  model from them from scratch, with no calibration steps. Results and
+  figures based on the old model will change.
+- **Algae encounter now scales with `w^n`** in `newReefParams()`, like
+  detritus and as in Rogers et al. (2018), instead of a fixed `w^0.86` whose
+  source could not be traced. With the default `n = 0.75` this changes every
+  newly built model's herbivore algae encounter. Saved models, including
+  `caribbean_10_model`, keep their stored rates.
+
 ## New features
+
+- A carrying capacity of `Inf` now means no carrying capacity for that
+  resource, so `use_UR_cc = TRUE` can give one to algae but not detritus (or
+  the reverse): for example `newReefParams(use_UR_cc = TRUE,
+  algae_capacity = 900, detritus_capacity = Inf)`. `algae_dynamics_cc()`,
+  `detritus_dynamics_cc()` and `tuneUR_cc()` then use the linear dynamics
+  for that resource.
 
 - New `scaleDownPlankton()` reduces the plankton resource by a factor
   relative to the fish, algae and detritus, so that predators' diets shift

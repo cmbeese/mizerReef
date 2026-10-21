@@ -28,8 +28,7 @@ test_that("tuneUR warns and leaves algae biomass unchanged when algae consumptio
 })
 
 test_that("tuneUR sets detritus external flux to consumption minus production-with-external-zeroed", {
-    data(caribbean_3_model)
-    params <- caribbean_3_model
+    params <- linear_caribbean_3()
     zeroed <- params
     zeroed@other_params$detritus$external <- 0
     din <- sum(getDetritusProduction(zeroed))

@@ -26,19 +26,20 @@ rates, maturation ages, and other life-history traits derived from FishBase
 on parameter sources and derivation.
 }
 \details{
-For details on parameter derivation and model calibration, see Chapter 3 of
-the PhD Thesis:
+For details on parameter derivation, see Chapter 3 of the PhD Thesis:
 Beese, C. (2025). "Modelling Coral Reef Futures: Exploring the role of
 structural complexity in sustaining ecosystem services."
 Victoria University of Wellington.
 
-Two herbivore parameters were revised in 2026 during recalibration against
-a corrected senescence-mortality formula (see \code{caribbean_3_model}'s
-documentation and \code{inst/scripts/Caribbean_3_model-calibration.R}'s design
-note): \code{satiation} (FALSE -> TRUE) and \code{age_mat} (4 -> 1.6, the age at
-median sexual maturity reported for the stoplight parrotfish, \emph{Sparisoma
-viride}, by Rivera Hernandez & Shervette (2025), replacing a value that
-appears to have conflated it with that species' age at sexual transition).
+Recalibrated in 2026 to follow the structure of Rogers et al. (2018). The
+table also holds the calibrated values that \code{caribbean_3_model} is built
+from: \code{w_min} (fish recruit at 10^-1.5 g), \code{gamma}, \code{h}, \code{ks}, \code{q},
+\code{erepro} and \code{R_max}, and the interactions with plankton, algae and
+detritus. Only predators eat plankton; herbivores eat only algae and
+invertebrates only detritus. Herbivores' \code{interaction_algae} and
+invertebrates' \code{interaction_detritus} give an algae standing biomass of
+350 g/m^2 and a detritus lifetime of 3.85 hours. See
+\code{inst/scripts/caribbean-3-calibration-clean.r}.
 }
 \references{
 FORCE dataset. From: Dryden, C. (2017). Habitat structural
@@ -46,10 +47,10 @@ complexity of Caribbean coral reefs and its relationships with fish
 community structure. PhD Thesis, Newcastle University.
 http://theses.ncl.ac.uk/jspui/handle/10443/3574
 
-Rivera Hernandez, J.M. & Shervette, V.R. (2025). Addressing
-life history information gaps for Caribbean parrotfishes: queen parrotfish
-Scarus vetula and stoplight parrotfish Sparisoma viride. Environmental
-Biology of Fishes, 108, 179-198. https://doi.org/10.1007/s10641-024-01651-x
+Rogers, A., Blanchard, J.L., Newman, S.P., Dryden, C.S. &
+Mumby, P.J. (2018). High refuge availability on coral reefs increases the
+vulnerability of reef-associated predators to overexploitation. Ecology,
+99, 450-463. https://doi.org/10.1002/ecy.2103
 
 Beese, C. (2025). PhD Thesis. "Modelling Coral Reef Futures:
 Exploring the role of structural complexity in sustaining ecosystem

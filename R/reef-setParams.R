@@ -59,7 +59,9 @@
 #'                             an approximate 20% dry-matter content for
 #'                             turf algae.
 #' @param algae_capacity Numeric. Carrying capacity for algae biomass in
-#'                       grams per year. Default is 1.
+#'                       grams per year. Default is 1. `Inf` means no
+#'                       carrying capacity for algae even when `use_UR_cc`
+#'                       is TRUE, so that only detritus has one.
 #' @param UR_interaction Optional. A named list or array with one or more
 #'                       resource interaction vectors (e.g. interaction_algae,
 #'                       interaction_detritus, interaction_sponge), each of
@@ -204,7 +206,9 @@ setAlgaeParams <- function(params,
 #'
 #' @param params A `MizerParams` object.
 #' @param detritus_capacity Numeric. Carrying capacity for detritus biomass in grams
-#'                          per year. Default is 1.
+#'                          per year. Default is 1. `Inf` means no carrying
+#'                          capacity for detritus even when `use_UR_cc` is
+#'                          TRUE, so that only algae has one.
 #' @param sen_decomp Numeric. Proportion of decomposing mass from senescence mortality
 #'                   that becomes detritus. Default is 0.8.
 #' @param ext_decomp Numeric. Proportion of decomposing mass from external mortality

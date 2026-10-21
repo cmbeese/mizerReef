@@ -68,7 +68,9 @@ their own explicit species/spectrum rather than
 folding them into the single background resource the
 way a typical mizer model often does.}
 
-\item{n}{Allometric growth exponent (also used as metabolic exponent p)}
+\item{n}{Allometric growth exponent (also used as metabolic exponent p,
+and as the exponent of the algae and detritus encounter rates,
+as in Rogers et al. 2018)}
 
 \item{new_refuge}{Logical. If TRUE, indicates this refuge profile is being
 set for use in a new simulation (prevents algae/detritus
@@ -204,10 +206,14 @@ consumption -- see
 unstructured resource" section.}
 
 \item{algae_capacity}{Numeric. Carrying capacity for algae biomass in
-grams per year. Default is 1.}
+grams per year. Default is 1. \code{Inf} means no
+carrying capacity for algae even when \code{use_UR_cc}
+is TRUE, so that only detritus has one.}
 
 \item{detritus_capacity}{Numeric. Carrying capacity for detritus biomass in grams
-per year. Default is 1.}
+per year. Default is 1. \code{Inf} means no carrying
+capacity for detritus even when \code{use_UR_cc} is
+TRUE, so that only algae has one.}
 
 \item{sen_decomp}{Numeric. Proportion of decomposing mass from senescence mortality
 that becomes detritus. Default is 0.8.}

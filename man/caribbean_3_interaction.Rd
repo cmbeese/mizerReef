@@ -16,22 +16,22 @@ caribbean_3_interaction
 }
 \description{
 This data frame encodes the trophic interactions among three functional
-groups: predators, herbivores, and invertebrates. The interaction
-strengths set to 1 for all piscivores in this model. Herbivores consume
-algae and invertebrates consume both plankton and detritus, with the
-proportion of detritus increasing with size.
-}
-\details{
-For full details on interaction matrix construction, see Chapter 3 of the
-PhD Thesis:
-Beese, C. (2025). "Modelling Coral Reef Futures: Exploring the role of
-structural complexity in sustaining ecosystem services."
-Victoria University of Wellington.
+groups: predators, herbivores, and invertebrates. Only predators eat other
+groups. Their interactions were calibrated in 2026 so that adult
+predators' diet is 33\% predators, 17\% herbivores and 50\% invertebrates,
+the proportions used by Rogers et al. (2018). Herbivores eat only algae and
+invertebrates only detritus; those interactions are in
+\code{caribbean_3_species}.
 }
 \references{
 FORCE dataset. From: Dryden, C. (2017). Habitat structural
 complexity of Caribbean coral reefs and its relationships with fish
 community structure. PhD Thesis, Newcastle University.
+
+Rogers, A., Blanchard, J.L., Newman, S.P., Dryden, C.S. &
+Mumby, P.J. (2018). High refuge availability on coral reefs increases the
+vulnerability of reef-associated predators to overexploitation. Ecology,
+99, 450-463. https://doi.org/10.1002/ecy.2103
 
 Beese, C. (2025). PhD Thesis. "Modelling Coral Reef Futures:
 Exploring the role of structural complexity in sustaining ecosystem

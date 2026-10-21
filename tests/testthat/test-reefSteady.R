@@ -64,8 +64,7 @@ test_that("reefSteady preserves erepro when preserve = 'erepro', except where mi
 })
 
 test_that("reefSteady retunes algae/detritus to a genuine steady state when new_refuge = FALSE", {
-    data(caribbean_3_model)
-    result <- reefSteady(caribbean_3_model, progress_bar = FALSE)
+    result <- reefSteady(linear_caribbean_3(), progress_bar = FALSE)
 
     P_A <- sum(getAlgaeProduction(result))
     c_A <- algae_consumption(result, n = result@initial_n, rates = getRates(result))
@@ -103,9 +102,9 @@ test_that("reefSteady dispatches to tuneUR_cc when use_UR_cc is TRUE", {
 })
 
 test_that("reefSteady with return_sim = TRUE returns a MizerSim-like object wrapping the tuned params", {
-    data(caribbean_3_model)
-    old_growth <- caribbean_3_model@other_params$algae$growth
-    sim <- reefSteady(caribbean_3_model, return_sim = TRUE, progress_bar = FALSE)
+    params <- linear_caribbean_3()
+    old_growth <- params@other_params$algae$growth
+    sim <- reefSteady(params, return_sim = TRUE, progress_bar = FALSE)
     expect_s3_class(sim@params, "mizerReef")
 
     # algae_growth is a fixed input, left unchanged by tuning -- only the

@@ -279,12 +279,17 @@ test_that("plotDiet() shows the refuge-aware diet", {
     params <- caribbean_3_model
     plot_data <- plotDiet(params, species = "predators", return_data = TRUE)
     diet <- getDiet(params)
-    row <- plot_data[plot_data$Prey == "predators", ][1, ]
+    # A 100 g predator: its preferred prey (~1 g) use refuge
+    pred_rows <- plot_data[plot_data$Prey == "predators", ]
+    row <- pred_rows[which.min(abs(log(pred_rows$w / 100))), ]
     wi <- which.min(abs(params@w - row$w))
     expect_equal(row$Proportion, diet["predators", wi, "predators"],
                  tolerance = 1e-8, ignore_attr = TRUE)
-    # mizer's own method shows more cannibalism, because it ignores refuge
-    expect_lt(row$Proportion, mizer_getDiet(params)["predators", wi, "predators"])
+    # mizer's own method shows more cannibalism, because it ignores refuge.
+    # Compare amounts, not proportions: refuge hides herbivores too, so the
+    # share of cannibalism can rise while the amount eaten falls.
+    expect_lt(getDiet(params, proportion = FALSE)["predators", wi, "predators"],
+              mizer_getDiet(params, proportion = FALSE)["predators", wi, "predators"])
 
     sim <- project(params, t_max = 1, progress_bar = FALSE)
     expect_s3_class(plotDiet(sim), "ggplot")

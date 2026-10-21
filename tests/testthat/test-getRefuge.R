@@ -171,7 +171,7 @@ test_that("getRefuge computes competitive method bin.id as the weight range for 
     w <- params@w
     a_bar <- 0.025
     b_bar <- 3
-    w_settle <- 0.1
+    w_settle <- params@other_params$refuge_params$w_settle
     for (k in seq_len(nrow(method_params))) {
         start_w <- max(a_bar * method_params$start_L[k]^b_bar, w_settle)
         end_w <- a_bar * method_params$end_L[k]^b_bar

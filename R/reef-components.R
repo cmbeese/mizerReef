@@ -118,7 +118,20 @@ tuneUR_cc <- function(params, info_level = mizer::default_info_level(),
     ka <- params@other_params$algae$capacity
     pa <- sum(getAlgaeProduction(params))
     ca <- algae_consumption(params)
-    params@initial_n_other$algae <- (ka * pa) / (pa + ka * ca)
+    if (is.finite(ka)) {
+        params@initial_n_other$algae <- (ka * pa) / (pa + ka * ca)
+    } else if (ca > 0) {
+        # An infinite capacity is no capacity: the limit as ka -> Inf is
+        # tuneUR()'s B_A = P_A / c_A.
+        params@initial_n_other$algae <- pa / ca
+    } else {
+        mizer::signal_info(
+            "algae_biomass",
+            paste("Algae consumption is zero, so algae has no finite",
+                  "steady-state biomass at the current algae growth rate.",
+                  "Leaving algae biomass unchanged."),
+            level = 1, severity = "warning", unhandled = "show")
+    }
 
     # detritus
     # Same reasoning: getDetritusConsumption() already returns c_D * B_D.

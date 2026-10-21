@@ -92,3 +92,18 @@ test_that("tuneUR_cc warns when the resulting external detritus flux is negative
 
     expect_warning(tuneUR_cc(cc_params), "flux of external detritus is negative")
 })
+
+test_that("tuneUR_cc with infinite capacities balances algae and detritus like tuneUR", {
+    data(caribbean_3_model)
+    cc_params <- caribbean_3_model
+    cc_params@other_params$algae$capacity <- Inf
+    cc_params@other_params$detritus$capacity <- Inf
+    cc_params@initial_n_other$algae <- algae_biomass(cc_params) * 0.5
+    cc_params@other_params$detritus$external <- 0
+
+    result <- tuneUR_cc(cc_params, info_level = 0)
+    expected <- tuneUR(cc_params, info_level = 0)
+    expect_equal(algae_biomass(result), algae_biomass(expected))
+    expect_equal(result@other_params$detritus$external,
+                 expected@other_params$detritus$external)
+})
