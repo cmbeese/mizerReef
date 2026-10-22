@@ -46,9 +46,6 @@
   source could not be traced. With the default `n = 0.75` this changes every
   newly built model's herbivore algae encounter. Saved models, including
   `caribbean_10_model`, keep their stored rates.
-
-## New features
-
 - New `feces_decomp` argument to `setDetritusParams()` and
   `newReefParams()`: the proportion of faeces that becomes detritus.
   Previously all faeces became detritus. It defaults to `sen_decomp`
@@ -56,6 +53,8 @@
   built models now get less detritus from faeces. Models upgraded with
   `upgradeReefParams()` keep `feces_decomp = 1`, and saved models without
   the setting behave as before.
+
+## New features
 
 - A carrying capacity of `Inf` now means no carrying capacity for that
   resource, so `use_UR_cc = TRUE` can give one to algae but not detritus (or

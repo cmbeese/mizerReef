@@ -37,3 +37,34 @@ test_that("detritus_dynamics floors negative production at zero", {
     expect_equal(result, expected_floored)
     expect_gte(result, 0)
 })
+
+test_that("detritus_dynamics and detritus_dynamics_cc use feces_decomp", {
+    # Both take production from getDetritusProduction(). Guards against a
+    # refactor that computes production inside the dynamics and drops the
+    # faeces scaling.
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    n <- params@initial_n
+    n_other <- params@initial_n_other
+    rates <- getRates(params)
+    dt <- 0.1
+    step <- function(params, feces_decomp, dynamics) {
+        params@other_params$detritus$feces_decomp <- feces_decomp
+        dynamics(params, n = n, n_other = n_other, rates = rates, dt = dt)
+    }
+    params@other_params$detritus$feces_decomp <- 1
+    feces <- getDetritusProduction(params, n, rates)[["feces"]]
+    c_D <- detritus_consumption(params, n, rates)
+
+    # Production enters the linear update as P / c_D * (1 - exp(-c_D * dt)),
+    # so sending 20% fewer faeces to detritus lowers the next biomass by
+    # 0.2 * feces / c_D * (1 - exp(-c_D * dt))
+    expect_equal(step(params, 1, detritus_dynamics) -
+                     step(params, 0.8, detritus_dynamics),
+                 0.2 * feces / c_D * (1 - exp(-c_D * dt)))
+
+    # With a carrying capacity, less production gives less detritus
+    params@other_params$detritus$capacity <- 2 * detritus_biomass(params)
+    expect_lt(step(params, 0.8, detritus_dynamics_cc),
+              step(params, 1, detritus_dynamics_cc))
+})

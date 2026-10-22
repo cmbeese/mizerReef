@@ -89,8 +89,7 @@ test_that("caribbean_3_species and caribbean_3_interaction rebuild caribbean_3_m
     }
     expect_equal(p@species_params, m@species_params)
     expect_equal(p@other_params$algae, m@other_params$algae)
-    expect_equal(p@other_params$detritus[names(m@other_params$detritus)],
-                 m@other_params$detritus)
+    expect_mapequal(p@other_params$detritus, m@other_params$detritus)
     expect_equal(p@other_dynamics, m@other_dynamics)
 })
 
