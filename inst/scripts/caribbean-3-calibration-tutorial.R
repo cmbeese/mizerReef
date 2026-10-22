@@ -1,13 +1,10 @@
 # Calibrating the 3-group Caribbean reef model from literature values
 # A worked example to follow when calibrating your own mizerReef model
 #
-# This script starts from literature parameter values and repeats the
-# calibration of caribbean_3_model with the standard package steps from
+# This script starts from literature parameter values and calibrates
+# caribbean_3_model with the standard package steps from
 # vignette("steady-state-recipe"), plus a small solver (Step 8) for the
-# targets that those steps cannot reach one at a time. It ends very close to
-# the shipped model. The shipped model itself is built without any
-# calibration by caribbean-3-calibration-clean.r, from parameter tables that
-# already hold the calibrated values.
+# targets that those steps cannot reach one at a time.
 #
 # The model follows the structure of Rogers et al. (2018): herbivores eat only
 # algae, invertebrates eat only detritus, and only predators eat plankton, up
@@ -23,12 +20,12 @@
 #   - adult predators eat 33% predators, 17% herbivores and 50%
 #     invertebrates: Rogers' fractions of feeding time, used here as diet
 #     shares
-#   - predators mature at age 2 (age_mat in the species table)
+#   - predators and herbivores mature at age 2 (age_mat in the species table)
 #   - algae standing biomass of 350 g/m^2 and a detritus lifetime of
 #     3.85 hours
 #
 # Run it from the package source folder. It takes a few minutes; the solver
-# in Steps 8 and 9 is the slow part.
+# in Steps 8 to 10 is the slow part.
 
 # Load required libraries
 library(mizer)
@@ -37,7 +34,8 @@ library(here)
 
 # Step 0: targets and a function to check them -------------------------------
 targets <- c(B_herb = 34, B_pred = 107, B_inv = 40, J_herb = 10,
-             diet_pred = 0.33, diet_herb = 0.17, age_mat_pred = 2)
+             diet_pred = 0.33, diet_herb = 0.17, age_mat_pred = 2,
+             age_mat_herb = 2)
 
 # Adult predators' diet: the share of predators, herbivores and invertebrates
 # in what predators larger than their maturity size eat (plankton left out)
@@ -60,7 +58,8 @@ calibration_outputs <- function(params) {
     J_herb = getN(params, min_w = 10^-1.5, max_w = 1.6)[["herbivores"]],
     diet_pred = diet[["predators"]],
     diet_herb = diet[["herbivores"]],
-    age_mat_pred = age_mat(params)[["predators"]])
+    age_mat_pred = age_mat(params)[["predators"]],
+    age_mat_herb = age_mat(params)[["herbivores"]])
 }
 check_targets <- function(params) {
   print(signif(rbind(model = calibration_outputs(params)[names(targets)],
@@ -80,10 +79,11 @@ tuning_profile <- read.csv(here("inst/data-csv/tuning_profile.csv"))
 # and put back the starting values used before calibration:
 species <- caribbean_3_species
 species[c("gamma", "h", "erepro", "R_max")] <- NULL
-# Standard metabolism: the values in the species table before calibration
-# (no source recorded; they equal Rogers' growth efficiencies, 0.15 and 0.1,
-# but ks is a metabolic rate, not an efficiency)
-species$ks <- c(0.15, 0.1, 0.1)
+# Metabolism: the model ends up with mizer's default (Step 10). While the
+# model is still far from calibrated, that default makes young predators,
+# which live on scarce plankton, grow too slowly to ever mature, so
+# calibration starts without metabolism.
+species$ks <- 0
 # Herbivores eat algae and invertebrates eat detritus at full strength; these
 # only set the scale of algae and detritus, which Step 10 sets properly
 species$interaction_algae <- c(0, 1, 0)
@@ -97,6 +97,10 @@ interaction["predators", ] <- c(0.33, 0.17, 0.5)
 # Invertebrates keep mizer's default w_min of 0.001 g (Rogers: 10^-4 g).
 species[, c("species", "w_min", "q", "ks", "interaction_resource",
             "interaction_algae", "interaction_detritus", "satiation")]
+# Senescence mortality and the shares of dead material and faeces that
+# become detritus use mizerReef's defaults, which follow Rogers et al.
+# (2018), except that newReefParams() below also sends 80% of the other
+# dead material to detritus (ext_decomp), as Rogers did.
 
 # Step 2: set up the model with the simple (binned) refuge -------------------
 # The competitive refuge depends on fish numbers, which makes it hard to find
@@ -117,7 +121,9 @@ params <- newReefParams(
   # Fish use refuge from 2.5 cm (0.39 g); this setting carries over to the
   # competitive refuge in Step 7
   w_settle = 0.025 * 2.5^3,
-  w_pp_cutoff = 1)
+  w_pp_cutoff = 1,
+  # Rogers et al. (2018): 80% of dead material becomes detritus
+  ext_decomp = 0.8)
 
 # newReefParams() warns that kappa is still at mizer's placeholder value
 # (1e11). Herbivores here eat only algae, and algae production is a fixed
@@ -128,7 +134,7 @@ params <- newReefParams(
 params <- calibrateReefBiomass(params)
 
 # Moderate density dependence in reproduction helps the model settle
-params <- setBevertonHolt(params, reproduction_level = 0.5)
+params <- setBevertonHolt(params, reproduction_level = 0.25)
 
 # Step 3: find a first steady state ------------------------------------------
 params <- params |>
@@ -138,13 +144,13 @@ params <- params |>
 # Step 4: match biomasses and age at maturity --------------------------------
 # One round of matching. matchBiomasses() and matchReefGrowth() keep erepro
 # fixed, so the Beverton-Holt reproduction level drifts, sometimes all the
-# way to 1, where reefSteady() stops with an error. Setting it back to 0.5
+# way to 1, where reefSteady() stops with an error. Setting it back to 0.25
 # each round prevents that; it changes erepro and R_max but not the
 # abundances, because reefSteady() holds recruitment fixed anyway.
 match_round <- function(params) {
   params |>
     matchBiomasses() |> matchReefGrowth() |>
-    setBevertonHolt(reproduction_level = 0.5) |>
+    setBevertonHolt(reproduction_level = 0.25) |>
     reefSteady()
 }
 params <- calibrateReefBiomass(params) |> reefSteady()
@@ -193,8 +199,8 @@ params <- setRefuge(params, method = "competitive",
                     w_settle = 0.025 * 2.5^3) |>
   getRefuge()
 # The refuge changes how much energy goes into eggs, and with it the
-# reproduction level; set it back to 0.5
-params <- setBevertonHolt(params, reproduction_level = 0.5)
+# reproduction level; set it back to 0.25
+params <- setBevertonHolt(params, reproduction_level = 0.25)
 # Let the model settle with recruitment held fixed. Don't use
 # matchBiomasses() from here on: it scales every size of a group by the same
 # factor, juveniles included. Here that leaves almost no juveniles (about
@@ -207,11 +213,12 @@ check_targets(params) # herbivores are now far too many
 # Step 8: solve for the coupled targets --------------------------------------
 # The targets now depend on each other: predators eat herbivores, herbivores
 # and young predators share the holes, and predators eat invertebrates. Fixing
-# one target at a time undoes the others, so a solver changes seven knobs
-# together to hit the seven targets:
+# one target at a time undoes the others, so a solver changes eight knobs
+# together to hit the eight targets:
 #   - predators' interaction with herbivores, predators and invertebrates
 #   - the recruitment of each group (recruits per m^2 per year)
 #   - the plankton abundance (kappa)
+#   - herbivores' maximum intake rate (h), for their age at maturity
 # After every change reefSteady() settles the model with recruitment held.
 # Predators' search volume (gamma) is not a knob: gamma times the
 # interaction is what matters, so gamma and the three interactions together
@@ -238,7 +245,8 @@ get_knobs <- function(params) {
     R_herb = recruitment[["herbivores"]],
     R_inv = recruitment[["inverts"]],
     R_pred = recruitment[["predators"]],
-    kappa = params@resource_params$kappa)
+    kappa = params@resource_params$kappa,
+    h_herb = params@species_params[["herbivores", "h"]])
 }
 set_knobs <- function(params, knobs) {
   level <- getReproductionLevel(params)
@@ -247,6 +255,11 @@ set_knobs <- function(params, knobs) {
   inter["predators", "predators"] <- knobs[["pred_on_pred"]]
   inter["predators", "inverts"] <- knobs[["pred_on_inv"]]
   params <- setInteraction(params, interaction = inter)
+  # Changing h this way lets mizer recalculate the maximum intake rate (and,
+  # from Step 10 on, the default metabolism, which depends on h)
+  sp <- species_params(params)
+  sp["herbivores", "h"] <- knobs[["h_herb"]]
+  species_params(params) <- sp
   plankton_factor <- knobs[["kappa"]] / params@resource_params$kappa
   resource_params(params)$kappa <- knobs[["kappa"]]
   initialNResource(params) <- initialNResource(params) * plankton_factor
@@ -255,26 +268,30 @@ set_knobs <- function(params, knobs) {
                                   inverts = knobs[["R_inv"]],
                                   predators = knobs[["R_pred"]]))
 }
-settle <- function(params) {
+# reefSteady() stops once egg production changes by less than `tol` (default
+# 0.01) over 1.5 years. That is precise enough to steer towards the targets,
+# but the targets reached that way move by about 1.5% once the model runs on
+# freely (Step 13), so the last solve (Step 10) settles with a smaller tol.
+settle <- function(params, tol = 0.01) {
   params |>
-    reefSteady(progress_bar = FALSE, info_level = 0) |>
-    reefSteady(progress_bar = FALSE, info_level = 0) |>
-    reefSteady(progress_bar = FALSE, info_level = 0)
+    reefSteady(tol = tol, progress_bar = FALSE, info_level = 0) |>
+    reefSteady(tol = tol, progress_bar = FALSE, info_level = 0) |>
+    reefSteady(tol = tol, progress_bar = FALSE, info_level = 0)
 }
 
 # A damped Newton solver. Each iteration runs the model once per knob, with
 # that knob changed by 10%, to see how the targets respond (the Jacobian).
 # It then moves all knobs part of the way (damp) towards where every target
-# would be met, by at most a factor `cap` in one step. `limits` stops chosen
-# knobs from moving more than that factor away from their starting values.
-# Errors are on a log scale: 0.01 means 1%.
-solve_targets <- function(params, targets, limits = NULL, n_iter = 60,
-                          tol = 0.01, damp = 0.5, cap = 2, h = 0.1,
+# would be met, by at most a factor `cap` in one step. `bounds` keeps chosen
+# knobs between a lower and an upper value. Errors are on a log scale: 0.01
+# means 1%.
+solve_targets <- function(params, targets, bounds = NULL, n_iter = 60,
+                          tol = 0.01, steady_tol = 0.01, damp = 0.5,
+                          cap = 2, h = 0.1,
                           cores = if (.Platform$OS.type == "windows") 1 else 4) {
   log_error <- function(p) log(calibration_outputs(p)[names(targets)] / targets)
   x <- log(get_knobs(params))
-  lower <- x[names(limits)] - log(limits)
-  upper <- x[names(limits)] + log(limits)
+  bounded <- names(bounds$lower)
   err <- log_error(params)
   if (max(abs(err)) > log(10)) {
     message("Starting far from the targets (", names(which.max(abs(err))),
@@ -301,7 +318,7 @@ solve_targets <- function(params, targets, limits = NULL, n_iter = 60,
     columns <- parallel::mclapply(names(x), function(k) {
       x_k <- x
       x_k[[k]] <- x_k[[k]] + h
-      p_k <- tryCatch(settle(set_knobs(params, exp(x_k))),
+      p_k <- tryCatch(settle(set_knobs(params, exp(x_k)), steady_tol),
                       error = function(e) NULL)
       if (is.null(p_k)) return(rep(NA, length(err)))
       (log_error(p_k) - err) / h
@@ -326,14 +343,17 @@ solve_targets <- function(params, targets, limits = NULL, n_iter = 60,
     }
     step <- -damp * solve(J, err)
     step <- step * min(1, log(cap) / max(abs(step)))
-    # Keep limited knobs within their limits
+    # Keep bounded knobs within their bounds
     x_new <- x + step
-    x_new[names(limits)] <- pmin(pmax(x_new[names(limits)], lower), upper)
+    if (!is.null(bounds)) {
+      x_new[bounded] <- pmin(pmax(x_new[bounded], log(bounds$lower)),
+                             log(bounds$upper))
+    }
     step <- x_new - x
     # Take the step; if the model fails, try half the step (up to 3 times)
     p_new <- NULL
     for (halving in 0:3) {
-      p_new <- tryCatch(settle(set_knobs(params, exp(x + step))),
+      p_new <- tryCatch(settle(set_knobs(params, exp(x + step)), steady_tol),
                         error = function(e) NULL)
       if (!is.null(p_new) && all(is.finite(log_error(p_new)))) break
       p_new <- NULL
@@ -358,20 +378,27 @@ solve_targets <- function(params, targets, limits = NULL, n_iter = 60,
   best
 }
 
-# Limits: predators' interactions may move at most a factor 10 from Rogers'
-# values, and plankton at most a factor 10 from where Steps 5 and 6 left it.
-# Without them the solver can end up somewhere else:
+# Bounds: predators' interaction with their own species (cannibalism) may
+# move at most a factor 10 from Rogers' value, and plankton at most a factor
+# 10 from where Steps 5 to 7 left it. Without them the solver can end up
+# somewhere else:
 #   - a dead end where predators eat almost only their own young
 #     (interaction with predators above 10, thousands of predator recruits
 #     per m^2) and the targets stop responding;
 #   - a second solution that meets every target, but in which plankton is
-#     about 100 times more abundant, young predators live on it until they
-#     are about 100 g, and there are almost no small predators (0.2 recruits
-#     per m^2 per year, against about 10 small fish per m^2 per group in
-#     Rogers et al. 2018).
-limits <- c(pred_on_herb = 10, pred_on_pred = 10, pred_on_inv = 10,
-            kappa = 10)
-params <- solve_targets(params, targets, limits = limits)
+#     far more abundant, young predators live on it, and there are almost
+#     no small predators (under 1 per m^2, against about 10 small fish per
+#     m^2 per group in Rogers et al. 2018).
+# Predators' interactions with herbivores and invertebrates are left free.
+# They end at about 8 times and 1/11 of Rogers' weights: her weights are
+# shares of feeding time, while here herbivores hide in holes and
+# invertebrates are plentiful, so matching her diet shares needs different
+# weights.
+limits <- c(pred_on_pred = 10, kappa = 10)
+# The bounds are fixed here and kept for every later solve
+start <- get_knobs(params)[names(limits)]
+bounds <- list(lower = start / limits, upper = start * limits)
+params <- solve_targets(params, targets, bounds = bounds)
 signif(attr(params, "solver_history"), 3)
 check_targets(params)
 
@@ -386,10 +413,42 @@ params <- setURcapacity(params, cap = 1.5)
 params@other_params$detritus$capacity <- Inf
 params <- params |> reefSteady() |> reefSteady() |> reefSteady()
 check_targets(params)
-params <- solve_targets(params, targets, limits = limits)
+params <- solve_targets(params, targets, bounds = bounds)
 check_targets(params)
 
-# Step 10: put algae and detritus on their literature scale ------------------
+# Step 10: switch on mizer's default metabolism ------------------------------
+# Taking ks out of the species parameters that were given lets mizer work out
+# its default, from each species' maximum intake rate and maturity size.
+# Metabolism slows growth, so solve again.
+gp <- given_species_params(params)
+gp$ks <- NULL
+given_species_params(params) <- gp
+species_params(params)$ks
+params <- params |> reefSteady() |> reefSteady() |> reefSteady()
+check_targets(params)
+params <- solve_targets(params, targets, bounds = bounds)
+check_targets(params)
+# Finally, settle precisely and solve once more, again settling each run
+# precisely, so that the targets still hold when the model runs on freely
+params <- settle(params, tol = 1e-5)
+check_targets(params)
+params <- solve_targets(params, targets, bounds = bounds, steady_tol = 1e-5)
+check_targets(params)
+
+# Step 11: a realistic reproductive efficiency -------------------------------
+# erepro above 1 is unrealistic: the species would need to turn more than all
+# of its reproductive energy into eggs. With Beverton-Holt reproduction,
+# erepro = (the erepro without density dependence) / (1 - reproduction
+# level), so a lower reproduction level (more density dependence) gives a
+# lower erepro. It does not change the steady state.
+# The solves have let the reproduction levels drift a little; put them back
+# to 0.25 and check erepro. Were it above 1 for a species, give that species
+# a lower level: setBevertonHolt(params, reproduction_level = c(...)), one
+# value per species.
+params <- setBevertonHolt(params, reproduction_level = 0.25)
+species_params(params)$erepro # all below 1
+
+# Step 12: put algae and detritus on their literature scale ------------------
 # Up to now algae and detritus biomasses have been on whatever scale the
 # rescaling steps left them (tiny). rescale_algae() and detritus_lifetime<-
 # multiply a biomass by a factor and divide the consumers' encounter rate by
@@ -406,7 +465,7 @@ params@other_params$algae$capacity <-
   params@other_params$algae$capacity * algae_factor
 detritus_lifetime(params) <- 3.85 / (24 * 365)
 
-# Step 11: final checks ------------------------------------------------------
+# Step 13: final checks ------------------------------------------------------
 # Is it a stable steady state? Project 100 years with Beverton-Holt
 # reproduction live: the biomasses should barely move (reefSteady() stops
 # within about 1% of the steady state). Keep the end state, as
@@ -424,14 +483,10 @@ age_mat(params)
 algae_biomass(params)                  # target 350 g/m^2
 params@other_params$algae$capacity     # algae carrying capacity (g/m^2)
 detritus_lifetime(params) * 24 * 365   # target 3.85 hours
-# erepro above 1 is unrealistic: the species would need to turn more than
-# all of its reproductive energy into eggs. A lower reproduction level (more
-# density dependence) gives a lower erepro and the same steady state:
-# setBevertonHolt(params, reproduction_level = ...)
-params@species_params$erepro
+params@species_params$erepro           # all below 1
 getReproductionLevel(params)
 
-# Step 12: compare with the shipped model ------------------------------------
+# Step 14: compare with the shipped model ------------------------------------
 shipped <- mizerReef::caribbean_3_model
 signif(rbind(this_script = calibration_outputs(params),
              shipped = calibration_outputs(shipped)), 3)
@@ -452,7 +507,7 @@ key_values <- function(p) {
 signif(rbind(this_script = key_values(params),
              shipped = key_values(shipped)), 3)
 
-# Step 13: save --------------------------------------------------------------
+# Step 15: save --------------------------------------------------------------
 # Saved to a temporary file; change the path to keep it. The shipped
 # caribbean_3_model is built by caribbean-3-calibration-clean.r instead.
 saveParams(params, file.path(tempdir(), "caribbean_3_calibrated.rds"))
