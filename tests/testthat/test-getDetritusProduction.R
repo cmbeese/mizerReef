@@ -26,6 +26,17 @@ test_that("getDetritusProduction's feces component matches an independent per-sp
                  expected_feces)
 })
 
+test_that("getDetritusProduction's feces component scales with feces_decomp", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    # Models saved before feces_decomp existed send all faeces to detritus
+    params@other_params$detritus$feces_decomp <- NULL
+    all_feces <- unname(getDetritusProduction(params)["feces"])
+    params@other_params$detritus$feces_decomp <- 0.8
+    expect_equal(unname(getDetritusProduction(params)["feces"]),
+                 0.8 * all_feces)
+})
+
 test_that("getDetritusProduction's decomp component correctly weights senescence vs residual mortality", {
     # Uses the already-independently-tested reefSenMort()/params@mu_b
     # building blocks directly (not re-derived) to check that

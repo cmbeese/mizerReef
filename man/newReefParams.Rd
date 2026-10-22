@@ -37,6 +37,7 @@ newReefParams(
   detritus_capacity = NULL,
   sen_decomp = NULL,
   ext_decomp = NULL,
+  feces_decomp = NULL,
   external = NULL,
   algae_colour = "darkseagreen3",
   detritus_colour = "plum4",
@@ -221,6 +222,10 @@ that becomes detritus. Default is 0.8.}
 \item{ext_decomp}{Numeric. Proportion of decomposing mass from external mortality
 that becomes detritus. Default is 0.2.}
 
+\item{feces_decomp}{Numeric. Proportion of faeces (consumed biomass that
+is not assimilated) that becomes detritus. Defaults to
+\code{sen_decomp}.}
+
 \item{external}{Numeric. Rate at which detritus biomass sinks from the pelagic
 zone (grams per year). Default is 1.}
 
@@ -320,7 +325,10 @@ resource components, senescence mortality, and predation refuge.
 
  The proportions of decomposing mass from senescence (`sen_decomp`) and
  external mortality (`ext_decomp`) that become detritus are set here,
- with typical defaults of 0.8 and 0.2, respectively. The rate at which
+ with typical defaults of 0.8 and 0.2, respectively, as is the
+ proportion of faeces that becomes detritus (`feces_decomp`). Faeces
+ stay on the reef like senescent deaths, so `feces_decomp` defaults to
+ `sen_decomp`. The rate at which
  detritus sinks from the pelagic zone (`d_external_initial`) is also set,
  controlling detritus input from external sources. These values may be
  reset by [reefSteady()] to ensure steady state abundances match observed

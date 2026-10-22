@@ -205,6 +205,8 @@ upgradeReefParams <- function(params) {
         detritus_capacity = detritus_capacity,
         sen_decomp = op$detritus$sen_decomp,
         ext_decomp = op$detritus$ext_decomp,
+        # Older models sent all faeces to detritus; keep that
+        feces_decomp = 1,
         external = op$detritus$external,
         use_UR_cc = use_UR_cc
     )

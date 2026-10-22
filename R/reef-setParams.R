@@ -189,7 +189,10 @@ setAlgaeParams <- function(params,
 #'
 #'      The proportions of decomposing mass from senescence (`sen_decomp`) and
 #'      external mortality (`ext_decomp`) that become detritus are set here,
-#'      with typical defaults of 0.8 and 0.2, respectively. The rate at which
+#'      with typical defaults of 0.8 and 0.2, respectively, as is the
+#'      proportion of faeces that becomes detritus (`feces_decomp`). Faeces
+#'      stay on the reef like senescent deaths, so `feces_decomp` defaults to
+#'      `sen_decomp`. The rate at which
 #'      detritus sinks from the pelagic zone (`d_external_initial`) is also set,
 #'      controlling detritus input from external sources. These values may be
 #'      reset by [reefSteady()] to ensure steady state abundances match observed
@@ -213,6 +216,9 @@ setAlgaeParams <- function(params,
 #'                   that becomes detritus. Default is 0.8.
 #' @param ext_decomp Numeric. Proportion of decomposing mass from external mortality
 #'                   that becomes detritus. Default is 0.2.
+#' @param feces_decomp Numeric. Proportion of faeces (consumed biomass that
+#'                   is not assimilated) that becomes detritus. Defaults to
+#'                   `sen_decomp`.
 #' @param external Numeric. Rate at which detritus biomass sinks from the pelagic
 #'                 zone (grams per year). Default is 1.
 #' @param UR_interaction Optional. A named list or array with one or more resource interaction
@@ -243,6 +249,7 @@ setDetritusParams <- function(params,
                               detritus_capacity = NULL,
                               sen_decomp = NULL,
                               ext_decomp = NULL,
+                              feces_decomp = NULL,
                               external = NULL,
                               UR_interaction = NULL,
                               use_UR_cc = FALSE,
@@ -307,6 +314,16 @@ setDetritusParams <- function(params,
         if (!is.numeric(ext_decomp)) stop("ext_decomp should be a numerical value.")
         if (ext_decomp < 0 || ext_decomp > 1) stop("ext_decomp must be a proportion between 0 and 1.")
         params@other_params$detritus$ext_decomp <- ext_decomp
+    }
+
+    # feces_decomp check
+    if (is.null(feces_decomp)) {
+        params@other_params$detritus$feces_decomp <-
+            params@other_params$detritus$sen_decomp
+    } else {
+        if (!is.numeric(feces_decomp)) stop("feces_decomp should be a numerical value.")
+        if (feces_decomp < 0 || feces_decomp > 1) stop("feces_decomp must be a proportion between 0 and 1.")
+        params@other_params$detritus$feces_decomp <- feces_decomp
     }
 
     params@other_params$detritus$external <- ifelse(is.null(external), 1, external)

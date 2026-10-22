@@ -52,7 +52,9 @@ params <- newReefParams(
   algae_capacity = 902.8,
   detritus_capacity = Inf,
   # External detritus input (g/m^2/year)
-  external = 7.757)
+  external = 7.757,
+  # Calibrated with all faeces becoming detritus
+  feces_decomp = 1)
 
 # Step 2: project forward from the initial abundances until the model
 #         settles at steady state

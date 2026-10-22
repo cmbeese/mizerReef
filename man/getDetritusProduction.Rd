@@ -43,10 +43,13 @@ ecosystem has contributions from three sources:
        p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
 
 \eqn{p_{D.f}} comes from the biomass that is consumed but not
-assimilated and is given by:
+assimilated (faeces), of which a proportion \code{feces_decomp} reaches the
+reef and becomes detritus (see \code{\link[=setDetritusParams]{setDetritusParams()}}):
 
-\deqn{p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}{
-       p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}
+\deqn{p_{D.f} = \mathtt{feces\_decomp}\,\sum_i(1-\alpha_i)\int
+       (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}{
+       p_{D.f} = feces_decomp * \sum_i(1-\alpha_i)\int
+       (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}
 
 where \eqn{f_i(w)} is the feeding level (see \code{\link[=algae_consumption]{algae_consumption()}}'s
 "Algae consumption" section for how \code{satiation} controls it), so that

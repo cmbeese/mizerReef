@@ -112,6 +112,7 @@ newReefParams <- function( # Original mizer parameters
                           algae_capacity = NULL,
                           detritus_capacity = NULL,
                           sen_decomp = NULL, ext_decomp = NULL,
+                          feces_decomp = NULL,
                           external = NULL,
                           # Resource aesthetics
                           algae_colour = "darkseagreen3",
@@ -240,6 +241,7 @@ newReefParams <- function( # Original mizer parameters
         detritus_capacity = detritus_capacity,
         sen_decomp = sen_decomp,
         ext_decomp = ext_decomp,
+        feces_decomp = feces_decomp,
         external = external,
         UR_interaction = UR_interaction,
         use_UR_cc = use_UR_cc,

@@ -303,10 +303,13 @@ plotDetritusConsumption <- function(params) {
 #'        p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
 #'
 #'  \eqn{p_{D.f}} comes from the biomass that is consumed but not
-#'  assimilated and is given by:
+#'  assimilated (faeces), of which a proportion `feces_decomp` reaches the
+#'  reef and becomes detritus (see [setDetritusParams()]):
 #'
-#'  \deqn{p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}{
-#'        p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}
+#'  \deqn{p_{D.f} = \mathtt{feces\_decomp}\,\sum_i(1-\alpha_i)\int
+#'        (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}{
+#'        p_{D.f} = feces_decomp * \sum_i(1-\alpha_i)\int
+#'        (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}
 #'
 #'  where \eqn{f_i(w)} is the feeding level (see [algae_consumption()]'s
 #'  "Algae consumption" section for how `satiation` controls it), so that
@@ -375,10 +378,13 @@ getDetritusProduction <- function(params, n = params@initial_n,
     # Get proportions of decomposition
     sen_decomp <- params@other_params$detritus$sen_decomp
     ext_decomp <- params@other_params$detritus$ext_decomp
+    # Models built before feces_decomp existed sent all faeces to detritus
+    feces_decomp <- params@other_params$detritus$feces_decomp
+    if (is.null(feces_decomp)) feces_decomp <- 1
 
     # Return vector
     c(
-        feces = sum(feces),
+        feces = feces_decomp * sum(feces),
         decomp = (ext_decomp * ex_mort) + (sen_decomp * sen_mort),
         external = params@other_params$detritus$external
     )

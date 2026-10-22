@@ -154,7 +154,10 @@ test_that("upgradeReefParams builds the expected algae/detritus/refuge schema", 
     expect_setequal(names(result@other_params$algae), c("rho", "capacity", "growth"))
     expect_null(result@other_params$algae_params)
     expect_setequal(names(result@other_params$detritus),
-                    c("rho", "capacity", "sen_decomp", "ext_decomp", "external"))
+                    c("rho", "capacity", "sen_decomp", "ext_decomp",
+                      "feces_decomp", "external"))
+    # Older models sent all faeces to detritus
+    expect_equal(result@other_params$detritus$feces_decomp, 1)
     expect_null(result@other_params$detritus_params)
     expect_true(is.list(result@other_params$refuge_params))
     expect_false(is.data.frame(result@other_params$refuge_params))

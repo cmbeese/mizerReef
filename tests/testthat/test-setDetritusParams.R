@@ -6,8 +6,20 @@ test_that("setDetritusParams defaults match its documented values", {
     expect_equal(result@other_params$detritus$capacity, 1)
     expect_equal(result@other_params$detritus$sen_decomp, 0.8)
     expect_equal(result@other_params$detritus$ext_decomp, 0.2)
+    expect_equal(result@other_params$detritus$feces_decomp, 0.8)
     expect_equal(result@other_params$detritus$external, 1)
     expect_false(result@other_params$use_UR_cc)
+})
+
+test_that("setDetritusParams defaults feces_decomp to sen_decomp", {
+    data(caribbean_3_model)
+    result <- setDetritusParams(caribbean_3_model, sen_decomp = 0.6)
+    expect_equal(result@other_params$detritus$feces_decomp, 0.6)
+    result <- setDetritusParams(caribbean_3_model, sen_decomp = 0.6,
+                                feces_decomp = 0.3)
+    expect_equal(result@other_params$detritus$feces_decomp, 0.3)
+    expect_error(setDetritusParams(caribbean_3_model, feces_decomp = 2),
+                 "proportion")
 })
 
 test_that("setDetritusParams stores the supplied values", {

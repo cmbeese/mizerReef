@@ -440,9 +440,11 @@ $$
 P_D = p_{D,f} + p_{D,d} + p_{D,\text{ext}}.
 $$
 
-- **Faeces** — the fraction of consumed biomass that is not assimilated:
+- **Faeces** — the fraction of consumed biomass that is not assimilated, of
+  which a proportion $c_{f}$ (`feces_decomp`, by default equal to
+  `sen_decomp`) becomes detritus:
   $$
-  p_{D,f} = \sum_i (1 - \alpha_i) \int \big(1 - f_i(w)\big)\,
+  p_{D,f} = c_{f} \sum_i (1 - \alpha_i) \int \big(1 - f_i(w)\big)\,
     E_i(w)\, N_i(w)\, dw.
   $$
 - **Decomposing carcasses** — a fraction of the biomass lost to residual

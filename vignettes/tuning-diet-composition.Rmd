@@ -93,14 +93,16 @@ knitr::kable(
   data.frame(
     Argument = c("algae_growth_initial", "algae_capacity",
                  "detritus_capacity", "sen_decomp", "ext_decomp",
-                 "use_UR_cc"),
-    Default = c("2000 g/m²/year", "1", "1", "0.8", "0.2", "FALSE"),
+                 "feces_decomp", "use_UR_cc"),
+    Default = c("2000 g/m²/year", "1", "1", "0.8", "0.2", "sen_decomp",
+                "FALSE"),
     Description = c(
       "Algae's fixed production rate -- see the note below on why this one is worth checking against your own system.",
       "Algae carrying capacity, only used if use_UR_cc = TRUE.",
       "Detritus carrying capacity, only used if use_UR_cc = TRUE.",
       "Proportion of senescence-mortality biomass that decomposes to detritus.",
       "Proportion of residual-natural-mortality biomass that decomposes to detritus.",
+      "Proportion of faeces that becomes detritus.",
       "Whether algae/detritus use the logistic, carrying-capacity-limited dynamics instead of the default unlimited linear ones."
     )
   ),

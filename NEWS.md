@@ -49,6 +49,14 @@
 
 ## New features
 
+- New `feces_decomp` argument to `setDetritusParams()` and
+  `newReefParams()`: the proportion of faeces that becomes detritus.
+  Previously all faeces became detritus. It defaults to `sen_decomp`
+  (0.8), because faeces, like senescent deaths, stay on the reef, so newly
+  built models now get less detritus from faeces. Models upgraded with
+  `upgradeReefParams()` keep `feces_decomp = 1`, and saved models without
+  the setting behave as before.
+
 - A carrying capacity of `Inf` now means no carrying capacity for that
   resource, so `use_UR_cc = TRUE` can give one to algae but not detritus (or
   the reverse): for example `newReefParams(use_UR_cc = TRUE,

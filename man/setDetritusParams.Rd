@@ -9,6 +9,7 @@ setDetritusParams(
   detritus_capacity = NULL,
   sen_decomp = NULL,
   ext_decomp = NULL,
+  feces_decomp = NULL,
   external = NULL,
   UR_interaction = NULL,
   use_UR_cc = FALSE,
@@ -29,6 +30,10 @@ that becomes detritus. Default is 0.8.}
 
 \item{ext_decomp}{Numeric. Proportion of decomposing mass from external mortality
 that becomes detritus. Default is 0.2.}
+
+\item{feces_decomp}{Numeric. Proportion of faeces (consumed biomass that
+is not assimilated) that becomes detritus. Defaults to
+\code{sen_decomp}.}
 
 \item{external}{Numeric. Rate at which detritus biomass sinks from the pelagic
 zone (grams per year). Default is 1.}
@@ -82,7 +87,10 @@ multi-resource interaction via the UR_interaction argument.
 
  The proportions of decomposing mass from senescence (`sen_decomp`) and
  external mortality (`ext_decomp`) that become detritus are set here,
- with typical defaults of 0.8 and 0.2, respectively. The rate at which
+ with typical defaults of 0.8 and 0.2, respectively, as is the
+ proportion of faeces that becomes detritus (`feces_decomp`). Faeces
+ stay on the reef like senescent deaths, so `feces_decomp` defaults to
+ `sen_decomp`. The rate at which
  detritus sinks from the pelagic zone (`d_external_initial`) is also set,
  controlling detritus input from external sources. These values may be
  reset by [reefSteady()] to ensure steady state abundances match observed
@@ -106,10 +114,13 @@ ecosystem has contributions from three sources:
        p_D = p_{D.f} + p_{D.d} + p_{D.ext}}
 
 \eqn{p_{D.f}} comes from the biomass that is consumed but not
-assimilated and is given by:
+assimilated (faeces), of which a proportion \code{feces_decomp} reaches the
+reef and becomes detritus (see \code{\link[=setDetritusParams]{setDetritusParams()}}):
 
-\deqn{p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}{
-       p_{D.f} = \sum_i(1-\alpha_i)\int (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}
+\deqn{p_{D.f} = \mathtt{feces\_decomp}\,\sum_i(1-\alpha_i)\int
+       (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}{
+       p_{D.f} = feces_decomp * \sum_i(1-\alpha_i)\int
+       (1-f_i(w))\,E_i(w)\,N_i(w)\,dw}
 
 where \eqn{f_i(w)} is the feeding level (see \code{\link[=algae_consumption]{algae_consumption()}}'s
 "Algae consumption" section for how \code{satiation} controls it), so that

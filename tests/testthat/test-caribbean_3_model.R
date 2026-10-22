@@ -79,15 +79,18 @@ test_that("caribbean_3_species and caribbean_3_interaction rebuild caribbean_3_m
         method = "competitive", method_params = karpata_refuge,
         w_settle = 0.025 * 2.5^3, w_pp_cutoff = 10^-1.5, kappa = 0.1757,
         use_UR_cc = TRUE, algae_capacity = 902.8, detritus_capacity = Inf,
-        external = 7.757, info_level = 0)
+        external = 7.757, feces_decomp = 1, info_level = 0)
     m <- caribbean_3_model
+    # The bundled model predates feces_decomp, which it treats as 1
+    m@other_params$detritus$feces_decomp <- 1
     for (slot in c("search_vol", "intake_max", "metab", "mu_b", "psi",
                    "interaction", "rr_pp", "cc_pp")) {
         expect_equal(p[[slot]], m[[slot]], info = slot)
     }
     expect_equal(p@species_params, m@species_params)
     expect_equal(p@other_params$algae, m@other_params$algae)
-    expect_equal(p@other_params$detritus, m@other_params$detritus)
+    expect_equal(p@other_params$detritus[names(m@other_params$detritus)],
+                 m@other_params$detritus)
     expect_equal(p@other_dynamics, m@other_dynamics)
 })
 
