@@ -28,8 +28,8 @@ structurally complex habitats such as coral reefs:
   apply,
 - **algae and detritus** — two unstructured (not size-structured) benthic
   resource pools that herbivorous and detritivorous species feed on,
-- **senescence mortality** — an extra size-dependent mortality term
-  representing non-predation death close to a species' maximum size.
+- **senescence mortality** — an extra mortality term, increasing with body
+  size, representing non-predation death from old age.
 
 The package uses the mechanisms described in
 `vignette("guide-create-extension-package", package = "mizer")`:

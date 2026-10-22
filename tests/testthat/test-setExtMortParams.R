@@ -51,13 +51,41 @@ test_that("setExtMortParams rejects negative values, missing required names and 
         setExtMortParams(params, ext_mort_params = list(sen_prop = 0.1, sen_curve = 0.3)),
         "nat_mort"
     )
-    for (bad in list(0, NA_real_, Inf, c(500, 1000))) {
+    for (bad in list(0, NA_real_, Inf)) {
         expect_error(
             setExtMortParams(params, ext_mort_params = list(
                 nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3, w_sen = bad)),
-            "single positive number"
+            "positive number"
         )
     }
+})
+
+test_that("setExtMortParams rejects per-species values", {
+    # The rates are the same for every species; a vector would be recycled
+    # along the size axis by reefSenMort()
+    data(caribbean_3_model)
+    expect_error(
+        setExtMortParams(caribbean_3_model, data.frame(
+            nat_mort = 0.2, sen_prop = c(0.1, 0.2, 0.3), sen_curve = 0.3)),
+        "single number"
+    )
+    expect_error(
+        setExtMortParams(caribbean_3_model, list(
+            nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3,
+            w_sen = c(500, 1000))),
+        "single number"
+    )
+})
+
+test_that("setExtMortParams accepts a named numeric vector", {
+    data(caribbean_3_model)
+    result <- setExtMortParams(caribbean_3_model,
+        c(nat_mort = 0.5, sen_prop = 0.2, sen_curve = 0.6))
+    expect_equal(result@other_params$ext_mort_params,
+                 list(nat_mort = 0.5, sen_prop = 0.2, sen_curve = 0.6,
+                      w_sen = 1000, sen_form = "power"))
+    expect_error(setExtMortParams(caribbean_3_model, c(0.5, 0.2, 0.6)),
+                 "named list")
 })
 
 test_that("setExtMortParams warns about and drops unknown names", {

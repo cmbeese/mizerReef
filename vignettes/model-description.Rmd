@@ -49,9 +49,8 @@ adds four ingredients to the standard multispecies model:
 3. **Satiation control.** Individual consumer groups can be exempted from the
    Holling type II satiation response, so that carnivores take all the food they
    encounter.
-4. **Senescence mortality.** An extra size-dependent mortality term
-   $\mu_{sen.i}(w)$ acting near a group's maximum size, on top of the residual
-   natural mortality.
+4. **Senescence mortality.** An extra mortality term $\mu_{sen}(w)$ that
+   increases with body size, on top of the residual natural mortality.
 
 Throughout, the index $i$ (or $j$) runs over the modelled functional groups
 rather than taxonomic species; in mizerReef the entries of $N_i(w)$ are usually
@@ -295,7 +294,7 @@ details.
 
 The total mortality on a consumer of group $i$ and weight $w$ is
 $$
-\mu_i(w) = \mu_{p.i}(w) + \mu_{nat.i}(w) + \mu_{sen.i}(w) + F_i(w),
+\mu_i(w) = \mu_{p.i}(w) + \mu_{nat.i}(w) + \mu_{sen}(w) + F_i(w),
 $$
 computed by `reefMort()`. Fishing mortality $F_i(w)$ is exactly as in mizer.
 The remaining three terms differ from core mizer as follows.
@@ -460,7 +459,7 @@ $$
   natural and senescence mortality:
   $$
   p_{D,d} = c_{ext}\sum_i \int \mu_{nat.i}(w)\, N_i(w)\, w\, dw
-    + c_{sen}\sum_i \int \mu_{sen.i}(w)\, N_i(w)\, w\, dw,
+    + c_{sen}\sum_i \int \mu_{sen}(w)\, N_i(w)\, w\, dw,
   $$
   where $c_{ext}$ (`ext_decomp`) and $c_{sen}$ (`sen_decomp`) are the
   proportions of each mortality source that decompose to detritus rather than
@@ -497,7 +496,7 @@ and reduces to the linear case as $K \to \infty$.
 | Prey availability | full abundance $N_j(w)$ | discounted by vulnerability $V_{ij}(w)\,N_j(w)$ |
 | Encounter | plankton + fish | plankton + fish + algae + detritus |
 | Satiation | all groups | optional; off for carnivores |
-| External mortality | constant $z0_i$ | $\mu_{nat}\,w^{n-1}$ plus senescence $\mu_{sen.i}(w)$ |
+| External mortality | constant $z0_i$ | $\mu_{nat}\,w^{n-1}$ plus senescence $\mu_{sen}(w)$ |
 | Extra resources | resource spectrum only | plus unstructured pools $B_A$, $B_D$ |
 
 For how these equations are realised through mizer's extension mechanism (S3

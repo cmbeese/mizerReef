@@ -96,3 +96,13 @@ test_that("reefSenMort rejects an unknown stored sen_form", {
     params@other_params$ext_mort_params$sen_form <- "log-ratio"
     expect_error(reefSenMort(params), "should be \"power\" or \"log_ratio\"")
 })
+
+test_that("reefSenMort returns a species x size array with dimnames", {
+    data(caribbean_3_model)
+    withr::local_options(lifecycle_verbosity = "quiet")
+    for (form in c("power", "log_ratio")) {
+        params <- setExtMortParams(caribbean_3_model, sen_form = form)
+        expect_identical(dimnames(reefSenMort(params)),
+                         dimnames(params@initial_n))
+    }
+})

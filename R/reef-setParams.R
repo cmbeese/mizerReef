@@ -478,17 +478,28 @@ set_ext_mort_params <- function(params, ext_mort_params, sen_form) {
         if (is.data.frame(ext_mort_params)) {
             ext_mort_params <- as.list(ext_mort_params)
         }
+        # A named numeric vector, e.g. c(nat_mort = 0.2, ...)
+        if (is.numeric(ext_mort_params) && !is.null(names(ext_mort_params))) {
+            ext_mort_params <- as.list(ext_mort_params)
+        }
+        if (!is.list(ext_mort_params)) {
+            stop("ext_mort_params should be a named list, data frame, ",
+                 "matrix or named numeric vector.")
+        }
         # A stored list also holds sen_form, already read by
         # choose_sen_form()
         ext_mort_params[["sen_form"]] <- NULL
         if (!all(sapply(ext_mort_params, is.numeric))) {
             stop("The external mortality parameters should be numeric.")
         }
+        if (!all(lengths(ext_mort_params) == 1)) {
+            stop("Each external mortality parameter should be a single ",
+                 "number: the same values apply to every species.")
+        }
         w_sen <- ext_mort_params[["w_sen"]]
-        if (!is.null(w_sen) &&
-            !(length(w_sen) == 1 && is.finite(w_sen) && w_sen > 0)) {
-            stop("The senescence size 'w_sen' should be a single positive ",
-                 "number (in grams).")
+        if (!is.null(w_sen) && !(is.finite(w_sen) && w_sen > 0)) {
+            stop("The senescence size 'w_sen' should be a positive number ",
+                 "(in grams).")
         }
         if (!all(unlist(ext_mort_params) >= 0)) {
             stop("The external mortality parameters should be

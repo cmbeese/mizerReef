@@ -851,16 +851,16 @@ reefSenMort <- function(params, ...) {
 
     # Get user set senescence mortality parameters
     mort_params <- params@other_params[["ext_mort_params"]]
-    sen_prop <- mort_params$sen_prop
-    sen_curve <- mort_params$sen_curve
+    sen_prop <- mort_params[["sen_prop"]]
+    sen_curve <- mort_params[["sen_curve"]]
     # Models built before sen_form and w_sen existed get the defaults
-    sen_form <- mort_params$sen_form
+    sen_form <- mort_params[["sen_form"]]
     if (is.null(sen_form)) sen_form <- "power"
     if (length(sen_form) != 1 || !sen_form %in% c("power", "log_ratio")) {
         stop("other_params$ext_mort_params$sen_form should be \"power\" ",
              "or \"log_ratio\"; set it with setExtMortParams().")
     }
-    w_sen <- mort_params$w_sen
+    w_sen <- mort_params[["w_sen"]]
     if (is.null(w_sen)) w_sen <- 1000
 
     if (sen_form == "log_ratio") {
@@ -869,12 +869,13 @@ reefSenMort <- function(params, ...) {
         ratio <- outer(1 / log10(params@species_params[["w_max"]]),
                        log10(params@w))
         ratio[ratio < 0] <- 0
-        return(sen_prop * ratio^sen_curve)
+        sen_mort <- sen_prop * ratio^sen_curve
+    } else {
+        # The same rate for every species: sen_prop at size w_sen
+        sen_mort <- matrix(sen_prop * (params@w / w_sen)^sen_curve,
+                           nrow = no_sp, ncol = no_w, byrow = TRUE)
     }
-
-    # The same rate for every species: sen_prop at size w_sen
-    sen_mort <- matrix(sen_prop * (params@w / w_sen)^sen_curve,
-                       nrow = no_sp, ncol = no_w, byrow = TRUE)
+    dimnames(sen_mort) <- dimnames(params@initial_n)
     return(sen_mort)
 }
 
