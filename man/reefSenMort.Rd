@@ -23,7 +23,9 @@ represents all other mortality that is not due to fishing or predation
 by predators included in the model.
 }
 \details{
-Users can change \code{sen_prop}/\code{sen_curve} via \code{\link[=setExtMortParams]{setExtMortParams()}}.
+Users can change \code{sen_prop}, \code{sen_curve}, \code{w_sen} and the form
+(\code{sen_form}) via \code{\link[=setExtMortParams]{setExtMortParams()}}. Models saved before \code{sen_form}
+and \code{w_sen} existed use the power form with \code{w_sen} = 1000 g.
 }
 \section{Senescence mortality}{
 
@@ -32,21 +34,35 @@ Users can change \code{sen_prop}/\code{sen_curve} via \code{\link[=setExtMortPar
  mortality caused by background sources such as illness or age. The
  rate of senescence mortality (in 1/year) is given by:
 
+ \deqn{\mu_{sen}(w) = \mathtt{sen\_prop}\,
+           \left(\frac{w}{w_{sen}}\right)^{\mathtt{sen\_curve}}}{
+          \mu_{sen}(w) = sen_prop * (w / w_sen)^sen_curve}
+
+ where \eqn{\mathtt{sen\_prop}} is the rate at the senescence size
+ \eqn{w_{sen}} (`w_sen`, in grams) and \eqn{\mathtt{sen\_curve}} is
+ the exponent shaping the senescence curve. The rate is the same
+ function of size for every species. This is the senescence mortality
+ of Rogers et al. (2014, 2018), where \eqn{\mathtt{sen\_prop} = 0.1},
+ \eqn{w_{sen} = 10^3} g and \eqn{\mathtt{sen\_curve} = 0.3}. Rogers
+ et al. (2014) kept the senescence size and exponent of the North Sea
+ model of Blanchard et al. (2009), citing Lorenzen (1996) and Hall et
+ al. (2006).
+
+ `r lifecycle::badge("deprecated")` `sen_form = "log_ratio"` gives the
+ form mizerReef used before version 2.1.0:
+
  \deqn{\mu_{sen.i}(w) = \mathtt{sen\_prop}\,
-                             \left[\max\left(0,\;
-                             \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
-                             \right)\right]^{\mathtt{sen\_curve}}}{
+           \left[\max\left(0,\;
+           \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
+           \right)\right]^{\mathtt{sen\_curve}}}{
           \mu_{sen.i}(w) = sen_prop *
           max(0, log10(w)/log10(w_{max.i}))^sen_curve}
 
- where \eqn{\mathtt{sen\_curve}} is the exponent shaping the
- senescence curve and \eqn{\mathtt{sen\_prop}} is the rate the curve
- approaches as \eqn{w \to w_{max.i}} (where the ratio is exactly 1).
- The ratio is floored at zero before being raised to the
- \eqn{\mathtt{sen\_curve}} power, since it is negative for individuals
- below 1 gram (where \eqn{\log_{10}(w) < 0}), which would otherwise
- raise a negative number to a fractional power -- those individuals
- get exactly zero senescence mortality.
+ It is zero below 1 g and reaches \eqn{\mathtt{sen\_prop}} at each
+ species' maximum size \eqn{w_{max.i}}; `w_sen` is not used. Its
+ parameter values are Rogers et al.'s but the form is not, and no
+ published source for the form was found, so it is deprecated and
+ kept only to reproduce older results.
 }\if{html}{\out{</div>}}
 }
 

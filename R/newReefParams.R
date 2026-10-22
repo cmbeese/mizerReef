@@ -120,10 +120,16 @@ newReefParams <- function( # Original mizer parameters
                           resource_color = "lightseagreen",
                           # Parameters for external mortality
                           ext_mort_params = NULL,
+                          sen_form = c("power", "log_ratio"),
                           include_ext_mort = TRUE,
                           include_sen_mort = TRUE,
                           z0pre = 0.2,
                           info_level = mizer::default_info_level(), ...) {
+    sen_form <- match.arg(sen_form)
+    # Warned here rather than in setExtMortParams() below, so that lifecycle
+    # reports it as the user's own call
+    if (sen_form == "log_ratio") warn_sen_log_ratio(parent.frame())
+
     # One handler for the whole construction: the reports raised by
     # setRefuge(), setAlgaeParams(), setDetritusParams() and the rest are
     # collected here and given together. `info_level` is also forwarded to
@@ -250,9 +256,16 @@ newReefParams <- function( # Original mizer parameters
     )
 
     ### External mortality ----
-    params <- setExtMortParams(
-        params = params,
-        ext_mort_params = ext_mort_params
+    params <- withCallingHandlers(
+        setExtMortParams(
+            params = params,
+            ext_mort_params = ext_mort_params,
+            sen_form = sen_form
+        ),
+        # Already warned at the top
+        lifecycle_warning_deprecated = function(cnd) {
+            tryInvokeRestart("muffleWarning")
+        }
     )
 
     ### Degradation ----

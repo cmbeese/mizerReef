@@ -833,7 +833,9 @@ reefPredMort <- function(params, n, n_pp, n_other, t, pred_rate,
 #'
 #' @inheritSection setExtMortParams Senescence mortality
 #'
-#' @details Users can change `sen_prop`/`sen_curve` via [setExtMortParams()].
+#' @details Users can change `sen_prop`, `sen_curve`, `w_sen` and the form
+#'   (`sen_form`) via [setExtMortParams()]. Models saved before `sen_form`
+#'   and `w_sen` existed use the power form with `w_sen` = 1000 g.
 #'
 #' @param params A MizerParams object
 #' @param ... Unused
@@ -851,25 +853,24 @@ reefSenMort <- function(params, ...) {
     mort_params <- params@other_params[["ext_mort_params"]]
     sen_prop <- mort_params$sen_prop
     sen_curve <- mort_params$sen_curve
+    # Models built before sen_form and w_sen existed get the defaults
+    sen_form <- mort_params$sen_form
+    if (is.null(sen_form)) sen_form <- "power"
+    w_sen <- mort_params$w_sen
+    if (is.null(w_sen)) w_sen <- 1000
 
-    # Initialize storage for each mortality rates
-    sen_mort <- matrix(0, nrow = no_sp, ncol = no_w)
-
-    # # Convert length to weight to get senesence weight for each species
-    # sen_weight <- params@species_params[["a"]] *
-    #     sen_length ^ params@species_params[["b"]]
-
-    # Or could use max size?
-    sen_weight <- params@species_params[["w_max"]]
-    log_sw <- log10(sen_weight)
-    log_w <- log10(params@w)
-
-    # Loop through species
-    for (i in seq_along(sen_weight)) {
-        ratio <- log_w / log_sw[i]
+    if (sen_form == "log_ratio") {
+        # Deprecated: sen_prop * max(0, log10(w) / log10(w_max))^sen_curve,
+        # zero below 1 g and sen_prop at each species' w_max
+        ratio <- outer(1 / log10(params@species_params[["w_max"]]),
+                       log10(params@w))
         ratio[ratio < 0] <- 0
-        sen_mort[i, ] <- sen_prop * ratio^sen_curve
+        return(sen_prop * ratio^sen_curve)
     }
+
+    # The same rate for every species: sen_prop at size w_sen
+    sen_mort <- matrix(sen_prop * (params@w / w_sen)^sen_curve,
+                       nrow = no_sp, ncol = no_w, byrow = TRUE)
     return(sen_mort)
 }
 

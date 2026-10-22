@@ -4,16 +4,23 @@ test_that("setExtMortParams defaults match its documented values", {
     result <- setExtMortParams(params)
 
     expect_equal(result@other_params$ext_mort_params,
-                 list(nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3))
+                 list(nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3,
+                      w_sen = 1000, sen_form = "power"))
 })
 
-test_that("setExtMortParams stores a supplied named list as-is", {
+test_that("setExtMortParams stores a supplied named list, adding w_sen and sen_form", {
     data(caribbean_3_model)
     params <- caribbean_3_model
     custom <- list(nat_mort = 0.5, sen_prop = 0.2, sen_curve = 0.6)
 
     result <- setExtMortParams(params, ext_mort_params = custom)
-    expect_equal(result@other_params$ext_mort_params, custom)
+    expect_equal(result@other_params$ext_mort_params,
+                 c(custom, list(w_sen = 1000, sen_form = "power")))
+
+    custom$w_sen <- 500
+    result <- setExtMortParams(params, ext_mort_params = custom)
+    expect_equal(result@other_params$ext_mort_params,
+                 c(custom, list(sen_form = "power")))
 })
 
 test_that("setExtMortParams normalises a data.frame/matrix input to the same list as a named list", {
@@ -33,7 +40,7 @@ test_that("setExtMortParams normalises a data.frame/matrix input to the same lis
                  result_mat@other_params$ext_mort_params)
 })
 
-test_that("setExtMortParams rejects negative values and missing required names", {
+test_that("setExtMortParams rejects negative values, missing required names and w_sen = 0", {
     data(caribbean_3_model)
     params <- caribbean_3_model
     expect_error(
@@ -44,4 +51,54 @@ test_that("setExtMortParams rejects negative values and missing required names",
         setExtMortParams(params, ext_mort_params = list(sen_prop = 0.1, sen_curve = 0.3)),
         "nat_mort"
     )
+    expect_error(
+        setExtMortParams(params, ext_mort_params = list(nat_mort = 0.2, sen_prop = 0.1,
+                                                        sen_curve = 0.3, w_sen = 0)),
+        "positive"
+    )
+})
+
+test_that("setExtMortParams rejects an unknown sen_form", {
+    data(caribbean_3_model)
+    expect_error(setExtMortParams(caribbean_3_model, sen_form = "linear"),
+                 "should be one of")
+})
+
+test_that("sen_form = 'log_ratio' is deprecated but stored", {
+    data(caribbean_3_model)
+    lifecycle::expect_deprecated(
+        result <- setExtMortParams(caribbean_3_model, sen_form = "log_ratio"),
+        "log-ratio senescence form"
+    )
+    expect_equal(result@other_params$ext_mort_params$sen_form, "log_ratio")
+})
+
+test_that("the stored list can be passed back, keeping its sen_form unless sen_form is given", {
+    data(caribbean_3_model)
+    withr::local_options(lifecycle_verbosity = "quiet")
+    old <- setExtMortParams(caribbean_3_model, sen_form = "log_ratio")
+    stored <- old@other_params$ext_mort_params
+
+    again <- setExtMortParams(old, ext_mort_params = stored)
+    expect_equal(again@other_params$ext_mort_params, stored)
+
+    switched <- setExtMortParams(old, ext_mort_params = stored,
+                                 sen_form = "power")
+    expect_equal(switched@other_params$ext_mort_params$sen_form, "power")
+})
+
+test_that("newReefParams passes sen_form to setExtMortParams", {
+    data(caribbean_3_species)
+    data(caribbean_3_interaction)
+    data(tuning_profile)
+    build <- function(...) {
+        suppressMessages(newReefParams(
+            species_params = caribbean_3_species,
+            interaction = caribbean_3_interaction,
+            method = "binned", method_params = tuning_profile,
+            info_level = 0, ...))
+    }
+    expect_equal(build()@other_params$ext_mort_params$sen_form, "power")
+    lifecycle::expect_deprecated(p <- build(sen_form = "log_ratio"))
+    expect_equal(p@other_params$ext_mort_params$sen_form, "log_ratio")
 })

@@ -10,3 +10,14 @@ linear_caribbean_3 <- function() {
     params@other_dynamics$detritus <- "detritus_dynamics"
     tuneUR(params, info_level = 0)
 }
+
+# The bundled models were calibrated with the senescence form mizerReef used
+# before 2.1.0 (sen_form = "log_ratio"); saved models now use the power form.
+# Until the models are recalibrated, tests of their steady state put back
+# the form they were calibrated with.
+with_calibration_senescence <- function(params) {
+    withr::with_options(
+        list(lifecycle_verbosity = "quiet"),
+        setExtMortParams(params, params@other_params$ext_mort_params,
+                         sen_form = "log_ratio"))
+}

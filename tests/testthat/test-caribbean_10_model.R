@@ -101,7 +101,7 @@ test_that("caribbean_10_model's algae and detritus are genuinely at steady state
     # zero). The current object is tuneUR()'s output, which should give
     # dB/dt = 0 for both resources.
     data(caribbean_10_model)
-    m <- caribbean_10_model
+    m <- with_calibration_senescence(caribbean_10_model)
 
     P_A <- sum(getAlgaeProduction(m))
     c_A <- algae_consumption(m, n = m@initial_n, rates = getRates(m))

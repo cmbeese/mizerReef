@@ -13,8 +13,11 @@ test_that("reefSteady reaches a genuine fixed point: one more t_per step barely 
     # project one further t_per (1.5 years) step from the result and confirm
     # mizer's own distanceSSLogN() (used by projectToSteady() to *define*
     # convergence) stays below the same default tolerance (tol = 0.1*dt).
+    # Starts from the bundled model's steady state: from further away,
+    # reefSteady()'s final retuning moves the state a little.
     data(caribbean_3_model)
-    result <- reefSteady(caribbean_3_model, progress_bar = FALSE)
+    result <- reefSteady(with_calibration_senescence(caribbean_3_model),
+                         progress_bar = FALSE)
 
     previous <- list(
         n = result@initial_n, n_pp = result@initial_n_pp,

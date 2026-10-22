@@ -1,73 +1,89 @@
 test_that("reefSenMort computes the documented senescence formula", {
-    # sen_mort[i,] = sen_prop * (log10(w)/log10(w_max[i]))^sen_curve, with
-    # the ratio (not sen_prop * ratio) clipped to 0 before exponentiation --
-    # hand-computed independently from params@w/w_max/ext_mort_params, not
-    # by re-deriving reefSenMort()'s own code. This is the formula from the
-    # original thesis chapter (Chapter3.tex eq-extmort): it approaches
-    # exactly sen_prop as w -> w_max, which the clip-then-multiply order
-    # used before this fix did not.
+    # sen_mort = sen_prop * (w / w_sen)^sen_curve for every species, the
+    # senescence mortality of Rogers et al. (2014, 2018). Computed by hand
+    # from params@w and ext_mort_params rather than by re-deriving
+    # reefSenMort()'s own code.
     data(caribbean_3_model)
-    params <- caribbean_3_model
+    params <- setExtMortParams(caribbean_3_model)
     mort_params <- params@other_params$ext_mort_params
-    sen_prop <- mort_params$sen_prop
-    sen_curve <- mort_params$sen_curve
     w <- params@w
-    w_max <- params@species_params$w_max
-
-    expected <- matrix(0, nrow = 3, ncol = length(w))
-    for (i in 1:3) {
-        ratio <- log10(w) / log10(w_max[i])
-        ratio[ratio < 0] <- 0
-        expected[i, ] <- sen_prop * ratio^sen_curve
-    }
+    expected <- t(replicate(
+        3, mort_params$sen_prop * (w / mort_params$w_sen)^mort_params$sen_curve))
 
     result <- reefSenMort(params)
     expect_equal(unname(result), unname(expected))
 })
 
-test_that("reefSenMort approaches exactly sen_prop at w_max", {
-    # Regression guard for the specific bug this fixed: sen_prop used to be
-    # multiplied in before exponentiating, so the rate at w_max was
-    # sen_prop^sen_curve (0.501 under the package defaults), not sen_prop
-    # (0.1) as the thesis and roxygen document.
-    data(caribbean_3_model)
-    params <- caribbean_3_model
-    result <- reefSenMort(params)
-    sen_prop <- params@other_params$ext_mort_params$sen_prop
-
-    for (i in 1:3) {
-        expect_equal(result[i, ncol(result)], sen_prop)
-    }
-})
-
-test_that("reefSenMort is zero at the smallest sizes and increases towards w_max", {
-    # A structural sanity check independent of the exact formula: senescence
-    # mortality should vanish for small individuals (log(w)/log(w_max) small,
-    # clipped at 0) and be strictly increasing up to w_max.
-    data(caribbean_3_model)
-    params <- caribbean_3_model
-    result <- reefSenMort(params)
-
-    for (i in 1:3) {
-        expect_equal(result[i, 1], 0)
-        expect_true(all(diff(result[i, ]) >= 0))
-    }
-})
-
-test_that("reefSenMort responds to setExtMortParams sen_prop/sen_curve overrides", {
+test_that("reefSenMort equals sen_prop at w_sen and increases with size", {
+    # Rogers et al. (2018) Table S2: k_s = 0.1, m_s = 10^3 g, p_s = 0.3
     data(caribbean_3_model)
     params <- setExtMortParams(caribbean_3_model,
-        ext_mort_params = data.frame(nat_mort = 0.2, sen_prop = 0.5, sen_curve = 2)
+        ext_mort_params = list(nat_mort = 0.2, sen_prop = 0.1,
+                               sen_curve = 0.3, w_sen = 1000))
+    w <- params@w
+    result <- reefSenMort(params)
+    i_1kg <- which.min(abs(log10(w) - 3))
+    expect_equal(result[1, i_1kg], 0.1 * (w[i_1kg] / 1000)^0.3)
+    # Increasing with size, and the same for every species
+    for (i in 1:3) {
+        expect_true(all(diff(result[i, ]) > 0))
+        expect_equal(result[i, ], result[1, ])
+    }
+})
+
+test_that("reefSenMort responds to setExtMortParams overrides", {
+    data(caribbean_3_model)
+    params <- setExtMortParams(caribbean_3_model,
+        ext_mort_params = data.frame(nat_mort = 0.2, sen_prop = 0.5,
+                                     sen_curve = 2, w_sen = 100)
     )
     w <- params@w
+    result <- reefSenMort(params)
+    expect_equal(unname(result[2, ]), 0.5 * (w / 100)^2)
+})
+
+test_that("reefSenMort uses w_sen = 1000 g for models without w_sen", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params@other_params$ext_mort_params$w_sen <- NULL
+    mort_params <- params@other_params$ext_mort_params
+    expect_equal(unname(reefSenMort(params)[1, ]),
+                 mort_params$sen_prop *
+                     (params@w / 1000)^mort_params$sen_curve)
+})
+
+test_that("reefSenMort uses the power form for models without sen_form", {
+    data(caribbean_3_model)
+    params <- setExtMortParams(caribbean_3_model)
+    expected <- reefSenMort(params)
+    params@other_params$ext_mort_params$sen_form <- NULL
+    expect_equal(reefSenMort(params), expected)
+})
+
+test_that("reefSenMort computes the deprecated log-ratio form", {
+    # sen_prop * max(0, log10(w) / log10(w_max[i]))^sen_curve, the form
+    # mizerReef used before 2.1.0, computed by hand per species
+    data(caribbean_3_model)
+    withr::local_options(lifecycle_verbosity = "quiet")
+    params <- setExtMortParams(caribbean_3_model, sen_form = "log_ratio")
+    mort_params <- params@other_params$ext_mort_params
+    w <- params@w
     w_max <- params@species_params$w_max
+
     expected <- matrix(0, nrow = 3, ncol = length(w))
     for (i in 1:3) {
         ratio <- log10(w) / log10(w_max[i])
         ratio[ratio < 0] <- 0
-        expected[i, ] <- 0.5 * ratio^2
+        expected[i, ] <- mort_params$sen_prop * ratio^mort_params$sen_curve
     }
-
     result <- reefSenMort(params)
-    expect_equal(unname(result), unname(expected))
+    expect_equal(unname(result), expected)
+
+    # Zero below 1 g and sen_prop at w_max, whatever w_sen is
+    for (i in 1:3) {
+        expect_equal(result[i, 1], 0)
+        expect_equal(result[i, ncol(result)], mort_params$sen_prop)
+    }
+    params@other_params$ext_mort_params$w_sen <- 1
+    expect_equal(reefSenMort(params), result)
 })

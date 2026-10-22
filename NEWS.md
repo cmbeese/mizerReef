@@ -53,6 +53,19 @@
   built models now get less detritus from faeces. Models upgraded with
   `upgradeReefParams()` keep `feces_decomp = 1`, and saved models without
   the setting behave as before.
+- **Senescence mortality now follows Rogers et al. (2014, 2018)**:
+  `sen_prop * (w / w_sen)^sen_curve`, the same for every species, with a new
+  senescence size `w_sen` (default 1000 g) in `setExtMortParams()`. The
+  previous form, `sen_prop * max(0, log10(w) / log10(w_max))^sen_curve`,
+  has no published source; it is deprecated, and still available with the
+  new `sen_form = "log_ratio"` argument of `setExtMortParams()` and
+  `newReefParams()`. Saved models, including `caribbean_3_model` and
+  `caribbean_10_model`, switch to the new form, so their results change.
+  For a group with a maximum size of 3.1 kg, small fish now die less (0.025
+  instead of 0.069 per year at 10 g) and fish above about 840 g die more
+  (0.141 instead of 0.100 per year at 3.1 kg). To keep the old rates, use
+  `setExtMortParams(params, params@other_params$ext_mort_params,
+  sen_form = "log_ratio")`.
 
 ## New features
 

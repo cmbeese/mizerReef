@@ -259,14 +259,18 @@ senescence-mortality parameters:
 
 ```{r, results = 'asis', echo = FALSE}
 ext_mort <- params@other_params[['ext_mort_params']]
+# Models saved before w_sen existed use the default, 1000 g
+w_sen <- if (is.null(ext_mort$w_sen)) 1000 else ext_mort$w_sen
 ```
 
 We use a residual natural mortality rate of $\mu_{nat} =$
 `r ext_mort$nat_mort` per year at size 1 gram, and senescence mortality
-parameters $k_{sen} =$ `r ext_mort$sen_prop` (`sen_prop`) and $p_{sen} =$
+parameters $k_{sen} =$ `r ext_mort$sen_prop` (`sen_prop`, the rate at the
+senescence size), $w_{sen} =$ `r w_sen` g (`w_sen`) and $p_{sen} =$
 `r ext_mort$sen_curve` (`sen_curve`, the exponent governing how steeply
-mortality climbs as individuals approach their maximum size), both based on
-estimates from @Hatcher_1988.
+mortality climbs with size). These are the values of @Rogers_2014 and
+@Rogers_2018, who cite @Lorenzen_1996 and @Hall_2006 for the senescence
+size and exponent.
 
 ### Fishing mortality
 

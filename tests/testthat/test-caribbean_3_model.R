@@ -9,7 +9,7 @@ test_that("caribbean_3_model's algae and detritus are genuinely at steady state"
     # shipped object's own state. This test checks the shipped object
     # directly, the same way test-caribbean_10_model.R does.
     data(caribbean_3_model)
-    m <- caribbean_3_model
+    m <- with_calibration_senescence(caribbean_3_model)
 
     # Algae has a carrying capacity, detritus does not
     expect_equal(m@other_dynamics$algae, "algae_dynamics_cc")
@@ -95,7 +95,8 @@ test_that("caribbean_3_species and caribbean_3_interaction rebuild caribbean_3_m
 
 test_that("caribbean_3_model is at steady state", {
     data(caribbean_3_model)
-    sim <- project(caribbean_3_model, t_max = 5, progress_bar = FALSE)
+    sim <- project(with_calibration_senescence(caribbean_3_model),
+                   t_max = 5, progress_bar = FALSE)
     b <- getBiomass(sim)
     expect_lt(max(abs(b[nrow(b), ] / b[1, ] - 1)), 1e-6)
 })

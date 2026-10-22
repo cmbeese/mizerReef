@@ -4,15 +4,23 @@
 \alias{setExtMortParams}
 \title{Set the parameters for external mortality}
 \usage{
-setExtMortParams(params, ext_mort_params = NULL)
+setExtMortParams(
+  params,
+  ext_mort_params = NULL,
+  sen_form = c("power", "log_ratio")
+)
 }
 \arguments{
 \item{params}{A \code{MizerParams} object.}
 
 \item{ext_mort_params}{Optional. A named list or matrix with columns/names
-'nat_mort', 'sen_prop', and 'sen_curve'. If NULL,
-defaults are used. All values must be numeric and
-non-negative.}
+'nat_mort', 'sen_prop', 'sen_curve' and, optionally,
+'w_sen' (default 1000 g). If NULL, defaults are
+used. All values must be numeric and non-negative.}
+
+\item{sen_form}{The senescence mortality formula: \code{"power"} (the default,
+Rogers et al. 2018) or \code{"log_ratio"} (deprecated, the form used before
+mizerReef 2.1.0). See the Senescence mortality section.}
 }
 \value{
 A \code{MizerParams} object with updated external mortality parameters
@@ -32,13 +40,16 @@ Set the parameters for external mortality
 
  Residual natural mortality is modeled as an allometric function of body
  size, decreasing with increasing size. Senescence mortality is modeled
- as a power function of relative size, allowing flexible control over
- the rate and scaling of age-related death.
+ as a power function of body size relative to a senescence size,
+ increasing with size.
 
  If no parameters are provided, defaults are used: nat_mort = 0.2,
- sen_prop = 0.1, sen_curve = 0.3. All parameters must be numeric
- and non-negative. The function checks for required columns and
- valid values if a custom parameter set is provided.
+ sen_prop = 0.1, sen_curve = 0.3, w_sen = 1000. All parameters must be
+ numeric and non-negative. The function checks for required columns and
+ valid values if a custom parameter set is provided; `w_sen` may be
+ left out, in which case it is 1000 g. The list stored in
+ `other_params$ext_mort_params` also holds `sen_form`, and can be
+ passed back as `ext_mort_params` unchanged.
 }\if{html}{\out{</div>}}
 }
 
@@ -66,21 +77,35 @@ Set the parameters for external mortality
  mortality caused by background sources such as illness or age. The
  rate of senescence mortality (in 1/year) is given by:
 
+ \deqn{\mu_{sen}(w) = \mathtt{sen\_prop}\,
+           \left(\frac{w}{w_{sen}}\right)^{\mathtt{sen\_curve}}}{
+          \mu_{sen}(w) = sen_prop * (w / w_sen)^sen_curve}
+
+ where \eqn{\mathtt{sen\_prop}} is the rate at the senescence size
+ \eqn{w_{sen}} (`w_sen`, in grams) and \eqn{\mathtt{sen\_curve}} is
+ the exponent shaping the senescence curve. The rate is the same
+ function of size for every species. This is the senescence mortality
+ of Rogers et al. (2014, 2018), where \eqn{\mathtt{sen\_prop} = 0.1},
+ \eqn{w_{sen} = 10^3} g and \eqn{\mathtt{sen\_curve} = 0.3}. Rogers
+ et al. (2014) kept the senescence size and exponent of the North Sea
+ model of Blanchard et al. (2009), citing Lorenzen (1996) and Hall et
+ al. (2006).
+
+ `r lifecycle::badge("deprecated")` `sen_form = "log_ratio"` gives the
+ form mizerReef used before version 2.1.0:
+
  \deqn{\mu_{sen.i}(w) = \mathtt{sen\_prop}\,
-                             \left[\max\left(0,\;
-                             \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
-                             \right)\right]^{\mathtt{sen\_curve}}}{
+           \left[\max\left(0,\;
+           \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
+           \right)\right]^{\mathtt{sen\_curve}}}{
           \mu_{sen.i}(w) = sen_prop *
           max(0, log10(w)/log10(w_{max.i}))^sen_curve}
 
- where \eqn{\mathtt{sen\_curve}} is the exponent shaping the
- senescence curve and \eqn{\mathtt{sen\_prop}} is the rate the curve
- approaches as \eqn{w \to w_{max.i}} (where the ratio is exactly 1).
- The ratio is floored at zero before being raised to the
- \eqn{\mathtt{sen\_curve}} power, since it is negative for individuals
- below 1 gram (where \eqn{\log_{10}(w) < 0}), which would otherwise
- raise a negative number to a fractional power -- those individuals
- get exactly zero senescence mortality.
+ It is zero below 1 g and reaches \eqn{\mathtt{sen\_prop}} at each
+ species' maximum size \eqn{w_{max.i}}; `w_sen` is not used. Its
+ parameter values are Rogers et al.'s but the form is not, and no
+ published source for the form was found, so it is deprecated and
+ kept only to reproduce older results.
 }\if{html}{\out{</div>}}
 }
 
