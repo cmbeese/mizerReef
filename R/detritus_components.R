@@ -372,7 +372,10 @@ getDetritusProduction <- function(params, n = params@initial_n,
 
     # Decomposition of dead organisms
     ex_mort <- sum((params@mu_b * n) %*% (params@w * params@dw))
-    sen_mort <- getSenMort(params)
+    # reefSenMort(), not getSenMort(): this runs at every time step and
+    # getSenMort() validates the whole params object first, which took
+    # about half of a projection's time
+    sen_mort <- reefSenMort(params)
     sen_mort <- sum((sen_mort * n) %*% (params@w * params@dw))
 
     # Get proportions of decomposition
