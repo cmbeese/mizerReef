@@ -238,10 +238,12 @@ Default is "darkseagreen3".}
 \item{resource_color}{Character. Colour to use for the resource line in plots.
 Default is "lightseagreen".}
 
-\item{ext_mort_params}{Optional. A named list or matrix with columns/names
-'nat_mort', 'sen_prop', 'sen_curve' and, optionally,
-'w_sen' (default 1000 g). If NULL, defaults are
-used. All values must be numeric and non-negative.}
+\item{ext_mort_params}{Optional. A named list, data frame, one-row matrix
+or named numeric vector with 'nat_mort',
+'sen_prop', 'sen_curve' and, optionally, 'w_sen'
+(default 1000 g). If NULL, defaults are used. All
+values must be single non-negative numbers
+(\code{w_sen} positive).}
 
 \item{sen_form}{The senescence mortality formula: \code{"power"} (the default,
 Rogers et al. 2018) or \code{"log_ratio"} (deprecated, the form used before

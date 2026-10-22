@@ -344,11 +344,13 @@ $p_{sen}$ (`sen_curve`, mizerReef default $0.3$) controls how steeply
 mortality climbs with size. This is the form and the default values of
 @Rogers_2014 and @Rogers_2018, who cite @Lorenzen_1996 and @Hall_2006 for
 the senescence size and exponent. `nat_mort`, `sen_prop`, `sen_curve` and
-`w_sen` are set together through `setExtMortParams()`'s `ext_mort_params`
-argument -- pass your own values there rather than accepting the package
-defaults if you have system-specific estimates. Senescence mortality itself
-is included by default (`include_sen_mort = TRUE` in `newReefParams()`) but
-can be turned off.
+`w_sen` are set together through the `ext_mort_params` argument of
+`newReefParams()` -- pass your own values there rather than accepting the
+package defaults if you have system-specific estimates. On an existing
+model, `setExtMortParams()` changes the senescence settings, but not the
+residual natural mortality already built into the model. Senescence
+mortality itself is included by default (`include_sen_mort = TRUE` in
+`newReefParams()`) but can be turned off.
 
 Versions of mizerReef before 2.1.0 used a different form,
 $k_{sen} \left[\max\left(0, \log_{10} w / \log_{10} w_{max.i}\right)\right]^{p_{sen}}$,

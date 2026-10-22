@@ -13,10 +13,12 @@ setExtMortParams(
 \arguments{
 \item{params}{A \code{MizerParams} object.}
 
-\item{ext_mort_params}{Optional. A named list or matrix with columns/names
-'nat_mort', 'sen_prop', 'sen_curve' and, optionally,
-'w_sen' (default 1000 g). If NULL, defaults are
-used. All values must be numeric and non-negative.}
+\item{ext_mort_params}{Optional. A named list, data frame, one-row matrix
+or named numeric vector with 'nat_mort',
+'sen_prop', 'sen_curve' and, optionally, 'w_sen'
+(default 1000 g). If NULL, defaults are used. All
+values must be single non-negative numbers
+(\code{w_sen} positive).}
 
 \item{sen_form}{The senescence mortality formula: \code{"power"} (the default,
 Rogers et al. 2018) or \code{"log_ratio"} (deprecated, the form used before
@@ -36,8 +38,11 @@ Set the parameters for external mortality
 
 External mortality in mizerReef includes residual natural mortality and
 senescence mortality, representing background sources of death not
-explicitly modeled (e.g., predation, disease, aging). This function allows
-you to set or override the default rates and scaling for these processes.
+explicitly modeled (e.g., predation, disease, aging). This function stores
+the settings for both. Senescence mortality uses them straight away, but
+residual natural mortality is put into the model's external mortality
+rate only when \code{\link[=newReefParams]{newReefParams()}} builds the model, so to change
+\code{nat_mort} pass it to \code{\link[=newReefParams]{newReefParams()}}'s \code{ext_mort_params}.
 
 Residual natural mortality is modeled as an allometric function of body
 size, decreasing with increasing size. Senescence mortality is modeled as a
@@ -46,7 +51,8 @@ size.
 
 If no parameters are provided, defaults are used: nat_mort = 0.2,
 sen_prop = 0.1, sen_curve = 0.3, w_sen = 1000. All parameters must be
-numeric and non-negative. The function checks for required columns and
+single non-negative numbers (\code{w_sen} positive), the same for every
+species. The function checks for required columns and
 valid values if a custom parameter set is provided; \code{w_sen} may be left
 out, in which case it is 1000 g. The list stored in
 \code{other_params$ext_mort_params} also holds \code{sen_form}, and can be passed

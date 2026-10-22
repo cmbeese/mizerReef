@@ -99,7 +99,8 @@ test_that("caribbean_10_model's algae and detritus are genuinely at steady state
     # algae_growth left at newReefParams()'s raw untuned default (2000),
     # so algae/detritus were confirmed NOT at steady state (dB/dt far from
     # zero). The current object is tuneUR()'s output, which should give
-    # dB/dt = 0 for both resources.
+    # dB/dt = 0 for both resources under the senescence form it was
+    # calibrated with (see with_calibration_senescence()).
     data(caribbean_10_model)
     m <- with_calibration_senescence(caribbean_10_model)
 

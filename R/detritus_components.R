@@ -331,10 +331,10 @@ plotDetritusConsumption <- function(params) {
 #'  production from decomposing dead organisms is given by:
 #'
 #'  \deqn{p_{D.d} = \mathtt{sen\_decomp}\,
-#'                  \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
+#'                  \sum_i\int\mu_{sen}(w)N_i(w)w\,dw +
 #'                  \mathtt{ext\_decomp}\,
 #'                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}{
-#'      p_{D.d} = sen_decomp * \sum_i\int\mu_{seni.i}(w)N_i(w)w\,dw +
+#'      p_{D.d} = sen_decomp * \sum_i\int\mu_{sen}(w)N_i(w)w\,dw +
 #'                  ext_decomp *
 #'                  \sum_i\int\mu_{nat.i}(w)N_i(w)w\,dw}
 #'

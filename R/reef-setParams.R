@@ -347,8 +347,11 @@ setDetritusParams <- function(params,
 #'
 #' External mortality in mizerReef includes residual natural mortality and
 #' senescence mortality, representing background sources of death not
-#' explicitly modeled (e.g., predation, disease, aging). This function allows
-#' you to set or override the default rates and scaling for these processes.
+#' explicitly modeled (e.g., predation, disease, aging). This function stores
+#' the settings for both. Senescence mortality uses them straight away, but
+#' residual natural mortality is put into the model's external mortality
+#' rate only when [newReefParams()] builds the model, so to change
+#' `nat_mort` pass it to [newReefParams()]'s `ext_mort_params`.
 #'
 #' Residual natural mortality is modeled as an allometric function of body
 #' size, decreasing with increasing size. Senescence mortality is modeled as a
@@ -357,7 +360,8 @@ setDetritusParams <- function(params,
 #'
 #' If no parameters are provided, defaults are used: nat_mort = 0.2,
 #' sen_prop = 0.1, sen_curve = 0.3, w_sen = 1000. All parameters must be
-#' numeric and non-negative. The function checks for required columns and
+#' single non-negative numbers (`w_sen` positive), the same for every
+#' species. The function checks for required columns and
 #' valid values if a custom parameter set is provided; `w_sen` may be left
 #' out, in which case it is 1000 g. The list stored in
 #' `other_params$ext_mort_params` also holds `sen_form`, and can be passed
@@ -410,10 +414,12 @@ setDetritusParams <- function(params,
 #' was found, so it is deprecated and kept only to reproduce older results.
 #'
 #' @param params A `MizerParams` object.
-#' @param ext_mort_params Optional. A named list or matrix with columns/names
-#'                        'nat_mort', 'sen_prop', 'sen_curve' and, optionally,
-#'                        'w_sen' (default 1000 g). If NULL, defaults are
-#'                        used. All values must be numeric and non-negative.
+#' @param ext_mort_params Optional. A named list, data frame, one-row matrix
+#'                        or named numeric vector with 'nat_mort',
+#'                        'sen_prop', 'sen_curve' and, optionally, 'w_sen'
+#'                        (default 1000 g). If NULL, defaults are used. All
+#'                        values must be single non-negative numbers
+#'                        (`w_sen` positive).
 #' @param sen_form The senescence mortality formula: `"power"` (the default,
 #'   Rogers et al. 2018) or `"log_ratio"` (deprecated, the form used before
 #'   mizerReef 2.1.0). If not given and `ext_mort_params` is a list stored by
@@ -496,10 +502,17 @@ set_ext_mort_params <- function(params, ext_mort_params, sen_form) {
             stop("Each external mortality parameter should be a single ",
                  "number: the same values apply to every species.")
         }
+        if (is.null(names(ext_mort_params)) ||
+            any(is.na(names(ext_mort_params)) | names(ext_mort_params) == "")) {
+            stop("Every external mortality parameter should be named.")
+        }
         w_sen <- ext_mort_params[["w_sen"]]
         if (!is.null(w_sen) && !(is.finite(w_sen) && w_sen > 0)) {
             stop("The senescence size 'w_sen' should be a positive number ",
                  "(in grams).")
+        }
+        if (anyNA(unlist(ext_mort_params))) {
+            stop("The external mortality parameters should not be NA.")
         }
         if (!all(unlist(ext_mort_params) >= 0)) {
             stop("The external mortality parameters should be
@@ -912,10 +925,9 @@ setRefuge <- function(params, method, method_params = NULL,
             # Calculate default satiation values based on feeding behavior.
             # In mizerReef, satiation-mediated consumption is intended to be
             # exclusive to detritivory (see algae_consumption()'s "Algae
-            # consumption" section, and setExtMortParams()'s thesis-matched
-            # design): species that graze algae behave like unregulated
-            # herbivores and should default to FALSE even if they also eat
-            # some detritus, since a species that both grazes and
+            # consumption" section): species that graze algae behave like
+            # unregulated herbivores and should default to FALSE even if
+            # they also eat some detritus, since a species that both grazes and
             # scavenges is herbivore-like in this respect, not a pure
             # detritivore. Only species whose diet is detritus without any
             # algae grazing, and that do not also eat other species,

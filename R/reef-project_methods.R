@@ -853,6 +853,11 @@ reefSenMort <- function(params, ...) {
     mort_params <- params@other_params[["ext_mort_params"]]
     sen_prop <- mort_params[["sen_prop"]]
     sen_curve <- mort_params[["sen_curve"]]
+    if (is.null(sen_prop) || is.null(sen_curve)) {
+        stop("The model has no senescence settings ",
+             "(other_params$ext_mort_params); set them with ",
+             "setExtMortParams().")
+    }
     # Models built before sen_form and w_sen existed get the defaults
     sen_form <- mort_params[["sen_form"]]
     if (is.null(sen_form)) sen_form <- "power"

@@ -155,3 +155,17 @@ test_that("newReefParams passes sen_form to setExtMortParams", {
     p3 <- build(ext_mort_params = stored, sen_form = "power")
     expect_equal(p3@other_params$ext_mort_params$sen_form, "power")
 })
+
+test_that("setExtMortParams rejects unnamed entries and NA values", {
+    data(caribbean_3_model)
+    expect_error(
+        setExtMortParams(caribbean_3_model, list(
+            nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3, 1000)),
+        "should be named"
+    )
+    expect_error(
+        setExtMortParams(caribbean_3_model, list(
+            nat_mort = 0.2, sen_prop = NA_real_, sen_curve = 0.3)),
+        "should not be NA"
+    )
+})

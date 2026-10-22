@@ -7,7 +7,9 @@ test_that("caribbean_3_model's algae and detritus are genuinely at steady state"
     # dB_D/dt was actually 120.1861, not zero, despite existing tuneUR tests
     # only ever checking a *fresh* tuneUR() call's output rather than the
     # shipped object's own state. This test checks the shipped object
-    # directly, the same way test-caribbean_10_model.R does.
+    # directly, the same way test-caribbean_10_model.R does, with the
+    # senescence form it was calibrated with put back (see
+    # with_calibration_senescence()).
     data(caribbean_3_model)
     m <- with_calibration_senescence(caribbean_3_model)
 

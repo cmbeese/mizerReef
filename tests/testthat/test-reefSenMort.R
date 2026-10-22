@@ -106,3 +106,10 @@ test_that("reefSenMort returns a species x size array with dimnames", {
                          dimnames(params@initial_n))
     }
 })
+
+test_that("reefSenMort errors when the model has no senescence settings", {
+    data(caribbean_3_model)
+    params <- caribbean_3_model
+    params@other_params$ext_mort_params <- NULL
+    expect_error(reefSenMort(params), "no senescence settings")
+})

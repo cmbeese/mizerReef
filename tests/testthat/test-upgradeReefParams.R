@@ -57,7 +57,9 @@ make_fake_v1 <- function(method = "binned",
         ext_decomp = op$detritus$ext_decomp,
         initial_d_external = 1,
         detritus_capacity = op$detritus$capacity,
-        ext_mort_params = op$ext_mort_params,
+        # mizerReef 1.x had no w_sen or sen_form
+        ext_mort_params = op$ext_mort_params[c("nat_mort", "sen_prop",
+                                               "sen_curve")],
         algae = list(rho = op$algae$rho, growth = op$algae$growth),
         detritus = list(
             rho = op$detritus$rho, sen_decomp = op$detritus$sen_decomp,
