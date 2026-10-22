@@ -85,6 +85,12 @@
 
 ## Bug fixes
 
+- `reefSteady()` now works on models with constant recruitment (the
+  `"constantRDD"` rate function). It holds recruitment fixed while
+  settling by switching to constant recruitment itself, and afterwards
+  deleted the model's `constant_reproduction` rates and refitted
+  Beverton-Holt parameters. Such models now keep their rates.
+
 - `getDiet()` and `plotDiet()` now account for predation refuge. mizerReef
   had no `getDiet()` method, so mizer's own computed the diet of predators
   blocked by refuge (`blocked_pred = TRUE`) from the whole prey population.

@@ -35,6 +35,13 @@
 #' `new_refuge == TRUE`, in which case algae and detritus are left
 #' completely untouched.
 #'
+#' Recruitment is held at its current rate while the fish sub-model
+#' converges. Afterwards a model with Beverton-Holt recruitment gets its
+#' reproduction parameters back (see `preserve`). A model with constant
+#' recruitment (the `"constantRDD"` rate function, with the rates in the
+#' `constant_reproduction` species parameter) keeps its rates unchanged,
+#' and `preserve` is ignored.
+#'
 #' `reefSteady()` is also registered as the [mizer::steady()] and
 #' [mizer::tuneSteadyState()] method for `mizerReef` objects, so calling
 #' either of those on a reef model does the reef-aware thing. Earlier
@@ -121,6 +128,8 @@ reefSteady <- function(params, d_func = NULL,
     # then withdraw the column again on every call.
     params@species_params$constant_reproduction <- mizer::getRDD(params)
     old_rdd_fun <- params@rates_funcs$RDD
+    # A model with constant recruitment keeps its rates afterwards
+    constant_recruitment <- identical(old_rdd_fun, "constantRDD")
     params@rates_funcs$RDD <- "constantRDD"
 
     # Force other components to stay at current level, EXCEPT algae: algae
@@ -190,7 +199,9 @@ reefSteady <- function(params, d_func = NULL,
     # Restore original RDD and other dynamics
     params@rates_funcs$RDD <- old_rdd_fun
     params@other_dynamics <- old_other_dynamics
-    params@species_params$constant_reproduction <- NULL
+    if (!constant_recruitment) {
+        params@species_params$constant_reproduction <- NULL
+    }
 
     # algae and detritus ----
     if (params@other_params$new_refuge == FALSE) {
@@ -220,7 +231,9 @@ reefSteady <- function(params, d_func = NULL,
         }
     }
 
-    if (preserve == "reproduction_level") {
+    if (constant_recruitment) {
+        # Nothing to refit: recruitment stays at the constant rates
+    } else if (preserve == "reproduction_level") {
         params <- mizer::setBevertonHolt(params,
             reproduction_level = old_reproduction_level
         )

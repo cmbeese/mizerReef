@@ -99,6 +99,13 @@ and to make algae's (already live-evolved) biomass exact, unless
 \code{new_refuge == TRUE}, in which case algae and detritus are left
 completely untouched.
 
+Recruitment is held at its current rate while the fish sub-model
+converges. Afterwards a model with Beverton-Holt recruitment gets its
+reproduction parameters back (see \code{preserve}). A model with constant
+recruitment (the \code{"constantRDD"} rate function, with the rates in the
+\code{constant_reproduction} species parameter) keeps its rates unchanged,
+and \code{preserve} is ignored.
+
 \code{reefSteady()} is also registered as the \code{\link[mizer:steady]{mizer::steady()}} and
 \code{\link[mizer:tuneSteadyState]{mizer::tuneSteadyState()}} method for \code{mizerReef} objects, so calling
 either of those on a reef model does the reef-aware thing. Earlier

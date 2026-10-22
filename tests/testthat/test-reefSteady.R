@@ -155,3 +155,18 @@ test_that("tuneSteadyState() on a reef model refuses the Newton solver", {
     expect_error(mizer::tuneSteadyState(caribbean_3_model, solver = "newton"),
                  "supports only")
 })
+
+test_that("reefSteady keeps a model's constant recruitment", {
+    # A model with constantRDD keeps its rate function and rates, and no
+    # Beverton-Holt parameters are refitted
+    data(caribbean_3_model)
+    p <- with_calibration_senescence(caribbean_3_model)
+    rdd <- getRDD(p)
+    species_params(p, recalculate = FALSE)$constant_reproduction <- rdd
+    p <- setRateFunction(p, "RDD", "constantRDD")
+    q <- reefSteady(p, progress_bar = FALSE, info_level = 0)
+    expect_identical(q@rates_funcs$RDD, "constantRDD")
+    expect_equal(getRDD(q), rdd)
+    expect_equal(q@species_params$erepro, p@species_params$erepro)
+    expect_equal(q@species_params$R_max, p@species_params$R_max)
+})
