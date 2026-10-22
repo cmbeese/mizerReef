@@ -40,7 +40,7 @@ test_that("setExtMortParams normalises a data.frame/matrix input to the same lis
                  result_mat@other_params$ext_mort_params)
 })
 
-test_that("setExtMortParams rejects negative values, missing required names and w_sen = 0", {
+test_that("setExtMortParams rejects negative values, missing required names and a bad w_sen", {
     data(caribbean_3_model)
     params <- caribbean_3_model
     expect_error(
@@ -51,11 +51,28 @@ test_that("setExtMortParams rejects negative values, missing required names and 
         setExtMortParams(params, ext_mort_params = list(sen_prop = 0.1, sen_curve = 0.3)),
         "nat_mort"
     )
-    expect_error(
-        setExtMortParams(params, ext_mort_params = list(nat_mort = 0.2, sen_prop = 0.1,
-                                                        sen_curve = 0.3, w_sen = 0)),
-        "positive"
+    for (bad in list(0, NA_real_, Inf, c(500, 1000))) {
+        expect_error(
+            setExtMortParams(params, ext_mort_params = list(
+                nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3, w_sen = bad)),
+            "single positive number"
+        )
+    }
+})
+
+test_that("setExtMortParams warns about and drops unknown names", {
+    # A misspelt w_sen must not be taken as w_sen (partial matching) or
+    # leave an empty entry behind
+    data(caribbean_3_model)
+    expect_warning(
+        result <- setExtMortParams(caribbean_3_model, ext_mort_params = list(
+            nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3,
+            w_senescence = 500)),
+        "unknown external mortality parameters: w_senescence"
     )
+    expect_equal(result@other_params$ext_mort_params,
+                 list(nat_mort = 0.2, sen_prop = 0.1, sen_curve = 0.3,
+                      w_sen = 1000, sen_form = "power"))
 })
 
 test_that("setExtMortParams rejects an unknown sen_form", {
@@ -101,4 +118,12 @@ test_that("newReefParams passes sen_form to setExtMortParams", {
     expect_equal(build()@other_params$ext_mort_params$sen_form, "power")
     lifecycle::expect_deprecated(p <- build(sen_form = "log_ratio"))
     expect_equal(p@other_params$ext_mort_params$sen_form, "log_ratio")
+
+    # A stored list passed back keeps its form, as in setExtMortParams(),
+    # unless sen_form is given
+    stored <- p@other_params$ext_mort_params
+    lifecycle::expect_deprecated(p2 <- build(ext_mort_params = stored))
+    expect_equal(p2@other_params$ext_mort_params, stored)
+    p3 <- build(ext_mort_params = stored, sen_form = "power")
+    expect_equal(p3@other_params$ext_mort_params$sen_form, "power")
 })

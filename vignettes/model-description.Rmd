@@ -355,7 +355,9 @@ Versions of mizerReef before 2.1.0 used a different form,
 $k_{sen} \left[\max\left(0, \log_{10} w / \log_{10} w_{max.i}\right)\right]^{p_{sen}}$,
 which is zero below 1 g and reaches $k_{sen}$ at each group's maximum
 weight $w_{max.i}$. It is deprecated, and kept only to reproduce older
-results: `setExtMortParams(params, sen_form = "log_ratio")`.
+results. To switch a model back to it while keeping its other
+external-mortality settings, use
+`setExtMortParams(params, params@other_params$ext_mort_params, sen_form = "log_ratio")`.
 
 ## Resource mortality
 

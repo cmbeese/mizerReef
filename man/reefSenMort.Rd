@@ -30,40 +30,36 @@ and \code{w_sen} existed use the power form with \code{w_sen} = 1000 g.
 \section{Senescence mortality}{
 
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
- mortality caused by background sources such as illness or age. The
- rate of senescence mortality (in 1/year) is given by:
+Senescence mortality \eqn{\mu_{sen}(w)} is used to represent mortality
+caused by background sources such as illness or age. The rate of
+senescence mortality (in 1/year) is given by:
 
- \deqn{\mu_{sen}(w) = \mathtt{sen\_prop}\,
-           \left(\frac{w}{w_{sen}}\right)^{\mathtt{sen\_curve}}}{
-          \mu_{sen}(w) = sen_prop * (w / w_sen)^sen_curve}
+\deqn{\mu_{sen}(w) = \mathtt{sen\_prop}\,
+  \left(\frac{w}{w_{sen}}\right)^{\mathtt{sen\_curve}}}{
+  \mu_{sen}(w) = sen_prop * (w / w_sen)^sen_curve}
 
- where \eqn{\mathtt{sen\_prop}} is the rate at the senescence size
- \eqn{w_{sen}} (`w_sen`, in grams) and \eqn{\mathtt{sen\_curve}} is
- the exponent shaping the senescence curve. The rate is the same
- function of size for every species. This is the senescence mortality
- of Rogers et al. (2014, 2018), where \eqn{\mathtt{sen\_prop} = 0.1},
- \eqn{w_{sen} = 10^3} g and \eqn{\mathtt{sen\_curve} = 0.3}. Rogers
- et al. (2014) kept the senescence size and exponent of the North Sea
- model of Blanchard et al. (2009), citing Lorenzen (1996) and Hall et
- al. (2006).
+where \eqn{\mathtt{sen\_prop}} is the rate at the senescence size
+\eqn{w_{sen}} (\code{w_sen}, in grams) and \eqn{\mathtt{sen\_curve}} is the
+exponent shaping the senescence curve. The rate is the same function of
+size for every species. This is the senescence mortality of Rogers et al.
+(2014, 2018), where \eqn{\mathtt{sen\_prop} = 0.1}, \eqn{w_{sen} = 10^3} g
+and \eqn{\mathtt{sen\_curve} = 0.3}. Rogers et al. (2014) kept the
+senescence size and exponent of the North Sea model of Blanchard et al.
+(2009), citing Lorenzen (1996) and Hall et al. (2006).
 
- `r lifecycle::badge("deprecated")` `sen_form = "log_ratio"` gives the
- form mizerReef used before version 2.1.0:
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} \code{sen_form = "log_ratio"} gives the form
+mizerReef used before version 2.1.0:
 
- \deqn{\mu_{sen.i}(w) = \mathtt{sen\_prop}\,
-           \left[\max\left(0,\;
-           \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
-           \right)\right]^{\mathtt{sen\_curve}}}{
-          \mu_{sen.i}(w) = sen_prop *
-          max(0, log10(w)/log10(w_{max.i}))^sen_curve}
+\deqn{\mu_{sen.i}(w) = \mathtt{sen\_prop}\,
+  \left[\max\left(0,\;
+  \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
+  \right)\right]^{\mathtt{sen\_curve}}}{
+  \mu_{sen.i}(w) = sen_prop * max(0, log10(w)/log10(w_{max.i}))^sen_curve}
 
- It is zero below 1 g and reaches \eqn{\mathtt{sen\_prop}} at each
- species' maximum size \eqn{w_{max.i}}; `w_sen` is not used. Its
- parameter values are Rogers et al.'s but the form is not, and no
- published source for the form was found, so it is deprecated and
- kept only to reproduce older results.
-}\if{html}{\out{</div>}}
+It is zero below 1 g and reaches \eqn{\mathtt{sen\_prop}} at each species'
+maximum size \eqn{w_{max.i}}; \code{w_sen} is not used. Its parameter values are
+Rogers et al.'s but the form is not, and no published source for the form
+was found, so it is deprecated and kept only to reproduce older results.
 }
 
 \concept{extmort}

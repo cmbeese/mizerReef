@@ -345,74 +345,69 @@ setDetritusParams <- function(params,
 #'
 #' @section External mortality in mizerReef:
 #'
-#'      External mortality in mizerReef includes residual natural mortality
-#'      and senescence mortality, representing background sources of death
-#'      not explicitly modeled (e.g., predation, disease, aging). This function
-#'      allows you to set or override the default rates and scaling for these
-#'      processes.
+#' External mortality in mizerReef includes residual natural mortality and
+#' senescence mortality, representing background sources of death not
+#' explicitly modeled (e.g., predation, disease, aging). This function allows
+#' you to set or override the default rates and scaling for these processes.
 #'
-#'      Residual natural mortality is modeled as an allometric function of body
-#'      size, decreasing with increasing size. Senescence mortality is modeled
-#'      as a power function of body size relative to a senescence size,
-#'      increasing with size.
+#' Residual natural mortality is modeled as an allometric function of body
+#' size, decreasing with increasing size. Senescence mortality is modeled as a
+#' power function of body size relative to a senescence size, increasing with
+#' size.
 #'
-#'      If no parameters are provided, defaults are used: nat_mort = 0.2,
-#'      sen_prop = 0.1, sen_curve = 0.3, w_sen = 1000. All parameters must be
-#'      numeric and non-negative. The function checks for required columns and
-#'      valid values if a custom parameter set is provided; `w_sen` may be
-#'      left out, in which case it is 1000 g. The list stored in
-#'      `other_params$ext_mort_params` also holds `sen_form`, and can be
-#'      passed back as `ext_mort_params` unchanged.
+#' If no parameters are provided, defaults are used: nat_mort = 0.2,
+#' sen_prop = 0.1, sen_curve = 0.3, w_sen = 1000. All parameters must be
+#' numeric and non-negative. The function checks for required columns and
+#' valid values if a custom parameter set is provided; `w_sen` may be left
+#' out, in which case it is 1000 g. The list stored in
+#' `other_params$ext_mort_params` also holds `sen_form`, and can be passed
+#' back as `ext_mort_params` unchanged.
 #'
 #' @section Residual natural mortality:
 #'
-#'      Residual natural mortality accounts for any external predation or
-#'      fishing mortality that is not explicitly included in the model. It is
-#'      assumed to decrease allometrically with body size. Residual natural
-#'      mortality is a rate with units 1/year given by:
+#' Residual natural mortality accounts for any external predation or fishing
+#' mortality that is not explicitly included in the model. It is assumed to
+#' decrease allometrically with body size. Residual natural mortality is a
+#' rate with units 1/year given by:
 #'
-#'      \deqn{\mu_{nat.i}(w) = \mu_{nat}\, w^{n-1}.}
-#'           {\mu_{nat.i}(w) = \mu_{nat}\, w^{n-1}.}
+#' \deqn{\mu_{nat.i}(w) = \mu_{nat}\, w^{n-1}.}{\mu_{nat.i}(w) = \mu_{nat}\, w^{n-1}.}
 #'
-#'       Here \eqn{\mu_{nat}} is the residual natural mortality rate at size
-#'       1 g and \eqn{n} is the allometric scaling exponent. In mizerReef,
-#'       these default to \eqn{\mu_{nat} = 0.2} and \eqn{n = 0.75}.
+#' Here \eqn{\mu_{nat}} is the residual natural mortality rate at size 1 g and
+#' \eqn{n} is the allometric scaling exponent. In mizerReef, these default to
+#' \eqn{\mu_{nat} = 0.2} and \eqn{n = 0.75}.
 #'
 #' @section Senescence mortality:
 #'
-#'      Senescence mortality \eqn{\mu_{sen.i}(w)} is used to represent
-#'      mortality caused by background sources such as illness or age. The
-#'      rate of senescence mortality (in 1/year) is given by:
+#' Senescence mortality \eqn{\mu_{sen}(w)} is used to represent mortality
+#' caused by background sources such as illness or age. The rate of
+#' senescence mortality (in 1/year) is given by:
 #'
-#'      \deqn{\mu_{sen}(w) = \mathtt{sen\_prop}\,
-#'            \left(\frac{w}{w_{sen}}\right)^{\mathtt{sen\_curve}}}{
-#'           \mu_{sen}(w) = sen_prop * (w / w_sen)^sen_curve}
+#' \deqn{\mu_{sen}(w) = \mathtt{sen\_prop}\,
+#'   \left(\frac{w}{w_{sen}}\right)^{\mathtt{sen\_curve}}}{
+#'   \mu_{sen}(w) = sen_prop * (w / w_sen)^sen_curve}
 #'
-#'      where \eqn{\mathtt{sen\_prop}} is the rate at the senescence size
-#'      \eqn{w_{sen}} (`w_sen`, in grams) and \eqn{\mathtt{sen\_curve}} is
-#'      the exponent shaping the senescence curve. The rate is the same
-#'      function of size for every species. This is the senescence mortality
-#'      of Rogers et al. (2014, 2018), where \eqn{\mathtt{sen\_prop} = 0.1},
-#'      \eqn{w_{sen} = 10^3} g and \eqn{\mathtt{sen\_curve} = 0.3}. Rogers
-#'      et al. (2014) kept the senescence size and exponent of the North Sea
-#'      model of Blanchard et al. (2009), citing Lorenzen (1996) and Hall et
-#'      al. (2006).
+#' where \eqn{\mathtt{sen\_prop}} is the rate at the senescence size
+#' \eqn{w_{sen}} (`w_sen`, in grams) and \eqn{\mathtt{sen\_curve}} is the
+#' exponent shaping the senescence curve. The rate is the same function of
+#' size for every species. This is the senescence mortality of Rogers et al.
+#' (2014, 2018), where \eqn{\mathtt{sen\_prop} = 0.1}, \eqn{w_{sen} = 10^3} g
+#' and \eqn{\mathtt{sen\_curve} = 0.3}. Rogers et al. (2014) kept the
+#' senescence size and exponent of the North Sea model of Blanchard et al.
+#' (2009), citing Lorenzen (1996) and Hall et al. (2006).
 #'
-#'      `r lifecycle::badge("deprecated")` `sen_form = "log_ratio"` gives the
-#'      form mizerReef used before version 2.1.0:
+#' `r lifecycle::badge("deprecated")` `sen_form = "log_ratio"` gives the form
+#' mizerReef used before version 2.1.0:
 #'
-#'      \deqn{\mu_{sen.i}(w) = \mathtt{sen\_prop}\,
-#'            \left[\max\left(0,\;
-#'            \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
-#'            \right)\right]^{\mathtt{sen\_curve}}}{
-#'           \mu_{sen.i}(w) = sen_prop *
-#'           max(0, log10(w)/log10(w_{max.i}))^sen_curve}
+#' \deqn{\mu_{sen.i}(w) = \mathtt{sen\_prop}\,
+#'   \left[\max\left(0,\;
+#'   \frac{\log_{10}(w)}{\log_{10}(w_{max.i})}
+#'   \right)\right]^{\mathtt{sen\_curve}}}{
+#'   \mu_{sen.i}(w) = sen_prop * max(0, log10(w)/log10(w_{max.i}))^sen_curve}
 #'
-#'      It is zero below 1 g and reaches \eqn{\mathtt{sen\_prop}} at each
-#'      species' maximum size \eqn{w_{max.i}}; `w_sen` is not used. Its
-#'      parameter values are Rogers et al.'s but the form is not, and no
-#'      published source for the form was found, so it is deprecated and
-#'      kept only to reproduce older results.
+#' It is zero below 1 g and reaches \eqn{\mathtt{sen\_prop}} at each species'
+#' maximum size \eqn{w_{max.i}}; `w_sen` is not used. Its parameter values are
+#' Rogers et al.'s but the form is not, and no published source for the form
+#' was found, so it is deprecated and kept only to reproduce older results.
 #'
 #' @param params A `MizerParams` object.
 #' @param ext_mort_params Optional. A named list or matrix with columns/names
@@ -421,7 +416,9 @@ setDetritusParams <- function(params,
 #'                        used. All values must be numeric and non-negative.
 #' @param sen_form The senescence mortality formula: `"power"` (the default,
 #'   Rogers et al. 2018) or `"log_ratio"` (deprecated, the form used before
-#'   mizerReef 2.1.0). See the Senescence mortality section.
+#'   mizerReef 2.1.0). If not given and `ext_mort_params` is a list stored by
+#'   this function, its `sen_form` is used. See the Senescence mortality
+#'   section.
 #' @return A `MizerParams` object with updated external mortality parameters
 #'         (stored in `other_params$ext_mort_params`).
 #' @concept extmort
@@ -429,6 +426,38 @@ setDetritusParams <- function(params,
 setExtMortParams <- function(params,
                              ext_mort_params = NULL,
                              sen_form = c("power", "log_ratio")) {
+    sen_form <- choose_sen_form(sen_form, !missing(sen_form), ext_mort_params)
+    if (sen_form == "log_ratio") warn_sen_log_ratio(parent.frame())
+    set_ext_mort_params(params, ext_mort_params, sen_form)
+}
+
+# The senescence form for setExtMortParams() and newReefParams(): the
+# `sen_form` argument if it was given, otherwise the form in an
+# ext_mort_params list stored by setExtMortParams(), otherwise "power".
+choose_sen_form <- function(sen_form, given, ext_mort_params) {
+    if (!given && is.list(ext_mort_params) &&
+        !is.null(ext_mort_params[["sen_form"]])) {
+        sen_form <- as.character(ext_mort_params[["sen_form"]])
+    }
+    match.arg(sen_form, c("power", "log_ratio"))
+}
+
+# Deprecation warning for sen_form = "log_ratio". `user_env` is the
+# environment the user called setExtMortParams() or newReefParams() from, so
+# lifecycle reports it as the user's own use rather than mizerReef's.
+warn_sen_log_ratio <- function(user_env) {
+    lifecycle::deprecate_warn(
+        "2.1.0",
+        I("The log-ratio senescence form (`sen_form = \"log_ratio\"`)"),
+        details = paste(
+            "Use the default `sen_form = \"power\"`, the form of",
+            "Rogers et al. (2018). See ?setExtMortParams."),
+        user_env = user_env)
+}
+
+# setExtMortParams() after the form has been chosen, without the deprecation
+# warning (newReefParams() gives that itself)
+set_ext_mort_params <- function(params, ext_mort_params, sen_form) {
     # object - Check if mizerParams is valid
     assert_that(inherits(params, "MizerParams"))
 
@@ -449,14 +478,17 @@ setExtMortParams <- function(params,
         if (is.data.frame(ext_mort_params)) {
             ext_mort_params <- as.list(ext_mort_params)
         }
-        # A list stored by this function also holds sen_form: use it unless
-        # the argument is given
-        if (!is.null(ext_mort_params[["sen_form"]])) {
-            if (missing(sen_form)) sen_form <- ext_mort_params[["sen_form"]]
-            ext_mort_params[["sen_form"]] <- NULL
-        }
+        # A stored list also holds sen_form, already read by
+        # choose_sen_form()
+        ext_mort_params[["sen_form"]] <- NULL
         if (!all(sapply(ext_mort_params, is.numeric))) {
             stop("The external mortality parameters should be numeric.")
+        }
+        w_sen <- ext_mort_params[["w_sen"]]
+        if (!is.null(w_sen) &&
+            !(length(w_sen) == 1 && is.finite(w_sen) && w_sen > 0)) {
+            stop("The senescence size 'w_sen' should be a single positive ",
+                 "number (in grams).")
         }
         if (!all(unlist(ext_mort_params) >= 0)) {
             stop("The external mortality parameters should be
@@ -475,27 +507,21 @@ setExtMortParams <- function(params,
                  called 'sen_curve' with the exponent for the external
                  curve.")
         }
-        if (is.null(ext_mort_params$w_sen)) {
-            ext_mort_params$w_sen <- 1000
-        } else if (ext_mort_params$w_sen <= 0) {
-            stop("The senescence size 'w_sen' should be positive.")
+        known <- c("nat_mort", "sen_prop", "sen_curve", "w_sen")
+        unknown <- setdiff(names(ext_mort_params), known)
+        if (length(unknown) > 0) {
+            warning("Ignoring unknown external mortality parameters: ",
+                    paste(unknown, collapse = ", "), ". The known ones are ",
+                    paste(known, collapse = ", "), ".")
         }
-        ext_mort_params <- ext_mort_params[c("nat_mort", "sen_prop",
-                                             "sen_curve", "w_sen")]
+        ext_mort_params <- ext_mort_params[intersect(known,
+                                                     names(ext_mort_params))]
     } else {
-        ext_mort_params <- vector("list", 4)
-        names(ext_mort_params) <- c("nat_mort", "sen_prop", "sen_curve",
-                                    "w_sen")
-        # Residual natural mortality
-        ext_mort_params$nat_mort <- 0.2
-        # Senescence
-        ext_mort_params$sen_prop <- 0.1
-        ext_mort_params$sen_curve <- 0.3
-        ext_mort_params$w_sen <- 1000
+        # Residual natural mortality and senescence
+        ext_mort_params <- list(nat_mort = 0.2, sen_prop = 0.1,
+                                sen_curve = 0.3)
     }
-
-    sen_form <- match.arg(sen_form)
-    if (sen_form == "log_ratio") warn_sen_log_ratio(parent.frame())
+    if (is.null(ext_mort_params[["w_sen"]])) ext_mort_params$w_sen <- 1000
     ext_mort_params$sen_form <- sen_form
 
     # Store in params
@@ -504,19 +530,6 @@ setExtMortParams <- function(params,
     params@time_modified <- lubridate::now()
 
     return(params)
-}
-
-# Deprecation warning for sen_form = "log_ratio". `user_env` is the
-# environment the user called setExtMortParams() or newReefParams() from, so
-# lifecycle reports it as the user's own use rather than mizerReef's.
-warn_sen_log_ratio <- function(user_env) {
-    lifecycle::deprecate_warn(
-        "2.1.0",
-        I("The log-ratio senescence form (`sen_form = \"log_ratio\"`)"),
-        details = paste(
-            "Use the default `sen_form = \"power\"`, the form of",
-            "Rogers et al. (2018). See ?setExtMortParams."),
-        user_env = user_env)
 }
 
 #' Set the refuge profile parameters

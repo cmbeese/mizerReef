@@ -856,6 +856,10 @@ reefSenMort <- function(params, ...) {
     # Models built before sen_form and w_sen existed get the defaults
     sen_form <- mort_params$sen_form
     if (is.null(sen_form)) sen_form <- "power"
+    if (length(sen_form) != 1 || !sen_form %in% c("power", "log_ratio")) {
+        stop("other_params$ext_mort_params$sen_form should be \"power\" ",
+             "or \"log_ratio\"; set it with setExtMortParams().")
+    }
     w_sen <- mort_params$w_sen
     if (is.null(w_sen)) w_sen <- 1000
 

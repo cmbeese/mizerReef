@@ -15,15 +15,17 @@ test_that("reefSenMort computes the documented senescence formula", {
 })
 
 test_that("reefSenMort equals sen_prop at w_sen and increases with size", {
-    # Rogers et al. (2018) Table S2: k_s = 0.1, m_s = 10^3 g, p_s = 0.3
+    # Rogers et al. (2018) Table S2: k_s = 0.1, m_s = 10^3 g, p_s = 0.3. The
+    # size grid has no point at exactly 1000 g, so w_sen is put on the grid
+    # point nearest 1 kg, where the rate must be exactly sen_prop.
     data(caribbean_3_model)
+    w <- caribbean_3_model@w
+    w_sen <- w[which.min(abs(log10(w) - 3))]
     params <- setExtMortParams(caribbean_3_model,
         ext_mort_params = list(nat_mort = 0.2, sen_prop = 0.1,
-                               sen_curve = 0.3, w_sen = 1000))
-    w <- params@w
+                               sen_curve = 0.3, w_sen = w_sen))
     result <- reefSenMort(params)
-    i_1kg <- which.min(abs(log10(w) - 3))
-    expect_equal(result[1, i_1kg], 0.1 * (w[i_1kg] / 1000)^0.3)
+    expect_equal(unname(result[, w == w_sen]), rep(0.1, 3))
     # Increasing with size, and the same for every species
     for (i in 1:3) {
         expect_true(all(diff(result[i, ]) > 0))
@@ -86,4 +88,11 @@ test_that("reefSenMort computes the deprecated log-ratio form", {
     }
     params@other_params$ext_mort_params$w_sen <- 1
     expect_equal(reefSenMort(params), result)
+})
+
+test_that("reefSenMort rejects an unknown stored sen_form", {
+    data(caribbean_3_model)
+    params <- setExtMortParams(caribbean_3_model)
+    params@other_params$ext_mort_params$sen_form <- "log-ratio"
+    expect_error(reefSenMort(params), "should be \"power\" or \"log_ratio\"")
 })

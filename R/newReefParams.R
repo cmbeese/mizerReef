@@ -125,9 +125,9 @@ newReefParams <- function( # Original mizer parameters
                           include_sen_mort = TRUE,
                           z0pre = 0.2,
                           info_level = mizer::default_info_level(), ...) {
-    sen_form <- match.arg(sen_form)
-    # Warned here rather than in setExtMortParams() below, so that lifecycle
-    # reports it as the user's own call
+    sen_form <- choose_sen_form(sen_form, !missing(sen_form), ext_mort_params)
+    # Warned here rather than when the external mortality is set below, so
+    # that lifecycle reports it as the user's own call
     if (sen_form == "log_ratio") warn_sen_log_ratio(parent.frame())
 
     # One handler for the whole construction: the reports raised by
@@ -256,17 +256,7 @@ newReefParams <- function( # Original mizer parameters
     )
 
     ### External mortality ----
-    params <- withCallingHandlers(
-        setExtMortParams(
-            params = params,
-            ext_mort_params = ext_mort_params,
-            sen_form = sen_form
-        ),
-        # Already warned at the top
-        lifecycle_warning_deprecated = function(cnd) {
-            tryInvokeRestart("muffleWarning")
-        }
-    )
+    params <- set_ext_mort_params(params, ext_mort_params, sen_form)
 
     ### Degradation ----
     if (isTRUE(degrade)) {
